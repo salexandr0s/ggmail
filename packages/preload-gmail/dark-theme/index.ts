@@ -66,8 +66,11 @@ function createColorToggle(body: HTMLElement, originals: Set<string>) {
     event.stopPropagation();
     const original = body.getAttribute(modeAttribute) === "dark";
     if (id) {
-      if (original) originals.add(id);
-      else originals.delete(id);
+      if (original) {
+        originals.add(id);
+      } else {
+        originals.delete(id);
+      }
     }
     setOriginal(original);
   });

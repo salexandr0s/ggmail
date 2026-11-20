@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import assert from "node:assert/strict";
+import { expect, test, type Page } from "@playwright/test";
 import { useApp } from "./lib/app";
 import { openSettingsPage } from "./lib/settings";
 
@@ -14,11 +15,19 @@ const html = `<body style="background: white"><header>Inbox</header><main role="
 <div class="ip"><div class="AD"><div id="draft" contenteditable role="textbox">${draft}</div></div></div>
 <div id="toolbar">Reply options</div></div></main></body>`;
 
+async function mailboxView(exclude?: Page) {
+  const find = () =>
+    ggmail.app
+      .windows()
+      .find((page) => page !== exclude && page.url() === ggmail.gmailStandIn.signInUrl);
+  await expect.poll(find).toBeDefined();
+  const page = find();
+  assert(page);
+  return page;
+}
+
 test("reading colors, original artwork and live settings preserve message and draft HTML", async () => {
-  const findAccount = () =>
-    ggmail.app.windows().find((page) => page.url() === ggmail.gmailStandIn.signInUrl);
-  await expect.poll(findAccount).toBeDefined();
-  const mail = findAccount()!;
+  const mail = await mailboxView();
   await mail.route(mailbox + "**", (route) =>
     route.fulfill({ contentType: "text/html", body: html }),
   );
@@ -51,8 +60,10 @@ test("reading colors, original artwork and live settings preserve message and dr
   await expect(copy).toHaveCSS("color", "rgb(0, 0, 0)");
 
   // Gmail mounts the new message and updates toolbar layout without a navigation.
+  await mail.locator("#toolbar").evaluate((el) => {
+    el.style.display = "none";
+  });
   await mail.locator("main").evaluate((main) => {
-    document.getElementById("toolbar")!.style.display = "none";
     const message = document.createElement("div");
     message.className = "adn";
     message.innerHTML = '<div class="a3s" id="late"><blockquote>A quoted line</blockquote></div>';
@@ -81,20 +92,12 @@ test("reading colors, original artwork and live settings preserve message and dr
 test("a workspace compose pop-out follows the setting and keeps an edited draft intact", async () => {
   // Open a real app-managed mail pop-out via the stand-in mailbox URL, then
   // navigate its workspace preload to the locally fulfilled Gmail document.
-  const findAccount = () =>
-    ggmail.app.windows().find((page) => page.url() === ggmail.gmailStandIn.signInUrl);
-  await expect.poll(findAccount).toBeDefined();
+  const account = await mailboxView();
   const popoutUrl = ggmail.gmailStandIn.gmailUrl + "/popout";
-  const account = findAccount()!;
   await account.evaluate((url) => {
     window.open(url, "_blank", "popup");
   }, popoutUrl);
-  const findPopout = () =>
-    ggmail.app
-      .windows()
-      .find((page) => page !== account && page.url() === ggmail.gmailStandIn.signInUrl);
-  await expect.poll(findPopout).toBeDefined();
-  const popout = findPopout()!;
+  const popout = await mailboxView(account);
   await popout.route(mailbox + "**", (route) =>
     route.fulfill({
       contentType: "text/html",
