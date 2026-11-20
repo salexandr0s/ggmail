@@ -10,11 +10,14 @@ const first = "194a92f8c0000001";
 const second = "194a92f8b0000002";
 const older = "1824ce6600000000";
 
+const senderPhoto = "https://lh3.googleusercontent.com/a/example";
+const picture = path.join(process.cwd(), "build/icons/32x32.png");
+
 const mail = {
   Work: {
     [first]: {
       subject: "Studio planning session",
-      sender: "Míra Chen",
+      sender: "Míra Chen &lt;studio@example.test&gt;",
       date: "2026-11-17",
       files: [
         ["Notes.txt", "8 KB"],
@@ -23,7 +26,7 @@ const mail = {
     },
     [second]: {
       subject: "Autumn identity review",
-      sender: "Theo Park",
+      sender: "Theo Park &lt;theo@example.test&gt;",
       date: "2026-11-19",
       files: [
         ["Identity overview.pdf", "2.4 MB"],
@@ -32,7 +35,7 @@ const mail = {
     },
     [older]: {
       subject: "Handover documents",
-      sender: "Lena Morris",
+      sender: "Lena Morris &lt;lena@example.test&gt;",
       date: "2026-11-12",
       files: [["Project handover.pdf", "1.2 MB"]],
     },
@@ -40,7 +43,7 @@ const mail = {
   Personal: {
     [first]: {
       subject: "Weekend in Vienna",
-      sender: "Alex Meyer",
+      sender: "Alex Meyer &lt;alex@personal.test&gt;",
       date: "2026-11-16",
       files: [
         ["Notes.txt", "4 KB"],
@@ -55,7 +58,7 @@ const mail = {
     },
     [older]: {
       subject: "November workshop",
-      sender: "Sam Ellis",
+      sender: "sam@workshop.test",
       date: "2026-11-13",
       files: [
         ["Workshop outline.docx", "92 KB"],
@@ -76,13 +79,36 @@ test.beforeEach(() => {
   fileRequests = 0;
 });
 
-const server = createServer((request, response) => {
+const server = createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", "http://localhost");
   const work = request.headers.cookie?.includes("library=work");
   const label = work ? "Work" : "Personal";
   const threads = mail[label];
+  if (url.searchParams.get("disp") === "thd") {
+    if (
+      work &&
+      url.searchParams.get("view") === "snatt" &&
+      url.searchParams.get("attid") === "0.1"
+    ) {
+      response.setHeader("Content-Type", "image/png");
+      response.end(await readFile(picture));
+    } else {
+      response.writeHead(404).end();
+    }
+    return;
+  }
   if (url.searchParams.get("view") === "att") {
     fileRequests++;
+    if (work && url.searchParams.get("th") === second && url.searchParams.get("attid") === "0.2") {
+      response.setHeader("Content-Type", "image/png");
+      response.end(await readFile(picture));
+      return;
+    }
+    if (work && url.searchParams.get("th") === older && url.searchParams.get("attid") === "0.1") {
+      response.setHeader("Content-Type", "application/pdf");
+      response.end(await readFile(path.join(process.cwd(), "tests/fixtures/project-handover.pdf")));
+      return;
+    }
     response.writeHead(200, {
       "Content-Disposition": 'attachment; filename="Notes.txt"',
       "Content-Type": "text/plain",
@@ -111,7 +137,7 @@ const server = createServer((request, response) => {
       )
       .join("");
     response.end(
-      `<table class="message"><tr><td>${thread.sender} &lt;studio@example.test&gt;</td><td>${thread.date}T12:00:00Z</td></tr><tr><td>${tiles}</td></tr></table>`,
+      `<table class="message"><tr><td>${work && id === first ? `<img src="${senderPhoto}">` : ""}${thread.sender}</td><td>${thread.date}T12:00:00Z</td></tr><tr><td>${tiles}</td></tr></table>`,
     );
     return;
   }
@@ -158,6 +184,17 @@ const ggmail = useApp(
   { env, args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
 );
 
+test.beforeEach(async () => {
+  await ggmail.renderer.route(senderPhoto, (route) => route.fulfill({ path: picture }));
+  await ggmail.renderer.route("https://www.google.com/s2/favicons?*", async (route) => {
+    if (new URL(route.request().url()).searchParams.get("domain") === "personal.test") {
+      await route.abort();
+    } else {
+      await route.fulfill({ path: path.join(process.cwd(), "build/icons/32x32.png") });
+    }
+  });
+});
+
 async function identifyWorkMailbox() {
   await ggmail.app.evaluate(async ({ session }, base) => {
     await session
@@ -172,8 +209,27 @@ test("browse, filter, preview, and download attachments in their own account", a
   await page.getByRole("button", { name: "Attachments", exact: true }).click();
   await expect(page.getByText("10 files")).toBeVisible();
   await expect(page.getByRole("button", { name: "Notes.txt" })).toHaveCount(2);
+  const senderColumn = page.locator(".attachment-row .attachment-from");
+  await expect(
+    senderColumn.filter({ hasText: "Míra Chen" }).first().locator("img"),
+  ).toHaveAttribute("src", senderPhoto);
+  await expect(
+    senderColumn.filter({ hasText: "sam@workshop.test" }).first().locator("img"),
+  ).toHaveAttribute("src", "https://www.google.com/s2/favicons?domain=workshop.test&sz=32");
+  await expect(
+    senderColumn.filter({ hasText: "Alex Meyer" }).first().locator('[data-slot="avatar-fallback"]'),
+  ).toHaveText("AM");
+  await expect(
+    senderColumn.filter({ hasText: "Inès Klein" }).locator('[data-slot="avatar-fallback"]'),
+  ).toHaveText("IK");
   expect(fileRequests).toBe(0);
   await page.screenshot({ path: test.info().outputPath("attachment-list.png") });
+  await page.getByRole("button", { name: "Wordmark studies.png" }).press("Enter");
+  const image = page.getByRole("dialog").getByRole("img", { name: "Wordmark studies.png" });
+  await expect(image).toBeVisible();
+  await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(32);
+  await page.keyboard.press("Escape");
+  await expect(image).toBeHidden();
   await page.getByRole("combobox", { name: "Sort by" }).click();
   await page.getByRole("option", { name: "File name", exact: true }).click();
   await expect(page.getByRole("listitem").first()).toContainText("City walks.zip");
@@ -194,21 +250,27 @@ test("browse, filter, preview, and download attachments in their own account", a
   const handoverCard = page
     .getByRole("listitem")
     .filter({ has: page.getByRole("button", { name: "Project handover.pdf" }) });
-  await handoverCard.click({ position: { x: 14, y: 14 } });
+  await expect(handoverCard).toHaveClass(/attachment-card/);
+  await expect(handoverCard.locator('[data-slot="avatar-image"]')).toBeVisible();
   await expect
-    .poll(async () =>
-      ggmail.app.evaluate(({ webContents }) =>
-        webContents
-          .getAllWebContents()
-          .map((w) => w.getURL())
-          .some((url) => url.endsWith("#all/" + "1824ce6600000000?projector=1&messagePartId=0.1")),
-      ),
+    .poll(() =>
+      handoverCard
+        .locator(".attachment-cover img")
+        .evaluateAll((images) => images.some((img) => (img as HTMLImageElement).naturalWidth > 0)),
     )
     .toBe(true);
-  await expect
-    .poll(async () => (await ggmail.readConfig()).accounts?.find((a) => a.selected)?.label)
-    .toBe("Work");
-  expect(await ggmail.runMenuCommand("Attachments")).toBe(true);
+  expect(fileRequests).toBe(1);
+  await handoverCard.click({ position: { x: 14, y: 14 } });
+  const pdf = page.getByRole("dialog", { name: "Project handover.pdf" });
+  await expect(pdf.locator('embed[type="application/pdf"]')).toBeVisible();
+  const pdfContents = await pdf.locator("embed").evaluate(async (el: HTMLEmbedElement) => {
+    const response = await fetch(el.src);
+    return response.text();
+  });
+  expect(pdfContents).toContain("(Project handover)");
+  expect((await ggmail.readConfig()).accounts?.find((a) => a.selected)?.label).toBe("Personal");
+  await pdf.getByRole("button", { name: "Close" }).click();
+  await expect(handoverCard.getByRole("button", { name: "Project handover.pdf" })).toBeFocused();
   await expect(page.getByRole("button", { name: "Grid view" })).toHaveAttribute(
     "aria-pressed",
     "true",
@@ -223,6 +285,11 @@ test("browse, filter, preview, and download attachments in their own account", a
   const row = page
     .getByRole("listitem")
     .filter({ has: page.getByRole("button", { name: "Notes.txt" }) });
+  await row.getByRole("button", { name: "Notes.txt" }).press("Enter");
+  const note = page.getByRole("dialog", { name: "Notes.txt" });
+  await expect(note.getByText("Work attachment")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(note).toBeHidden();
   await row.getByRole("button", { name: "Download", exact: true }).click();
   await expect
     .poll(async () => readFile(path.join(ggmail.userDataDir, "Notes.txt"), "utf8").catch(() => ""))
@@ -235,6 +302,23 @@ test("browse, filter, preview, and download attachments in their own account", a
       ),
     )
     .toBe(true);
+});
+
+test("a file without a Gmail preview keeps its download action", async () => {
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await page.getByRole("button", { name: "Grid view" }).click();
+  await page.getByRole("searchbox").fill("City walks.zip");
+  const card = page.locator(".attachment-card").first();
+  await expect(card.locator(".attachment-cover .attachment-mark")).toBeVisible();
+  await card.getByRole("button", { name: "City walks.zip" }).click();
+  const preview = page.getByRole("dialog", { name: "City walks.zip" });
+  await expect(preview.getByText("No preview available")).toBeVisible();
+  await expect(preview.getByRole("button", { name: "Download" })).toBeVisible();
+  expect(fileRequests).toBe(0);
+  await page.keyboard.press("Escape");
+  await expect(preview).toBeHidden();
+  await expect(page.getByRole("searchbox")).toHaveValue("City walks.zip");
 });
 
 test("retains partial results, retries unreadable mail, and refreshes to an empty mailbox", async () => {
@@ -281,6 +365,9 @@ test("compact windows keep filters, file actions and keyboard navigation reachab
   await expect(filters).toBeHidden();
   await expect(page.getByText("2 files", { exact: true })).toBeVisible();
   await expect(page.getByRole("listitem")).toHaveCount(2);
+  await expect(
+    page.locator('.attachment-compact-detail [data-slot="avatar-image"]').first(),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Download", exact: true }).first(),
   ).toBeInViewport();

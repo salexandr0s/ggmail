@@ -60,6 +60,8 @@ import {
 import { registerTabBroadcasts } from "@/tabs";
 import { appTray } from "@/tray";
 import { WorkspaceApp } from "@/workspace-app";
+import { syncGmailDarkTheme } from "./dark-theme";
+import { cancelUnifiedSearch } from "./unified-search";
 import { gmailUrl } from "./url";
 import ggmailCSS from "./ggmail.css";
 import gmailCSS from "./gmail.css";
@@ -331,10 +333,6 @@ export class Gmail {
       additionalArguments.push(GMAIL_PRELOAD_ARGUMENTS.replyForwardInPopOut);
     }
 
-    if (config.get("gmail.extendDarkTheme")) {
-      additionalArguments.push(GMAIL_PRELOAD_ARGUMENTS.extendDarkTheme);
-    }
-
     this.accountId = accountId;
 
     this.url = delegatedAccountId ? createGmailDelegatedAccountUrl(delegatedAccountId) : gmailUrl;
@@ -381,6 +379,7 @@ export class Gmail {
       },
     });
 
+    syncGmailDarkTheme(this.view.webContents);
     this.registerNavigationHandler(this.view);
 
     logLoadFailures(this.view.webContents, "Gmail view");
@@ -498,7 +497,7 @@ export class Gmail {
       WorkspaceApp.handleNavigate(url, this.session);
 
       if (window === this.view) {
-        this.invalidateAttachmentLibrary();
+        this.invalidateMailboxReads();
         this.store.setState({
           attentionRequired: !url.startsWith(this.baseUrl),
         });
@@ -586,14 +585,17 @@ export class Gmail {
     );
   }
 
-  invalidateAttachmentLibrary() {
+  invalidateMailboxReads() {
+    if (cancelUnifiedSearch(this.accountId) && main.location === "/unified-inbox") {
+      ipc.renderer.send(main.window.webContents, "unifiedSearch.invalidated", this.accountId);
+    }
     if (forgetAttachments(this) && main.location === "/attachments") {
       ipc.renderer.send(main.window.webContents, "attachments.invalidated");
     }
   }
 
   destroy() {
-    this.invalidateAttachmentLibrary();
+    this.invalidateMailboxReads();
     removeWebContentsListeners(this.view.webContents);
 
     this.view.webContents.close();
@@ -672,7 +674,7 @@ export class Gmail {
               // Changes nothing today: a pop-out is a `window.open` from the
               // page, so Chromium hosts it in the opener's process and it finds
               // these on that process's command line already. Passed so the
-              // pop-out's theme does not depend on where Chromium puts it.
+              // pop-out's preload settings does not depend on where Chromium puts it.
               additionalArguments: this.additionalArguments,
               asWindow: true,
             });

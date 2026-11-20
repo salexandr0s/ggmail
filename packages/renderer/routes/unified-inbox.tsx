@@ -1,6 +1,3 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import type { GmailAction } from "@ggmail/shared/gmail";
 import { getGoogleDomainFaviconUrl } from "@ggmail/shared/google";
 import { ms } from "@ggmail/shared/ms";
@@ -23,6 +20,9 @@ import {
 } from "@ggmail/ui/components/select";
 import { Table, TableBody, TableCell, TableRow } from "@ggmail/ui/components/table";
 import { cn } from "@ggmail/ui/lib/utils";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   type PaginationState,
   createColumnHelper,
@@ -48,6 +48,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { navigate } from "wouter/use-hash-location";
 import { AccountBadge } from "@/components/account-badge";
 import { SettingsHeader, SettingsTitle } from "@/components/settings";
+import { UnifiedInboxSearch } from "@/components/unified-search";
 import { createDateTimeFormatter, dayjs } from "@/lib/date";
 import { useUnifiedInbox, type UnifiedInboxMessage } from "@/lib/hooks";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
@@ -649,7 +650,7 @@ export function UnifiedInbox() {
           <Trans comment="Title of the unified inbox page">Unified inbox</Trans>
         </SettingsTitle>
       </SettingsHeader>
-      {renderContent()}
+      <UnifiedInboxSearch>{renderContent()}</UnifiedInboxSearch>
     </>
   );
 }

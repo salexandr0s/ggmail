@@ -10,6 +10,11 @@ export const GMAIL_ACTION_CODE_MAP = {
 
 export type GmailAction = keyof typeof GMAIL_ACTION_CODE_MAP;
 
+export type GmailSearchPage = {
+  threads: { id: string; subject: string; sender: string; snippet: string; date: string }[];
+  more: boolean;
+};
+
 export const GMAIL_URL = "https://mail.google.com/mail/u/0";
 
 export const GMAIL_INBOX_FEED_URL = `${GMAIL_URL}/feed/atom`;
@@ -55,7 +60,6 @@ export const GMAIL_PRELOAD_ARGUMENTS = {
   loadClippedMessages: "--ggmail-load-clipped-messages",
   closeComposeWindowAfterSend: "--ggmail-close-compose-after-send",
   replyForwardInPopOut: "--ggmail-reply-forward-in-pop-out",
-  extendDarkTheme: "--ggmail-extend-dark-theme",
   /**
    * Says the view is a compose window ggmail opened itself, rather than a
    * setting. The preload cannot tell from the URL: Gmail redirects the

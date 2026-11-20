@@ -22,6 +22,11 @@ msgstr "Bericht verzonden"
 msgid "Notifications"
 msgstr "Pop-ups"
 
+#. Toggle showing one email in its sender’s original colors
+#: packages/preload-gmail/dark-theme/index.ts
+msgid "Original colors"
+msgstr "Oorspronkelijke kleuren"
+
 #. Button in the message-sent toast, which recalls the message
 #: packages/preload-gmail/ipc.ts
 msgctxt "button"

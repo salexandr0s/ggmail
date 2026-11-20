@@ -1,6 +1,3 @@
-/* Gmail dark-theme fixes for state styles the inline-override engine can't reach,
-   scoped to [data-dark-theme] so they apply only where the engine has themed. */
-
 /* Reply container */
 .HM .I5[data-dark-theme] {
   border-color: rgb(61 61 61) !important;
@@ -22,4 +19,14 @@
 /* "Send" button in reply container */
 .dC[data-dark-theme]:hover {
   background-color: rgb(19, 19, 19) !important;
+}
+
+/* More options in reply container */
+.J-M:has([data-dark-theme]) {
+  background-color: rgb(19, 19, 19) !important;
+}
+
+.HQ .Un[data-dark-theme]::after {
+  background-image: url(//ssl.gstatic.com/ui/v1/icons/mail/gm3/1x/arrow_drop_down_baseline_nv700_20dp.png) !important;
+  filter: invert(1) !important;
 }

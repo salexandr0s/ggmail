@@ -32,9 +32,20 @@ export type AssistantRequest = z.infer<typeof assistantRequestSchema>;
 export const assistantCitationSchema = z.object({
   id: z.uuid(),
   subject: z.string().max(300),
+  senders: z
+    .array(
+      z.object({
+        name: z.string().max(320),
+        domain: z.string().max(253).optional(),
+        photoUrl: z.string().max(2048).optional(),
+      }),
+    )
+    .max(8)
+    .optional(),
 });
 
 export type AssistantCitation = z.infer<typeof assistantCitationSchema>;
+export type AssistantSender = NonNullable<AssistantCitation["senders"]>[number];
 
 export const assistantDraftSchema = z.object({
   subject: z

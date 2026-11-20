@@ -7,6 +7,7 @@ import { accounts } from "@/accounts";
 import { watchForAppMenuKey } from "@/app-menu-shortcut";
 import { pauseAttachmentReads } from "@/attachments/library";
 import { config } from "@/config";
+import { clearUnifiedSearches } from "@/gmail/unified-search";
 import {
   getCommonBrowserWindowOptions,
   isWindowVisibleOnConnectedDisplay,
@@ -59,6 +60,9 @@ class Main {
       pauseAttachmentReads();
     }
 
+    if (this.location === "/unified-inbox" && location !== this.location) {
+      clearUnifiedSearches();
+    }
     this.location = location;
 
     const isAccountLocation = location === "/";

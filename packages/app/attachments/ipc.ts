@@ -43,6 +43,22 @@ export function registerAttachmentIpc({ main: listener }: typeof ipc) {
     return result;
   });
 
+  listener.handle("attachments.preview", async (event, id, fileId, size) => {
+    if (size !== "thumbnail" && size !== "full") {
+      throw new Error("Unknown preview size");
+    }
+    const getLibrary = () => {
+      const account = accountFor(event, id);
+      return getAttachmentLibrary(account.instance.gmail, account.config.gmail.delegatedAccountId);
+    };
+    const library = getLibrary();
+    const preview = await library.preview(fileId, size);
+    if (library !== getLibrary()) {
+      throw new Error("Mailbox changed");
+    }
+    return preview;
+  });
+
   listener.handle("attachments.act", (event, id, fileId, action) => {
     const account = accountFor(event, id);
     const gmail = account.instance.gmail;
@@ -56,19 +72,12 @@ export function registerAttachmentIpc({ main: listener }: typeof ipc) {
       gmail.view.webContents.downloadURL(entry.downloadUrl);
       return;
     }
-    if (action !== "message" && action !== "preview") {
+    if (action !== "message") {
       throw new Error("Unknown attachment action");
     }
     account.instance.tabs.activateTab(GMAIL_TAB_ID);
     accounts.selectAccount(id);
     main.navigate("/");
-    gmail.navigateToHash(
-      action === "message"
-        ? "#all/" + entry.threadId
-        : "#all/" +
-            (entry.messageId.startsWith("msg-a:") ? entry.threadId : entry.messageId) +
-            "?projector=1&messagePartId=" +
-            entry.part,
-    );
+    return gmail.navigateToHash("#all/" + entry.threadId);
   });
 }

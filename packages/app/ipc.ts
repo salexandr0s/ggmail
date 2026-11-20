@@ -58,6 +58,7 @@ import {
   uninstallCuratedExtension,
 } from "./extensions";
 import { Gmail, GMAIL_USER_STYLES_PATH } from "./gmail";
+import { registerUnifiedSearchIpc } from "./gmail/unified-search";
 import {
   ExtensionInstallError,
   getCouldNotInstallExtensionMessage,
@@ -166,6 +167,7 @@ class Ipc {
   init() {
     registerAssistantIpc(this);
     registerAttachmentIpc(this);
+    registerUnifiedSearchIpc(this);
 
     config.onDidAnyChange(() => {
       ipc.broadcast("config.configChanged", config.store);
@@ -1115,7 +1117,7 @@ class Ipc {
       const accountInstance = accounts.findInstanceByGmailWebContentsId(event.sender.id);
 
       if (accountInstance && accountInstance.gmail.userEmail !== email) {
-        accountInstance.gmail.invalidateAttachmentLibrary();
+        accountInstance.gmail.invalidateMailboxReads();
         accountInstance.gmail.userEmail = email;
       }
     });

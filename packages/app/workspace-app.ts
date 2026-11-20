@@ -32,6 +32,7 @@ import { bookmarks } from "./bookmarks";
 import { config } from "./config";
 import { getNativeOkLabel } from "./dialogs";
 import { extensions } from "./extensions";
+import { syncGmailDarkTheme } from "./gmail/dark-theme";
 import { ipc } from "./ipc";
 import { copyText } from "./lib/clipboard";
 import { loadUrl, loadUrlOrRestoreNavigationHistory } from "./lib/load-url";
@@ -680,6 +681,8 @@ export class WorkspaceApp {
         this.setWindowOpenHandler(createdView);
       },
     });
+
+    syncGmailDarkTheme(view.webContents);
 
     // A pop-out adopts the `webContents` Chromium opened it in, which
     // navigates it to the page itself. Loading it as well requests the page

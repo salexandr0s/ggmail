@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
 import { readPrintAttachments } from "./metadata";
+import { snapshotUrl } from "./preview";
 
 const mailbox = "https://mail.google.com/mail/u/0/";
 const thread = "193078998a370000";
@@ -62,5 +64,31 @@ describe("Gmail attachment metadata", () => {
     );
     expect(rows[0]?.file.id).toBe(message + "/0.2.3");
     expect(() => readPrintAttachments("<h1>Sign in</h1>", mailbox, thread, "")).toThrow();
+  });
+
+  test("uses Gmail's thumbnail for the same message part and matches photos by sender", () => {
+    const target = `?view=att&th=${message}&attid=0.2.3`;
+    const thumbnail = `?view=snatt&disp=thd&th=${message}&attid=0.2.3&attbid=tile`;
+    const photo = "https://lh3.googleusercontent.com/a/sender";
+    const parse = (src: string) => {
+      const [entry] = readPrintAttachments(
+        printDocument(tile(target).replace("<img>", `<img src="${src}">`)),
+        mailbox,
+        thread,
+        "",
+        [
+          { address: "other@example.test", url: "https://lh4.googleusercontent.com/a/other" },
+          { address: "MIRA@example.test", url: photo },
+        ],
+      );
+      assert.ok(entry);
+      return entry;
+    };
+    const entry = parse(thumbnail);
+    expect(entry.file.senderPhotoUrl).toBe(photo);
+    expect(snapshotUrl(entry, false).searchParams.get("attbid")).toBe("tile");
+    expect(snapshotUrl(entry, true).searchParams.get("attid")).toBe("0.2.3");
+    expect(parse(thumbnail.replace("0.2.3", "0.1")).thumbnailUrl).toBeUndefined();
+    expect(parse("https://example.test/" + thumbnail).thumbnailUrl).toBeUndefined();
   });
 });

@@ -3,6 +3,7 @@ export type MailAttachment = {
   name: string;
   subject: string;
   sender: string;
+  senderPhotoUrl?: string;
   receivedAt: number;
   size: string;
 };
@@ -13,7 +14,12 @@ export type AttachmentBatch = {
   partial: boolean;
 };
 
-export type AttachmentAction = "preview" | "message" | "download";
+export type AttachmentAction = "message" | "download";
+
+export type AttachmentPreview = {
+  mime: string;
+  bytes: ArrayBuffer;
+};
 
 export function fileKind(filename: string) {
   const ext = /\.([a-z0-9]+)$/i.exec(filename)?.[1]?.toLowerCase() ?? "";

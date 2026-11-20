@@ -13,7 +13,11 @@
    selection highlight becomes a dark one. Nothing inside gets a rule of its
    own, so nothing here depends on Gmail's markup. */
 
-[data-dark-theme-root] [contenteditable="true"] {
+[data-dark-theme-root]
+  [contenteditable]:not(
+    [contenteditable="false" i],
+    [contenteditable]:not([contenteditable="false" i]) *
+  ) {
   /* Transparent survives the filter, so the surface the engine gave the compose
      window shows through and the editor matches whatever surrounds it */
   background-color: transparent !important;
@@ -25,6 +29,6 @@
 }
 
 /* The same filter twice is the identity, so images keep their true colors */
-[data-dark-theme-root] [contenteditable="true"] img {
+[data-dark-theme-root] [contenteditable]:not([contenteditable="false" i]) img {
   filter: invert(1) hue-rotate(180deg) !important;
 }

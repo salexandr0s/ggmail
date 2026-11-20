@@ -8,8 +8,7 @@ import { moveAttachmentsToTop } from "./attachments";
 import { loadClippedMessages } from "./clipped-messages";
 import { openComposeInNewWindow } from "./compose";
 import { initCss } from "./css";
-import { darkThemeCompose } from "./dark-theme/compose";
-import { darkThemeMessage } from "./dark-theme/message";
+import { initGmailDarkTheme } from "./dark-theme";
 import { observeOutOfOfficeBanner } from "./out-of-office";
 import { replyForwardInPopOut } from "./reply-forward";
 import { addSenderIcons } from "./sender-icons";
@@ -26,8 +25,6 @@ const features = [
   openComposeInNewWindow,
   setUserEmail,
   replyForwardInPopOut,
-  darkThemeMessage,
-  darkThemeCompose,
 ];
 
 // Only macOS swipes between pages, and elsewhere the reads would cost every
@@ -53,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  initGmailDarkTheme();
   initCss();
   initUrlPreview();
 

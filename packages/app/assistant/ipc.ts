@@ -1,14 +1,15 @@
-import { t } from "@lingui/core/macro";
 import {
   assistantDraftSchema,
   assistantRequestSchema,
   type AssistantConnection,
 } from "@ggmail/shared/assistant";
+import { t } from "@lingui/core/macro";
 import type { IpcMainEvent, IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
 import type { ipc } from "@/ipc";
 import { main } from "@/main";
 import { assistantChat } from "./chat";
+import { AssistantError } from "./responses";
 
 function isMainFrame(event: IpcMainEvent | IpcMainInvokeEvent) {
   const view = main.windowIfCreated?.webContents;
@@ -106,5 +107,22 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
     authorize(event);
     const validated = assistantDraftSchema.parse(draft);
     assistantChat.openDraft(validated, z.string().parse(key));
+  });
+  listener.handle("assistant.insertReply", async (event, body, key) => {
+    authorize(event);
+    const text = assistantDraftSchema.shape.body.parse(body);
+    const scopeKey = z.string().parse(key);
+    try {
+      await assistantChat.insertReply(text, scopeKey);
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        message:
+          error instanceof AssistantError
+            ? error.message
+            : t`Open a reply in this thread and try again.`,
+      };
+    }
   });
 }

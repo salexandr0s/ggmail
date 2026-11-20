@@ -7,8 +7,8 @@ import type {
   AssistantRequest,
   AssistantResult,
 } from "./assistant";
-import type { AttachmentAction, AttachmentBatch } from "./attachments";
-import type { GmailAction, GmailInboxMessage } from "./gmail";
+import type { AttachmentAction, AttachmentBatch, AttachmentPreview } from "./attachments";
+import type { GmailAction, GmailInboxMessage, GmailSearchPage } from "./gmail";
 import type { CatalogTag } from "./i18n";
 import type {
   AccountConfig,
@@ -227,6 +227,7 @@ export type IpcMainEvents =
       "workspaceApp.stop": [workspaceAppId?: string];
       "gmail.unreadCountChanged": [unreadCountString: string];
       "gmail.setOutOfOffice": [outOfOffice: boolean];
+      "unifiedSearch.cancel": [accountId: string, requestId: string];
       "gmail.search": [searchQuery: string];
       "assistant.setVisible": [visible: boolean];
       "assistant.clear": [];
@@ -289,11 +290,23 @@ export type IpcMainEvents =
       "swipeNavigation.setPageScrollEdge": [pageScrollEdge: PageScrollEdge];
     }
   | {
+      "unifiedSearch.read": (
+        accountId: string,
+        requestId: string,
+        query: string,
+        page: number,
+      ) => GmailSearchPage;
+      "unifiedSearch.open": (accountId: string, requestId: string, threadId: string) => void;
       "attachments.read": (
         accountId: string,
         mode: "snapshot" | "refresh" | "retry" | "next",
       ) => AttachmentBatch;
       "attachments.act": (accountId: string, fileId: string, action: AttachmentAction) => void;
+      "attachments.preview": (
+        accountId: string,
+        fileId: string,
+        size: "thumbnail" | "full",
+      ) => AttachmentPreview | null;
       "assistant.status": () => AssistantConnection;
       "assistant.connect": () => AssistantConnection;
       "assistant.disconnect": () => AssistantConnection;
@@ -301,6 +314,10 @@ export type IpcMainEvents =
       "assistant.send": (request: AssistantRequest) => AssistantResult;
       "assistant.openSource": (id: string) => void;
       "assistant.openDraft": (draft: AssistantDraft, key: string) => void;
+      "assistant.insertReply": (
+        body: string,
+        key: string,
+      ) => { ok: true } | { ok: false; message: string };
       "gmail.handleMessage": (
         accountId: AccountConfig["id"],
         messageId: string,
@@ -335,6 +352,7 @@ export type IpcMainEvents =
 
 export type IpcRendererEvent = {
   navigate: [to: string];
+  "unifiedSearch.invalidated": [accountId: string];
   "attachments.invalidated": [];
   "assistant.progress": [id: string, text: string, activity?: AssistantActivity];
   "assistant.connectionChanged": [connection: AssistantConnection];
@@ -348,6 +366,7 @@ export type IpcRendererEvent = {
   "gmail.showMessageSentNotification": [browserWindowId: number];
   "gmail.dismissMessageSentNotification": [browserWindowId: number];
   "gmail.undoMessageSent": [];
+  "gmail.extendDarkThemeChanged": [enabled: boolean];
   "theme.darkModeChanged": [darkMode: boolean];
   "accounts.changed": [accounts: AccountInstances];
   "tabs.changed": [accountsTabs: AccountTabsState[]];

@@ -1,5 +1,6 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail selectors, request parameters and IPC errors. The renderer localizes status messages. */
 import type { MailAttachment } from "@ggmail/shared/attachments";
+import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { load } from "cheerio/slim";
 
 export type AttachmentEntry = {
@@ -8,12 +9,13 @@ export type AttachmentEntry = {
   messageId: string;
   part: string;
   downloadUrl: string;
+  thumbnailUrl?: string;
 };
 
 const legacyId = /^[\da-f]{15,16}$/i;
 
 /** Only reconstruct Gmail's attachment request. Never use a link from the email as a download target. */
-function readLocator(href: string, mailbox: string) {
+function readLocator(href: string, mailbox: string, thumbnail = false) {
   const url = URL.parse(href, mailbox);
   if (!url || url.username || url.password) {
     return;
@@ -27,6 +29,7 @@ function readLocator(href: string, mailbox: string) {
     url.origin === "https://mail-attachment.googleusercontent.com" &&
     url.pathname === "/attachment";
   const params = url.searchParams;
+  const view = params.get("view") ?? "";
   const part = params.get("attid");
   const permanentId = /^msg-f:(\d{1,20})$/.exec(params.get("permmsgid") ?? "")?.[1];
   const legacyMessage = params.get("th") || (permanentId && BigInt(permanentId).toString(16));
@@ -39,7 +42,9 @@ function readLocator(href: string, mailbox: string) {
         : undefined;
   if (
     (!sameMailbox && !attachmentHost) ||
-    params.get("view") !== "att" ||
+    (thumbnail
+      ? !["snatt", "fimg", "att"].includes(view) || params.get("disp") !== "thd"
+      : view !== "att") ||
     !messageId ||
     !part ||
     !/^\d+(?:\.\d+)+$/.test(part)
@@ -49,14 +54,14 @@ function readLocator(href: string, mailbox: string) {
 
   base.search = new URLSearchParams({
     ui: "2",
-    view: "att",
+    view,
     ...(legacyId.test(messageId) && { th: messageId }),
     attid: part,
-    disp: "attd",
+    disp: thumbnail ? "thd" : "attd",
     safe: "1",
     zw: "",
   }).toString();
-  for (const key of ["ik", "realattid", "permmsgid"]) {
+  for (const key of ["ik", "realattid", "permmsgid", "attbid", "ats"]) {
     const value = params.get(key);
     if (value) {
       base.searchParams.set(key, value);
@@ -71,6 +76,7 @@ export function readPrintAttachments(
   mailbox: string,
   threadId: string,
   subject: string,
+  photos: { address: string; url: string }[] = [],
 ) {
   const $ = load(html);
   const messages = $("table.message").filter(
@@ -84,6 +90,12 @@ export function readPrintAttachments(
     const rows = $(message).children("tr").add($(message).children("tbody").children("tr"));
     const header = rows.first().children("td");
     const sender = header.first().text().trim();
+    const address = (/<([^<>]+)>$/.exec(sender)?.[1] ?? sender).trim().toLowerCase();
+    const senderPhotoUrl =
+      getGoogleProfilePhotoUrl(header.first().find("img[src]").attr("src") ?? "") ??
+      getGoogleProfilePhotoUrl(
+        photos.find((photo) => photo.address.toLowerCase() === address)?.url ?? "",
+      );
     // The message body is in a div before Gmail's own attachment table. Exclude tables inside it.
     const tiles = $(message)
       .find("table.att")
@@ -95,6 +107,8 @@ export function readPrintAttachments(
           continue;
         }
         const row = $(link).closest("tr");
+        const thumbnailSrc = $(link).find("img[src]").attr("src");
+        const thumbnail = thumbnailSrc && readLocator(thumbnailSrc, mailbox, true);
         const label = row.find("td b").last();
         const name = label.text().trim();
         if (!name) {
@@ -109,12 +123,19 @@ export function readPrintAttachments(
             );
         files.set(id, {
           ...locator,
+          thumbnailUrl:
+            thumbnail &&
+            thumbnail.messageId === locator.messageId &&
+            thumbnail.part === locator.part
+              ? thumbnail.downloadUrl
+              : undefined,
           threadId,
           file: {
             id,
             name,
             subject,
             sender,
+            senderPhotoUrl,
             receivedAt,
             size: label.next("br").parent().text().slice(name.length).trim(),
           },

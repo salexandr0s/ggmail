@@ -1,10 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
 import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
 import { fileKind, type AttachmentAction, type MailAttachment } from "@ggmail/shared/attachments";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { AccountConfig } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
 import { cn } from "@ggmail/ui/lib/utils";
+import { useLingui } from "@lingui/react/macro";
 import {
   DownloadIcon,
   FileIcon,
@@ -14,8 +14,10 @@ import {
   SheetIcon,
   TextIcon,
 } from "lucide-react";
-import { useId } from "react";
+import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
+import { SenderAvatar } from "@/components/assistant/sender-avatar";
+import { FilePreview, FileThumbnail } from "./preview";
 import "./files.css";
 
 export type LibraryFile = MailAttachment & { account: AccountConfig };
@@ -66,6 +68,37 @@ function AccountName({ account }: { account: AccountConfig }) {
   );
 }
 
+function Sender({
+  sender,
+  photoUrl,
+  showIcon,
+  account,
+}: {
+  sender: string;
+  photoUrl?: string;
+  showIcon: boolean;
+  account?: AccountConfig;
+}) {
+  const mailbox = /^(.*)<([^<>]+)>$/u.exec(sender);
+  const address = (mailbox?.[2] ?? sender).trim();
+  const name = mailbox?.[1]?.trim() || address;
+  const domain = /^[^\s<>@]+@([\p{L}\p{N}.-]+)$/u.exec(address)?.[1];
+
+  return (
+    <span className="inline-flex max-w-full min-w-0 items-center gap-1.5" title={sender}>
+      {showIcon && <SenderAvatar sender={{ name, domain, photoUrl }} className="size-5" />}
+      <span className="min-w-0">
+        <span className="block truncate">{name}</span>
+        {account && (
+          <span className="mt-0.5 flex text-xs text-muted-foreground">
+            <AccountName account={account} />
+          </span>
+        )}
+      </span>
+    </span>
+  );
+}
+
 export function ListHeadings() {
   const { t } = useLingui();
   return (
@@ -82,16 +115,19 @@ export function FileItem({
   item,
   grid,
   showAccount,
+  showSenderIcons,
   date,
 }: {
   item: LibraryFile;
   grid: boolean;
   showAccount: boolean;
+  showSenderIcons: boolean;
   date: Intl.DateTimeFormat;
 }) {
   const { t } = useLingui();
   const filenameId = useId();
-  const sender = item.sender.split("<")[0]?.trim() || item.sender;
+  const button = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
   const received = date.format(item.receivedAt);
   const act = async (action: AttachmentAction) => {
     try {
@@ -101,17 +137,29 @@ export function FileItem({
     }
   };
   const preview = (
-    <button
-      type="button"
-      className="attachment-preview"
-      title={item.name + "\n" + t`Preview in Gmail`}
-      aria-description={t`Preview in Gmail`}
-      onClick={() => void act("preview")}
-    >
-      <span id={filenameId} className={grid ? "line-clamp-2 break-words" : "block truncate"}>
-        {item.name}
-      </span>
-    </button>
+    <>
+      <button
+        ref={button}
+        type="button"
+        className="attachment-preview"
+        title={item.name + "\n" + t`Preview attachment`}
+        aria-description={t`Preview attachment`}
+        aria-haspopup="dialog"
+        onClick={() => setOpen(true)}
+      >
+        <span id={filenameId} className={grid ? "line-clamp-2 break-words" : "block truncate"}>
+          {item.name}
+        </span>
+      </button>
+      {open && (
+        <FilePreview
+          item={item}
+          onClose={() => setOpen(false)}
+          returnFocus={button}
+          onDownload={() => void act("download")}
+        />
+      )}
+    </>
   );
   const actions = (
     <div className="attachment-actions">
@@ -138,9 +186,9 @@ export function FileItem({
   if (grid) {
     return (
       <li className="attachment-card" data-kind={fileKind(item.name)}>
-        <div className="attachment-cover" aria-hidden="true">
+        <FileThumbnail item={item} large>
           <FileMark name={item.name} large />
-        </div>
+        </FileThumbnail>
         <div className="flex flex-1 flex-col px-4 pt-3 pb-2">
           {preview}
           {item.subject && (
@@ -148,11 +196,12 @@ export function FileItem({
               {item.subject}
             </span>
           )}
-          <div
-            className="mt-auto flex min-w-0 items-center gap-1.5 pt-3 text-xs"
-            title={item.sender}
-          >
-            <span className="truncate">{sender}</span>
+          <div className="mt-auto flex min-w-0 items-center gap-1.5 pt-3 text-xs">
+            <Sender
+              sender={item.sender}
+              photoUrl={item.senderPhotoUrl}
+              showIcon={showSenderIcons}
+            />
             {showAccount && (
               <span className="inline-flex min-w-0 items-center gap-1.5 truncate text-muted-foreground">
                 <span aria-hidden="true">·</span>
@@ -179,7 +228,9 @@ export function FileItem({
   return (
     <li className="attachment-columns attachment-row">
       <div className="flex min-w-0 items-center gap-3">
-        <FileMark name={item.name} />
+        <FileThumbnail item={item}>
+          <FileMark name={item.name} />
+        </FileThumbnail>
         <div className="min-w-0">
           {preview}
           {item.subject && (
@@ -187,11 +238,12 @@ export function FileItem({
               {item.subject}
             </div>
           )}
-          <div
-            className="attachment-compact-detail text-xs text-muted-foreground"
-            title={item.sender}
-          >
-            <span className="truncate">{sender}</span>
+          <div className="attachment-compact-detail text-xs text-muted-foreground">
+            <Sender
+              sender={item.sender}
+              photoUrl={item.senderPhotoUrl}
+              showIcon={showSenderIcons}
+            />
             {showAccount && <AccountName account={item.account} />}
             <span className="inline-flex shrink-0 items-center gap-1.5 tabular-nums">
               <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>
@@ -205,15 +257,13 @@ export function FileItem({
           </div>
         </div>
       </div>
-      <div className="attachment-from min-w-0">
-        <div className="truncate text-[13px]" title={item.sender}>
-          {sender}
-        </div>
-        {showAccount && (
-          <div className="mt-0.5 flex min-w-0 text-xs text-muted-foreground">
-            <AccountName account={item.account} />
-          </div>
-        )}
+      <div className="attachment-from min-w-0 text-[13px]">
+        <Sender
+          sender={item.sender}
+          photoUrl={item.senderPhotoUrl}
+          showIcon={showSenderIcons}
+          account={showAccount ? item.account : undefined}
+        />
       </div>
       <div className="attachment-date text-xs text-muted-foreground tabular-nums">
         <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>

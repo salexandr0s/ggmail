@@ -11,6 +11,6 @@ import css from "./gmail-editor-dark-theme.css";
  * editor can appear in takes both: the Gmail view's compose and message, and
  * the mail workspace app, which is a pop-out or a compose window ggmail opened.
  */
-export const GMAIL_EDITOR_SELECTOR = '[contenteditable="true"]';
+export const GMAIL_EDITOR_SELECTOR = '[contenteditable]:not([contenteditable="false" i])';
 
 export const GMAIL_EDITOR_DARK_THEME_CSS: string = css;

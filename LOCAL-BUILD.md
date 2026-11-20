@@ -11,6 +11,11 @@ DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run build:mac:local
 
 The build writes `dist/mac-arm64/ggmail.app` and verifies its ad-hoc signature. It requires no signing credentials.
 
+On macOS, a profile migrated from Meru Local can reuse its existing Keychain entry.
+For a profile that already uses that entry, quit the app and create an empty
+`.meru-local-keychain` file in the ggmail profile directory before launching the new
+build. The marker belongs only in profiles whose cookies were encrypted by Meru Local.
+
 ## Mail assistant
 
 Select the sparkle button in the title bar and choose **Continue with ChatGPT**.
@@ -23,8 +28,7 @@ view, it can search the selected account and use matching snippets. Open a sourc
 and ask there for a full-message summary. In other Gmail lists it can use the
 visible snippets. Switching views or accounts starts a fresh conversation.
 
-Ask for a draft, then ask for changes to its wording or length. You can copy the
-draft body or select **Open in Gmail** to add recipients, edit and send it yourself.
+Ask for a draft, then ask for changes to its wording or length. In an open thread, **Insert into reply** places the draft above any existing reply text. Gmail handles recipients and threading. Review the reply and send it when ready. You can also copy the body or choose **Open in Gmail** for a separate message.
 **Stop reply** keeps the text received so far. **Try again** repeats the last
 interrupted request and preserves anything you have typed for your next message.
 
@@ -37,7 +41,7 @@ new chat. Electron's protected storage keeps the ChatGPT connection on this devi
 Choose **View → Attachments** or click the paperclip in the title bar. Search by filename,
 sender or subject. Choose a file type or account in the sidebar, or open **Filters** in a
 narrow window. Switch between list and grid with the controls beside the sort menu.
-Select a row or card to preview its file in Gmail. The envelope opens its conversation, and the
+Select a row or card to preview its file in the library. Gmail supplies thumbnails when available. The envelope opens its conversation, and the
 download button uses your normal download settings.
 
 The library loads older mail while the view is open and keeps its file list in memory
