@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { getAccountLabel } from "@ggmail/shared/accounts";
 import {
   assistantPanelWidth,
@@ -16,6 +15,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@ggmail/ui/components/dropdown-menu";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   EllipsisIcon,
   LoaderCircleIcon,
@@ -39,7 +39,7 @@ function getWidth() {
 
 const modelPreferenceKey = "assistant.model";
 
-export function AssistantPanel({ close }: { close: () => void }) {
+export function AssistantPanel({ close }: { close: (focusToggle?: boolean) => void }) {
   const { t } = useLingui();
   const width = useSyncExternalStore(watchWidth, getWidth);
   const panel = useRef<HTMLElement>(null);
@@ -236,7 +236,7 @@ export function AssistantPanel({ close }: { close: () => void }) {
             size="icon-sm"
             title={t`Close mail assistant`}
             aria-label={t`Close mail assistant`}
-            onClick={close}
+            onClick={() => close()}
           >
             <XIcon />
           </Button>
@@ -262,6 +262,11 @@ export function AssistantPanel({ close }: { close: () => void }) {
             setModelPreference(id);
           }}
           onReplyError={() => void update("assistant.status")}
+          onInserted={() => {
+            if (getWidth() === window.innerWidth) {
+              close(false);
+            }
+          }}
         />
       ) : !connection || ready ? (
         <p role="status" className="flex items-center gap-2 p-5 text-sm text-muted-foreground">

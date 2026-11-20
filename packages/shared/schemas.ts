@@ -61,6 +61,7 @@ export const accountConfigSchema = z.object({
   id: z.string(),
   label: z.string(),
   color: z.enum(accountColors).nullable(),
+  logo: z.string().startsWith("data:image/png;base64,").max(16_384).nullish(),
   selected: z.boolean(),
   /** Absent on every account written before the switch existed, which means enabled. */
   disabled: z.boolean().optional(),
@@ -89,6 +90,7 @@ export const accountConfigInputSchema = accountConfigSchema
   .pick({
     label: true,
     color: true,
+    logo: true,
     disabled: true,
     notifications: true,
   })

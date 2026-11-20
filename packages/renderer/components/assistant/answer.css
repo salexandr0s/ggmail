@@ -1,0 +1,227 @@
+.assistant-answer {
+  --answer-accent: light-dark(#176c61, #8ed5c9);
+  color-scheme: light;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  line-height: 1.63;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.dark .assistant-answer {
+  color-scheme: dark;
+}
+.assistant-answer > * + * {
+  margin-block-start: 0.8rem;
+}
+.assistant-answer > p:first-child:not(:only-child) {
+  font-size: 0.955rem;
+  line-height: 1.55;
+}
+.assistant-answer strong {
+  font-weight: 635;
+}
+.assistant-answer :is(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1.3rem 0.34rem;
+  line-height: 1.32;
+  letter-spacing: -0.018em;
+  font-weight: 660;
+}
+.assistant-answer h1 {
+  font-size: 1.16rem;
+}
+.assistant-answer h2 {
+  font-size: 1.02rem;
+}
+.assistant-answer :is(h3, h4, h5, h6) {
+  font-size: 0.9rem;
+}
+.assistant-answer > :first-child {
+  margin-block-start: 0;
+}
+.assistant-answer :is(h1, h2, h3, h4, h5, h6) + * {
+  margin-block-start: 0;
+}
+.assistant-answer :is(ul, ol) {
+  padding-inline-start: 1.35rem;
+}
+.assistant-answer ul {
+  list-style: disc;
+}
+.assistant-answer ol {
+  list-style: decimal;
+}
+.assistant-answer li {
+  padding-inline-start: 0.2rem;
+}
+.assistant-answer li + li,
+.assistant-answer li > :is(ol, ul, p) + p {
+  margin-block-start: 0.34rem;
+}
+.assistant-answer li::marker {
+  color: var(--answer-accent);
+  font-weight: 580;
+}
+.assistant-answer li > :is(ul, ol) {
+  margin-block-start: 0.28rem;
+}
+.assistant-answer li ul {
+  list-style: circle;
+}
+.assistant-answer li.task-list-item {
+  list-style: none;
+}
+.assistant-answer input[type="checkbox"] {
+  inline-size: 0.87rem;
+  block-size: 0.87rem;
+  margin-inline: -1.42rem 0.35rem;
+  vertical-align: -0.05em;
+  appearance: none;
+  position: relative;
+  border: 1.5px solid var(--muted-foreground);
+  border-radius: 0.2rem;
+}
+.assistant-answer input[type="checkbox"]:checked {
+  background: var(--answer-accent);
+  border-color: var(--answer-accent);
+}
+.assistant-answer input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  inset: 9% 31% 19% 31%;
+  border: solid var(--background);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+@media (forced-colors: active) {
+  .assistant-answer input[type="checkbox"] {
+    appearance: auto;
+  }
+  .assistant-answer input[type="checkbox"]:checked::after {
+    display: none;
+  }
+}
+.assistant-answer blockquote {
+  padding: 0.5rem 0.82rem;
+  border-inline-start: 3px solid var(--answer-accent);
+  border-radius: 0 0.35rem 0.35rem 0;
+  background: color-mix(in srgb, var(--answer-accent) 6%, transparent);
+}
+.assistant-answer blockquote p + p {
+  margin-block-start: 0.55rem;
+}
+.assistant-answer :not(pre) > code {
+  padding: 0.12em 0.36em;
+  border: 1px solid var(--border);
+  border-radius: 0.28rem;
+  background: var(--muted);
+  font-size: 0.85em;
+}
+.assistant-answer pre {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  background: var(--muted);
+  font-size: 0.79rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  tab-size: 2;
+}
+.assistant-answer hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+.answer-citation {
+  position: static;
+  vertical-align: 0.06em;
+}
+.answer-citation button {
+  display: inline-flex;
+  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
+  gap: 0.23rem;
+  min-width: 1.15rem;
+  margin-inline: 1px;
+  padding: 1px 0.32rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--answer-accent) 11%, var(--background));
+  color: var(--answer-accent);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.answer-citation button:has([data-slot="avatar"]) {
+  padding-inline-start: 2px;
+}
+.answer-citation button:hover {
+  background: color-mix(in srgb, var(--answer-accent) 23%, var(--background));
+}
+.answer-citation button:focus-visible {
+  outline: 2px solid var(--answer-accent);
+  outline-offset: 1px;
+}
+.answer-table {
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+.answer-table table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.answer-table :is(th, td) {
+  padding: 0.48rem 0.68rem;
+  vertical-align: top;
+}
+.answer-table th {
+  background: var(--muted);
+  text-align: start;
+  font-weight: 600;
+}
+.answer-table td {
+  border-top: 1px solid var(--border);
+}
+.answer-records {
+  display: grid;
+  gap: 0.5rem;
+}
+.answer-record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--card) 80%, var(--muted));
+}
+.answer-record > div {
+  min-width: 0;
+  flex: 1 1 4.5rem;
+}
+.answer-record > :is(.answer-record-lead, .answer-record-long) {
+  flex-basis: 100%;
+}
+.answer-record dt {
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  font-weight: 520;
+}
+.answer-record dd {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.48;
+}
+.answer-record-lead dt {
+  color: var(--answer-accent);
+}
+.answer-record-lead dd {
+  margin-block-start: 0.12rem;
+  font-size: 0.9rem;
+  font-weight: 540;
+}

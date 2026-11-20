@@ -35,7 +35,6 @@ type ParsedColor = ReturnType<typeof parseColorWithCache>;
 
 type ColorSnapshot = {
   element: HTMLElement;
-  originalStyle: string;
   backgroundColor: ParsedColor;
   backgroundImage: string;
   textColor: ParsedColor;
@@ -97,7 +96,7 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
   const theme = { ...DEFAULT_THEME, ...themeOptions };
 
   let cancelled = false;
-  const isCancelled = () => cancelled;
+  const rootId = String(instanceCounter++);
 
   const ignoreSelectors = (ignore ?? []).filter(
     (entry): entry is string => typeof entry === "string",
@@ -139,8 +138,50 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
   // Which properties this engine has overridden on each element, so re-theming
   // (on class changes) only fills in newly-appeared properties instead of
   // re-darkening its own output or touching the element's own inline styles.
-  const overriddenProperties = new WeakMap<HTMLElement, Set<string>>();
-  const originalStyles = new Map<HTMLElement, string>();
+  type PropertyOverride = { original: string; priority: string; applied: string };
+  const originals = new Map<
+    HTMLElement,
+    {
+      hadStyle: boolean;
+      properties: Map<string, PropertyOverride>;
+    }
+  >();
+
+  // Gmail can move, hide or resize a panel while it is themed. Undo only
+  // properties we still own, preserving the page's more recent inline edits.
+  const writeStyle = (element: HTMLElement, property: string, value: string) => {
+    const properties = originals.get(element)?.properties;
+    if (!properties) {
+      return;
+    }
+    const style = element.style;
+    const previous = properties.get(property);
+    const current = style.getPropertyValue(property);
+    const priority = style.getPropertyPriority(property);
+    const original =
+      previous && current === previous.applied && priority === "important"
+        ? previous
+        : { original: current, priority, applied: "" };
+    style.setProperty(property, value, "important");
+    original.applied = style.getPropertyValue(property);
+    properties.set(property, original);
+  };
+
+  const restoreProperty = (element: HTMLElement, property: string) => {
+    const properties = originals.get(element)?.properties;
+    const saved = properties?.get(property);
+    if (!saved) {
+      return;
+    }
+    const style = element.style;
+    if (
+      style.getPropertyValue(property) === saved.applied &&
+      style.getPropertyPriority(property) === "important"
+    ) {
+      style.setProperty(property, saved.original, saved.priority);
+    }
+    properties?.delete(property);
+  };
 
   // Elements we've blank-inverted for a monochrome background-image. Unlike the
   // sticky overrides above, this must be re-evaluated on state changes: an
@@ -179,20 +220,11 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
       return false;
     }
 
-    let properties = overriddenProperties.get(element);
-
-    if (!properties) {
-      properties = new Set();
-      overriddenProperties.set(element, properties);
-    }
-
-    if (properties.has(property)) {
+    if (originals.get(element)?.properties.has(property)) {
       return false;
     }
 
-    element.style.setProperty(property, value, "important");
-    properties.add(property);
-
+    writeStyle(element, property, value);
     return true;
   };
 
@@ -360,7 +392,6 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
 
     return {
       element,
-      originalStyle: element.style.cssText,
       backgroundColor: parseColorWithCache(computedStyle.backgroundColor),
       backgroundImage: computedStyle.backgroundImage,
       textColor: parseColorWithCache(computedStyle.color),
@@ -427,25 +458,39 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     }
 
     if (shouldInvert) {
-      element.style.setProperty("filter", "invert(1)", "important");
+      writeStyle(element, "filter", "invert(1)");
       invertedImageElements.add(element);
     } else {
-      element.style.removeProperty("filter");
+      restoreProperty(element, "filter");
       invertedImageElements.delete(element);
     }
   };
 
   const applyImages = (snapshot: ColorSnapshot) => {
+    const { element } = snapshot;
+    const owner = originals.get(element);
+    const isCancelled = () =>
+      cancelled ||
+      originals.get(element) !== owner ||
+      !root.contains(element) ||
+      isIgnored(element);
+    const writeImage = (property: string, value: string) => writeStyle(element, property, value);
     if (snapshot.backgroundImage && snapshot.backgroundImage !== "none") {
       refreshImageInvert(snapshot.element, snapshot.backgroundImage);
 
       if (!invertedImageElements.has(snapshot.element)) {
-        modifyBackgroundImage(snapshot.element, snapshot.backgroundImage, theme, isCancelled);
+        modifyBackgroundImage(
+          snapshot.element,
+          snapshot.backgroundImage,
+          theme,
+          isCancelled,
+          writeImage,
+        );
       }
     }
 
     if (snapshot.element instanceof HTMLImageElement) {
-      invertDarkImageElement(snapshot.element, theme, isCancelled);
+      invertDarkImageElement(snapshot.element, theme, isCancelled, writeImage);
     }
   };
 
@@ -459,7 +504,7 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
         return;
       }
 
-      id = String(pseudoRuleCounter++);
+      id = `${rootId}-${pseudoRuleCounter++}`;
       pseudoIds.set(element, id);
       element.setAttribute(PSEUDO_ATTRIBUTE, id);
     }
@@ -509,7 +554,8 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
   // inherited colors.
   const processBatch = (candidates: HTMLElement[]) => {
     const targets = candidates.filter(
-      (element) => !element.hasAttribute(PROCESSED_ATTRIBUTE) && !isIgnored(element),
+      (element) =>
+        root.contains(element) && !element.hasAttribute(PROCESSED_ATTRIBUTE) && !isIgnored(element),
     );
 
     if (targets.length === 0) {
@@ -519,7 +565,10 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     const snapshots = targets.map(captureSnapshot);
 
     for (const snapshot of snapshots) {
-      originalStyles.set(snapshot.element, snapshot.originalStyle);
+      originals.set(snapshot.element, {
+        hadStyle: snapshot.element.hasAttribute("style"),
+        properties: new Map(),
+      });
       applyColors(snapshot);
       snapshot.element.setAttribute(PROCESSED_ATTRIBUTE, "");
     }
@@ -532,50 +581,23 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     flushPseudoRules();
   };
 
-  // Without pruning, elements the page removes stay strongly held by the
-  // original-style map until revert()/destroy() — a detached-subtree leak that
-  // grows for as long as the controller lives — and their pseudo rules bloat
-  // the injected sheet forever. A node that was merely moved is connected again
-  // by the time the mutation records are processed, so it is kept; a pruned
-  // element that later re-attaches comes back through the refresh path, which
-  // rebuilds its pseudo rules from the still-alive weak caches.
-  const pruneRemovedElements = (removedRoots: Iterable<HTMLElement>) => {
-    let didPrunePseudoRules = false;
-
-    for (const removedRoot of removedRoots) {
-      if (removedRoot.isConnected) {
-        continue;
-      }
-
-      for (const element of [removedRoot, ...removedRoot.querySelectorAll<HTMLElement>("*")]) {
-        originalStyles.delete(element);
-
-        const pseudoId = element.getAttribute(PSEUDO_ATTRIBUTE);
-
-        if (pseudoId != null && pseudoRulesById.delete(pseudoId)) {
-          didPrunePseudoRules = true;
-        }
-      }
-    }
-
-    if (didPrunePseudoRules) {
-      flushPseudoRules();
-    }
-  };
-
   // Undoes this engine's writes on one element, for an element that has come to
   // match `ignore`. Returns whether it dropped pseudo rules, so the caller writes
   // the sheet once for the batch.
   const restoreElement = (element: HTMLElement) => {
-    const originalStyle = originalStyles.get(element);
-
-    if (originalStyle !== undefined) {
-      element.style.cssText = originalStyle;
-      originalStyles.delete(element);
+    const original = originals.get(element);
+    if (!original) {
+      return false;
     }
-
+    for (const property of original.properties.keys()) {
+      restoreProperty(element, property);
+    }
+    if (!original.hadStyle && !element.style.length) {
+      element.removeAttribute("style");
+    }
+    originals.delete(element);
     element.removeAttribute(PROCESSED_ATTRIBUTE);
-    overriddenProperties.delete(element);
+    pseudoColorDeclarationsCache.delete(element);
     invertedImageElements.delete(element);
 
     const pseudoId = pseudoIds.get(element);
@@ -598,7 +620,7 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     let didRestorePseudoRules = false;
 
     for (const element of elements) {
-      if (!element.hasAttribute(PROCESSED_ATTRIBUTE)) {
+      if (!originals.has(element) || !root.contains(element)) {
         continue;
       }
 
@@ -640,9 +662,33 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     flushPseudoRules();
   };
 
-  processBatch([root, ...root.querySelectorAll<HTMLElement>("*")]);
+  // Reject ignored subtrees at their boundary. A long newsletter can have
+  // thousands of nodes, all rendered by the reader stylesheet instead.
+  const walkCandidates = (node: HTMLElement, visit: (element: HTMLElement) => void) => {
+    if (isIgnored(node)) {
+      return;
+    }
+    visit(node);
+    const walker = node.ownerDocument.createTreeWalker(
+      node,
+      NodeFilter.SHOW_ELEMENT,
+      ignoreSelector
+        ? {
+            acceptNode: (child) =>
+              (child as Element).matches(ignoreSelector)
+                ? NodeFilter.FILTER_REJECT
+                : NodeFilter.FILTER_ACCEPT,
+          }
+        : null,
+    );
+    for (let child = walker.nextNode(); child; child = walker.nextNode()) {
+      visit(child as HTMLElement);
+    }
+  };
+  const initial: HTMLElement[] = [];
+  walkCandidates(root, (element) => initial.push(element));
+  processBatch(initial);
 
-  const rootId = String(instanceCounter++);
   root.setAttribute(ROOT_ATTRIBUTE, rootId);
 
   const scopeSelector = `[${ROOT_ATTRIBUTE}="${rootId}"]`;
@@ -655,7 +701,13 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     injectStyle(variableOverrides);
   }
 
-  const stateOverrides = buildDarkStateOverrides(root, theme, scopeSelector, ignorePropertyRules);
+  const stateOverrides = buildDarkStateOverrides(
+    root,
+    theme,
+    scopeSelector,
+    ignorePropertyRules,
+    ignoreSelector,
+  );
 
   if (stateOverrides) {
     injectStyle(stateOverrides);
@@ -682,9 +734,7 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
       const refreshTargets = new Set<HTMLElement>();
       const removedElements = new Set<HTMLElement>();
 
-      // An added node that was already processed is a re-attachment (the page
-      // moved or restored it); it goes through the refresh path instead so the
-      // pseudo rules pruned while it was detached are rebuilt.
+      // Nodes moved within this panel already have a snapshot.
       const collectAddedElement = (element: HTMLElement) => {
         if (element.hasAttribute(PROCESSED_ATTRIBUTE)) {
           refreshTargets.add(element);
@@ -697,11 +747,7 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
         if (mutation.type === "childList") {
           for (const node of mutation.addedNodes) {
             if (node instanceof HTMLElement) {
-              collectAddedElement(node);
-
-              for (const descendant of node.querySelectorAll<HTMLElement>("*")) {
-                collectAddedElement(descendant);
-              }
+              walkCandidates(node, collectAddedElement);
             }
           }
 
@@ -711,20 +757,36 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
             }
           }
         } else if (mutation.type === "attributes" && mutation.target instanceof HTMLElement) {
-          refreshTargets.add(mutation.target);
+          if (originals.has(mutation.target)) {
+            refreshTargets.add(mutation.target);
+          } else {
+            walkCandidates(mutation.target, collectAddedElement);
+          }
         }
       }
 
+      // A moved node can still be connected outside this controller (including
+      // in a draft). Release its styles before another panel picks it up.
+      let prunedRules = false;
+      for (const node of removedElements) {
+        if (!root.contains(node) || isIgnored(node)) {
+          for (const element of [
+            node,
+            ...node.querySelectorAll<HTMLElement>(`[${PROCESSED_ATTRIBUTE}]`),
+          ]) {
+            prunedRules = restoreElement(element) || prunedRules;
+          }
+        }
+      }
+      if (prunedRules) {
+        flushPseudoRules();
+      }
       if (addedElements.size > 0) {
         processBatch([...addedElements]);
       }
 
       if (refreshTargets.size > 0) {
         refreshElements(refreshTargets);
-      }
-
-      if (removedElements.size > 0) {
-        pruneRemovedElements(removedElements);
       }
     });
 
@@ -759,17 +821,13 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
     revert: () => {
       teardown();
 
-      for (const [element, originalStyle] of originalStyles) {
-        element.style.cssText = originalStyle;
-        element.removeAttribute(PROCESSED_ATTRIBUTE);
-        element.removeAttribute(PSEUDO_ATTRIBUTE);
+      for (const element of originals.keys()) {
+        restoreElement(element);
       }
-
-      originalStyles.clear();
     },
     destroy: () => {
       teardown();
-      originalStyles.clear();
+      originals.clear();
     },
   };
 }
@@ -780,7 +838,12 @@ export function applyDarkTheme(root: HTMLElement, options?: DarkThemeOptions): D
 // one has nothing to analyze, so both are skipped before that fetch by reading
 // the natural size off the element — which means waiting for its own load
 // instead of racing it with an immediate parallel fetch.
-function invertDarkImageElement(image: HTMLImageElement, theme: Theme, isCancelled: () => boolean) {
+function invertDarkImageElement(
+  image: HTMLImageElement,
+  theme: Theme,
+  isCancelled: () => boolean,
+  write: (property: string, value: string) => void,
+) {
   const analyzeLoadedImage = () => {
     const source = image.currentSrc || image.src;
 
@@ -789,12 +852,12 @@ function invertDarkImageElement(image: HTMLImageElement, theme: Theme, isCancell
     }
 
     getImageDetails(source).then((details) => {
-      if (isCancelled() || !details) {
+      if (isCancelled() || source !== (image.currentSrc || image.src) || !details) {
         return;
       }
 
       if (shouldInvertDarkImage(details)) {
-        image.style.setProperty("filter", getCSSFilterValue(theme), "important");
+        write("filter", getCSSFilterValue(theme));
       }
     });
   };

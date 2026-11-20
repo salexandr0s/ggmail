@@ -7,16 +7,12 @@ export function createNotMatchingAttributeSelector(selector: string, attribute: 
 }
 
 export function reEmitClickWithShiftKey(element: Element) {
-  let isClicked = false;
-
   element.addEventListener("click", (event) => {
-    if (isClicked) {
-      isClicked = false;
-
+    // Only redirect a user's click. The assistant explicitly opens an inline
+    // reply, and the synthetic Shift-click below already has its destination.
+    if (!event.isTrusted) {
       return;
     }
-
-    isClicked = true;
 
     event.stopPropagation();
 

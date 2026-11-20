@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ASSISTANT_PROMPT_LIMIT,
   type AssistantActivity,
@@ -16,6 +15,7 @@ import {
   SelectValue,
 } from "@ggmail/ui/components/select";
 import { Textarea } from "@ggmail/ui/components/textarea";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -29,10 +29,19 @@ import {
   SquareIcon,
   TextIcon,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { Answer, AssistantReply } from "./assistant-reply";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Answer } from "./answer";
+import { AssistantReply } from "./assistant-reply";
 
-type Entry = { id: string; prompt: string; reply?: Reply; error?: string; interrupted?: string };
+type PromptOrigin = "starter" | "written";
+type Entry = {
+  id: string;
+  prompt: string;
+  origin: PromptOrigin;
+  reply?: Reply;
+  error?: string;
+  interrupted?: string;
+};
 
 export function AssistantConversation({
   scope,
@@ -41,6 +50,7 @@ export function AssistantConversation({
   models,
   chooseModel,
   onReplyError,
+  onInserted,
 }: {
   scope: AssistantScope;
   contextKey: string;
@@ -48,10 +58,12 @@ export function AssistantConversation({
   models: AssistantModel[];
   chooseModel: (model: string) => void;
   onReplyError: () => void;
+  onInserted: () => void;
 }) {
   const { t } = useLingui();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [prompt, setPrompt] = useState("");
+  const [composerOrigin, setComposerOrigin] = useState<PromptOrigin>("written");
   const [pending, setPending] = useState("");
   const [stopping, setStopping] = useState(false);
   const [partial, setPartial] = useState("");
@@ -60,7 +72,10 @@ export function AssistantConversation({
   const lastText = useRef("");
   const composer = useRef<HTMLTextAreaElement>(null);
   const transcript = useRef<HTMLDivElement>(null);
-  const [following, setFollowing] = useState(true);
+  const latestTurn = useRef<HTMLDivElement>(null);
+  const scrollMode = useRef<"start" | "end" | "reading">("start");
+  const lastScrollTop = useRef(0);
+  const [showJump, setShowJump] = useState(false);
 
   useEffect(() => {
     if (document.activeElement === document.getElementById("mail-assistant")) {
@@ -82,14 +97,38 @@ export function AssistantConversation({
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const view = transcript.current;
-    if (view && following) {
+    const turn = latestTurn.current;
+    if (!view || !turn) {
+      return;
+    }
+    if (scrollMode.current === "start") {
+      view.scrollTop += turn.getBoundingClientRect().top - view.getBoundingClientRect().top - 16;
+    } else if (scrollMode.current === "end") {
       view.scrollTop = view.scrollHeight;
     }
-  }, [entries, partial, following]);
+    lastScrollTop.current = view.scrollTop;
+    setShowJump(view.scrollHeight - view.scrollTop - view.clientHeight > 48);
+  }, [entries, partial]);
 
-  async function send(value: string, retry?: string) {
+  // Resizing the window or expanding sources can change what is below the
+  // fold without a scroll event. Neither should move the reader's place.
+  const hasEntries = entries.length > 0;
+  useEffect(() => {
+    const view = transcript.current;
+    if (!hasEntries || !view?.firstElementChild) {
+      return;
+    }
+    const observer = new ResizeObserver(() =>
+      setShowJump(view.scrollHeight - view.scrollTop - view.clientHeight > 48),
+    );
+    observer.observe(view);
+    observer.observe(view.firstElementChild);
+    return () => observer.disconnect();
+  }, [hasEntries]);
+
+  async function send(value: string, origin: PromptOrigin, retry?: string) {
     const input = value.trim();
     if (!input || pendingId.current) {
       return;
@@ -102,8 +141,8 @@ export function AssistantConversation({
     setActivity(undefined);
     setStopping(false);
     setPartial("");
-    setFollowing(true);
-    const next = { id, prompt: input };
+    scrollMode.current = "start";
+    const next = { id, prompt: input, origin };
     setEntries((previous) =>
       retry ? previous.map((entry) => (entry.id === retry ? next : entry)) : [...previous, next],
     );
@@ -152,8 +191,9 @@ export function AssistantConversation({
     if (!prompt.trim() || pendingId.current) {
       return;
     }
-    void send(prompt);
+    void send(prompt, composerOrigin);
     setPrompt("");
+    setComposerOrigin("written");
     composer.current?.focus();
   }
 
@@ -204,10 +244,15 @@ export function AssistantConversation({
       <div className="relative min-h-0 flex-1">
         <div
           ref={transcript}
-          className="h-full overflow-y-auto overscroll-contain px-4"
+          className="h-full overflow-y-auto overscroll-contain px-4 [overflow-anchor:none]"
           onScroll={(event) => {
             const view = event.currentTarget;
-            setFollowing(view.scrollHeight - view.scrollTop - view.clientHeight < 48);
+            const below = view.scrollHeight - view.scrollTop - view.clientHeight;
+            if (Math.abs(view.scrollTop - lastScrollTop.current) > 1) {
+              scrollMode.current = below < 2 ? "end" : "reading";
+            }
+            lastScrollTop.current = view.scrollTop;
+            setShowJump(below > 48);
           }}
         >
           {entries.length === 0 ? (
@@ -226,10 +271,11 @@ export function AssistantConversation({
                     className="group flex w-full items-center gap-3 px-3.5 py-3 text-left text-sm font-medium hover:bg-muted/70 focus-visible:bg-muted focus-visible:outline-offset-[-2px]"
                     onClick={() => {
                       if (value) {
-                        void send(value);
+                        void send(value, "starter");
                       } else {
                         if (!prompt.trim()) {
                           setPrompt(t`Find emails about `);
+                          setComposerOrigin("starter");
                         }
                         composer.current?.focus();
                       }
@@ -254,11 +300,24 @@ export function AssistantConversation({
               className="space-y-6 py-5 text-sm"
             >
               {entries.map((entry, index) => (
-                <div key={entry.id} className="space-y-3">
-                  <div className="ml-auto w-fit max-w-[92%] rounded-2xl rounded-br-sm bg-teal-50 px-3.5 py-2.5 text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap text-teal-950 dark:bg-teal-950/65 dark:text-teal-50">
-                    {entry.prompt}
-                  </div>
-                  {entry.reply && <AssistantReply reply={entry.reply} contextKey={contextKey} />}
+                <div
+                  key={entry.id}
+                  ref={index === entries.length - 1 ? latestTurn : undefined}
+                  className="min-w-0 space-y-3"
+                >
+                  {entry.origin === "written" && (
+                    <div className="ml-auto w-fit max-w-[92%] rounded-2xl rounded-br-sm bg-teal-50 px-3.5 py-2.5 text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap text-teal-950 dark:bg-teal-950/65 dark:text-teal-50">
+                      {entry.prompt}
+                    </div>
+                  )}
+                  {entry.reply && (
+                    <AssistantReply
+                      reply={entry.reply}
+                      contextKey={contextKey}
+                      inThread={scope === "thread"}
+                      onInserted={onInserted}
+                    />
+                  )}
                   {entry.interrupted && <Answer text={entry.interrupted} />}
                   {(entry.error || entry.interrupted !== undefined) && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -275,7 +334,7 @@ export function AssistantConversation({
                         <Button
                           variant="outline"
                           size="xs"
-                          onClick={() => void send(entry.prompt, entry.id)}
+                          onClick={() => void send(entry.prompt, entry.origin, entry.id)}
                         >
                           <RotateCcwIcon />
                           <Trans>Try again</Trans>
@@ -306,14 +365,22 @@ export function AssistantConversation({
             </div>
           )}
         </div>
-        {!following && entries.length > 0 && (
+        {showJump && entries.length > 0 && (
           <Button
             variant="outline"
             size="icon-sm"
             className="absolute right-4 bottom-2 rounded-full shadow-sm"
             title={t`Jump to latest reply`}
             aria-label={t`Jump to latest reply`}
-            onClick={() => setFollowing(true)}
+            onClick={() => {
+              const view = transcript.current;
+              if (view) {
+                scrollMode.current = "end";
+                view.scrollTop = view.scrollHeight;
+                lastScrollTop.current = view.scrollTop;
+                setShowJump(false);
+              }
+            }}
           >
             <ArrowDownIcon />
           </Button>
@@ -334,7 +401,10 @@ export function AssistantConversation({
             value={prompt}
             placeholder={scope === "chat" ? t`Write a message…` : t`Ask about your mail…`}
             maxLength={ASSISTANT_PROMPT_LIMIT}
-            onChange={(event) => setPrompt(event.target.value)}
+            onChange={(event) => {
+              setPrompt(event.target.value);
+              setComposerOrigin("written");
+            }}
             onKeyDown={(event) => {
               if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) {
                 return;

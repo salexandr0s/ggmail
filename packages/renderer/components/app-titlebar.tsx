@@ -37,6 +37,7 @@ import { UnreadCountBadge } from "@/components/unread-count-badge";
 import { WorkspaceAppsLauncher } from "@/components/workspace-apps-launcher";
 import { useVerticalTabs } from "@/lib/hooks";
 import { useConfig } from "@/lib/react-query";
+import { submitUnifiedSearch } from "@/lib/unified-search";
 import { HOST_HANDOVER_FADE_CLASS_NAME } from "@/lib/utils";
 import { useAccountsStore, useAppUpdaterStore, useFindInPageStore } from "../lib/stores";
 
@@ -634,6 +635,14 @@ export function AppTitlebar({
         )}
         {account.gmail.outOfOffice && <BriefcaseIcon />}
         {getAccountLabel(account.config.label)}
+        {account.config.logo && (
+          <img
+            src={account.config.logo}
+            alt=""
+            draggable={false}
+            className="size-4 shrink-0 object-contain"
+          />
+        )}
         {account.gmail.attentionRequired && <CircleAlertIcon className="text-yellow-400" />}
         {!account.gmail.attentionRequired &&
         config["accounts.unreadBadge"] &&
@@ -932,7 +941,9 @@ export function AppTitlebar({
                 title={t`Show saved searches`}
                 icon={<MailSearchIcon />}
                 side="left"
-                disabled={isMailLibraryLocation || isWorkspaceAppTabActive}
+                disabled={
+                  isAttachmentsLocation || (!isUnifiedInboxLocation && isWorkspaceAppTabActive)
+                }
                 isOpen={isGmailSavedSearchesOpen}
                 onOpenChange={setIsGmailSavedSearchesOpen}
               >
@@ -940,7 +951,11 @@ export function AppTitlebar({
                   <TitlebarDropdownMenuItem
                     key={savedSearch.id}
                     onClick={() => {
-                      ipc.main.send("gmail.search", savedSearch.query);
+                      if (isUnifiedInboxLocation) {
+                        submitUnifiedSearch(savedSearch.query);
+                      } else {
+                        ipc.main.send("gmail.search", savedSearch.query);
+                      }
                     }}
                   >
                     {savedSearch.label}

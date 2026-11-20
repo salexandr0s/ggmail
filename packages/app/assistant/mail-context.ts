@@ -1,9 +1,10 @@
 import { setTimeout as delay } from "node:timers/promises";
-import { t } from "@lingui/core/macro";
-import type { AssistantScope } from "@ggmail/shared/assistant";
+import type { AssistantScope, AssistantSender } from "@ggmail/shared/assistant";
 import { gmailSearchHash, parseGmailMessageId } from "@ggmail/shared/gmail";
+import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { ms } from "@ggmail/shared/ms";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
+import { t } from "@lingui/core/macro";
 import { WebContentsView, type WebContents } from "electron";
 import { z } from "zod";
 import { accounts } from "@/accounts";
@@ -62,9 +63,26 @@ export function getMailScope(): Scope {
   return { kind, key, accountId, accountLabel, gmail, mailbox, hash };
 }
 
+// Photos are UI metadata from Gmail's message header. Never load an inline
+// email image as an avatar or include photo URLs in provider input.
+const senderSchema = z
+  .object({
+    name: z.string().max(320),
+    address: z.string().max(320),
+    photo: z.string().max(2048),
+  })
+  .transform(({ name, address, photo }): AssistantSender => {
+    const host = z.email().safeParse(address).success
+      ? address.slice(address.lastIndexOf("@") + 1).toLowerCase()
+      : undefined;
+    const domain = host && z.hostname().safeParse(host).success ? host : undefined;
+    return { name: name || address, domain, photoUrl: getGoogleProfilePhotoUrl(photo) };
+  });
+
 const snippetSchema = z.object({
   subject: z.string().max(300),
   sender: z.string().max(320),
+  senders: z.array(senderSchema).max(8),
   snippet: z.string().max(700),
   date: z.string().max(180),
   id: z
@@ -79,6 +97,7 @@ const threadSchema = z.object({
     .array(
       z.object({
         sender: z.string().max(320),
+        author: senderSchema,
         date: z.string().max(180),
         body: z.string().max(8000),
         truncated: z.boolean(),
@@ -92,14 +111,27 @@ type Snippet = z.infer<typeof snippetSchema>;
 export type MailSource = {
   subject: string;
   hash: string;
+  senders?: AssistantSender[];
+  rowSender?: string;
 };
 
 function snippetsToSources(rows: Snippet[], fallback: string) {
-  return rows.map(({ id, ...row }) => ({
+  return rows.map(({ id, senders, ...row }) => ({
     ...row,
-    source: { subject: row.subject, hash: id ? `#all/${id}` : fallback },
+    source: {
+      subject: row.subject,
+      hash: id ? `#all/${id}` : fallback,
+      senders: senders.length || !row.sender ? senders : [{ name: row.sender }],
+      rowSender: id ? undefined : row.sender,
+    },
   }));
 }
+
+const readSender = String.raw`(el, img) => ({
+  name: (el?.getAttribute("name") || el?.textContent || "").trim().slice(0, 320),
+  address: (el?.getAttribute("email") || "").trim().slice(0, 320),
+  photo: (img?.currentSrc || img?.src || "").slice(0, 2048),
+})`;
 
 // Run fixed readers in an isolated world. Gmail supplies strings only; page content
 // never becomes code, and no IPC or Electron API is exposed to the mail document.
@@ -114,13 +146,16 @@ const readRows = String.raw`(() => {
   }
   const snippets = rows.map((row) => {
     const subjectElement = row.querySelector(".bog");
-    const author = row.querySelector(".yW [email]");
+    const authors = Array.from(row.querySelectorAll(".yW [email]")).slice(0, 8);
+    const author = authors[0];
     const date = row.querySelector(".xW [title]");
-    const id = row.querySelector("[data-legacy-thread-id]")?.getAttribute("data-legacy-thread-id")
-      ?? row.getAttribute("data-legacy-thread-id");
+    const id = (row.querySelector("[data-legacy-thread-id]")?.getAttribute("data-legacy-thread-id")
+      ?? row.getAttribute("data-legacy-thread-id"))?.replace(/^#/, "");
     return {
       subject: subjectElement?.textContent?.trim().slice(0, 300) ?? "",
       sender: (author?.getAttribute("email") ?? row.querySelector(".yW")?.textContent ?? "").trim().slice(0, 320),
+      senders: authors.map(el => (${readSender})(el, el.querySelector("img") ??
+        (authors.length === 1 ? row.querySelector(".yW img") : null))),
       snippet: row.querySelector(".y2")?.textContent?.trim().slice(0, 700) ?? "",
       date: (date?.getAttribute("title") ?? row.querySelector(".xW")?.textContent ?? "").trim().slice(0, 180),
       id: /^[\da-f]{15,32}$/i.test(id ?? "") ? id : undefined,
@@ -141,11 +176,14 @@ const readThread = String.raw`(() => {
     subject: subject?.textContent?.trim().slice(0, 300) ?? "",
     messages: bodies.map((body) => {
       const message = body.closest(".adn");
-      const sender = message?.querySelector(".gD[email]");
+      const sender = Array.from(message?.querySelectorAll(".gD[email], .gD") ?? []).find(el => !el.closest(".a3s, .gmail_quote"));
+      const photo = Array.from(message?.querySelectorAll(".aju img, img.ajn, .gE img[data-hovercard-id]") ?? [])
+        .find(img => !img.closest(".a3s, .gmail_quote"));
       const date = message?.querySelector(".g3[title]");
       const text = body.innerText.trim();
       return {
         sender: (sender?.getAttribute("email") ?? sender?.textContent ?? "").trim().slice(0, 320),
+        author: (${readSender})(sender, photo),
         date: (date?.getAttribute("title") ?? date?.textContent ?? "").trim().slice(0, 180),
         body: text.slice(0, 8000),
         truncated: text.length > 8000,
@@ -176,12 +214,21 @@ export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
     const parsed = threadSchema.safeParse(await readDom(view, readThread));
     ensureCurrentScope(scope, signal);
     const thread = parsed.success ? parsed.data : undefined;
+    const authors = new Map<string, AssistantSender>();
+    const messages = thread?.messages.map(({ author, ...message }) => {
+      if (author.name) {
+        authors.set(message.sender || author.name, author);
+      }
+      return message;
+    });
     return {
       kind: "thread",
       // oxlint-disable-next-line lingui/no-unlocalized-strings -- Internal model context about the source data.
       note: "Only expanded messages are included. If none were captured, ask the user to open or expand the email and try again.",
-      thread,
-      sources: thread?.messages.length ? [{ subject: thread.subject, hash: scope.hash }] : [],
+      thread: thread && { subject: thread.subject, messages },
+      sources: thread?.messages.length
+        ? [{ subject: thread.subject, hash: scope.hash, senders: Array.from(authors.values()) }]
+        : [],
     };
   }
 
@@ -195,7 +242,7 @@ export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
     kind: scope.kind,
     // oxlint-disable-next-line lingui/no-unlocalized-strings -- Internal model context about the source data.
     note: "A limited snapshot of visible email snippets. A missing row is not evidence that the email does not exist.",
-    rows,
+    rows: rows.map(({ source: _source, ...row }) => row),
     sources: rows.map((row) => row.source),
   };
 }

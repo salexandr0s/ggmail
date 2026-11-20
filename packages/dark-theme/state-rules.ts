@@ -144,6 +144,7 @@ export function buildDarkStateOverrides(
   theme: Theme,
   scopeSelector: string,
   ignorePropertyRules: IgnorePropertyRule[],
+  ignoreSelector: string | null,
 ): string | null {
   const seen = new Set<string>();
   const rules: string[] = [];
@@ -227,5 +228,6 @@ export function buildDarkStateOverrides(
     return null;
   }
 
-  return `@scope (${scopeSelector}) {\n${rules.join("\n")}\n}`;
+  const boundary = ignoreSelector ? ` to (:is(${ignoreSelector}))` : "";
+  return `@scope (${scopeSelector})${boundary} {\n${rules.join("\n")}\n}`;
 }

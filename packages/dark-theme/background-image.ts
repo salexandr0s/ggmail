@@ -145,17 +145,18 @@ export function modifyBackgroundImage(
   backgroundImage: string,
   theme: Theme,
   isCancelled: () => boolean,
+  write = (property: string, value: string) =>
+    element.style.setProperty(property, value, "important"),
 ) {
   const layers = splitTopLevelLayers(backgroundImage);
 
   // Gradients are remapped synchronously so they apply immediately; url()
   // layers stay as-is until their image has been analyzed asynchronously.
-  element.style.setProperty(
+  write(
     "background-image",
     layers
       .map((layer) => (isGradientLayer(layer) ? replaceColorTokens(layer, theme) : layer))
       .join(", "),
-    "important",
   );
 
   if (!layers.some((layer) => readUrlLayerTarget(layer) != null)) {
@@ -183,6 +184,6 @@ export function modifyBackgroundImage(
       return;
     }
 
-    element.style.setProperty("background-image", finalLayers.join(", "), "important");
+    write("background-image", finalLayers.join(", "));
   });
 }

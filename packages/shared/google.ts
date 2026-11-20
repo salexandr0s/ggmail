@@ -8,6 +8,19 @@ export function getGoogleDomainFaviconUrl(domain: string, size: number) {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
 }
 
+export function getGoogleProfilePhotoUrl(photo: string) {
+  const url = URL.parse(photo);
+  if (
+    url?.protocol === "https:" &&
+    !url.username &&
+    !url.password &&
+    !url.port &&
+    /^lh\d+\.(?:googleusercontent\.com|google\.com|ggpht\.com)$/.test(url.hostname)
+  ) {
+    return url.href;
+  }
+}
+
 /**
  * Subdomains Google has moved an app off. Each one still redirects to the app's
  * current home, so a link to one — an old bookmark, a message sent before the

@@ -22,6 +22,11 @@ msgstr "メールを送信しました"
 msgid "Notifications"
 msgstr "トースト"
 
+#. Toggle showing one email in its sender’s original colors
+#: packages/preload-gmail/dark-theme/index.ts
+msgid "Original colors"
+msgstr "元の色"
+
 #. Button in the message-sent toast, which recalls the message
 #: packages/preload-gmail/ipc.ts
 msgctxt "button"

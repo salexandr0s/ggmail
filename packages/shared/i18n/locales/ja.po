@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: ja\n"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "(no subject)"
+msgstr "（件名なし）"
+
 #. conflictName and extensionName are extensions' names. “it” is extensionName, the extension being turned on: turning it on again retries the swap, since conflictName is already off
 #: packages/app/lib/extension-swap.ts
 msgid "{conflictName} is off, but some of its files may be left in ggmail. {extensionName} wasn't installed. Turn it on to try again."
@@ -257,6 +261,10 @@ msgstr "8時間"
 msgid "A notification shows the code either way. Press its Copy button to copy the code yourself."
 msgstr "どちらの場合も、通知にコードが表示されます。自分でコピーするには、通知の“コピー”ボタンを押してください。"
 
+#: packages/app/assistant/chat.ts
+msgid "A reply is already being inserted."
+msgstr "返信への挿入が進行中です。"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -280,7 +288,7 @@ msgstr "{appName}のバージョン情報"
 msgid "About ggmail"
 msgstr "ggmailについて"
 
-#: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/account-filters.tsx
 msgid "Account"
 msgstr "アカウント"
 
@@ -370,7 +378,8 @@ msgstr "独自のCSSを追加して、Gmailのインターフェイスをさら�
 msgid "Advanced"
 msgstr "詳細"
 
-#: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/account-filters.tsx
+#: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "すべてのアカウント"
 
@@ -777,6 +786,10 @@ msgstr "<0>{installFolder}</0>内のggmailを選択してください。"
 msgid "Choose ggmail in the Applications folder."
 msgstr "“アプリケーション”フォルダ内のggmailを選択してください。"
 
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Choose image"
+msgstr "画像を選択"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgctxt "Linux"
 msgid "Choose the color of the system tray icon."
@@ -815,6 +828,7 @@ msgstr "色をクリア"
 msgid "Clear filters"
 msgstr "フィルタをクリア"
 
+#: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Clear search"
 msgstr "検索をクリア"
@@ -825,6 +839,7 @@ msgstr "検索をクリア"
 #. Titlebar button that closes the details of an update ggmail couldn't verify
 #: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
 #: packages/renderer/recent-download-history.tsx
 msgid "Close"
@@ -1108,6 +1123,10 @@ msgstr "引用元のメールを開けませんでした。"
 msgid "Couldn't open the local ChatGPT sign-in page."
 msgstr "ChatGPT ログイン用のローカルページを開けませんでした。"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Couldn’t open this conversation."
+msgstr "このスレッドを開けませんでした。"
+
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open your browser for ChatGPT sign-in."
 msgstr "ChatGPT へのログインに使用するブラウザーを開けませんでした。"
@@ -1119,6 +1138,14 @@ msgstr "メールアシスタントに接続できませんでした。もう一
 #: packages/app/assistant/connection.ts
 msgid "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
 msgstr "保存された ChatGPT の接続情報を読み取れませんでした。接続を解除してから、もう一度ログインしてください。"
+
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Couldn’t read this image. Try another file."
+msgstr "この画像を読み込めませんでした。別のファイルをお試しください。"
+
+#: packages/renderer/components/unified-search.tsx
+msgid "Couldn’t search this account."
+msgstr "このアカウントを検索できませんでした。"
 
 #. conflictName is an extension's name; errorMessage is the technical reason, left untranslated
 #: packages/app/lib/extension-swap.ts
@@ -1335,6 +1362,7 @@ msgstr "完了"
 #. Titlebar button that opens the release page of an update ggmail couldn't verify, to download it from there
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/attachments/files.tsx
+#: packages/renderer/components/attachments/preview.tsx
 msgid "Download"
 msgstr "ダウンロード"
 
@@ -1433,6 +1461,7 @@ msgstr "ラベルの色を編集"
 msgid "Edit saved search"
 msgstr "保存した検索を編集"
 
+#: packages/renderer/components/assistant/answer.tsx
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Email source"
 msgstr "引用元のメール"
@@ -1565,11 +1594,6 @@ msgstr "問題の診断やサポートとの共有のために、アプリケー
 msgid "Extend dark theme"
 msgstr "ダークテーマの適用範囲を拡張"
 
-#. Dark theme is Gmail's own theme of that name, and dark the name of its setting, so both follow Gmail's words for them
-#: packages/renderer/routes/settings/gmail/index.tsx
-msgid "Extend Gmail's own dark theme to emails and the compose window. Gmail's theme has to be set to dark. The feature is in beta, so report anything it gets wrong."
-msgstr "Gmailのダークテーマをメールと作成ウィンドウにも適用します。Gmailのテーマを“ダーク”に設定する必要があります。この機能はベータ版のため、正しく表示されない箇所があれば報告してください。"
-
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Extension support is still being tested and may not work as reliably as the rest of ggmail. To help make it stable, report any issues."
 msgstr "拡張機能のサポートはまだテスト中のため、ggmailのほかの機能ほど安定して動作しない可能性があります。安定化に向けて、問題があれば報告してください。"
@@ -1641,6 +1665,7 @@ msgstr "Googleアカウントのパスワードとパスキーを入力・生成
 msgid "Fills and generates passwords and passkeys for your Google Account. Unlocking with biometrics needs the Bitwarden desktop app."
 msgstr "Googleアカウントのパスワードとパスキーを入力・生成します。生体認証でロックを解除するにはBitwardenデスクトップアプリが必要です。"
 
+#: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Filters"
 msgstr "フィルター"
@@ -1995,6 +2020,14 @@ msgstr "無期限"
 msgid "Indigo"
 msgstr "インディゴ"
 
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Insert into reply"
+msgstr "返信に挿入"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Inserted into reply"
+msgstr "返信に挿入しました"
+
 #. Context menu item that opens the developer tools on the element clicked
 #: packages/app/context-menu.ts
 msgid "Inspect Element"
@@ -2119,12 +2152,17 @@ msgstr "専用のウィンドウで開いているWorkspaceアプリをタブと
 msgid "Load clipped messages in full"
 msgstr "省略されたメッセージを全文読み込む"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Load more"
+msgstr "さらに読み込む"
+
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/ipc.ts
 msgid "Load on Launch"
 msgstr "起動時に読み込む"
 
 #. Screen reader label of a spinner shown while something loads
+#: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/loading-spinner.tsx
 msgid "Loading"
 msgstr "読み込み中"
@@ -2132,6 +2170,10 @@ msgstr "読み込み中"
 #: packages/renderer/routes/attachments.tsx
 msgid "Loading older mail…"
 msgstr "過去のメールを読み込み中…"
+
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Logo"
+msgstr "ロゴ"
 
 #. Heading of the About ggmail section for exporting the application's logs
 #: packages/renderer/routes/settings/about.tsx
@@ -2336,6 +2378,10 @@ msgstr "時間帯を追加する空き時間がありません。先にいずれ
 msgid "No Guesses Found"
 msgstr "候補が見つかりません"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "No matching conversations"
+msgstr "一致するスレッドはありません"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "No matching files"
 msgstr "一致するファイルはありません"
@@ -2343,6 +2389,10 @@ msgstr "一致するファイルはありません"
 #: packages/app/assistant/connection.ts
 msgid "No models are available for this ChatGPT account."
 msgstr "この ChatGPT アカウントで利用できるモデルはありません。"
+
+#: packages/renderer/components/attachments/preview.tsx
+msgid "No preview available"
+msgstr "プレビューできません"
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -2446,6 +2496,12 @@ msgstr "{extensionName}を開く"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Open a new window to compose an email, instead of composing inside Gmail."
 msgstr "Gmail内ではなく、新しいウィンドウを開いてメールを作成します。"
+
+#: packages/app/assistant/insert-reply.ts
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Open a reply in this thread and try again."
+msgstr "このスレッドで返信を開き、もう一度お試しください。"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password again."
@@ -2691,8 +2747,8 @@ msgid "Preparing your draft…"
 msgstr "下書きを準備中…"
 
 #: packages/renderer/components/attachments/files.tsx
-msgid "Preview in Gmail"
-msgstr "Gmail でプレビュー"
+msgid "Preview attachment"
+msgstr "添付ファイルをプレビュー"
 
 #: packages/renderer/routes/attachments.tsx
 #: packages/renderer/routes/unified-inbox.tsx
@@ -2871,6 +2927,10 @@ msgstr "ブックマークを削除"
 msgid "Remove from history"
 msgstr "履歴から削除"
 
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Remove logo"
+msgstr "ロゴを削除"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Remove time window"
 msgstr "時間帯を削除"
@@ -2954,6 +3014,7 @@ msgstr "今すぐ再起動"
 msgid "Restrict minimum window size"
 msgstr "ウィンドウの最小サイズを制限"
 
+#: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Retry"
 msgstr "再試行"
@@ -3024,6 +3085,10 @@ msgstr "アカウントを左にスクロール"
 msgid "Scroll accounts right"
 msgstr "アカウントを右にスクロール"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Search all accounts"
+msgstr "すべてのアカウントを検索"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "Search attachments"
 msgstr "添付ファイルを検索"
@@ -3044,6 +3109,10 @@ msgstr "検索…"
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Searching All Mail…"
 msgstr "すべてのメールを検索中…"
+
+#: packages/renderer/components/unified-search.tsx
+msgid "Searching…"
+msgstr "検索中…"
 
 #. Button in the folder picker that chooses where downloads are saved
 #: packages/app/ipc.ts
@@ -3487,6 +3556,10 @@ msgstr "パスキーとTouch IDでGoogleにログイン"
 msgid "Sign in to Google with a passkey and Windows Hello"
 msgstr "パスキーとWindows HelloでGoogleにログイン"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Sign in to search this account."
+msgstr "このアカウントを検索するにはログインしてください。"
+
 #: packages/app/workspace-app.ts
 msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
 msgstr "パスワードまたは利用可能なほかの2段階認証の方法でログインしてください。アカウントにパスワードがない場合は、先にブラウザでmyaccount.google.comからパスワードを追加してから、ここでログインしてください。"
@@ -3683,6 +3756,7 @@ msgid "The extension starts after ggmail restarts. Restart ggmail, then try agai
 msgstr "拡張機能はggmailの再起動後に起動します。ggmailを再起動してから、もう一度お試しください。"
 
 #: packages/app/assistant/chat.ts
+#: packages/app/assistant/insert-reply.ts
 #: packages/app/assistant/mail-context.ts
 msgid "The mail view changed. Ask again to use the new view."
 msgstr "メール画面が変わりました。新しい画面についてもう一度質問してください。"
@@ -3859,6 +3933,11 @@ msgstr "未検証のアップデート"
 #: packages/renderer/lib/settings-pages.ts
 msgid "Updates"
 msgstr "アップデート"
+
+#. Original colors is the label of the toggle on an individual email
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
+msgstr "メールと作成ウィンドウをダーク表示にします。メールの「元の色」を選ぶと、送信者のデザインで表示されます。"
 
 #. Setting that shares the screen through the operating system's own picker
 #: packages/renderer/routes/settings/advanced.tsx

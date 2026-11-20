@@ -124,13 +124,11 @@ export function GmailSettings() {
               })}
               description={t({
                 message:
-                  "Extend Gmail's own dark theme to emails and the compose window. Gmail's theme has to be set to dark. The feature is in beta, so report anything it gets wrong.",
+                  "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design.",
                 comment:
-                  "Dark theme is Gmail's own theme of that name, and dark the name of its setting, so both follow Gmail's words for them",
+                  "Original colors is the label of the toggle on an individual email",
               })}
               configKey="gmail.extendDarkTheme"
-              restartRequired
-              maturity="Beta"
             />
           </FieldSet>
           <FieldSeparator />

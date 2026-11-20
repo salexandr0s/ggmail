@@ -460,7 +460,7 @@ class Accounts {
   }
 
   addAccount(
-    accountDetails: Pick<AccountConfig, "label" | "notifications" | "color"> & {
+    accountDetails: Pick<AccountConfig, "label" | "notifications" | "color" | "logo"> & {
       gmail: Pick<AccountConfig["gmail"], "unreadBadge" | "unifiedInbox">;
     },
   ) {

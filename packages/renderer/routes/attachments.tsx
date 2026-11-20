@@ -1,4 +1,3 @@
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { getAccountLabel } from "@ggmail/shared/accounts";
 import { fileKind } from "@ggmail/shared/attachments";
 import { Button } from "@ggmail/ui/components/button";
@@ -15,7 +14,12 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@ggmail/ui/components/input-group";
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ggmail/ui/components/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ggmail/ui/components/popover";
 import {
   Select,
   SelectContent,
@@ -23,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ggmail/ui/components/select";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowDownWideNarrowIcon,
   ChevronLeftIcon,
@@ -174,7 +179,9 @@ export function Attachments() {
         event.key !== "Escape" ||
         event.defaultPrevented ||
         event.isComposing ||
-        document.querySelector('[data-slot="popover-content"], [data-slot="select-content"]')
+        document.querySelector(
+          '[data-slot="popover-content"], [data-slot="select-content"], [data-slot="dialog-content"]',
+        )
       ) {
         return;
       }
@@ -389,6 +396,7 @@ export function Attachments() {
                         grid={grid}
                         date={date}
                         showAccount={!chosen && accounts.length > 1}
+                        showSenderIcons={config?.["gmail.showSenderIcons"] === true}
                       />
                     ))}
                 </ul>

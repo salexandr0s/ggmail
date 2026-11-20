@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { is, platform } from "@electron-toolkit/utils";
 import { APP_ID } from "@ggmail/shared/constants";
 import { app, session } from "electron";
@@ -113,6 +115,17 @@ async function init() {
     app.quit();
 
     return;
+  }
+
+  if (platform.isMacOS && existsSync(path.join(app.getPath("userData"), ".meru-local-keychain"))) {
+    // Electron 45 selects the macOS Safe Storage entry during startup, before
+    // ready. Migrated profiles still use that entry for their encrypted cookies.
+    const productName = app.name;
+    // oxlint-disable-next-line lingui/no-unlocalized-strings -- Exact Keychain account name.
+    app.name = "Meru Local";
+    app.prependOnceListener("ready", () => {
+      app.name = productName;
+    });
   }
 
   if (config.get("app.hardwareAcceleration") === false) {

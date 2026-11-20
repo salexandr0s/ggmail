@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: sv\n"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "(no subject)"
+msgstr "(inget ämne)"
+
 #. conflictName and extensionName are extensions' names. “it” is extensionName, the extension being turned on: turning it on again retries the swap, since conflictName is already off
 #: packages/app/lib/extension-swap.ts
 msgid "{conflictName} is off, but some of its files may be left in ggmail. {extensionName} wasn't installed. Turn it on to try again."
@@ -257,6 +261,10 @@ msgstr "8 timmar"
 msgid "A notification shows the code either way. Press its Copy button to copy the code yourself."
 msgstr "En avisering visar koden i båda fallen. Klicka på knappen Kopiera i aviseringen för att kopiera koden själv."
 
+#: packages/app/assistant/chat.ts
+msgid "A reply is already being inserted."
+msgstr "Ett svar håller redan på att infogas."
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -280,7 +288,7 @@ msgstr "Om {appName}"
 msgid "About ggmail"
 msgstr "Om ggmail"
 
-#: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/account-filters.tsx
 msgid "Account"
 msgstr "Konto"
 
@@ -370,7 +378,8 @@ msgstr "Lägg till egen CSS för att anpassa Gmail-gränssnittet ytterligare. Ä
 msgid "Advanced"
 msgstr "Avancerat"
 
-#: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/account-filters.tsx
+#: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "Alla konton"
 
@@ -777,6 +786,10 @@ msgstr "Välj ggmail i <0>{installFolder}</0>."
 msgid "Choose ggmail in the Applications folder."
 msgstr "Välj ggmail i mappen Program."
 
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Choose image"
+msgstr "Välj bild"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgctxt "Linux"
 msgid "Choose the color of the system tray icon."
@@ -815,6 +828,7 @@ msgstr "Rensa färg"
 msgid "Clear filters"
 msgstr "Rensa filter"
 
+#: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Clear search"
 msgstr "Rensa sökningen"
@@ -825,6 +839,7 @@ msgstr "Rensa sökningen"
 #. Titlebar button that closes the details of an update ggmail couldn't verify
 #: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
 #: packages/renderer/recent-download-history.tsx
 msgid "Close"
@@ -1108,6 +1123,10 @@ msgstr "Det gick inte att öppna det citerade mejlet."
 msgid "Couldn't open the local ChatGPT sign-in page."
 msgstr "Det gick inte att öppna den lokala sidan för inloggning i ChatGPT."
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Couldn’t open this conversation."
+msgstr "Det gick inte att öppna konversationen."
+
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open your browser for ChatGPT sign-in."
 msgstr "Det gick inte att öppna webbläsaren för inloggning i ChatGPT."
@@ -1119,6 +1138,14 @@ msgstr "Det gick inte att nå mejlassistenten. Försök igen."
 #: packages/app/assistant/connection.ts
 msgid "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
 msgstr "Det gick inte att läsa den sparade ChatGPT-anslutningen. Koppla från den och logga in igen."
+
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Couldn’t read this image. Try another file."
+msgstr "Det gick inte att läsa bilden. Prova en annan fil."
+
+#: packages/renderer/components/unified-search.tsx
+msgid "Couldn’t search this account."
+msgstr "Det gick inte att söka i det här kontot."
 
 #. conflictName is an extension's name; errorMessage is the technical reason, left untranslated
 #: packages/app/lib/extension-swap.ts
@@ -1335,6 +1362,7 @@ msgstr "Klart"
 #. Titlebar button that opens the release page of an update ggmail couldn't verify, to download it from there
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/attachments/files.tsx
+#: packages/renderer/components/attachments/preview.tsx
 msgid "Download"
 msgstr "Ladda ned"
 
@@ -1433,6 +1461,7 @@ msgstr "Redigera etikettfärg"
 msgid "Edit saved search"
 msgstr "Redigera sparad sökning"
 
+#: packages/renderer/components/assistant/answer.tsx
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Email source"
 msgstr "Citerat mejl"
@@ -1565,11 +1594,6 @@ msgstr "Exportera apploggarna till en fil för att felsöka ett problem eller de
 msgid "Extend dark theme"
 msgstr "Utöka mörkt tema"
 
-#. Dark theme is Gmail's own theme of that name, and dark the name of its setting, so both follow Gmail's words for them
-#: packages/renderer/routes/settings/gmail/index.tsx
-msgid "Extend Gmail's own dark theme to emails and the compose window. Gmail's theme has to be set to dark. The feature is in beta, so report anything it gets wrong."
-msgstr "Utöka Gmails eget mörka tema till e-postmeddelanden och skrivfönstret. Gmails tema måste vara inställt på Mörkt. Funktionen är i betaversion, så rapportera allt som blir fel."
-
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Extension support is still being tested and may not work as reliably as the rest of ggmail. To help make it stable, report any issues."
 msgstr "Stödet för tillägg testas fortfarande och fungerar kanske inte lika tillförlitligt som resten av ggmail. Rapportera eventuella problem för att hjälpa till att göra det stabilt."
@@ -1641,6 +1665,7 @@ msgstr "Fyller i och genererar lösenord och nycklar för ditt Google-konto. Kr�
 msgid "Fills and generates passwords and passkeys for your Google Account. Unlocking with biometrics needs the Bitwarden desktop app."
 msgstr "Fyller i och genererar lösenord och nycklar för ditt Google-konto. Upplåsning med biometri kräver skrivbordsappen Bitwarden."
 
+#: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Filters"
 msgstr "Filter"
@@ -1995,6 +2020,14 @@ msgstr "Tills vidare"
 msgid "Indigo"
 msgstr "Indigo"
 
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Insert into reply"
+msgstr "Infoga i svaret"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Inserted into reply"
+msgstr "Infogat i svaret"
+
 #. Context menu item that opens the developer tools on the element clicked
 #: packages/app/context-menu.ts
 msgid "Inspect Element"
@@ -2119,12 +2152,17 @@ msgstr "Lista Workspace-appar som är öppna i egna fönster bredvid flikarna, s
 msgid "Load clipped messages in full"
 msgstr "Läs in avklippta meddelanden i sin helhet"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Load more"
+msgstr "Läs in fler"
+
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/ipc.ts
 msgid "Load on Launch"
 msgstr "Läs in vid start"
 
 #. Screen reader label of a spinner shown while something loads
+#: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/loading-spinner.tsx
 msgid "Loading"
 msgstr "Läser in"
@@ -2132,6 +2170,10 @@ msgstr "Läser in"
 #: packages/renderer/routes/attachments.tsx
 msgid "Loading older mail…"
 msgstr "Läser in äldre mejl…"
+
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Logo"
+msgstr "Logotyp"
 
 #. Heading of the About ggmail section for exporting the application's logs
 #: packages/renderer/routes/settings/about.tsx
@@ -2336,6 +2378,10 @@ msgstr "Det finns ingen ledig tid kvar för ett till tidsintervall. Ta bort elle
 msgid "No Guesses Found"
 msgstr "Inga förslag hittades"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "No matching conversations"
+msgstr "Inga matchande konversationer"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "No matching files"
 msgstr "Inga matchande filer"
@@ -2343,6 +2389,10 @@ msgstr "Inga matchande filer"
 #: packages/app/assistant/connection.ts
 msgid "No models are available for this ChatGPT account."
 msgstr "Det finns inga modeller tillgängliga för det här ChatGPT-kontot."
+
+#: packages/renderer/components/attachments/preview.tsx
+msgid "No preview available"
+msgstr "Ingen förhandsvisning tillgänglig"
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -2446,6 +2496,12 @@ msgstr "Öppna {extensionName}"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Open a new window to compose an email, instead of composing inside Gmail."
 msgstr "Öppna ett nytt fönster för att skriva ett e-postmeddelande i stället för att skriva i Gmail."
+
+#: packages/app/assistant/insert-reply.ts
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Open a reply in this thread and try again."
+msgstr "Öppna ett svar i den här tråden och försök igen."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password again."
@@ -2691,8 +2747,8 @@ msgid "Preparing your draft…"
 msgstr "Förbereder ditt utkast…"
 
 #: packages/renderer/components/attachments/files.tsx
-msgid "Preview in Gmail"
-msgstr "Förhandsvisa i Gmail"
+msgid "Preview attachment"
+msgstr "Förhandsvisa bilaga"
 
 #: packages/renderer/routes/attachments.tsx
 #: packages/renderer/routes/unified-inbox.tsx
@@ -2871,6 +2927,10 @@ msgstr "Ta bort bokmärke"
 msgid "Remove from history"
 msgstr "Ta bort från historiken"
 
+#: packages/renderer/components/account-logo-field.tsx
+msgid "Remove logo"
+msgstr "Ta bort logotyp"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Remove time window"
 msgstr "Ta bort tidsintervall"
@@ -2954,6 +3014,7 @@ msgstr "Starta om nu"
 msgid "Restrict minimum window size"
 msgstr "Begränsa minsta fönsterstorlek"
 
+#: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Retry"
 msgstr "Försök igen"
@@ -3024,6 +3085,10 @@ msgstr "Scrolla konton åt vänster"
 msgid "Scroll accounts right"
 msgstr "Scrolla konton åt höger"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Search all accounts"
+msgstr "Sök i alla konton"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "Search attachments"
 msgstr "Sök bland bilagor"
@@ -3044,6 +3109,10 @@ msgstr "Sök…"
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Searching All Mail…"
 msgstr "Söker i Alla mail…"
+
+#: packages/renderer/components/unified-search.tsx
+msgid "Searching…"
+msgstr "Söker…"
 
 #. Button in the folder picker that chooses where downloads are saved
 #: packages/app/ipc.ts
@@ -3487,6 +3556,10 @@ msgstr "Logga in på Google med en nyckel och Touch ID"
 msgid "Sign in to Google with a passkey and Windows Hello"
 msgstr "Logga in på Google med en nyckel och Windows Hello"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Sign in to search this account."
+msgstr "Logga in för att söka i det här kontot."
+
 #: packages/app/workspace-app.ts
 msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
 msgstr "Logga in med ditt lösenord eller en annan tillgänglig tvåstegsmetod. Om kontot inte har något lösenord lägger du först till ett på myaccount.google.com i en webbläsare och loggar sedan in här."
@@ -3683,6 +3756,7 @@ msgid "The extension starts after ggmail restarts. Restart ggmail, then try agai
 msgstr "Tillägget startar när ggmail har startats om. Starta om ggmail och försök sedan igen."
 
 #: packages/app/assistant/chat.ts
+#: packages/app/assistant/insert-reply.ts
 #: packages/app/assistant/mail-context.ts
 msgid "The mail view changed. Ask again to use the new view."
 msgstr "Mejlvyn har ändrats. Fråga igen för att använda den nya vyn."
@@ -3859,6 +3933,11 @@ msgstr "Uppdatering ej verifierad"
 #: packages/renderer/lib/settings-pages.ts
 msgid "Updates"
 msgstr "Uppdateringar"
+
+#. Original colors is the label of the toggle on an individual email
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
+msgstr "Visa meddelanden och skrivfönster i mörka färger. Välj Ursprungliga färger på ett meddelande för att se avsändarens utformning."
 
 #. Setting that shares the screen through the operating system's own picker
 #: packages/renderer/routes/settings/advanced.tsx

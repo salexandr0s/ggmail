@@ -29,9 +29,11 @@ function Main() {
               <div className="min-w-0 flex-1" />
               {showAssistant && (
                 <AssistantPanel
-                  close={() => {
+                  close={(focusToggle = true) => {
                     setShowAssistant(false);
-                    document.getElementById("mail-assistant-toggle")?.focus();
+                    if (focusToggle) {
+                      document.getElementById("mail-assistant-toggle")?.focus();
+                    }
                   }}
                 />
               )}

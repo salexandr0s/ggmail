@@ -61,6 +61,7 @@ import { GripVerticalIcon, MoreHorizontalIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Entries } from "type-fest";
+import { AccountLogoField } from "@/components/account-logo-field";
 import { EmojiPickerButton } from "@/components/emoji-picker-button";
 import { SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
 import { SettingsDialogContent } from "@/components/settings-dialog-content";
@@ -122,6 +123,8 @@ function AccountForm({
 }) {
   const { t } = useLingui();
 
+  const [isLogoLoading, setIsLogoLoading] = useState(false);
+
   const form = useForm({
     defaultValues: account,
     validators: {
@@ -138,11 +141,13 @@ function AccountForm({
       onSubmit={(event) => {
         event.preventDefault();
 
-        form.handleSubmit();
+        if (!isLogoLoading) {
+          form.handleSubmit();
+        }
       }}
     >
       <FieldGroup>
-        <FieldSet>
+        <FieldSet className="grid @xs/field-group:grid-cols-2">
           <form.Field name="color">
             {(field) => (
               <Field>
@@ -207,12 +212,22 @@ function AccountForm({
               </Field>
             )}
           </form.Field>
+          <form.Field name="logo">
+            {(field) => (
+              <AccountLogoField
+                logo={field.state.value}
+                onChange={field.handleChange}
+                loading={isLogoLoading}
+                onLoadingChange={setIsLogoLoading}
+              />
+            )}
+          </form.Field>
           <form.Field name="label">
             {(field) => {
               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
               return (
-                <Field>
+                <Field className="col-span-full">
                   <FieldLabel htmlFor={field.name}>
                     <Trans comment="Field for the name ggmail shows for the account">Label</Trans>
                   </FieldLabel>
@@ -332,7 +347,7 @@ function AccountForm({
             </Button>
           }
         />
-        <Button type="submit">
+        <Button type="submit" disabled={isLogoLoading}>
           {type === "add" ? (
             <Trans comment="Button that adds the account in the dialog">Add</Trans>
           ) : (
@@ -707,6 +722,14 @@ function SortableAccountItem({
           />
           {/* A label such as an address has nowhere to break, and would otherwise run under the actions. */}
           <span className="min-w-0 [overflow-wrap:anywhere]">{label}</span>
+          {account.logo && (
+            <img
+              src={account.logo}
+              alt=""
+              draggable={false}
+              className="size-4 shrink-0 object-contain"
+            />
+          )}
         </ItemTitle>
         {(account.disabled ||
           account.gmail.unreadBadge ||
