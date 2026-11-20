@@ -1,0 +1,57 @@
+import type { Config } from "@ggmail/shared/types";
+import { expect, type Page } from "@playwright/test";
+
+/**
+ * The switch a config key is rendered by, found through the label it points at.
+ *
+ * Controls are addressed by their config key rather than by a test id. Both
+ * field components pass the key as the control's `id` and label it with
+ * `<key>-label`, so the key is already a stable handle and adding test ids
+ * would only give the two somewhere to drift apart.
+ */
+export function configSwitch(settings: Page, configKey: keyof Config) {
+  return settings.locator(`[aria-labelledby="${configKey}-label"]`);
+}
+
+/**
+ * Every settings page, taken from the sidebar the app renders rather than from
+ * a list kept here.
+ *
+ * A list kept here is a copy of `sidebarNavItems` that nothing keeps in step: a
+ * page added to the app is simply never walked, and every caller reports clean
+ * without having looked at it. What each page has to satisfy stays with the
+ * test; only which pages exist comes from the app.
+ *
+ * Walking what the sidebar lists also means walking what anyone can reach.
+ * Languages is hidden from the sidebar on macOS, so it goes uncovered there —
+ * which is right, because there is no way to open it there either.
+ */
+export async function readSettingsPageLabels(settings: Page) {
+  const labels = await settings.getByTestId("settings-nav").getByRole("button").allInnerTexts();
+
+  /*
+   * Guards the reading itself. A selector that stopped matching would hand
+   * every walk an empty list, and each of them would pass having checked
+   * nothing at all.
+   */
+  expect(labels).toEqual(
+    expect.arrayContaining(["General", "Appearance", "Notifications", "About ggmail"]),
+  );
+
+  return labels;
+}
+
+/**
+ * Opens a page from the sidebar and waits for it, which is what makes the walks
+ * safe to read the DOM afterwards. The title is asserted against the label that
+ * was clicked, so an item wired to the wrong page still fails.
+ */
+export async function openSettingsPage(settings: Page, label: string) {
+  await settings
+    .getByTestId("settings-nav")
+    .getByRole("button", { name: label, exact: true })
+    .click();
+
+  // Contained, not equal: Extensions carries a maturity badge inside its title.
+  await expect(settings.getByTestId("settings-title"), label).toContainText(label);
+}

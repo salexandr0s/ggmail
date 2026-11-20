@@ -1,0 +1,86 @@
+import { removeBrowserGlobal } from "../facade/lib/browser-global";
+import type { ChromeNamespace } from "../facade/lib/chrome";
+import type { RuntimeProxySenderReport } from "./bridge-protocol";
+import { createPageStreamClient } from "./page-stream-client";
+import { getContextSenderReport, installRuntimeProxyShim } from "./shim";
+import { createRuntimeProxyStorageShim } from "./storage-shim";
+
+/**
+ * Where a context records that it has been shimmed. A content script's isolated
+ * world is invisible to the page and an extension page's window is the
+ * extension's own, so this is only ever read by the shim's own second run.
+ */
+const INSTALLED_GLOBAL = "__ggmailRuntimeProxyShimInstalled";
+
+export type InstallShimOptions = {
+  getSenderReport?: () => RuntimeProxySenderReport;
+  retryDelayMs?: number;
+};
+
+/**
+ * Everything a shimmed context installs, exactly once however often the bundle
+ * runs.
+ *
+ * Once is not a given: the derive prepends the shim to *every* `content_scripts`
+ * entry, and Chromium runs each matching entry's scripts in the same isolated
+ * world — so a page matching three of an extension's entries runs this bundle
+ * three times in one world. 1Password has three entries reaching Google, all
+ * `all_frames` at `document_start`, so three is the real number rather than a
+ * hypothetical one.
+ *
+ * Without the guard each run parked a page stream of its own and evicted its
+ * siblings', which re-parked a second later and evicted this one in turn:
+ * about three parks a second per frame, for as long as the page was open, with
+ * every message in flight failing as a closed port and every worker-opened port
+ * disconnecting. It could not be seen in the end-to-end suite, whose fixture
+ * declares one entry.
+ *
+ * Returns the page-stream client on the run that installs, and nothing on the
+ * runs that do not — which is what a test asserts on.
+ *
+ * The storage shadow is installed here for the same reason everything else is:
+ * one guard for the context, rather than each thing installed carrying its own.
+ * The storage shim's own `install` is idempotent too, since a second shadow of
+ * an area would leave its call ordering independent of the first's and a second
+ * shadow of an `onChanged` would split its listeners between two dispatchers,
+ * but that is a backstop rather than the rule.
+ */
+export function installShim({ getSenderReport, retryDelayMs }: InstallShimOptions = {}) {
+  const contextGlobals = globalThis as unknown as Record<string, unknown>;
+
+  if (contextGlobals[INSTALLED_GLOBAL] === true) {
+    return undefined;
+  }
+
+  contextGlobals[INSTALLED_GLOBAL] = true;
+
+  // A content script's isolated world is the one context the facade never
+  // runs in, so the shim is what takes `browser` away there
+  removeBrowserGlobal();
+
+  const reportSender = getSenderReport ?? getContextSenderReport;
+
+  // Before the client, which hands it every change of the worker's store: the
+  // storage shim is where the listeners for those live
+  const storageShim = createRuntimeProxyStorageShim({ getSenderReport: reportSender });
+
+  const pageStreamClient = createPageStreamClient({
+    getSenderReport: reportSender,
+    onStorageChanged: storageShim.dispatchChange,
+    retryDelayMs,
+  });
+
+  const extensionApi = contextGlobals.chrome as ChromeNamespace | undefined;
+
+  if (extensionApi) {
+    installRuntimeProxyShim(extensionApi);
+
+    storageShim.install(extensionApi);
+
+    pageStreamClient.wrapRuntime(extensionApi);
+  }
+
+  pageStreamClient.start();
+
+  return pageStreamClient;
+}

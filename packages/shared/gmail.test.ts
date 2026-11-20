@@ -1,0 +1,274 @@
+import { describe, expect, test } from "bun:test";
+import {
+  diffInboxFeed,
+  filterNewMailIdsByImportance,
+  GMAIL_INBOX_FEED_URL,
+  gmailFeedUrl,
+  gmailSearchHash,
+  inboxFeedPollDelay,
+  parseGmailMessageId,
+} from "./gmail";
+import { ms } from "./ms";
+
+const MESSAGE_ID = "FMfcgzQhVWzcNswCzNbqBmBjxGmZBbbV";
+
+describe("parseGmailMessageId", () => {
+  test("parses a message opened from a system label view", () => {
+    expect(parseGmailMessageId(`#inbox/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+    expect(parseGmailMessageId(`#all/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+    expect(parseGmailMessageId(`#sent/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+  });
+
+  test("parses a message opened from search", () => {
+    expect(parseGmailMessageId(`#search/ggmail/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+  });
+
+  test("parses a message opened from advanced search", () => {
+    expect(parseGmailMessageId(`#advanced-search/from%3Dsender%40example.com/${MESSAGE_ID}`)).toBe(
+      MESSAGE_ID,
+    );
+  });
+
+  test("parses a message opened from a label view", () => {
+    expect(parseGmailMessageId(`#label/Newsletters/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+    expect(parseGmailMessageId(`#label/Work%2FProjects/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+  });
+
+  test("parses a message opened from a category view", () => {
+    expect(parseGmailMessageId(`#category/social/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+  });
+
+  test("parses a message with a trailing hash query", () => {
+    expect(parseGmailMessageId(`#inbox/${MESSAGE_ID}?compose=new`)).toBe(MESSAGE_ID);
+    expect(parseGmailMessageId(`#search/ggmail/${MESSAGE_ID}?compose=new`)).toBe(MESSAGE_ID);
+  });
+
+  test("parses a hash without a leading number sign", () => {
+    expect(parseGmailMessageId(`inbox/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+  });
+
+  test("returns null for message list views", () => {
+    expect(parseGmailMessageId("#inbox")).toBeNull();
+    expect(parseGmailMessageId("#search/ggmail")).toBeNull();
+    expect(parseGmailMessageId("#label/Newsletters")).toBeNull();
+    expect(parseGmailMessageId("#category/social")).toBeNull();
+  });
+
+  test("returns null for a list view named like a message id", () => {
+    expect(parseGmailMessageId("#label/SomeLongLabelName123")).toBeNull();
+    expect(parseGmailMessageId("#search/somelongsearchterm")).toBeNull();
+  });
+
+  test("returns null for paginated message list views", () => {
+    expect(parseGmailMessageId("#inbox/p2")).toBeNull();
+    expect(parseGmailMessageId("#search/ggmail/p2")).toBeNull();
+  });
+
+  test("returns null for settings views", () => {
+    expect(parseGmailMessageId("#settings/general")).toBeNull();
+  });
+
+  test("returns null for an empty hash", () => {
+    expect(parseGmailMessageId("")).toBeNull();
+    expect(parseGmailMessageId("#")).toBeNull();
+  });
+});
+
+const READ_AT = 1_700_000_000_000;
+
+const SLACK = 60_000;
+
+function entries(...ids: string[]) {
+  return ids.map((id) => ({ id, receivedAt: READ_AT }));
+}
+
+describe("diffInboxFeed", () => {
+  test("reports a change without new mail when there is no baseline", () => {
+    expect(diffInboxFeed(null, new Set(), entries("a", "b"), SLACK)).toEqual({
+      changed: true,
+      newIds: [],
+    });
+  });
+
+  test("reports no change for an identical set", () => {
+    const previous = { ids: new Set(["a", "b"]), readAt: READ_AT };
+
+    expect(diffInboxFeed(previous, new Set(), entries("a", "b"), SLACK)).toEqual({
+      changed: false,
+      newIds: [],
+    });
+    expect(diffInboxFeed(previous, new Set(), entries("b", "a"), SLACK)).toEqual({
+      changed: false,
+      newIds: [],
+    });
+  });
+
+  test("reports the arrival when one entry is read and one arrives", () => {
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a", "b"]), readAt: READ_AT },
+        new Set(),
+        entries("c", "b"),
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: ["c"] });
+  });
+
+  test("reports a change without new mail when an entry is only removed", () => {
+    expect(
+      diffInboxFeed({ ids: new Set(["a", "b"]), readAt: READ_AT }, new Set(), entries("b"), SLACK),
+    ).toEqual({ changed: true, newIds: [] });
+  });
+
+  test("returns new ids once and in feed order", () => {
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a"]), readAt: READ_AT },
+        new Set(),
+        entries("c", "b", "c", "a"),
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: ["c", "b"] });
+  });
+
+  test("reports a change without new mail for an entry this session already listed", () => {
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a"]), readAt: READ_AT },
+        new Set(["c"]),
+        entries("c", "a"),
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: [] });
+  });
+
+  test("reports a change without new mail for an entry received before the slack window", () => {
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a"]), readAt: READ_AT },
+        new Set(),
+        [
+          { id: "c", receivedAt: READ_AT - SLACK - 1 },
+          { id: "a", receivedAt: READ_AT },
+        ],
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: [] });
+  });
+
+  test("reports the arrival for an entry received inside the slack window", () => {
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a"]), readAt: READ_AT },
+        new Set(),
+        [
+          { id: "c", receivedAt: READ_AT - SLACK },
+          { id: "a", receivedAt: READ_AT },
+        ],
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: ["c"] });
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a"]), readAt: READ_AT },
+        new Set(),
+        [
+          { id: "c", receivedAt: READ_AT - SLACK + 1 },
+          { id: "a", receivedAt: READ_AT },
+        ],
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: ["c"] });
+  });
+
+  test("reports the arrival for an entry received after the feed was last read", () => {
+    expect(
+      diffInboxFeed(
+        { ids: new Set(["a"]), readAt: READ_AT },
+        new Set(),
+        [
+          { id: "c", receivedAt: READ_AT + 1 },
+          { id: "a", receivedAt: READ_AT },
+        ],
+        SLACK,
+      ),
+    ).toEqual({ changed: true, newIds: ["c"] });
+  });
+});
+
+describe("gmailFeedUrl", () => {
+  test("returns the inbox feed url without a label", () => {
+    expect(gmailFeedUrl()).toBe(GMAIL_INBOX_FEED_URL);
+  });
+
+  test("appends the system label id of a label", () => {
+    expect(gmailFeedUrl("primary")).toBe(`${GMAIL_INBOX_FEED_URL}/^sq_ig_i_personal`);
+    expect(gmailFeedUrl("important")).toBe(`${GMAIL_INBOX_FEED_URL}/^iim`);
+  });
+});
+
+describe("gmailSearchHash", () => {
+  test("percent-encodes the operators and quoting a query is written with", () => {
+    expect(gmailSearchHash('from:a@b.com "x y"')).toBe("#search/from%3Aa%40b.com%20%22x%20y%22");
+  });
+
+  test("encodes a slash, so the query stays one hash segment", () => {
+    expect(gmailSearchHash("filename:report/final")).toBe("#search/filename%3Areport%2Ffinal");
+    expect(parseGmailMessageId(`${gmailSearchHash("a/b")}/${MESSAGE_ID}`)).toBe(MESSAGE_ID);
+  });
+
+  test("encodes a plus, which a reader that takes it for a space would swallow", () => {
+    expect(gmailSearchHash("c++")).toBe("#search/c%2B%2B");
+  });
+
+  test("encodes a hash and an ampersand, which would end the fragment or start a parameter", () => {
+    expect(gmailSearchHash("#urgent & new")).toBe("#search/%23urgent%20%26%20new");
+  });
+
+  test("encodes a quote and a backslash, which broke the string the hash used to be built in", () => {
+    expect(gmailSearchHash('"\\')).toBe("#search/%22%5C");
+  });
+});
+
+describe("inboxFeedPollDelay", () => {
+  const delay = (consecutiveFailures: number) =>
+    inboxFeedPollDelay(ms("30s"), consecutiveFailures, ms("5m"));
+
+  test("polls at the interval while nothing has failed", () => {
+    expect(delay(0)).toBe(ms("30s"));
+  });
+
+  test("doubles with each consecutive failure", () => {
+    expect([1, 2, 3].map(delay)).toEqual([ms("1m"), ms("2m"), ms("4m")]);
+  });
+
+  test("never waits longer than the cap", () => {
+    expect([4, 5, 10, 2000].map(delay)).toEqual([ms("5m"), ms("5m"), ms("5m"), ms("5m")]);
+  });
+});
+
+describe("filterNewMailIdsByImportance", () => {
+  test("keeps every id when notifying for all new emails", () => {
+    expect(filterNewMailIdsByImportance(["a", "b"], "all", new Set(["a"]))).toEqual(
+      new Set(["a", "b"]),
+    );
+    expect(filterNewMailIdsByImportance(["a", "b"], "all", new Set())).toEqual(new Set(["a", "b"]));
+    expect(filterNewMailIdsByImportance(["a", "b"], "all", null)).toEqual(new Set(["a", "b"]));
+  });
+
+  test("keeps only the ids the important feed carries", () => {
+    expect(filterNewMailIdsByImportance(["a", "b", "c"], "important", new Set(["b", "d"]))).toEqual(
+      new Set(["b"]),
+    );
+  });
+
+  test("keeps nothing when the important feed is empty", () => {
+    expect(filterNewMailIdsByImportance(["a", "b"], "important", new Set())).toEqual(new Set());
+  });
+
+  test("keeps every id when the important feed could not be fetched", () => {
+    expect(filterNewMailIdsByImportance(["a", "b"], "important", null)).toEqual(
+      new Set(["a", "b"]),
+    );
+  });
+});

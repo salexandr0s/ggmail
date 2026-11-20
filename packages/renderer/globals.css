@@ -1,0 +1,21 @@
+@import "sonner/dist/styles.css";
+@import "../ui/styles/globals.css";
+
+@plugin "@tailwindcss/typography";
+
+@source "../shared/**/*.{ts,tsx}";
+
+/* Japanese has no spaces, so without phrase detection Chromium wraps between any two characters, mid-word. */
+@layer base {
+  :root:lang(ja) {
+    word-break: auto-phrase;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

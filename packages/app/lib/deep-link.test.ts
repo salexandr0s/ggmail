@@ -1,0 +1,151 @@
+import { describe, expect, test } from "bun:test";
+import { isWebUrl, parseGgmailUrl, resolveRoutableUrl, upgradeToHttps } from "./deep-link";
+
+describe("parseGgmailUrl", () => {
+  test("resolves the message route", () => {
+    expect(parseGgmailUrl("ggmail://someone@gmail.com/message/abc123")).toEqual({
+      type: "message",
+      email: "someone@gmail.com",
+      messageId: "abc123",
+    });
+  });
+
+  test("resolves the open route without an account", () => {
+    expect(parseGgmailUrl("ggmail://open?url=https%3A%2F%2Fmeet.google.com%2Fabc-defg-hij")).toEqual({
+      type: "open",
+      url: "https://meet.google.com/abc-defg-hij",
+      email: undefined,
+    });
+  });
+
+  test("resolves the open route addressed to an account", () => {
+    expect(
+      parseGgmailUrl("ggmail://someone@gmail.com/open?url=https%3A%2F%2Fchat.google.com%2F"),
+    ).toEqual({
+      type: "open",
+      url: "https://chat.google.com/",
+      email: "someone@gmail.com",
+    });
+  });
+
+  test("keeps a query string belonging to the target url", () => {
+    expect(
+      parseGgmailUrl("ggmail://open?url=https%3A%2F%2Fcalendar.google.com%2F%3Fpli%3D1%26tab%3Dmc"),
+    ).toEqual({
+      type: "open",
+      url: "https://calendar.google.com/?pli=1&tab=mc",
+      email: undefined,
+    });
+  });
+
+  test("returns undefined for another scheme", () => {
+    expect(parseGgmailUrl("https://meet.google.com/abc-defg-hij")).toBeUndefined();
+    expect(parseGgmailUrl("mailto:someone@gmail.com")).toBeUndefined();
+  });
+
+  test("returns undefined for an unknown route", () => {
+    expect(parseGgmailUrl("ggmail://someone@gmail.com/compose/abc123")).toBeUndefined();
+    expect(parseGgmailUrl("ggmail://")).toBeUndefined();
+    expect(parseGgmailUrl("ggmail://open")).toBeUndefined();
+  });
+
+  test("returns undefined for a route missing its argument", () => {
+    expect(parseGgmailUrl("ggmail://someone@gmail.com/message")).toBeUndefined();
+    expect(parseGgmailUrl("ggmail://someone@gmail.com/message/")).toBeUndefined();
+    expect(parseGgmailUrl("ggmail://open?url=")).toBeUndefined();
+    expect(parseGgmailUrl("ggmail://open?query=hello")).toBeUndefined();
+  });
+
+  test("requires an address on the message route", () => {
+    expect(parseGgmailUrl("ggmail://message/abc123")).toBeUndefined();
+  });
+});
+
+describe("resolveRoutableUrl", () => {
+  test("accepts a workspace app url", () => {
+    expect(resolveRoutableUrl("https://meet.google.com/abc-defg-hij")).toBe(
+      "https://meet.google.com/abc-defg-hij",
+    );
+    expect(resolveRoutableUrl("https://chat.google.com/u/0/")).toBe("https://chat.google.com/u/0/");
+    expect(resolveRoutableUrl("https://docs.google.com/spreadsheets/d/abc123/edit")).toBe(
+      "https://docs.google.com/spreadsheets/d/abc123/edit",
+    );
+  });
+
+  test("rejects a host that only carries a workspace app name in its path", () => {
+    expect(resolveRoutableUrl("https://evil.com/meet.google.com/x")).toBeUndefined();
+  });
+
+  test("rejects a host that only ends in a google.com lookalike", () => {
+    expect(resolveRoutableUrl("https://meet.google.com.evil.com/")).toBeUndefined();
+    expect(resolveRoutableUrl("https://notgoogle.com/")).toBeUndefined();
+  });
+
+  test("rejects a google host with no workspace app", () => {
+    expect(resolveRoutableUrl("https://news.google.com/")).toBeUndefined();
+  });
+
+  test("rejects every scheme but https", () => {
+    expect(resolveRoutableUrl("http://meet.google.com/abc-defg-hij")).toBeUndefined();
+    expect(resolveRoutableUrl("javascript:alert(1)")).toBeUndefined();
+    expect(resolveRoutableUrl("file:///etc/passwd")).toBeUndefined();
+    expect(resolveRoutableUrl("ggmail://open?url=https%3A%2F%2Fmeet.google.com%2F")).toBeUndefined();
+  });
+
+  test("rejects a url that does not parse", () => {
+    expect(resolveRoutableUrl("not a url at all")).toBeUndefined();
+    expect(resolveRoutableUrl("")).toBeUndefined();
+  });
+
+  test("rejects credentials smuggled into the authority", () => {
+    expect(resolveRoutableUrl("https://meet.google.com@evil.com/")).toBeUndefined();
+  });
+});
+
+describe("isWebUrl", () => {
+  test("accepts an http and an https url", () => {
+    expect(isWebUrl("https://meet.google.com/abc-defg-hij")).toBe(true);
+    expect(isWebUrl("http://meet.google.com/abc-defg-hij")).toBe(true);
+  });
+
+  test("rejects every other scheme", () => {
+    expect(isWebUrl("ggmail://open?url=https%3A%2F%2Fmeet.google.com%2F")).toBe(false);
+    expect(isWebUrl("mailto:someone@gmail.com")).toBe(false);
+    expect(isWebUrl("file:///etc/passwd")).toBe(false);
+  });
+
+  test("rejects a switch that carries a url", () => {
+    expect(isWebUrl("--proxy-server=https://example.com")).toBe(false);
+    expect(isWebUrl("--user-data-dir=/tmp/http://x")).toBe(false);
+  });
+});
+
+describe("upgradeToHttps", () => {
+  test("rewrites the scheme and nothing else", () => {
+    expect(upgradeToHttps("http://meet.google.com/abc-defg-hij")).toBe(
+      "https://meet.google.com/abc-defg-hij",
+    );
+    expect(upgradeToHttps("http://calendar.google.com/?pli=1&tab=mc")).toBe(
+      "https://calendar.google.com/?pli=1&tab=mc",
+    );
+  });
+
+  test("leaves an https url alone", () => {
+    expect(upgradeToHttps("https://meet.google.com/abc-defg-hij")).toBe(
+      "https://meet.google.com/abc-defg-hij",
+    );
+  });
+
+  test("leaves a host that merely starts with the prefix alone", () => {
+    expect(upgradeToHttps("https://evil.com/http://meet.google.com")).toBe(
+      "https://evil.com/http://meet.google.com",
+    );
+  });
+
+  test("upgrades no host into being Google's", () => {
+    expect(upgradeToHttps("http://evil.com/meet.google.com/x")).toBe(
+      "https://evil.com/meet.google.com/x",
+    );
+    expect(resolveRoutableUrl(upgradeToHttps("http://evil.com/meet.google.com/x"))).toBeUndefined();
+  });
+});

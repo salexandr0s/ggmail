@@ -1,0 +1,42 @@
+import { config } from "@/config";
+import { createBlockMatcher } from "./hosts";
+
+export class Blocker {
+  private blockMatcher: ((url: string) => boolean) | undefined;
+
+  init() {
+    if (!config.get("blocker.enabled")) {
+      return;
+    }
+
+    this.blockMatcher = createBlockMatcher({
+      ads: config.get("blocker.ads"),
+      tracking: config.get("blocker.tracking"),
+    });
+  }
+
+  private onBeforeRequest = (
+    details: Electron.OnBeforeRequestListenerDetails,
+    callback: (response: Electron.CallbackResponse) => void,
+  ) => {
+    if (this.blockMatcher?.(details.url)) {
+      callback({ cancel: true });
+
+      return;
+    }
+
+    callback({});
+  };
+
+  setupSession(session: Electron.Session) {
+    if (this.blockMatcher) {
+      session.webRequest.onBeforeRequest({ urls: ["<all_urls>"] }, this.onBeforeRequest);
+    }
+  }
+
+  teardownSession(session: Electron.Session) {
+    session.webRequest.onBeforeRequest(null);
+  }
+}
+
+export const blocker = new Blocker();

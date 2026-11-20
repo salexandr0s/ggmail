@@ -1,0 +1,273 @@
+import path from "node:path";
+import { platform } from "@electron-toolkit/utils";
+import { assistantPanelWidth } from "@ggmail/shared/assistant";
+import { DEFAULT_WINDOW_STATE_BOUNDS } from "@ggmail/shared/config";
+import { app, BrowserWindow } from "electron";
+import { accounts } from "@/accounts";
+import { watchForAppMenuKey } from "@/app-menu-shortcut";
+import { pauseAttachmentReads } from "@/attachments/library";
+import { config } from "@/config";
+import {
+  getCommonBrowserWindowOptions,
+  isWindowVisibleOnConnectedDisplay,
+  loadRenderer,
+  onceReadyToShow,
+} from "@/lib/window";
+import { appMenu } from "@/menu";
+import { ipc } from "./ipc";
+
+class Main {
+  private _window: BrowserWindow | undefined;
+
+  private resolveRendererReady: (() => void) | undefined;
+
+  /**
+   * Resolved once the renderer has loaded and can receive what main sends it.
+   *
+   * Built here rather than in `init()` because `Gmail` instances are
+   * constructed before the window is, and their first feed fetch awaits this;
+   * a promise created alongside the window would not exist yet to be awaited.
+   * Resolving once is enough: the window is created a single time and hidden
+   * rather than closed, so there is never a second one to wait for.
+   */
+  rendererReady = new Promise<void>((resolve) => {
+    this.resolveRendererReady = resolve;
+  });
+
+  location = "/";
+
+  private assistantVisible = false;
+
+  setAssistantVisible(visible: boolean) {
+    if (this.assistantVisible === visible) {
+      return;
+    }
+    this.assistantVisible = visible;
+    accounts.updateAllViewBounds();
+  }
+
+  embeddedViewWidth(width: number, leftInset: number) {
+    const rightInset =
+      this.assistantVisible && this.location === "/" ? assistantPanelWidth(width) : 0;
+    return Math.max(0, width - leftInset - rightInset);
+  }
+
+  private setLocation(location: string) {
+    const wasAccountLocation = this.location === "/";
+
+    if (this.location === "/attachments" && location !== this.location) {
+      pauseAttachmentReads();
+    }
+
+    this.location = location;
+
+    const isAccountLocation = location === "/";
+
+    if (isAccountLocation === wasAccountLocation) {
+      return;
+    }
+
+    if (isAccountLocation) {
+      accounts.show();
+      accounts.focusActiveView();
+    } else {
+      accounts.hide();
+    }
+
+    appMenu.refresh();
+  }
+
+  get window() {
+    if (!this._window) {
+      throw new Error("Window has not been initialized");
+    }
+
+    return this._window;
+  }
+
+  set window(browserWindow: BrowserWindow) {
+    this._window = browserWindow;
+  }
+
+  /** For what can run before `init()` has created the window, where `window` throws. */
+  get windowIfCreated() {
+    return this._window;
+  }
+
+  shouldLaunchMinimized =
+    app.commandLine.hasSwitch("launch-minimized") || config.get("launchMinimized");
+
+  /**
+   * Set where several sessions share one desktop, on which a window's first
+   * `show()`, or any `focus()`, activates the app and takes the foreground
+   * from whatever another session is working in. The app opens behind and
+   * stays there until someone brings it forward.
+   */
+  shouldStayBehindUntilFocused = Boolean(process.env.GGMAIL_BACKGROUND);
+
+  /**
+   * The end-to-end suite runs the packaged app and says so through
+   * `GGMAIL_TEST_BACKGROUND`. No one uses that app, so it is never let in front,
+   * and every menu command and window a test opens stays behind too, rather
+   * than each call site that shows or focuses a window learning about tests.
+   */
+  private isBackgroundOnly = platform.isMacOS && Boolean(process.env.GGMAIL_TEST_BACKGROUND);
+
+  isQuittingApp = false;
+
+  /** The state a page with the titlebar or settings needs for its first paint. */
+  createSeedSearchParams() {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set("accounts", JSON.stringify(accounts.serializeAccounts()));
+
+    return searchParams;
+  }
+
+  loadURL() {
+    const searchParams = this.createSeedSearchParams();
+
+    searchParams.set("accountsUnreadBadge", JSON.stringify(config.get("accounts.unreadBadge")));
+
+    loadRenderer(this.window, {
+      page: "main",
+      searchParams,
+    });
+  }
+
+  init() {
+    if (this.isBackgroundOnly) {
+      app.setActivationPolicy("prohibited");
+    }
+
+    const lastWindowState = config.get("window.lastState");
+    const restrictWindowMinimumSize = config.get("window.restrictMinimumSize");
+
+    if (!isWindowVisibleOnConnectedDisplay(lastWindowState.bounds)) {
+      lastWindowState.bounds = DEFAULT_WINDOW_STATE_BOUNDS;
+    }
+
+    this.window = new BrowserWindow({
+      title: app.name,
+      minWidth: restrictWindowMinimumSize ? 912 : 320,
+      width: lastWindowState.bounds.width,
+      minHeight: restrictWindowMinimumSize ? 512 : 256,
+      height: lastWindowState.bounds.height,
+      x: lastWindowState.bounds.x,
+      y: lastWindowState.bounds.y,
+      show: false,
+      ...getCommonBrowserWindowOptions(),
+      icon: platform.isLinux ? path.join(__dirname, "..", "static", "Icon.png") : undefined,
+    });
+
+    if (!this.shouldLaunchMinimized) {
+      onceReadyToShow(this.window, () => {
+        if (this.shouldStayBehindUntilFocused) {
+          this.window.showInactive();
+        } else {
+          this.show();
+        }
+      });
+
+      if (lastWindowState.fullscreen) {
+        this.window.setFullScreen(true);
+      }
+
+      if (lastWindowState.maximized) {
+        this.window.maximize();
+      }
+    }
+
+    watchForAppMenuKey(this.window.webContents);
+
+    this.window.webContents.on("did-navigate-in-page", (_event, url) => {
+      this.setLocation(`/${new URL(url).hash.replace(/^#?\/?/, "")}`);
+    });
+
+    // A reload fires this again, and resolving a settled promise does nothing,
+    // which is the intent: what waits on it only ever waits for the first load.
+    this.window.webContents.on("did-finish-load", () => {
+      this.resolveRendererReady?.();
+    });
+
+    this.window.on("close", (event) => {
+      // Workaround: Closing the main window when on full screen leaves a black screen.
+      // Still open on Electron 44: https://github.com/electron/electron/issues/39572
+      // reopened https://github.com/electron/electron/issues/20263, which a triage bot
+      // had closed for naming an unsupported version rather than for being fixed.
+      if (platform.isMacOS && this.window.isFullScreen()) {
+        this.window.once("leave-full-screen", () => {
+          this.window.hide();
+        });
+
+        this.window.setFullScreen(false);
+      }
+
+      if (!this.isQuittingApp) {
+        event.preventDefault();
+
+        this.window.blur();
+
+        this.window.hide();
+
+        if (!config.get("dock.enabled") && !this.isBackgroundOnly) {
+          app.dock?.hide();
+        }
+      }
+    });
+
+    if (platform.isWindows) {
+      this.window.on("resized", () => {
+        this.saveWindowState();
+      });
+
+      this.window.on("moved", () => {
+        this.saveWindowState();
+      });
+
+      this.window.on("maximize", () => {
+        this.saveWindowState();
+      });
+
+      this.window.on("unmaximize", () => {
+        this.saveWindowState();
+      });
+    }
+  }
+
+  show() {
+    if (this.window.isMinimized()) {
+      this.window.restore();
+    } else {
+      this.window.show();
+    }
+
+    // Showing the dock icon turns the app back into a regular one, which can
+    // be activated.
+    if (app.dock?.isVisible && !this.isBackgroundOnly) {
+      app.dock.show();
+    }
+  }
+
+  saveWindowState() {
+    config.set("window.lastState", {
+      bounds: main.window.getBounds(),
+      fullscreen: main.window.isFullScreen(),
+      maximized: main.window.isMaximized(),
+    });
+  }
+
+  navigate(to: string) {
+    this.setLocation(to);
+
+    ipc.renderer.send(main.window.webContents, "navigate", to);
+
+    this.show();
+  }
+
+  getWindowBounds() {
+    return this.window[platform.isWindows ? "getContentBounds" : "getBounds"]();
+  }
+}
+
+export const main = new Main();

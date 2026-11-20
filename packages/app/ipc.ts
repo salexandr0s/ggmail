@@ -1,0 +1,1307 @@
+import fs from "node:fs";
+import os from "node:os";
+import { IpcEmitter, IpcListener } from "@electron-toolkit/typed-ipc/main";
+import { platform } from "@electron-toolkit/utils";
+import { isExtensionId } from "@ggmail/electron-extensions";
+import { getAccountLabel } from "@ggmail/shared/accounts";
+import { MAX_RECENT_DOWNLOAD_HISTORY_ITEMS } from "@ggmail/shared/constants";
+import { curatedExtensions, isCuratedExtensionId } from "@ggmail/shared/extensions";
+import { getWorkspaceAppUrl } from "@ggmail/shared/google";
+import { i18n } from "@ggmail/shared/i18n";
+import { ms } from "@ggmail/shared/ms";
+import { byPlatform } from "@ggmail/shared/platform";
+import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
+import type { IpcMainEvents, IpcRendererEvent } from "@ggmail/shared/types";
+import { workspaceApps } from "@ggmail/shared/workspace-apps";
+import { select, t } from "@lingui/core/macro";
+import {
+  app,
+  BrowserWindow,
+  desktopCapturer,
+  dialog,
+  Menu,
+  type MenuItemConstructorOptions,
+  nativeImage,
+  nativeTheme,
+  session,
+  shell,
+} from "electron";
+import { serializeError } from "serialize-error";
+import { getDesktopSourcesWindowTitle } from "@/account";
+import { accounts } from "@/accounts";
+import { registerAssistantIpc } from "@/assistant/ipc";
+import { registerAttachmentIpc } from "@/attachments/ipc";
+import { bookmarks } from "@/bookmarks";
+import { config } from "@/config";
+import { copyText } from "@/lib/clipboard";
+import { getExtensionWindowError } from "@/lib/extension-window";
+import { readFindRequest } from "@/lib/find-in-page";
+import { relaunchApp } from "@/lib/relaunch";
+import { main } from "@/main";
+import { appMenu } from "@/menu";
+import { settingsWindow } from "@/settings-window";
+import { swipeNavigation } from "@/swipe-navigation";
+import { DormantTab, isWindowedTab } from "@/tabs";
+import {
+  canOpenWorkspaceAppInApp,
+  resolveWorkspaceAppOpenBehavior,
+  WorkspaceApp,
+} from "@/workspace-app";
+import { confirmAppLinksTabHandover } from "./dialogs";
+import { DoNotDisturb, doNotDisturb } from "./do-not-disturb";
+import { downloads } from "./downloads";
+import {
+  extensionUpdater,
+  getInstalledExtensions,
+  installCuratedExtension,
+  openCuratedExtensionWindow,
+  uninstallCuratedExtension,
+} from "./extensions";
+import { Gmail, GMAIL_USER_STYLES_PATH } from "./gmail";
+import {
+  ExtensionInstallError,
+  getCouldNotInstallExtensionMessage,
+  getErrorMessage,
+} from "./lib/extension-swap";
+import { hibernatesTabWhenIdle } from "./lib/hibernation";
+import { log } from "./lib/log";
+import {
+  areWorkspaceAppNotificationsAllowed,
+  createNewEmailNotification,
+  createNotification,
+} from "./notifications";
+import { getIsDefaultMailtoClient, setAsDefaultMailtoClient } from "./protocol";
+import { openWindowsDefaultAppsSettings } from "./protocol/windows-mail-client";
+import { appUpdater } from "./updater";
+import { openExternalUrl } from "./url";
+
+const undoSendLapseTimeouts = new Map<number, NodeJS.Timeout>();
+
+function clearUndoSendLapseTimeout(browserWindowId: number) {
+  const undoSendLapseTimeout = undoSendLapseTimeouts.get(browserWindowId);
+
+  if (undoSendLapseTimeout) {
+    clearTimeout(undoSendLapseTimeout);
+  }
+
+  undoSendLapseTimeouts.delete(browserWindowId);
+}
+
+function getNavigationWebContents(workspaceAppId?: string) {
+  if (workspaceAppId) {
+    return WorkspaceApp.fromId(workspaceAppId).view.webContents;
+  }
+
+  const selectedAccount = accounts.getSelectedAccount();
+
+  return (selectedAccount.instance.tabs.activeTab.view ?? selectedAccount.instance.gmail.view)
+    .webContents;
+}
+
+function getRendererWebContents() {
+  const rendererWebContents = [main.window.webContents];
+
+  if (settingsWindow.window && !settingsWindow.window.webContents.isDestroyed()) {
+    rendererWebContents.push(settingsWindow.window.webContents);
+  }
+
+  const recentDownloadHistoryPopupWebContents = downloads.recentDownloadHistoryPopup.webContents;
+
+  if (recentDownloadHistoryPopupWebContents) {
+    rendererWebContents.push(recentDownloadHistoryPopupWebContents);
+  }
+
+  for (const workspaceAppWindow of WorkspaceApp.getAllWindows()) {
+    rendererWebContents.push(workspaceAppWindow.webContents);
+  }
+
+  return rendererWebContents;
+}
+
+function getNewTabLabel(appLabel: string, target: "window" | "tab") {
+  return t({
+    message: select(target, {
+      window: `New ${appLabel} Window`,
+      other: `New ${appLabel} Tab`,
+    }),
+    comment:
+      "Tab context menu item; appLabel is the name of a Google Workspace app, such as Docs or Sheets",
+  });
+}
+
+function getOpenLinksHereLabel(appLabel: string, target: "window" | "tab") {
+  return t({
+    message: select(target, {
+      window: `Open ${appLabel} Links in This Window`,
+      other: `Open ${appLabel} Links in This Tab`,
+    }),
+    comment:
+      "Tab context menu checkbox that makes this tab open the app's links; appLabel is the name of a Google Workspace app, such as Docs or Sheets",
+  });
+}
+
+function getCouldNotUninstallExtensionMessage(error: unknown) {
+  const errorMessage = getErrorMessage(error);
+
+  return t({
+    message: `Couldn't uninstall the extension: ${errorMessage}`,
+    comment: "errorMessage is the technical reason, left untranslated",
+  });
+}
+
+class Ipc {
+  main = new IpcListener<IpcMainEvents>();
+
+  renderer = new IpcEmitter<IpcRendererEvent>();
+
+  broadcast<E extends keyof IpcRendererEvent>(
+    channel: Extract<E, string>,
+    ...args: IpcRendererEvent[E]
+  ) {
+    for (const rendererWebContents of getRendererWebContents()) {
+      this.renderer.send(rendererWebContents, channel, ...args);
+    }
+  }
+
+  init() {
+    registerAssistantIpc(this);
+    registerAttachmentIpc(this);
+
+    config.onDidAnyChange(() => {
+      ipc.broadcast("config.configChanged", config.store);
+    });
+
+    config.onDidChange("accounts", () => {
+      accounts.sendAccountsChangedToRenderer();
+
+      // Bookmarks live in the account config, so every surface reflecting them
+      // redraws from here rather than from a change event of its own. The strip's
+      // tab rows star the URL they sit on, so they are sent again too.
+      accounts.sendTabsChangedToRenderer();
+
+      bookmarks.sendChangedToPopup();
+
+      WorkspaceApp.broadcastBookmarkStates();
+    });
+
+    this.main.on("accounts.selectAccount", (_event, selectedAccountId) => {
+      accounts.selectAccount(selectedAccountId);
+    });
+
+    this.main.on("accounts.selectPreviousAccount", () => {
+      accounts.selectPreviousAccount();
+    });
+
+    this.main.on("accounts.selectNextAccount", () => {
+      accounts.selectNextAccount();
+    });
+
+    this.main.on("accounts.addAccount", (_event, accountDetails) => {
+      accounts.addAccount(accountDetails);
+    });
+
+    this.main.on("accounts.removeAccount", (_event, selectedAccountId) => {
+      accounts.removeAccount(selectedAccountId);
+    });
+
+    this.main.on("accounts.updateAccount", (_event, updatedAccount) => {
+      accounts.updateAccount(updatedAccount);
+    });
+
+    this.main.on("accounts.setAccountEnabled", (_event, accountId, enabled) => {
+      accounts.setAccountEnabled(accountId, enabled);
+    });
+
+    this.main.handle("accounts.deleteBrowsingData", async (_event, accountId, dataTypes) => {
+      try {
+        await accounts.deleteBrowsingData(accountId, dataTypes);
+      } catch (error) {
+        log.error("Failed to delete browsing data", {
+          accountId,
+          dataTypes,
+          error: serializeError(error),
+        });
+
+        throw error;
+      }
+    });
+
+    this.main.on("workspaceApp.goBack", (_event, workspaceAppId) => {
+      getNavigationWebContents(workspaceAppId).navigationHistory.goBack();
+    });
+
+    this.main.on("workspaceApp.goForward", (_event, workspaceAppId) => {
+      getNavigationWebContents(workspaceAppId).navigationHistory.goForward();
+    });
+
+    this.main.on("workspaceApp.reload", (_event, workspaceAppId) => {
+      getNavigationWebContents(workspaceAppId).reload();
+    });
+
+    this.main.on("workspaceApp.stop", (_event, workspaceAppId) => {
+      getNavigationWebContents(workspaceAppId).stop();
+    });
+
+    this.main.handle("workspaceApp.getLoadingState", (_event, workspaceAppId) => {
+      return getNavigationWebContents(workspaceAppId).isLoading();
+    });
+
+    this.main.on("gmail.setOutOfOffice", (event, outOfOffice) => {
+      const accountInstance = accounts.findInstanceByGmailWebContentsId(event.sender.id);
+
+      if (accountInstance) {
+        accountInstance.gmail.store.setState({
+          outOfOffice,
+        });
+      }
+    });
+
+    this.main.on("swipeNavigation.setPageScrollEdge", (event, pageScrollEdge) => {
+      swipeNavigation.setPageScrollEdge(event.sender, pageScrollEdge);
+    });
+
+    this.main.on("titleBar.toggleAppMenu", (event, anchor) => {
+      appMenu.togglePopup(anchor, settingsWindow.getAppMenuWindow(event.sender));
+    });
+
+    // A menu in the chrome closing, which leaves the keyboard nowhere on purpose.
+    ipc.main.on("window.focusActiveView", () => {
+      accounts.focusActiveView();
+    });
+
+    this.main.handle("desktopSources.getSources", async () => {
+      const desktopSources = await desktopCapturer.getSources({
+        types: ["screen", "window"],
+      });
+
+      const desktopSourcesWindowTitle = getDesktopSourcesWindowTitle();
+
+      return desktopSources
+        .filter((source) => !source.name.startsWith(desktopSourcesWindowTitle))
+        .map(({ id, name, thumbnail }) => ({
+          id,
+          name,
+          thumbnail: thumbnail.toDataURL(),
+        }));
+    });
+
+    this.main.on("findInPage", (event, text, options) => {
+      const workspaceApp = WorkspaceApp.tryFromWebContents(event.sender);
+
+      const targetWebContents = workspaceApp?.view.webContents ?? getNavigationWebContents();
+
+      const request = readFindRequest(text);
+
+      if (request.kind !== "search") {
+        targetWebContents.stopFindInPage("clearSelection");
+
+        // Closing the field gives the keyboard back to the page it searched,
+        // which is where the window's own find bar took it from. Clearing the
+        // text does not: the field is still open and still being typed in.
+        if (request.kind === "close" && !workspaceApp) {
+          accounts.focusActiveView();
+        }
+
+        return;
+      }
+
+      targetWebContents.findInPage(request.text, {
+        forward: options?.forward,
+        findNext: options?.findNext,
+      });
+    });
+
+    ipc.main.on("downloads.openFile", async (_event, { id, filePath }) => {
+      if (await downloads.markDownloadMissingIfGone(id, filePath)) {
+        return;
+      }
+
+      shell.openPath(filePath);
+    });
+
+    ipc.main.on("downloads.showFileInFolder", async (_event, { id, filePath }) => {
+      if (await downloads.markDownloadMissingIfGone(id, filePath)) {
+        return;
+      }
+
+      shell.showItemInFolder(filePath);
+    });
+
+    ipc.main.on("taskbar.setOverlayIcon", (_event, dataUrl) => {
+      main.window.setOverlayIcon(
+        nativeImage.createFromDataURL(dataUrl),
+        t({
+          message: "You have unread messages",
+          comment:
+            "Accessible description of the unread badge on ggmail's taskbar button on Windows",
+        }),
+      );
+    });
+
+    ipc.main.on("appUpdater.quitAndInstall", () => {
+      appUpdater.quitAndInstall();
+    });
+
+    ipc.main.on("appUpdater.openVersionHistory", () => {
+      settingsWindow.open("version-history");
+    });
+
+    ipc.main.on("appUpdater.openReleasePage", () => {
+      appUpdater.openReleasePage();
+    });
+
+    ipc.main.on("gmail.search", (_event, searchQuery) => {
+      const selectedAccount = accounts.getSelectedAccount();
+
+      selectedAccount.instance.gmail.search(searchQuery);
+    });
+
+    this.main.handle("workspaceApp.getBookmarkState", (_event, workspaceAppId) => {
+      return WorkspaceApp.fromId(workspaceAppId).bookmarkState;
+    });
+
+    ipc.main.on("workspaceApp.toggleBookmark", (_event, workspaceAppId) => {
+      WorkspaceApp.fromId(workspaceAppId).toggleBookmark();
+    });
+
+    ipc.main.on("workspaceApp.showMenu", (_event, workspaceAppId) => {
+      const workspaceApp = WorkspaceApp.fromId(workspaceAppId);
+
+      const isWindowsMode = config.get("workspaceApps.mode") === "windows";
+
+      Menu.buildFromTemplate([
+        ...(workspaceApp.isPopup || isWindowsMode
+          ? []
+          : [
+              {
+                label: t`Move to Tab`,
+                click: () => {
+                  workspaceApp.adoptIntoTabs();
+                },
+              },
+              {
+                type: "separator" as const,
+              },
+            ]),
+        ...(workspaceApp.isSavable
+          ? [
+              {
+                label: t`Load on Launch`,
+                type: "checkbox" as const,
+                checked: workspaceApp.pinned && workspaceApp.loadOnLaunch,
+                click: () => {
+                  if (workspaceApp.loadOnLaunch) {
+                    workspaceApp.loadOnLaunch = false;
+
+                    accounts.saveTabs();
+
+                    return;
+                  }
+
+                  workspaceApp.loadOnLaunch = true;
+
+                  workspaceApp.account.instance.tabs.setTabPinned(workspaceApp.id, true);
+                },
+              },
+              {
+                type: "separator" as const,
+              },
+            ]
+          : []),
+        {
+          label: t`Copy URL`,
+          click: () => {
+            workspaceApp.copyUrl();
+          },
+        },
+        {
+          label: t`Open in Default Browser`,
+          click: () => {
+            workspaceApp.openInBrowser();
+          },
+        },
+      ]).popup();
+    });
+
+    ipc.main.on("tabs.selectTab", (_event, accountId, tabId) => {
+      const account = accounts.getAccount(accountId);
+
+      const selectedTab = account.instance.tabs.getTab(tabId);
+
+      account.instance.tabs.activateTab(tabId);
+
+      if (selectedTab instanceof WorkspaceApp && selectedTab.isWindowed) {
+        return;
+      }
+
+      if (account.config.selected) {
+        accounts.refreshSelectedAccountView();
+      } else {
+        accounts.selectAccount(accountId);
+      }
+    });
+
+    ipc.main.on("tabs.closeTab", (_event, accountId, tabId) => {
+      const account = accounts.getAccount(accountId);
+
+      account.instance.tabs.closeTab(tabId);
+
+      if (account.config.selected) {
+        accounts.refreshSelectedAccountView();
+      }
+    });
+
+    ipc.main.on("tabs.moveTab", (_event, accountId, tabId, targetSectionIndex) => {
+      const account = accounts.getAccount(accountId);
+
+      account.instance.tabs.moveTab(tabId, targetSectionIndex);
+    });
+
+    ipc.main.on("tabs.showTabContextMenu", (_event, accountId, tabId) => {
+      const account = accounts.getAccount(accountId);
+
+      const tab = account.instance.tabs.getTab(tabId);
+
+      if (!(tab instanceof WorkspaceApp) && !(tab instanceof DormantTab)) {
+        return;
+      }
+
+      const tabApp = tab.app;
+
+      // The designation stays visible and removable from the tab holding it.
+      const appLinksApp = tab.opensLinksForApp ?? tabApp;
+
+      const hasOtherClosableTabs = account.instance.tabs.tabs.some(
+        (accountTab) =>
+          accountTab.id !== tabId && accountTab.id !== GMAIL_TAB_ID && !accountTab.pinned,
+      );
+
+      const contextTabIndex = account.instance.tabs.tabs.findIndex(
+        (accountTab) => accountTab.id === tabId,
+      );
+
+      const hasClosableTabsBelow = account.instance.tabs.tabs
+        .slice(contextTabIndex + 1)
+        .some((accountTab) => !accountTab.pinned);
+
+      const isWindowsMode = config.get("workspaceApps.mode") === "windows";
+
+      const isTabWindowed = isWindowedTab(tab);
+
+      const openWorkspaceAppUrl = (url: string) => {
+        account.instance.tabs.openUrl(url);
+
+        if (account.config.selected) {
+          accounts.refreshSelectedAccountView();
+        }
+      };
+
+      // lingui-set comment="An item in the context menu of a Google Workspace app's tab"
+      Menu.buildFromTemplate([
+        ...(tabApp && !workspaceApps[tabApp].singleInstance
+          ? [
+              {
+                label: getNewTabLabel(
+                  workspaceApps[tabApp].label,
+                  isWindowsMode ? "window" : "tab",
+                ),
+                click: () => {
+                  openWorkspaceAppUrl(getWorkspaceAppUrl(tabApp));
+                },
+              },
+            ]
+          : []),
+        {
+          label: t({ message: "Reload", context: "context menu" }),
+          enabled: tab instanceof WorkspaceApp,
+          click: () => {
+            if (tab instanceof WorkspaceApp) {
+              tab.reload();
+            }
+          },
+        },
+        {
+          label: t`Duplicate`,
+          click: () => {
+            const currentTabUrl =
+              tab instanceof WorkspaceApp ? tab.view.webContents.getURL() : tab.url;
+
+            const duplicatedTabUrl =
+              !currentTabUrl && tabApp ? getWorkspaceAppUrl(tabApp) : currentTabUrl;
+
+            openWorkspaceAppUrl(duplicatedTabUrl);
+          },
+        },
+        ...(tab instanceof WorkspaceApp && tab.isWindowed
+          ? [
+              {
+                label: t`Move to Tab`,
+                click: () => {
+                  if (tab instanceof WorkspaceApp) {
+                    tab.adoptIntoTabs();
+                  }
+
+                  if (account.config.selected) {
+                    accounts.refreshSelectedAccountView();
+                  }
+                },
+              },
+            ]
+          : [
+              {
+                label: t`Move to New Window`,
+                enabled: tab instanceof WorkspaceApp && !tab.isWindowed,
+                click: () => {
+                  if (tab instanceof WorkspaceApp) {
+                    tab.detachToWindow();
+                  }
+
+                  if (account.config.selected) {
+                    accounts.refreshSelectedAccountView();
+                  }
+                },
+              },
+            ]),
+        {
+          type: "separator",
+        },
+        {
+          label: t({
+            message: "Copy URL",
+            comment:
+              "Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu",
+          }),
+          click: () => {
+            if (tab instanceof WorkspaceApp) {
+              tab.copyUrl();
+
+              return;
+            }
+
+            copyText(tab.url);
+          },
+        },
+        {
+          label: t`Open in Default Browser`,
+          click: () => {
+            if (tab instanceof WorkspaceApp) {
+              tab.openInBrowser();
+
+              return;
+            }
+
+            openExternalUrl(tab.url, { skipTrustedHostCheck: true });
+          },
+        },
+        {
+          type: "separator" as const,
+        },
+        ...(tabApp
+          ? [
+              {
+                label: tab.pinned ? t`Unpin` : t`Pin`,
+                click: () => {
+                  account.instance.tabs.setTabPinned(tabId, !tab.pinned);
+                },
+              },
+              {
+                label: bookmarks.isBookmarked(accountId, tab.url)
+                  ? t`Remove Bookmark`
+                  : t({
+                      message: "Bookmark",
+                      context: "context menu",
+                      comment: "Context menu item that bookmarks the tab",
+                    }),
+                click: () => {
+                  bookmarks.toggle(accountId, {
+                    app: tabApp,
+                    url: tab.url,
+                    title: tab.title,
+                  });
+                },
+              },
+              ...(tab.pinned
+                ? [
+                    {
+                      label: t`Load on Launch`,
+                      type: "checkbox" as const,
+                      checked: tab.loadOnLaunch,
+                      click: () => {
+                        tab.loadOnLaunch = !tab.loadOnLaunch;
+
+                        accounts.saveTabs();
+                      },
+                    },
+                  ]
+                : []),
+            ]
+          : []),
+        // The checkbox shows what the tab does today, under the setting and any
+        // mark it already carries, so ticking it always says hibernate this one
+        // and clearing it always says leave it alone.
+        {
+          label: t`Hibernate When Idle`,
+          type: "checkbox" as const,
+          checked: hibernatesTabWhenIdle(tab, config.get("workspaceApps.hibernation")),
+          click: () => {
+            tab.hibernatesWhenIdle = !hibernatesTabWhenIdle(
+              tab,
+              config.get("workspaceApps.hibernation"),
+            );
+
+            // An unpinned tab is not saved, so the mark lasts as long as the
+            // tab itself does.
+            if (tab.pinned) {
+              accounts.saveTabs();
+            }
+          },
+        },
+        ...(appLinksApp && !workspaceApps[appLinksApp].singleInstance
+          ? [
+              {
+                label: getOpenLinksHereLabel(
+                  workspaceApps[appLinksApp].label,
+                  isTabWindowed ? "window" : "tab",
+                ),
+                type: "checkbox" as const,
+                checked: Boolean(tab.opensLinksForApp),
+                click: async () => {
+                  if (tab.opensLinksForApp) {
+                    account.instance.tabs.setTabOpensLinksForApp(tabId, null);
+
+                    return;
+                  }
+
+                  const appLinksTab = account.instance.tabs.getAppLinksTab(appLinksApp);
+
+                  if (
+                    appLinksTab &&
+                    !(await confirmAppLinksTabHandover(appLinksApp, appLinksTab.title, {
+                      isTargetWindowed: isTabWindowed,
+                    }))
+                  ) {
+                    return;
+                  }
+
+                  account.instance.tabs.setTabOpensLinksForApp(tabId, appLinksApp);
+                },
+              },
+            ]
+          : []),
+        {
+          type: "separator",
+        },
+        ...(tab instanceof DormantTab
+          ? [
+              {
+                label: t({
+                  message: "Open",
+                  context: "context menu",
+                  comment: "Context menu item that loads an unloaded tab",
+                }),
+                click: () => {
+                  account.instance.tabs.activateTab(tabId);
+
+                  if (account.config.selected) {
+                    accounts.refreshSelectedAccountView();
+                  }
+                },
+              },
+            ]
+          : []),
+        // An unloaded pinned tab is the one thing with nothing left to close:
+        // it is already saved, and closing it again would drop what was pinned.
+        ...(tab instanceof DormantTab && tab.pinned
+          ? []
+          : [
+              {
+                label: t({
+                  message: "Close",
+                  context: "context menu",
+                  comment: "Context menu item that closes the tab",
+                }),
+                click: () => {
+                  account.instance.tabs.closeTab(tabId);
+
+                  if (account.config.selected) {
+                    accounts.refreshSelectedAccountView();
+                  }
+                },
+              },
+            ]),
+        {
+          label: t`Close Other Tabs`,
+          enabled: hasOtherClosableTabs,
+          click: () => {
+            account.instance.tabs.closeOtherTabs(tabId);
+
+            if (account.config.selected) {
+              accounts.refreshSelectedAccountView();
+            }
+          },
+        },
+        {
+          label: t`Close Tabs Below`,
+          enabled: hasClosableTabsBelow,
+          click: () => {
+            account.instance.tabs.closeTabsBelow(tabId);
+
+            if (account.config.selected) {
+              accounts.refreshSelectedAccountView();
+            }
+          },
+        },
+      ]).popup();
+      // lingui-reset
+    });
+
+    ipc.main.on("tabs.showVerticalTabsContextMenu", (_event, accountId) => {
+      const account = accounts.getAccount(accountId);
+
+      Menu.buildFromTemplate([
+        {
+          label: t({ message: "Reopen Closed Tab", context: "context menu" }),
+          enabled: account.instance.tabs.hasRecentlyClosedTabs,
+          click: () => {
+            if (account.instance.tabs.reopenClosedTab() && account.config.selected) {
+              accounts.refreshSelectedAccountView();
+            }
+          },
+        },
+        {
+          type: "separator",
+        },
+        // The way back from a width set by the button, which is otherwise the
+        // Width setting's to give — and there is nothing to reset to on `auto`,
+        // where picking it again in settings changes nothing.
+        {
+          label: t({
+            message: "Reset Width",
+            comment: "Context menu item that resets the width of the vertical tabs strip",
+          }),
+          enabled: Boolean(account.instance.verticalTabsWidth),
+          click: () => {
+            accounts.setVerticalTabsWidth(accountId, null);
+          },
+        },
+      ]).popup();
+    });
+
+    ipc.main.on("tabs.setVerticalTabsWidth", (_event, accountId, width) => {
+      accounts.setVerticalTabsWidth(accountId, width);
+    });
+
+    ipc.main.handle("config.getConfig", () => config.store);
+
+    ipc.main.handle(
+      "spellchecker.getAvailableLanguages",
+      () => session.defaultSession.availableSpellCheckerLanguages,
+    );
+
+    ipc.main.handle("spellchecker.getOsLocale", () => app.getLocale());
+
+    ipc.main.handle("config.setConfig", (_event, keyValues) => {
+      Object.entries(keyValues).forEach(([key, value]) => {
+        config.set(key as keyof typeof keyValues, value);
+      });
+    });
+
+    ipc.main.handle("downloads.setLocation", async () => {
+      const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ["openDirectory"],
+        buttonLabel: t({
+          message: "Select",
+          comment: "Button in the folder picker that chooses where downloads are saved",
+        }),
+        defaultPath: config.get("downloads.location"),
+      });
+
+      if (canceled) {
+        return { canceled: true };
+      }
+
+      config.set("downloads.location", filePaths[0]);
+
+      return { canceled: false };
+    });
+
+    ipc.main.on("app.relaunch", () => {
+      relaunchApp();
+      app.quit();
+    });
+
+    ipc.main.on("theme.setTheme", (_event, theme) => {
+      nativeTheme.themeSource = theme;
+
+      config.set("theme", theme);
+    });
+
+    ipc.main.handle("app.getLoginItemSettings", () => app.getLoginItemSettings());
+
+    ipc.main.handle("app.setLoginItemSettings", (_event, settings) => {
+      app.setLoginItemSettings(settings);
+    });
+
+    ipc.main.handle("app.getIsDefaultMailtoClient", () => getIsDefaultMailtoClient());
+
+    ipc.main.handle("app.setAsDefaultMailtoClient", () => {
+      setAsDefaultMailtoClient();
+    });
+
+    ipc.main.on("app.openDefaultAppsSettings", () => {
+      openWindowsDefaultAppsSettings();
+    });
+
+    ipc.main.handle("updates.isBelowMinimumMacOSVersion", () => !appUpdater.isUpdateSupported());
+
+    ipc.main.handle("about.getInfo", async () => ({
+      version: app.getVersion(),
+      os: `${os.type()} ${os.release()} (${os.arch()})`,
+    }));
+
+    ipc.main.handle("about.exportLogs", async () => {
+      // lingui-set comment="Button in the save dialog that exports ggmail's log file"
+      const buttonLabel = byPlatform(platform, {
+        macOS: t({ message: "Export", context: "macOS" }),
+        windows: t({ message: "Export", context: "Windows" }),
+        linux: t({ message: "Export", context: "Linux" }),
+      });
+      // lingui-reset
+
+      const { canceled, filePath } = await dialog.showSaveDialog({
+        defaultPath: "ggmail.log",
+        buttonLabel,
+      });
+
+      if (canceled || !filePath) {
+        return { canceled: true };
+      }
+
+      fs.copyFileSync(log.transports.file.getFile().path, filePath);
+
+      return { canceled: false };
+    });
+
+    ipc.main.on("notifications.showTestNotification", () => {
+      createNewEmailNotification({
+        // oxlint-disable-next-line lingui/no-unlocalized-strings -- a sender's name, which stays as it is
+        title: "Tim from ggmail",
+        subtitle: t({
+          message: "Your test notification request",
+          comment: "Subject of the sample email in the test notification",
+        }),
+        body: t`This is what a new email notification looks like.`,
+      });
+    });
+
+    ipc.main.on("workspaceApp.showNotification", (event, notification) => {
+      if (!areWorkspaceAppNotificationsAllowed()) {
+        return;
+      }
+
+      const notifyingWorkspaceApp = WorkspaceApp.tryFromViewWebContents(event.sender);
+
+      if (!notifyingWorkspaceApp) {
+        return;
+      }
+
+      const workspaceAppLabel = notifyingWorkspaceApp.app
+        ? workspaceApps[notifyingWorkspaceApp.app].label
+        : undefined;
+
+      const hasMultipleAccounts = accounts.getAccountConfigs().length > 1;
+
+      let notificationTitle = workspaceAppLabel ?? notification.title;
+
+      if (hasMultipleAccounts) {
+        notificationTitle = `[${getAccountLabel(notifyingWorkspaceApp.account.config.label)}] ${notificationTitle}`;
+      }
+
+      let subtitle: string | undefined;
+
+      let body = notification.body;
+
+      if (workspaceAppLabel) {
+        if (platform.isMacOS) {
+          subtitle = notification.title;
+        } else {
+          body = [notification.title, notification.body].filter(Boolean).join("\n");
+        }
+      }
+
+      createNotification({
+        title: notificationTitle,
+        subtitle,
+        body,
+        silent: notifyingWorkspaceApp.app === "calendar" ? true : notification.silent,
+        timeoutType: notification.requireInteraction ? "never" : "default",
+        click: () => {
+          if (notifyingWorkspaceApp.isWindowed) {
+            notifyingWorkspaceApp.window.show();
+
+            return;
+          }
+
+          main.show();
+
+          notifyingWorkspaceApp.account.instance.tabs.activateTab(notifyingWorkspaceApp.id);
+
+          if (notifyingWorkspaceApp.account.config.selected) {
+            accounts.refreshSelectedAccountView();
+          } else {
+            accounts.selectAccount(notifyingWorkspaceApp.accountId);
+          }
+        },
+      });
+    });
+
+    ipc.main.on("workspaceApps.openApp", (_event, app, modifierOpenBehavior) => {
+      if (!canOpenWorkspaceAppInApp(app)) {
+        openExternalUrl(getWorkspaceAppUrl(app), {
+          skipTrustedHostCheck: true,
+          focusBrowser: modifierOpenBehavior !== "backgroundTab",
+        });
+
+        return;
+      }
+
+      const openBehavior = resolveWorkspaceAppOpenBehavior(modifierOpenBehavior);
+
+      const selectedAccount = accounts.getSelectedAccount();
+
+      if (openBehavior === "newWindow") {
+        selectedAccount.instance.tabs.openWindowedTab(getWorkspaceAppUrl(app));
+
+        return;
+      }
+
+      const workspaceApp = selectedAccount.instance.tabs.openTab(getWorkspaceAppUrl(app));
+
+      if (openBehavior === "backgroundTab") {
+        return;
+      }
+
+      selectedAccount.instance.tabs.activateTab(workspaceApp.id);
+
+      accounts.refreshSelectedAccountView();
+    });
+
+    ipc.main.on("doNotDisturb.toggle", () => {
+      doNotDisturb.toggle();
+    });
+
+    ipc.main.on("doNotDisturb.showOptions", () => {
+      const options: MenuItemConstructorOptions[] = DoNotDisturb.options.map(
+        ({ label, duration }) => ({
+          label: i18n.t(label),
+          type: "checkbox",
+          checked: config.get("doNotDisturb.duration") === duration,
+          click: () => {
+            doNotDisturb.enable(duration);
+          },
+        }),
+      );
+
+      const menu = Menu.buildFromTemplate(
+        config.get("doNotDisturb.enabled")
+          ? [
+              {
+                label: t({
+                  message: "Disable",
+                  comment: "Do Not Disturb menu item that turns Do Not Disturb off",
+                }),
+                click: () => {
+                  doNotDisturb.disable();
+                },
+              },
+              { type: "separator" },
+              ...options,
+            ]
+          : options,
+      );
+
+      menu.popup();
+    });
+
+    ipc.main.on("gmail.openUserStyles", (_event, openIn) => {
+      if (!fs.existsSync(GMAIL_USER_STYLES_PATH)) {
+        fs.closeSync(fs.openSync(GMAIL_USER_STYLES_PATH, "w"));
+      }
+
+      if (openIn === "editor") {
+        shell.openPath(GMAIL_USER_STYLES_PATH);
+      } else {
+        shell.showItemInFolder(GMAIL_USER_STYLES_PATH);
+      }
+    });
+
+    ipc.main.on("gmail.navigateTo", (_event, hashLocation) => {
+      ipc.renderer.send(
+        accounts.getSelectedAccount().instance.gmail.view.webContents,
+        "gmail.navigateTo",
+        hashLocation,
+      );
+    });
+
+    ipc.main.on("gmail.closeComposeWindow", (event) => {
+      const composeWorkspaceApp = WorkspaceApp.tryFromViewWebContents(event.sender);
+
+      if (!composeWorkspaceApp?.isWindowed) {
+        return;
+      }
+
+      const composeWindow = composeWorkspaceApp.window;
+
+      const gmailWebContents = composeWorkspaceApp.account.instance.gmail.view.webContents;
+
+      composeWindow.hide();
+
+      const browserWindowId = composeWindow.id;
+
+      clearUndoSendLapseTimeout(browserWindowId);
+
+      // Gmail's undo send period is configurable up to 30 seconds
+      undoSendLapseTimeouts.set(
+        browserWindowId,
+        setTimeout(() => {
+          if (!composeWindow.isDestroyed() && !composeWindow.isVisible()) {
+            composeWindow.close();
+          }
+        }, ms("30s")),
+      );
+
+      composeWindow.once("closed", () => {
+        clearUndoSendLapseTimeout(browserWindowId);
+
+        if (gmailWebContents.isDestroyed()) {
+          return;
+        }
+
+        ipc.renderer.send(
+          gmailWebContents,
+          "gmail.dismissMessageSentNotification",
+          browserWindowId,
+        );
+      });
+
+      if (gmailWebContents.isDestroyed()) {
+        return;
+      }
+
+      ipc.renderer.send(gmailWebContents, "gmail.showMessageSentNotification", browserWindowId);
+    });
+
+    ipc.main.on("gmail.undoMessageSent", (_event, browserWindowId) => {
+      const composeWindow = BrowserWindow.fromId(browserWindowId);
+
+      if (!composeWindow) {
+        return;
+      }
+
+      const composeWorkspaceApp = WorkspaceApp.tryFromWebContents(composeWindow.webContents);
+
+      if (!composeWorkspaceApp) {
+        return;
+      }
+
+      clearUndoSendLapseTimeout(browserWindowId);
+
+      composeWindow.show();
+
+      ipc.renderer.send(composeWorkspaceApp.view.webContents, "gmail.undoMessageSent");
+    });
+
+    ipc.main.on("gmail.setUserEmail", (event, email) => {
+      const accountInstance = accounts.findInstanceByGmailWebContentsId(event.sender.id);
+
+      if (accountInstance && accountInstance.gmail.userEmail !== email) {
+        accountInstance.gmail.invalidateAttachmentLibrary();
+        accountInstance.gmail.userEmail = email;
+      }
+    });
+
+    ipc.main.on("downloads.dragFile", async (event, { id, filePath }) => {
+      if (await downloads.markDownloadMissingIfGone(id, filePath)) {
+        return;
+      }
+
+      event.sender.startDrag({
+        file: filePath,
+        icon: nativeImage.createFromDataURL(
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABFklEQVR4nN3RzysEcRjH8afd1kE5ODg4ODgoBwcHRSFEfs0f4V9x9D+478HZqCmllB+llFLYqG1mWzTM0jhY6vtWa5GDnhnPiXe9Ls/38Dl8Rf5d3j3LXoPIa8CPEpyXcOElrOQemI+JFu4gs5jVXAOzt6CpNKGcwtzH7Ya1zAPTddA8vLqWjdQx075N1TOOTESgiV/cp/KjY7J9H69l+JOxKmium+6b9cS17qNVztWBkSvQ7KeO6PnLwZN7f7vEqQPDFbAQraEzsBCtwVOwEK2BE7AQrf5jsBCtviOwEK3eQ7AQrZ49sBCt7l2wEK2uHbAQrc5tsBCtUkDUEcBvlAJCdaDos1TwCQtbkItPWNxkUR34c70BSSmcO++HIKkAAAAASUVORK5CYII=",
+        ),
+      });
+    });
+
+    ipc.main.handle("bookmarks.getBookmarks", () => {
+      return bookmarks.serialize();
+    });
+
+    ipc.main.on("bookmarks.togglePopup", (event, placement) => {
+      const parentWindow = BrowserWindow.fromWebContents(event.sender);
+
+      if (!parentWindow) {
+        return;
+      }
+
+      bookmarks.togglePopup(parentWindow, placement);
+    });
+
+    /*
+     * Only the closes the popup asks for land here — Escape, its close button,
+     * opening a bookmark — so the keyboard goes back to the content behind it.
+     * A close the popup's own blur caused does not: something else has the
+     * focus by then, and it is where the click went.
+     */
+    ipc.main.on("bookmarks.closePopup", () => {
+      bookmarks.popup.close();
+
+      accounts.focusActiveView();
+    });
+
+    ipc.main.on("bookmarks.setPopupCloseOnBlurEnabled", (_event, enabled) => {
+      bookmarks.popup.closeOnBlurEnabled = enabled;
+    });
+
+    ipc.main.on("bookmarks.openBookmark", (_event, accountId, bookmarkId) => {
+      bookmarks.open(accountId, bookmarkId);
+    });
+
+    ipc.main.on("bookmarks.removeBookmark", (_event, accountId, bookmarkId) => {
+      bookmarks.remove(accountId, bookmarkId);
+    });
+
+    ipc.main.on("bookmarks.moveBookmark", (_event, accountId, bookmarkId, targetIndex) => {
+      bookmarks.move(accountId, bookmarkId, targetIndex);
+    });
+
+    ipc.main.handle("extensions.getInstalled", () => {
+      return getInstalledExtensions();
+    });
+
+    ipc.main.handle("extensions.install", async (_event, extensionId) => {
+      if (!isCuratedExtensionId(extensionId)) {
+        return { error: t`ggmail doesn't offer this extension.` };
+      }
+
+      try {
+        await installCuratedExtension(extensionId);
+
+        return {};
+      } catch (error) {
+        log.error("Failed to install extension", { extensionId, error: serializeError(error) });
+
+        if (error instanceof ExtensionInstallError) {
+          return { error: error.message };
+        }
+
+        return {
+          error: getCouldNotInstallExtensionMessage(error),
+        };
+      }
+    });
+
+    ipc.main.handle("extensions.uninstall", async (_event, extensionId) => {
+      if (!isExtensionId(extensionId)) {
+        return { error: t`ggmail doesn't know this extension.` };
+      }
+
+      try {
+        await uninstallCuratedExtension(extensionId);
+
+        return {};
+      } catch (error) {
+        log.error("Failed to uninstall extension", { extensionId, error: serializeError(error) });
+
+        return {
+          error: getCouldNotUninstallExtensionMessage(error),
+        };
+      }
+    });
+
+    ipc.main.handle("extensions.update", async () => {
+      return { results: await extensionUpdater.checkForUpdates() };
+    });
+
+    ipc.main.handle("extensions.openWindow", (_event, extensionId) => {
+      const name = curatedExtensions.find(
+        (curatedExtension) => curatedExtension.id === extensionId,
+      )?.name;
+
+      return { error: getExtensionWindowError(name, openCuratedExtensionWindow(extensionId)) };
+    });
+
+    ipc.main.on("downloads.toggleRecentDownloadHistoryPopup", (event) => {
+      const parentWindow = BrowserWindow.fromWebContents(event.sender);
+
+      if (!parentWindow) {
+        return;
+      }
+
+      if (downloads.toggleRecentDownloadHistoryPopup(parentWindow)) {
+        downloads.checkDownloadHistoryItems(MAX_RECENT_DOWNLOAD_HISTORY_ITEMS);
+      }
+    });
+
+    ipc.main.on("downloads.closeRecentDownloadHistoryPopup", () => {
+      downloads.recentDownloadHistoryPopup.close();
+
+      accounts.focusActiveView();
+    });
+
+    ipc.main.on("downloads.setDownloadHistoryPopupOnBlurEnabled", (_event, enabled) => {
+      downloads.recentDownloadHistoryPopup.closeOnBlurEnabled = enabled;
+    });
+
+    ipc.main.on("downloads.openDownloadHistory", () => {
+      downloads.recentDownloadHistoryPopup.close();
+
+      main.navigate("/download-history");
+
+      downloads.checkDownloadHistoryItems();
+    });
+
+    this.main.on("gmail.unreadCountChanged", (event, unreadCountString) => {
+      const parsedUnreadCountString = unreadCountString
+        .split(":")
+        .map((count) => Number(count.replace(/\D/g, "")) || 0);
+
+      const unreadCountPreference = config.get("gmail.unreadCountPreference");
+
+      const unreadCount =
+        parsedUnreadCountString.length === 2
+          ? parsedUnreadCountString[unreadCountPreference === "first-section" ? 0 : 1]
+          : parsedUnreadCountString[0];
+
+      if (typeof unreadCount !== "number") {
+        log.error(`Received invalid "unreadCount" from renderer:`, unreadCountString);
+
+        return;
+      }
+
+      for (const account of accounts.instances.values()) {
+        if (event.sender.id === account.gmail.view.webContents.id) {
+          account.gmail.setUnreadCount(unreadCount);
+
+          account.gmail.fetchInboxFeed();
+
+          break;
+        }
+      }
+    });
+
+    this.main.on("gmail.openMessage", (_event, messageId) => {
+      accounts.openMessage(accounts.getSelectedAccount().config.id, messageId);
+    });
+
+    this.main.handle("gmail.handleMessage", async (_event, accountId, messageId, action) => {
+      await accounts.instances.get(accountId)?.gmail.handleMessage(messageId, action);
+    });
+
+    this.main.on("gmail.messageHandled", (_event, requestId, success) => {
+      Gmail.resolveMessageHandled(requestId, success);
+    });
+  }
+}
+
+export const ipc = new Ipc();

@@ -1,0 +1,4100 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-18 18:29+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#. conflictName and extensionName are extensions' names. “it” is extensionName, the extension being turned on: turning it on again retries the swap, since conflictName is already off
+#: packages/app/lib/extension-swap.ts
+msgid "{conflictName} is off, but some of its files may be left in ggmail. {extensionName} wasn't installed. Turn it on to try again."
+msgstr "{conflictName} is off, but some of its files may be left in ggmail. {extensionName} wasn't installed. Turn it on to try again."
+
+#: packages/app/lib/extension-swap.ts
+msgid "{conflictName} is still on, and {extensionName} wasn't installed."
+msgstr "{conflictName} is still on, and {extensionName} wasn't installed."
+
+#: packages/app/lib/extension-swap.ts
+msgid "{conflictName} was turned off, and you're signed out of it in ggmail."
+msgstr "{conflictName} was turned off, and you're signed out of it in ggmail."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "{count, plural, one {# file} other {# files}}"
+msgstr "{count, plural, one {# file} other {# files}}"
+
+#. On Linux, a finished download's notification acts when clicked; elsewhere, through its button
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "{downloadNotificationAction, select, click {Choose what clicking the notification does.} other {Choose what the notification's button does.}}"
+msgstr "{downloadNotificationAction, select, click {Choose what clicking the notification does.} other {Choose what the notification's button does.}}"
+
+#. Setting that picks what a finished download's notification does: on Linux, clicking it; elsewhere, its button
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "{downloadNotificationAction, select, click {On click} other {Button}}"
+msgstr "{downloadNotificationAction, select, click {On click} other {Button}}"
+
+#. Placeholder of the Color field, giving two example colors: a hex code and an rgb() value
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "{EXAMPLE_HEX_COLOR} or {EXAMPLE_RGB_COLOR}"
+msgstr "{EXAMPLE_HEX_COLOR} or {EXAMPLE_RGB_COLOR}"
+
+#. extensionName is a password manager extension's name
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "{extensionName} runs on Google's sign-in pages only. Add a site to run it there too, such as your company's single sign-on provider. Sites apply after a restart."
+msgstr "{extensionName} runs on Google's sign-in pages only. Add a site to run it there too, such as your company's single sign-on provider. Sites apply after a restart."
+
+#. Title of the dialog when more than one extension failed to update
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
+msgstr "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
+
+#. name is the name of a browser extension, such as Bitwarden
+#: packages/app/lib/extension-window.ts
+msgid "{name} is running, but ggmail can't open a window for it."
+msgstr "{name} is running, but ggmail can't open a window for it."
+
+#. name is the name of a browser extension, such as Bitwarden
+#: packages/app/lib/extension-swap.ts
+msgid "{name} is still on."
+msgstr "{name} is still on."
+
+#. name is an extension's name
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "{name} is up to date"
+msgstr "{name} is up to date"
+
+#. name is the name of a browser extension, such as Bitwarden
+#: packages/app/lib/extension-window.ts
+msgid "{name} starts after ggmail restarts. Restart ggmail, then try again."
+msgstr "{name} starts after ggmail restarts. Restart ggmail, then try again."
+
+#. name is an extension's name
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "{name} updated to {version}"
+msgstr "{name} updated to {version}"
+
+#. name is an extension's name; reason is the technical reason, left untranslated
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "{name}: {reason}"
+msgstr "{name}: {reason}"
+
+#. The first form is shown on Windows, the other on macOS
+#: packages/app/workspace-app.ts
+msgid "{platformName, select, windows {Continue with Windows Hello if you've created a passkey in ggmail. Passkeys from Chrome, Google Password Manager, or your phone don't work here — sign in with your password or another second factor, then create a passkey for ggmail in your Google account's security settings.} other {Continue with Touch ID if you've created a passkey in ggmail. Passkeys from Chrome, iCloud, or your phone don't work here — sign in with your password or another second factor, then create a passkey for ggmail in your Google account's security settings.}}"
+msgstr "{platformName, select, windows {Continue with Windows Hello if you've created a passkey in ggmail. Passkeys from Chrome, Google Password Manager, or your phone don't work here — sign in with your password or another second factor, then create a passkey for ggmail in your Google account's security settings.} other {Continue with Touch ID if you've created a passkey in ggmail. Passkeys from Chrome, iCloud, or your phone don't work here — sign in with your password or another second factor, then create a passkey for ggmail in your Google account's security settings.}}"
+
+#. The Excluded apps field once more than three apps are excluded: the names of the first three, then how many more are excluded
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "{remainingExcludedAppCount, plural, one {{visibleExcludedApps} +# excluded} other {{visibleExcludedApps} +# excluded}}"
+msgstr "{remainingExcludedAppCount, plural, one {{visibleExcludedApps} +# excluded} other {{visibleExcludedApps} +# excluded}}"
+
+#. Spellchecker languages chosen beyond the system language, counted once there are more than two to name
+#: packages/renderer/routes/settings/languages.tsx
+msgid "{selectedCount, plural, one {# additional language} other {# additional languages}}"
+msgstr "{selectedCount, plural, one {# additional language} other {# additional languages}}"
+
+#. Tooltip of the tab every link to a Google Workspace app opens in. tabTitle is the page's title; appName is the app's English name, such as Calendar
+#: packages/renderer/components/vertical-tabs.tsx
+msgid "{tabTitle} — opens {appName} links"
+msgstr "{tabTitle} — opens {appName} links"
+
+#. appLinksTabTitle is the title of the tab that opens the links today; appLabel is the name of a Google Workspace app, such as Docs or Sheets
+#: packages/app/dialogs.ts
+msgid "{target, select, window {“{appLinksTabTitle}” currently opens all {appLabel} links. This window will open them instead.} other {“{appLinksTabTitle}” currently opens all {appLabel} links. This tab will open them instead.}}"
+msgstr "{target, select, window {“{appLinksTabTitle}” currently opens all {appLabel} links. This window will open them instead.} other {“{appLinksTabTitle}” currently opens all {appLabel} links. This tab will open them instead.}}"
+
+#. Tab context menu item; appLabel is the name of a Google Workspace app, such as Docs or Sheets
+#: packages/app/ipc.ts
+msgid "{target, select, window {New {appLabel} Window} other {New {appLabel} Tab}}"
+msgstr "{target, select, window {New {appLabel} Window} other {New {appLabel} Tab}}"
+
+#. appLabel is the name of a Google Workspace app, such as Docs or Sheets
+#: packages/app/dialogs.ts
+msgid "{target, select, window {Open {appLabel} links in this window?} other {Open {appLabel} links in this tab?}}"
+msgstr "{target, select, window {Open {appLabel} links in this window?} other {Open {appLabel} links in this tab?}}"
+
+#. Tab context menu checkbox that makes this tab open the app's links; appLabel is the name of a Google Workspace app, such as Docs or Sheets
+#: packages/app/ipc.ts
+msgid "{target, select, window {Open {appLabel} Links in This Window} other {Open {appLabel} Links in This Tab}}"
+msgstr "{target, select, window {Open {appLabel} Links in This Window} other {Open {appLabel} Links in This Tab}}"
+
+#. Dialog asking to confirm switching the Workspace apps Mode setting to New windows, which says more when Workspace app tabs are open, when pinned apps load on launch, or both
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "{workspaceAppsInUse, select, both {Workspace apps open in their own window from now on. The tabs you already have open stay as they are, and the tab strip hides after you close them, or after a restart. Pinned apps set to load on launch open as windows the next time you start ggmail.} openTabs {Workspace apps open in their own window from now on. The tabs you already have open stay as they are, and the tab strip hides after you close them, or after a restart.} loadOnLaunch {Workspace apps open in their own window from now on. Pinned apps set to load on launch open as windows the next time you start ggmail.} other {Workspace apps open in their own window from now on.}}"
+msgstr "{workspaceAppsInUse, select, both {Workspace apps open in their own window from now on. The tabs you already have open stay as they are, and the tab strip hides after you close them, or after a restart. Pinned apps set to load on launch open as windows the next time you start ggmail.} openTabs {Workspace apps open in their own window from now on. The tabs you already have open stay as they are, and the tab strip hides after you close them, or after a restart.} loadOnLaunch {Workspace apps open in their own window from now on. Pinned apps set to load on launch open as windows the next time you start ggmail.} other {Workspace apps open in their own window from now on.}}"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "&Copy"
+msgstr "&Copy"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "&Copy"
+msgstr "&Copy"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "&Copy"
+msgstr "&Copy"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgid "&Learn Spelling"
+msgstr "&Learn Spelling"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "&Learn Spelling"
+msgstr "&Learn Spelling"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "&Paste"
+msgstr "&Paste"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "&Paste"
+msgstr "&Paste"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "&Paste"
+msgstr "&Paste"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgid "&Search with Google"
+msgstr "&Search with Google"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "&Search with Google"
+msgstr "&Search with Google"
+
+#. Option of the Hibernate after setting: how long a tab goes unused before it hibernates
+#: packages/shared/workspace-apps.ts
+msgid "1 hour"
+msgstr "1 hour"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "1 Hour"
+msgstr "1 Hour"
+
+#. Option of the Hibernate after setting: how long a tab goes unused before it hibernates
+#: packages/shared/workspace-apps.ts
+msgid "1 minute"
+msgstr "1 minute"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "10 Minutes"
+msgstr "10 Minutes"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "12 Hours"
+msgstr "12 Hours"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "15 Minutes"
+msgstr "15 Minutes"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "2 Hours"
+msgstr "2 Hours"
+
+#. Option of the Hibernate after setting: how long a tab goes unused before it hibernates
+#: packages/shared/workspace-apps.ts
+msgid "3 hours"
+msgstr "3 hours"
+
+#. Option of the Hibernate after setting: how long a tab goes unused before it hibernates
+#: packages/shared/workspace-apps.ts
+msgid "30 minutes"
+msgstr "30 minutes"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "30 Minutes"
+msgstr "30 Minutes"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "4 Hours"
+msgstr "4 Hours"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "5 Minutes"
+msgstr "5 Minutes"
+
+#. Option of the Hibernate after setting: how long a tab goes unused before it hibernates
+#: packages/shared/workspace-apps.ts
+msgid "6 hours"
+msgstr "6 hours"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "8 Hours"
+msgstr "8 Hours"
+
+#. Copy names the button on the verification code notification, so it matches that button's label
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "A notification shows the code either way. Press its Copy button to copy the code yourself."
+msgstr "A notification shows the code either way. Press its Copy button to copy the code yourself."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "About {appName}"
+msgstr "About {appName}"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "About {appName}"
+msgstr "About {appName}"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "About {appName}"
+msgstr "About {appName}"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "About ggmail"
+msgstr "About ggmail"
+
+#: packages/renderer/components/attachments/filters.tsx
+msgid "Account"
+msgstr "Account"
+
+#. Button on an account's row in Settings that opens a menu of its actions
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Account actions"
+msgstr "Account actions"
+
+#. A menu or a menu item in ggmail's menu bar
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Heading of the Appearance section for how accounts look
+#: packages/app/menu.ts
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Accounts"
+msgstr "Accounts"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Actual Size"
+msgstr "Actual Size"
+
+#. Button that adds the account in the dialog
+#. Button that adds the label color in the dialog
+#. Button that adds the saved search in the dialog
+#. Button that adds the site entered in the field
+#. Button that opens the dialog for adding a saved search
+#. Button that opens the dialog for adding an account
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/extensions.tsx
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Add"
+msgstr "Add"
+
+#. Screen reader label of the button that puts a Workspace app in the launcher; label is the app's name
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Add {label} to launcher"
+msgstr "Add {label} to launcher"
+
+#. allowlistEntry is the line to add to 1Password's list of allowed browsers, which stays as it is
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Add <0>{allowlistEntry}</0> on its own line, then save."
+msgstr "Add <0>{allowlistEntry}</0> on its own line, then save."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Add a passkey to your Google account from its security settings inside ggmail, then sign in with Touch ID — no password manager extension to install, so ggmail stays fast and light. iCloud passkeys don't work here, and filling passwords still needs a password manager."
+msgstr "Add a passkey to your Google account from its security settings inside ggmail, then sign in with Touch ID — no password manager extension to install, so ggmail stays fast and light. iCloud passkeys don't work here, and filling passwords still needs a password manager."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Add a passkey to your Google account from its security settings inside ggmail, then sign in with Windows Hello — no password manager extension to install, so ggmail stays fast and light. Passkeys from Chrome, Google Password Manager, or your phone don't work here, and filling passwords still needs a password manager."
+msgstr "Add a passkey to your Google account from its security settings inside ggmail, then sign in with Windows Hello — no password manager extension to install, so ggmail stays fast and light. Passkeys from Chrome, Google Password Manager, or your phone don't work here, and filling passwords still needs a password manager."
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Add account"
+msgstr "Add account"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Add label color"
+msgstr "Add label color"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Add saved search"
+msgstr "Add saved search"
+
+#. Button that opens the dialog of the sites the extension runs on
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Add sites"
+msgstr "Add sites"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Add time window"
+msgstr "Add time window"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Add Workspace apps to the launcher on the right of the titlebar."
+msgstr "Add Workspace apps to the launcher on the right of the titlebar."
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Add your own CSS to personalize the Gmail interface further. Changes take effect after a restart."
+msgstr "Add your own CSS to personalize the Gmail interface further. Changes take effect after a restart."
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Heading of the Gmail page's section for settings most people leave alone
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Advanced"
+msgstr "Advanced"
+
+#: packages/renderer/components/attachments/filters.tsx
+msgid "All accounts"
+msgstr "All accounts"
+
+#. Option of the Categories to monitor setting: every category of Gmail's inbox
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "All categories"
+msgstr "All categories"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "All files"
+msgstr "All files"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "All mail"
+msgstr "All mail"
+
+#. Option of the Notify for setting: a notification for every new email
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "All new emails"
+msgstr "All new emails"
+
+#. Option of the Hibernate idle tabs setting: which Workspace app tabs are unloaded when idle
+#: packages/shared/workspace-apps.ts
+msgid "All tabs"
+msgstr "All tabs"
+
+#: packages/app/assistant/connection.ts
+msgid "Allow ggmail to use your ChatGPT plan in the browser and try again."
+msgstr "Allow ggmail to use your ChatGPT plan in the browser and try again."
+
+#. Option of the Show Gmail unread badge setting: when the Gmail tab shows its unread count
+#: packages/shared/tabs.ts
+msgid "Always"
+msgstr "Always"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Always compose new emails in new window"
+msgstr "Always compose new emails in new window"
+
+#. A pop-out is Gmail's own name for a reply in its own window, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Always reply and forward in a pop-out"
+msgstr "Always reply and forward in a pop-out"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Always show trimmed content"
+msgstr "Always show trimmed content"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Amber"
+msgstr "Amber"
+
+#. Titlebar button on Windows and Linux that opens ggmail's menu, in place of a menu bar
+#: packages/renderer/components/app-menu-button.tsx
+msgid "App menu"
+msgstr "App menu"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Heading of the Gmail page's section about how Gmail looks
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Appearance"
+msgstr "Appearance"
+
+#: packages/renderer/routes/settings/about.tsx
+msgid "Application version"
+msgstr "Application version"
+
+#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#. Button on a new email notification. A Gmail action, so it follows Gmail's word for it, under Gmail's words in the glossary
+#: packages/app/gmail/index.ts
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Archive"
+msgstr "Archive"
+
+#. Option of the When to copy setting: when a detected verification code is copied to the clipboard
+#: packages/shared/verification-codes.ts
+msgid "As soon as it arrives"
+msgstr "As soon as it arrives"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Ask about an email, find to-dos, or draft a reply. When you ask, ChatGPT receives the relevant mail from your current view."
+msgstr "Ask about an email, find to-dos, or draft a reply. When you ask, ChatGPT receives the relevant mail from your current view."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Ask about your mail…"
+msgstr "Ask about your mail…"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Ask where to save each file before it downloads."
+msgstr "Ask where to save each file before it downloads."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/routes/attachments.tsx
+msgid "Attachments"
+msgstr "Attachments"
+
+#. Option of the Launcher display setting: how the Workspace apps launcher shows its apps in the titlebar; agrees with the word for display where the language genders it
+#: packages/shared/workspace-apps.ts
+msgctxt "launcher display"
+msgid "Auto"
+msgstr "Auto"
+
+#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit; agrees with the word for placement where the language genders it
+#: packages/shared/workspace-apps.ts
+msgctxt "placement"
+msgid "Auto"
+msgstr "Auto"
+
+#. Option of a label color's Text color setting; agrees with the word for color where the language genders it
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgctxt "text color"
+msgid "Auto"
+msgstr "Auto"
+
+#. Option of the Width setting for the vertical tabs sidebar; agrees with the word for width where the language genders it
+#: packages/shared/tabs.ts
+msgctxt "width"
+msgid "Auto"
+msgstr "Auto"
+
+#. Option of the Window controls setting: whether the titlebar shows the close, minimize and maximize buttons
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Automatic"
+msgstr "Automatic"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Automatically select the first account with unread emails when clicking the menu bar icon."
+msgstr "Automatically select the first account with unread emails when clicking the menu bar icon."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Linux"
+msgid "Automatically select the first account with unread emails when clicking the system tray icon."
+msgstr "Automatically select the first account with unread emails when clicking the system tray icon."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Windows"
+msgid "Automatically select the first account with unread emails when clicking the system tray icon."
+msgstr "Automatically select the first account with unread emails when clicking the system tray icon."
+
+#. Heading of the Workspace apps that can be added to the launcher
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Available"
+msgstr "Available"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Back"
+msgstr "Back"
+
+#. Badge beside a setting whose feature isn't stable yet
+#: packages/renderer/components/maturity-field-badge.tsx
+msgid "Beta"
+msgstr "Beta"
+
+#. Option of a label color's Text color setting
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Black"
+msgstr "Black"
+
+#: packages/renderer/routes/settings/blocker.tsx
+msgid "Block ads"
+msgstr "Block ads"
+
+#: packages/renderer/routes/settings/blocker.tsx
+msgid "Block advertisements on the pages you open."
+msgstr "Block advertisements on the pages you open."
+
+#: packages/renderer/routes/settings/blocker.tsx
+msgid "Block the scripts that follow you from site to site."
+msgstr "Block the scripts that follow you from site to site."
+
+#: packages/renderer/routes/settings/blocker.tsx
+msgid "Block trackers"
+msgstr "Block trackers"
+
+#: packages/renderer/routes/settings/blocker.tsx
+msgid "Block unwanted content and network requests."
+msgstr "Block unwanted content and network requests."
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Blocker"
+msgstr "Blocker"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Blue"
+msgstr "Blue"
+
+#. Button that bookmarks the page on display
+#. Button that bookmarks the page on display
+#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/workspace-app.tsx
+msgid "Bookmark"
+msgstr "Bookmark"
+
+#. Context menu item that bookmarks the tab
+#: packages/app/ipc.ts
+msgctxt "context menu"
+msgid "Bookmark"
+msgstr "Bookmark"
+
+#: packages/renderer/bookmarks.tsx
+msgid "Bookmark a page with the star on its tab or window titlebar, or from a tab's context menu."
+msgstr "Bookmark a page with the star on its tab or window titlebar, or from a tab's context menu."
+
+#. Button in the vertical tabs strip that shows the bookmarks
+#. Heading of the bookmarks popup
+#: packages/renderer/bookmarks.tsx
+#: packages/renderer/components/vertical-tabs.tsx
+msgid "Bookmarks"
+msgstr "Bookmarks"
+
+#. Name of a notification sound, picked in Settings
+#: packages/renderer/lib/notifications/index.ts
+msgid "Breeze"
+msgstr "Breeze"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Bring All to Front"
+msgstr "Bring All to Front"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Browsing data deleted"
+msgstr "Browsing data deleted"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgid "C&opy Image Address"
+msgstr "C&opy Image Address"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "C&opy Image Address"
+msgstr "C&opy Image Address"
+
+#. Checkbox in the Delete browsing data dialog that deletes the account's cache
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Cached images and files"
+msgstr "Cached images and files"
+
+#. Button in a dialog asking to confirm a setting change, which leaves the setting as it was
+#: packages/renderer/components/config-select-field.tsx
+#: packages/renderer/desktop-sources.tsx
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/extensions.tsx
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Cancel"
+msgstr "Cancel"
+
+#. The Cancel button of a native dialog
+#: packages/app/lib/native-cancel-label.ts
+msgctxt "Linux"
+msgid "Cancel"
+msgstr "Cancel"
+
+#. The Cancel button of a native dialog
+#: packages/app/lib/native-cancel-label.ts
+msgctxt "macOS"
+msgid "Cancel"
+msgstr "Cancel"
+
+#. The Cancel button of a native dialog
+#: packages/app/lib/native-cancel-label.ts
+msgctxt "Windows"
+msgid "Cancel"
+msgstr "Cancel"
+
+#. Cancel ChatGPT sign-in
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Cancel sign-in"
+msgstr "Cancel sign-in"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Catch me up"
+msgstr "Catch me up"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Catch me up on recent emails in this view. What needs my attention?"
+msgstr "Catch me up on recent emails in this view. What needs my attention?"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Categories to monitor"
+msgstr "Categories to monitor"
+
+#. Button that picks another folder for downloads
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Change…"
+msgstr "Change…"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Chat only"
+msgstr "Chat only"
+
+#: packages/app/assistant/connection.ts
+msgid "ChatGPT can't renew this session yet. Try again in a moment."
+msgstr "ChatGPT can't renew this session yet. Try again in a moment."
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "ChatGPT connection"
+msgstr "ChatGPT connection"
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "ChatGPT couldn't complete sign-in. Try again."
+msgstr "ChatGPT couldn't complete sign-in. Try again."
+
+#: packages/app/assistant/responses.ts
+msgid "ChatGPT couldn't complete the request. Try again."
+msgstr "ChatGPT couldn't complete the request. Try again."
+
+#: packages/app/assistant/chat.ts
+msgid "ChatGPT couldn't finish the mail request. Try a narrower question."
+msgstr "ChatGPT couldn't finish the mail request. Try a narrower question."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "ChatGPT model"
+msgstr "ChatGPT model"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "ChatGPT models unavailable"
+msgstr "ChatGPT models unavailable"
+
+#: packages/app/assistant/chat.ts
+msgid "ChatGPT requested too many mail actions. Try a narrower question."
+msgstr "ChatGPT requested too many mail actions. Try a narrower question."
+
+#: packages/app/assistant/http.ts
+#: packages/app/assistant/responses.ts
+msgid "ChatGPT returned a response that is too large."
+msgstr "ChatGPT returned a response that is too large."
+
+#: packages/app/assistant/chat.ts
+msgid "ChatGPT returned an empty reply. Try asking again."
+msgstr "ChatGPT returned an empty reply. Try asking again."
+
+#: packages/app/assistant/http.ts
+#: packages/app/assistant/responses.ts
+msgid "ChatGPT returned an empty response."
+msgstr "ChatGPT returned an empty response."
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "ChatGPT returned an invalid identity token."
+msgstr "ChatGPT returned an invalid identity token."
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "ChatGPT sign-in timed out. Try again."
+msgstr "ChatGPT sign-in timed out. Try again."
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "ChatGPT sign-in was canceled."
+msgstr "ChatGPT sign-in was canceled."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Check for Updates…"
+msgstr "Check for Updates…"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Check for Updates…"
+msgstr "Check for Updates…"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Check for Updates…"
+msgstr "Check for Updates…"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Checking ChatGPT connection…"
+msgstr "Checking ChatGPT connection…"
+
+#. Name of a notification sound, picked in Settings
+#: packages/renderer/lib/notifications/index.ts
+msgid "Chime"
+msgstr "Chime"
+
+#: packages/app/assistant/chat.ts
+msgid "Choose an available ChatGPT model."
+msgstr "Choose an available ChatGPT model."
+
+#. Windows Settings is the Settings app of Windows, so it follows Microsoft's name for it
+#: packages/renderer/routes/settings/general.tsx
+msgid "Choose ggmail as the default mail client in Windows Settings."
+msgstr "Choose ggmail as the default mail client in Windows Settings."
+
+#. installFolder is the folder ggmail is installed in on Windows, which stays as it is
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Choose ggmail in <0>{installFolder}</0>."
+msgstr "Choose ggmail in <0>{installFolder}</0>."
+
+#. Applications is the macOS folder, so use the name the Finder shows in that language
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Choose ggmail in the Applications folder."
+msgstr "Choose ggmail in the Applications folder."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Linux"
+msgid "Choose the color of the system tray icon."
+msgstr "Choose the color of the system tray icon."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Windows"
+msgid "Choose the color of the system tray icon."
+msgstr "Choose the color of the system tray icon."
+
+#. Title of the window that picks a screen or a window to share in a Google Meet call
+#: packages/app/account.ts
+msgid "Choose what to share"
+msgstr "Choose what to share"
+
+#. Marks as important names Gmail's Important marker, so important follows Gmail's word for it
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Choose whether every new email or only the emails Gmail marks as important shows a notification."
+msgstr "Choose whether every new email or only the emails Gmail marks as important shows a notification."
+
+#. Button that clears the whole download history
+#: packages/renderer/routes/download-history.tsx
+msgid "Clear all"
+msgstr "Clear all"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Clear Cache"
+msgstr "Clear Cache"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Clear color"
+msgstr "Clear color"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Clear filters"
+msgstr "Clear filters"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Clear search"
+msgstr "Clear search"
+
+#. Button that closes the bookmarks popup
+#. Button that closes the recent download history popup
+#. Screen reader label of the button that closes a dialog in Settings
+#. Titlebar button that closes the details of an update ggmail couldn't verify
+#: packages/renderer/bookmarks.tsx
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/settings-dialog-content.tsx
+#: packages/renderer/recent-download-history.tsx
+msgid "Close"
+msgstr "Close"
+
+#. Context menu item that closes the tab
+#: packages/app/ipc.ts
+msgctxt "context menu"
+msgid "Close"
+msgstr "Close"
+
+#. File menu item that closes the window
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Close"
+msgstr "Close"
+
+#. Button on a tab in the vertical tabs strip that closes the tab
+#: packages/renderer/components/vertical-tabs.tsx
+msgctxt "tab"
+msgid "Close"
+msgstr "Close"
+
+#. File menu item that closes the window
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Close"
+msgstr "Close"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Close attachments"
+msgstr "Close attachments"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Close compose window after send"
+msgstr "Close compose window after send"
+
+#: packages/renderer/components/app-main.tsx
+msgid "Close download history"
+msgstr "Close download history"
+
+#: packages/renderer/components/find-in-page.tsx
+msgid "Close find in page"
+msgstr "Close find in page"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Close mail assistant"
+msgstr "Close mail assistant"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Close Other Tabs"
+msgstr "Close Other Tabs"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Close Tab"
+msgstr "Close Tab"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Close Tabs Below"
+msgstr "Close Tabs Below"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Close the compose window after you send."
+msgstr "Close the compose window after you send."
+
+#: packages/renderer/components/app-main.tsx
+msgid "Close unified inbox"
+msgstr "Close unified inbox"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Close Window"
+msgstr "Close Window"
+
+#. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Cmd"
+msgstr "Cmd"
+
+#. Option of the Launcher display setting: how the Workspace apps launcher shows its apps in the titlebar
+#: packages/shared/workspace-apps.ts
+msgid "Collapsed"
+msgstr "Collapsed"
+
+#. Field for the background color of a Gmail label
+#. Field that picks the account's color
+#. Setting that picks the system tray icon's color
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/appearance.tsx
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Color"
+msgstr "Color"
+
+#. Heading of the Gmail page's section about writing emails
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Compose"
+msgstr "Compose"
+
+#. File menu item that opens a new email in Gmail
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Compose"
+msgstr "Compose"
+
+#. File menu item that opens a new email in Gmail
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Compose"
+msgstr "Compose"
+
+#. File menu item that opens a new email in Gmail
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Compose"
+msgstr "Compose"
+
+#: packages/renderer/routes/settings/phishing-protection.tsx
+msgid "Confirm external links before opening"
+msgstr "Confirm external links before opening"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Connect 1Password"
+msgstr "Connect 1Password"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Connect ChatGPT"
+msgstr "Connect ChatGPT"
+
+#: packages/app/assistant/connection.ts
+msgid "Connect ChatGPT to use the mail assistant."
+msgstr "Connect ChatGPT to use the mail assistant."
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Continue with ChatGPT"
+msgstr "Continue with ChatGPT"
+
+#. Heading of the Gmail page's section about reading an email conversation
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Conversation"
+msgstr "Conversation"
+
+#. Checkbox in the Delete browsing data dialog that deletes the account's cookies and the data sites store, such as local storage
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Cookies and other site data"
+msgstr "Cookies and other site data"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgid "Cop&y Image"
+msgstr "Cop&y Image"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Cop&y Image"
+msgstr "Cop&y Image"
+
+#: packages/app/gmail/index.ts
+msgid "Copied verification code {verificationCode}"
+msgstr "Copied verification code {verificationCode}"
+
+#. Button on a notification that copies the verification code
+#. Screen reader label of an icon button that copies the value beside it
+#: packages/app/gmail/index.ts
+#: packages/renderer/components/copy-button.tsx
+msgid "Copy"
+msgstr "Copy"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Copy"
+msgstr "Copy"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Copy"
+msgstr "Copy"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Copy"
+msgstr "Copy"
+
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "Copy codes to clipboard"
+msgstr "Copy codes to clipboard"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy draft body"
+msgstr "Copy draft body"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgid "Copy Email Address"
+msgstr "Copy Email Address"
+
+#: packages/app/url.ts
+msgid "Copy link"
+msgstr "Copy link"
+
+#. Context menu item that copies the address of the clicked link; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgid "Copy Link Addr&ess"
+msgstr "Copy Link Addr&ess"
+
+#. Context menu item that copies the address of the clicked link
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Copy Link Addr&ess"
+msgstr "Copy Link Addr&ess"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Copy Message Link"
+msgstr "Copy Message Link"
+
+#: packages/app/context-menu.ts
+msgctxt "context menu"
+msgid "Copy Message Link"
+msgstr "Copy Message Link"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy reply"
+msgstr "Copy reply"
+
+#. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
+#: packages/app/context-menu.ts
+#: packages/app/ipc.ts
+msgid "Copy URL"
+msgstr "Copy URL"
+
+#: packages/app/assistant/connection.ts
+msgid "Couldn't connect to ChatGPT. Try again."
+msgstr "Couldn't connect to ChatGPT. Try again."
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't copy to the clipboard."
+msgstr "Couldn't copy to the clipboard."
+
+#: packages/renderer/routes/settings/about.tsx
+msgid "Couldn't export the logs."
+msgstr "Couldn't export the logs."
+
+#: packages/app/assistant/chat.ts
+msgid "Couldn't finish the reply. Try again."
+msgstr "Couldn't finish the reply. Try again."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Couldn't install {extensionName}"
+msgstr "Couldn't install {extensionName}"
+
+#. errorMessage is the technical reason, left untranslated
+#: packages/app/lib/extension-swap.ts
+msgid "Couldn't install the extension: {errorMessage}"
+msgstr "Couldn't install the extension: {errorMessage}"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Couldn’t load attachments for {unavailableAccounts}. Check your Gmail connection and refresh."
+msgstr "Couldn’t load attachments for {unavailableAccounts}. Check your Gmail connection and refresh."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Couldn't open {extensionName}"
+msgstr "Couldn't open {extensionName}"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't open the draft in Gmail."
+msgstr "Couldn't open the draft in Gmail."
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't open the email source."
+msgstr "Couldn't open the email source."
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "Couldn't open the local ChatGPT sign-in page."
+msgstr "Couldn't open the local ChatGPT sign-in page."
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "Couldn't open your browser for ChatGPT sign-in."
+msgstr "Couldn't open your browser for ChatGPT sign-in."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Couldn't reach the mail assistant. Try again."
+msgstr "Couldn't reach the mail assistant. Try again."
+
+#: packages/app/assistant/connection.ts
+msgid "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
+msgstr "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
+
+#. conflictName is an extension's name; errorMessage is the technical reason, left untranslated
+#: packages/app/lib/extension-swap.ts
+msgid "Couldn't turn off {conflictName}: {errorMessage}"
+msgstr "Couldn't turn off {conflictName}: {errorMessage}"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Couldn't uninstall {extensionName}"
+msgstr "Couldn't uninstall {extensionName}"
+
+#. errorMessage is the technical reason, left untranslated
+#: packages/app/ipc.ts
+msgid "Couldn't uninstall the extension: {errorMessage}"
+msgstr "Couldn't uninstall the extension: {errorMessage}"
+
+#. failedName is an extension's name, shown when only that one failed to update
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Couldn't update {failedName}"
+msgstr "Couldn't update {failedName}"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Couldn't update extensions"
+msgstr "Couldn't update extensions"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't update the ChatGPT connection. Try again."
+msgstr "Couldn't update the ChatGPT connection. Try again."
+
+#. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Cu&t"
+msgstr "Cu&t"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Cu&t"
+msgstr "Cu&t"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Cu&t"
+msgstr "Cu&t"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Current mail view"
+msgstr "Current mail view"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Cut"
+msgstr "Cut"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Cut"
+msgstr "Cut"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Cut"
+msgstr "Cut"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Cyan"
+msgstr "Cyan"
+
+#. Option of the Theme setting
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Dark"
+msgstr "Dark"
+
+#. Option of the system tray icon's Color setting; agrees with the word for color where the language genders it
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "tray icon color"
+msgid "Dark"
+msgstr "Dark"
+
+#. Name of the first account until the user renames it, shown wherever accounts are listed
+#: packages/shared/accounts.ts
+msgctxt "account label"
+msgid "Default"
+msgstr "Default"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Default download location"
+msgstr "Default download location"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Default mail client"
+msgstr "Default mail client"
+
+#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#. Button on a new email notification. A Gmail action, so it follows Gmail's word for it, under Gmail's words in the glossary
+#: packages/app/gmail/index.ts
+#: packages/renderer/routes/unified-inbox.tsx
+msgctxt "Gmail action"
+msgid "Delete"
+msgstr "Delete"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Delete"
+msgstr "Delete"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Delete"
+msgstr "Delete"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Delete"
+msgstr "Delete"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Delete {label}?"
+msgstr "Delete {label}?"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Delete browsing data"
+msgstr "Delete browsing data"
+
+#. Menu item that opens the dialog for deleting the account's cookies and cache
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Delete browsing data…"
+msgstr "Delete browsing data…"
+
+#. Button that deletes the browsing data checked in the dialog
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Delete data"
+msgstr "Delete data"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Delete label color"
+msgstr "Delete label color"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Delete saved search"
+msgstr "Delete saved search"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Describe the email you want to write, or open a Gmail thread to work with its messages."
+msgstr "Describe the email you want to write, or open a Gmail thread to work with its messages."
+
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "Detect a verification code in an incoming email and copy it to your clipboard."
+msgstr "Detect a verification code in an incoming email and copy it to your clipboard."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Developer Tools"
+msgstr "Developer Tools"
+
+#. Do Not Disturb menu item that turns Do Not Disturb off
+#: packages/app/ipc.ts
+msgid "Disable"
+msgstr "Disable"
+
+#. Switch, and a badge on the account, for an account ggmail keeps signed in but doesn't load
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Disabled"
+msgstr "Disabled"
+
+#. Disconnect the linked ChatGPT account from the mail assistant
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Disconnect ChatGPT"
+msgstr "Disconnect ChatGPT"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Display the email sender's name in notifications."
+msgstr "Display the email sender's name in notifications."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Display the email subject in notifications."
+msgstr "Display the email subject in notifications."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Display the email summary in notifications."
+msgstr "Display the email summary in notifications."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Dock icon"
+msgstr "Dock icon"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Documents"
+msgstr "Documents"
+
+#: packages/app/dialogs.ts
+#: packages/app/workspace-app.ts
+msgid "Don't show again"
+msgstr "Don't show again"
+
+#. Button that closes the dialog of an extension's sites
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Done"
+msgstr "Done"
+
+#. Titlebar button that opens the release page of an update ggmail couldn't verify, to download it from there
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/attachments/files.tsx
+msgid "Download"
+msgstr "Download"
+
+#. Title of the error box shown when a download fails
+#: packages/app/downloads.ts
+msgid "Download Error"
+msgstr "Download Error"
+
+#: packages/renderer/routes/download-history.tsx
+msgid "Download history"
+msgstr "Download history"
+
+#: packages/app/downloads.ts
+msgid "Downloaded {fileName}"
+msgstr "Downloaded {fileName}"
+
+#. A menu or a menu item in ggmail's menu bar
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Heading of the Notifications section about notifications for finished downloads
+#: packages/app/menu.ts
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Downloads"
+msgstr "Downloads"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Draft a reply"
+msgstr "Draft a reply"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Draft a reply to the open email."
+msgstr "Draft a reply to the open email."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Draft an email"
+msgstr "Draft an email"
+
+#. Label for a suggested email draft
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft email"
+msgstr "Draft email"
+
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Drag {label} to reorder"
+msgstr "Drag {label} to reorder"
+
+#. Name of a notification sound, picked in Settings
+#: packages/renderer/lib/notifications/index.ts
+msgid "Duet"
+msgstr "Duet"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Duplicate"
+msgstr "Duplicate"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Edit"
+msgstr "Edit"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Edit"
+msgstr "Edit"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Edit"
+msgstr "Edit"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Edit account"
+msgstr "Edit account"
+
+#. Menu item that opens the dialog for editing the account
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Edit account…"
+msgstr "Edit account…"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Edit Config"
+msgstr "Edit Config"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Edit label color"
+msgstr "Edit label color"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Edit saved search"
+msgstr "Edit saved search"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Email source"
+msgstr "Email source"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Email sources"
+msgstr "Email sources"
+
+#. Heading of the Notifications section about notifications for new emails
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Emails"
+msgstr "Emails"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Emerald"
+msgstr "Emerald"
+
+#: packages/renderer/routes/settings/blocker.tsx
+msgid "Enable blocker"
+msgstr "Enable blocker"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Enable dock icon"
+msgstr "Enable dock icon"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Enable extensions"
+msgstr "Enable extensions"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Enable menu bar icon"
+msgstr "Enable menu bar icon"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Linux"
+msgid "Enable system tray icon"
+msgstr "Enable system tray icon"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Windows"
+msgid "Enable system tray icon"
+msgstr "Enable system tray icon"
+
+#: packages/renderer/routes/settings/unified-inbox.tsx
+msgid "Enable unified inbox"
+msgstr "Enable unified inbox"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Enter a color"
+msgstr "Enter a color"
+
+#. Error under the empty Label field, which takes the exact name of a Gmail label; label is Gmail's word
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgctxt "Gmail label"
+msgid "Enter a label"
+msgstr "Enter a label"
+
+#. Error under the empty Label field, which takes the name ggmail shows for the saved search
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgctxt "saved search"
+msgid "Enter a label"
+msgstr "Enter a label"
+
+#: packages/app/assistant/ipc.ts
+msgid "Enter a message and choose a ChatGPT model."
+msgstr "Enter a message and choose a ChatGPT model."
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Enter a search query"
+msgstr "Enter a search query"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Enter a valid hex, rgb, or rgba color"
+msgstr "Enter a valid hex, rgb, or rgba color"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Enter a website address, like {exampleSite}."
+msgstr "Enter a website address, like {exampleSite}."
+
+#. Setting that picks the Workspace apps that open in the external browser
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Excluded apps"
+msgstr "Excluded apps"
+
+#. Tray menu item that quits ggmail
+#: packages/app/tray.ts
+msgctxt "Windows"
+msgid "Exit"
+msgstr "Exit"
+
+#. Option of the Launcher display setting: how the Workspace apps launcher shows its apps in the titlebar
+#: packages/shared/workspace-apps.ts
+msgid "Expanded"
+msgstr "Expanded"
+
+#. Badge beside a setting whose feature isn't stable yet
+#: packages/renderer/components/maturity-field-badge.tsx
+msgid "Experimental"
+msgstr "Experimental"
+
+#. Button in the save dialog that exports ggmail's log file
+#: packages/app/ipc.ts
+msgctxt "Linux"
+msgid "Export"
+msgstr "Export"
+
+#. Button in the save dialog that exports ggmail's log file
+#: packages/app/ipc.ts
+msgctxt "macOS"
+msgid "Export"
+msgstr "Export"
+
+#. Button in the save dialog that exports ggmail's log file
+#: packages/app/ipc.ts
+msgctxt "Windows"
+msgid "Export"
+msgstr "Export"
+
+#: packages/renderer/routes/settings/about.tsx
+msgid "Export logs"
+msgstr "Export logs"
+
+#: packages/renderer/routes/settings/about.tsx
+msgid "Export the application logs to a file, to diagnose a problem or to share with support."
+msgstr "Export the application logs to a file, to diagnose a problem or to share with support."
+
+#. Dark theme is Gmail's own theme of that name
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Extend dark theme"
+msgstr "Extend dark theme"
+
+#. Dark theme is Gmail's own theme of that name, and dark the name of its setting, so both follow Gmail's words for them
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Extend Gmail's own dark theme to emails and the compose window. Gmail's theme has to be set to dark. The feature is in beta, so report anything it gets wrong."
+msgstr "Extend Gmail's own dark theme to emails and the compose window. Gmail's theme has to be set to dark. The feature is in beta, so report anything it gets wrong."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Extension support is still being tested and may not work as reliably as the rest of ggmail. To help make it stable, report any issues."
+msgstr "Extension support is still being tested and may not work as reliably as the rest of ggmail. To help make it stable, report any issues."
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Extensions"
+msgstr "Extensions"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Extensions add features to ggmail, like filling passwords on the Google sign-in page. Turn one on below and ggmail installs the official version from the Chrome Web Store. Extensions start after a restart, and every account shares one copy, so you sign in to an extension once."
+msgstr "Extensions add features to ggmail, like filling passwords on the Google sign-in page. Turn one on below and ggmail installs the official version from the Chrome Web Store. Extensions start after a restart, and every account shares one copy, so you sign in to an extension once."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Extensions are in testing"
+msgstr "Extensions are in testing"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "File"
+msgstr "File"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "File"
+msgstr "File"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "File"
+msgstr "File"
+
+#. In the download history, in place of when a file was downloaded, once the file is no longer where it was saved
+#: packages/renderer/components/download-history.tsx
+msgid "File moved or deleted"
+msgstr "File moved or deleted"
+
+#: packages/renderer/components/attachments/files.tsx
+#: packages/renderer/routes/attachments.tsx
+msgid "File name"
+msgstr "File name"
+
+#: packages/renderer/components/attachments/filters.tsx
+msgid "File type"
+msgstr "File type"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Files attached to your Gmail messages appear here."
+msgstr "Files attached to your Gmail messages appear here."
+
+#: packages/renderer/components/download-history.tsx
+msgid "Files you download appear here for 30 days."
+msgstr "Files you download appear here for 30 days."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Filling passwords and passkeys needs the 1Password desktop app, because ggmail stores no vault data of its own. Trust ggmail in 1Password's settings to connect the two."
+msgstr "Filling passwords and passkeys needs the 1Password desktop app, because ggmail stores no vault data of its own. Trust ggmail in 1Password's settings to connect the two."
+
+#. Description of a password manager extension in Settings. Google Account is Google's name for the account, so use Google's own word for it in that language
+#: packages/renderer/lib/extension-descriptions.ts
+msgid "Fills and generates passwords and passkeys for your Google Account. Needs the 1Password desktop app, connected to ggmail."
+msgstr "Fills and generates passwords and passkeys for your Google Account. Needs the 1Password desktop app, connected to ggmail."
+
+#. Description of a password manager extension in Settings. Google Account is Google's name for the account, so use Google's own word for it in that language
+#: packages/renderer/lib/extension-descriptions.ts
+msgid "Fills and generates passwords and passkeys for your Google Account. Unlocking with biometrics needs the Bitwarden desktop app."
+msgstr "Fills and generates passwords and passkeys for your Google Account. Unlocking with biometrics needs the Bitwarden desktop app."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Filters"
+msgstr "Filters"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Find an email"
+msgstr "Find an email"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Find emails about "
+msgstr "Find emails about "
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Find my to-dos in this mail scope. Include due dates when the email gives them."
+msgstr "Find my to-dos in this mail scope. Include due dates when the email gives them."
+
+#: packages/renderer/components/find-in-page.tsx
+msgid "Find next match"
+msgstr "Find next match"
+
+#: packages/renderer/components/find-in-page.tsx
+msgid "Find previous match"
+msgstr "Find previous match"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Find to-dos"
+msgstr "Find to-dos"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Find…"
+msgstr "Find…"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Finish signing in in your browser."
+msgstr "Finish signing in in your browser."
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "First page"
+msgstr "First page"
+
+#. Option of the Unread count preference setting: count only the first section of Gmail's multiple inboxes
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "First section only"
+msgstr "First section only"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Forward"
+msgstr "Forward"
+
+#. Example of a saved search's label, shown in the empty Label field
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Friends"
+msgstr "Friends"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Fuchsia"
+msgstr "Fuchsia"
+
+#: packages/renderer/recent-download-history.tsx
+msgid "Full download history"
+msgstr "Full download history"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Heading of the Appearance section for the settings that apply to the whole app
+#. Heading of the Downloads section for how files are downloaded
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/appearance.tsx
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "General"
+msgstr "General"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "ggmail {version} couldn't be verified, so it wasn't installed"
+msgstr "ggmail {version} couldn't be verified, so it wasn't installed"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "ggmail {version} is available and ready to install"
+msgstr "ggmail {version} is available and ready to install"
+
+#: packages/app/dialogs.ts
+msgid "ggmail {version} is available."
+msgstr "ggmail {version} is available."
+
+#: packages/app/dialogs.ts
+msgid "ggmail {version} is the last version that runs on macOS {macOSVersion}. Newer versions need macOS 13 or later, so ggmail won't check for updates on this Mac. This version keeps working, but it gets no further fixes, security fixes included, so using it long term is at your own risk."
+msgstr "ggmail {version} is the last version that runs on macOS {macOSVersion}. Newer versions need macOS 13 or later, so ggmail won't check for updates on this Mac. This version keeps working, but it gets no further fixes, security fixes included, so using it long term is at your own risk."
+
+#: packages/app/dialogs.ts
+msgid "ggmail {version} is the latest version."
+msgstr "ggmail {version} is the latest version."
+
+#: packages/app/url.ts
+msgid "ggmail can't open this link in a browser."
+msgstr "ggmail can't open this link in a browser."
+
+#: packages/app/dialogs.ts
+msgid "ggmail couldn't check for updates."
+msgstr "ggmail couldn't check for updates."
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "ggmail couldn't delete this account's browsing data. Try again."
+msgstr "ggmail couldn't delete this account's browsing data. Try again."
+
+#: packages/app/ipc.ts
+msgid "ggmail doesn't know this extension."
+msgstr "ggmail doesn't know this extension."
+
+#: packages/app/ipc.ts
+msgid "ggmail doesn't offer this extension."
+msgstr "ggmail doesn't offer this extension."
+
+#: packages/app/dialogs.ts
+msgid "ggmail installs it when you quit."
+msgstr "ggmail installs it when you quit."
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "ggmail is set as the default mail client."
+msgstr "ggmail is set as the default mail client."
+
+#: packages/app/url.ts
+msgid "ggmail is set as your default browser, so there's no other browser to open it in. Choose another default browser to open links outside ggmail."
+msgstr "ggmail is set as your default browser, so there's no other browser to open it in. Choose another default browser to open links outside ggmail."
+
+#: packages/app/dialogs.ts
+msgid "ggmail is up to date."
+msgstr "ggmail is up to date."
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "ggmail keeps this account signed in but doesn't load it."
+msgstr "ggmail keeps this account signed in but doesn't load it."
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "ggmail needs at least one account turned on."
+msgstr "ggmail needs at least one account turned on."
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
+msgstr "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
+
+#: packages/renderer/routes/settings/language-field.tsx
+msgid "Gmail and Google apps follow your Google account's language."
+msgstr "Gmail and Google apps follow your Google account's language."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Gmail Keyboard Shortcuts"
+msgstr "Gmail Keyboard Shortcuts"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Gmail Settings"
+msgstr "Gmail Settings"
+
+#: packages/renderer/components/titlebar.tsx
+msgid "Go back"
+msgstr "Go back"
+
+#: packages/renderer/components/titlebar.tsx
+msgid "Go forward"
+msgstr "Go forward"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Green"
+msgstr "Green"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Grid view"
+msgstr "Grid view"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Hard Reload"
+msgstr "Hard Reload"
+
+#: packages/renderer/routes/settings/advanced.tsx
+msgid "Hardware acceleration"
+msgstr "Hardware acceleration"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Help"
+msgstr "Help"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Help"
+msgstr "Help"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Help"
+msgstr "Help"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Help me draft an email. Ask me for the details you need."
+msgstr "Help me draft an email. Ask me for the details you need."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Hibernate after"
+msgstr "Hibernate after"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Hibernate idle tabs"
+msgstr "Hibernate idle tabs"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Hibernate When Idle"
+msgstr "Hibernate When Idle"
+
+#. Option of the Window controls setting: whether the titlebar shows the close, minimize and maximize buttons
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Hide"
+msgstr "Hide"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Hide {appName}"
+msgstr "Hide {appName}"
+
+#. Tray menu item that hides ggmail's window
+#: packages/app/tray.ts
+msgctxt "Linux"
+msgid "Hide ggmail"
+msgstr "Hide ggmail"
+
+#. Tray menu item that hides ggmail's window
+#: packages/app/tray.ts
+msgctxt "macOS"
+msgid "Hide ggmail"
+msgstr "Hide ggmail"
+
+#. Tray menu item that hides ggmail's window
+#: packages/app/tray.ts
+msgctxt "Windows"
+msgid "Hide ggmail"
+msgstr "Hide ggmail"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide Gmail logo"
+msgstr "Hide Gmail logo"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide inbox footer"
+msgstr "Hide inbox footer"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Hide Others"
+msgstr "Hide Others"
+
+#. The out-of-office banner is the one Gmail shows while an out-of-office reply is on, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide out-of-office banner"
+msgstr "Hide out-of-office banner"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide promotional banner"
+msgstr "Hide promotional banner"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide the footer at the bottom of the inbox."
+msgstr "Hide the footer at the bottom of the inbox."
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide the Gmail logo in the top left corner."
+msgstr "Hide the Gmail logo in the top left corner."
+
+#. The out-of-office banner is the one Gmail shows while an out-of-office reply is on, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide the out-of-office banner at the top of the window."
+msgstr "Hide the out-of-office banner at the top of the window."
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide the promotional banners at the top of the message list, such as the Google Workspace upgrade offer."
+msgstr "Hide the promotional banners at the top of the message list, such as the Google Workspace upgrade offer."
+
+#. Upgrade is the label of Gmail's own button, so it is written as Gmail writes it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide the Upgrade button in Gmail."
+msgstr "Hide the Upgrade button in Gmail."
+
+#. The upgrade button is Gmail's own Upgrade button
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Hide upgrade button"
+msgstr "Hide upgrade button"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "History"
+msgstr "History"
+
+#. Auto, Collapsed and Expanded quote this setting's options, so they match those options' wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "How launcher apps are shown in the titlebar. Auto expands up to three apps into individual buttons and collapses beyond that. Collapsed always keeps them behind a single button, and Expanded always shows them as individual buttons."
+msgstr "How launcher apps are shown in the titlebar. Auto expands up to three apps into individual buttons and collapses beyond that. Collapsed always keeps them behind a single button, and Expanded always shows them as individual buttons."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "How long a tab has to go unused before it hibernates. The active tab, tabs in their own window, and tabs playing audio are left alone."
+msgstr "How long a tab has to go unused before it hibernates. The active tab, tabs in their own window, and tabs playing audio are left alone."
+
+#. Auto quotes this setting's option and Reset Width the sidebar's context menu item, so they match those messages' wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back."
+msgstr "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back."
+
+#. Tabs and New windows quote this setting's options, so they match those options' wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "How Workspace apps open. Tabs, the default, opens them in the main window. New windows gives each one its own window with no tab strip. In Tabs, hold <0>{backgroundTabKey}</0> to open a background tab or <1>{newWindowKey}</1> to open a new window."
+msgstr "How Workspace apps open. Tabs, the default, opens them in the main window. New windows gives each one its own window with no tab strip. In Tabs, hold <0>{backgroundTabKey}</0> to open a background tab or <1>{newWindowKey}</1> to open a new window."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Images"
+msgstr "Images"
+
+#. Option of the Notify for setting: a notification only for the emails Gmail marks as important. Important is Gmail's word for them, so it follows Gmail's word in this language
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Important only"
+msgstr "Important only"
+
+#. Heading of the Workspace apps already in the launcher
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "In launcher"
+msgstr "In launcher"
+
+#. Heading of the Gmail page's section about Gmail's inbox; Inbox follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Inbox"
+msgstr "Inbox"
+
+#. Option of the Unread count preference setting. Inbox is Gmail's folder of that name, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Inbox only"
+msgstr "Inbox only"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "Indefinitely"
+msgstr "Indefinitely"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Indigo"
+msgstr "Indigo"
+
+#. Context menu item that opens the developer tools on the element clicked
+#: packages/app/context-menu.ts
+msgid "Inspect Element"
+msgstr "Inspect Element"
+
+#. Screen reader label of the switch that installs the extension
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Install {extensionName}"
+msgstr "Install {extensionName}"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Jump to latest reply"
+msgstr "Jump to latest reply"
+
+#. Name of a notification sound, picked in Settings
+#: packages/renderer/lib/notifications/index.ts
+msgid "Knock"
+msgstr "Knock"
+
+#. Field for the name ggmail shows for the account
+#. Field for the name ggmail shows for the saved search
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Label"
+msgstr "Label"
+
+#. Field for the exact name of the Gmail label to recolor; label is Gmail's word
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgctxt "Gmail label"
+msgid "Label"
+msgstr "Label"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Label colors"
+msgstr "Label colors"
+
+#. Label of the setting that chooses the language of ggmail's own menus and settings
+#: packages/renderer/routes/settings/language-field.tsx
+msgid "Language"
+msgstr "Language"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Languages"
+msgstr "Languages"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Last page"
+msgstr "Last page"
+
+#. Button on the toast after a setting changes, which dismisses it and leaves the restart for later
+#. Dialog button that puts off restarting ggmail
+#. Dialog button that puts off restarting ggmail
+#. Titlebar button that puts off installing a downloaded update
+#: packages/app/dialogs.ts
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/lib/toast.ts
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Later"
+msgstr "Later"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Launch at login"
+msgstr "Launch at login"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Launch minimized"
+msgstr "Launch minimized"
+
+#. Heading of the settings for the Workspace apps launcher and the bookmarks button
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Launcher and bookmarks"
+msgstr "Launcher and bookmarks"
+
+#. Setting that picks the Workspace apps in the launcher
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Launcher apps"
+msgstr "Launcher apps"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Launcher display"
+msgstr "Launcher display"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Layout"
+msgstr "Layout"
+
+#. Option of the Theme setting
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Light"
+msgstr "Light"
+
+#. Option of the system tray icon's Color setting; agrees with the word for color where the language genders it
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "tray icon color"
+msgid "Light"
+msgstr "Light"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Lime"
+msgstr "Lime"
+
+#. Name of a notification sound, picked in Settings
+#: packages/renderer/lib/notifications/index.ts
+msgid "Linen"
+msgstr "Linen"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Linux has no system passkey support, so a password manager extension is the only way to sign in to Google with a passkey in ggmail."
+msgstr "Linux has no system passkey support, so a password manager extension is the only way to sign in to Google with a passkey in ggmail."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "List view"
+msgstr "List view"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward."
+msgstr "List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward."
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Load clipped messages in full"
+msgstr "Load clipped messages in full"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Load on Launch"
+msgstr "Load on Launch"
+
+#. Screen reader label of a spinner shown while something loads
+#: packages/renderer/components/loading-spinner.tsx
+msgid "Loading"
+msgstr "Loading"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Loading older mail…"
+msgstr "Loading older mail…"
+
+#. Heading of the About ggmail section for exporting the application's logs
+#: packages/renderer/routes/settings/about.tsx
+msgid "Logs"
+msgstr "Logs"
+
+#. Context menu item on macOS; selection is the selected text
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Look Up “{selection}”"
+msgstr "Look Up “{selection}”"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Looking for attachments…"
+msgstr "Looking for attachments…"
+
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Mail assistant"
+msgstr "Mail assistant"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Mail assistant conversation"
+msgstr "Mail assistant conversation"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Manage Accounts"
+msgstr "Manage Accounts"
+
+#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Mark as read"
+msgstr "Mark as read"
+
+#. Button on a new email notification. A Gmail action, so it follows Gmail's word for it, under Gmail's words in the glossary
+#: packages/app/gmail/index.ts
+msgid "Mark as Read"
+msgstr "Mark as Read"
+
+#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Mark as spam"
+msgstr "Mark as spam"
+
+#. Button on a new email notification. A Gmail action, so it follows Gmail's word for it, under Gmail's words in the glossary
+#: packages/app/gmail/index.ts
+msgid "Mark as Spam"
+msgstr "Mark as Spam"
+
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "Mark email as read after copying"
+msgstr "Mark email as read after copying"
+
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "Mark the email as read once its verification code has been copied."
+msgstr "Mark the email as read once its verification code has been copied."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so."
+msgstr "Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Menu bar icon"
+msgstr "Menu bar icon"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Message"
+msgstr "Message"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Message the mail assistant"
+msgstr "Message the mail assistant"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Minimize"
+msgstr "Minimize"
+
+#. Heading of the Settings section for settings that fit no other
+#: packages/renderer/routes/settings/advanced.tsx
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
+#. Setting for whether Workspace apps open as tabs or in windows of their own
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Mode"
+msgstr "Mode"
+
+#. Button in a Google Workspace app window's titlebar that opens its menu
+#: packages/renderer/workspace-app.tsx
+msgid "More options"
+msgstr "More options"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Move attachments to top"
+msgstr "Move attachments to top"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Move email attachments to the top of the email."
+msgstr "Move email attachments to the top of the email."
+
+#. Trash is Gmail's folder of that name, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "Move email to Trash after copying"
+msgstr "Move email to Trash after copying"
+
+#. Trash is Gmail's folder of that name; Mark email as read names the setting above this one, Mark email as read after copying
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "Move the email to Trash once its verification code has been copied. Detection can misfire, and a real email can be moved too — Mark email as read is the safer choice."
+msgstr "Move the email to Trash once its verification code has been copied. Detection can misfire, and a real email can be moved too — Mark email as read is the safer choice."
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Move to New Window"
+msgstr "Move to New Window"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Move to Tab"
+msgstr "Move to Tab"
+
+#. Option of the Width setting for the vertical tabs sidebar
+#: packages/shared/tabs.ts
+msgid "Narrow"
+msgstr "Narrow"
+
+#: packages/renderer/components/vertical-tabs.tsx
+msgid "Narrow the tab strip"
+msgstr "Narrow the tab strip"
+
+#. Heading of the Settings section about going back and forward between pages
+#: packages/renderer/routes/settings/general.tsx
+msgid "Navigation"
+msgstr "Navigation"
+
+#. Option of the Show Gmail unread badge setting: when the Gmail tab shows its unread count
+#: packages/shared/tabs.ts
+msgid "Never"
+msgstr "Never"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "New chat"
+msgstr "New chat"
+
+#. Setting that turns on notifications for new emails
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "New emails"
+msgstr "New emails"
+
+#. Option of the Workspace apps Mode setting: whether Workspace apps open as tabs in the main window or in windows of their own
+#: packages/shared/workspace-apps.ts
+msgid "New windows"
+msgstr "New windows"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Newest first"
+msgstr "Newest first"
+
+#: packages/renderer/routes/attachments.tsx
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Next page"
+msgstr "Next page"
+
+#: packages/renderer/routes/settings/languages.tsx
+msgid "No additional languages selected"
+msgstr "No additional languages selected"
+
+#. Available quotes the heading of the apps that can be added, so it matches that heading's wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "No apps in the launcher yet. Add one from Available."
+msgstr "No apps in the launcher yet. Add one from Available."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "No attachments"
+msgstr "No attachments"
+
+#: packages/renderer/bookmarks.tsx
+msgid "No bookmarks yet"
+msgstr "No bookmarks yet"
+
+#: packages/renderer/components/download-history.tsx
+msgid "No downloads yet"
+msgstr "No downloads yet"
+
+#: packages/renderer/components/emoji-picker-button.tsx
+msgid "No emoji found."
+msgstr "No emoji found."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "No files available"
+msgstr "No files available"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "No free time slot left for another window. Remove or shorten one first."
+msgstr "No free time slot left for another window. Remove or shorten one first."
+
+#. Disabled context menu item shown in place of spelling suggestions when there are none
+#: packages/app/context-menu.ts
+msgid "No Guesses Found"
+msgstr "No Guesses Found"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "No matching files"
+msgstr "No matching files"
+
+#: packages/app/assistant/connection.ts
+msgid "No models are available for this ChatGPT account."
+msgstr "No models are available for this ChatGPT account."
+
+#. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
+#: packages/renderer/routes/settings/phishing-protection.tsx
+msgid "No trusted hosts yet. Selecting Trust all links on a host in the link prompt adds it here."
+msgstr "No trusted hosts yet. Selecting Trust all links on a host in the link prompt adds it here."
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "No unread messages"
+msgstr "No unread messages"
+
+#. The account's color when no color is picked; agrees with the word for color where the language genders it
+#: packages/renderer/routes/settings/accounts.tsx
+msgctxt "account color"
+msgid "None"
+msgstr "None"
+
+#. The Excluded apps field when no Workspace app is excluded; agrees with the word for apps where the language genders it
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgctxt "excluded apps"
+msgid "None"
+msgstr "None"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Notification times"
+msgstr "Notification times"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Notification times overlap. Adjust the windows so that none of them do."
+msgstr "Notification times overlap. Adjust the windows so that none of them do."
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Switch, and a badge on the account, for showing the account's notifications
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Notifications"
+msgstr "Notifications"
+
+#. Screen reader label of the area of the window where ggmail's toasts appear, not the system's notifications
+#: packages/renderer/components/app-toaster.tsx
+msgctxt "toasts"
+msgid "Notifications"
+msgstr "Notifications"
+
+#. Setting that picks which new emails show a notification
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Notify for"
+msgstr "Notify for"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "OK"
+msgstr "OK"
+
+#. The OK button of a native dialog
+#: packages/app/dialogs.ts
+msgctxt "Linux"
+msgid "OK"
+msgstr "OK"
+
+#. The OK button of a native dialog
+#: packages/app/dialogs.ts
+msgctxt "macOS"
+msgid "OK"
+msgstr "OK"
+
+#. The OK button of a native dialog
+#: packages/app/dialogs.ts
+msgctxt "Windows"
+msgid "OK"
+msgstr "OK"
+
+#. Both are password manager extensions
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Only one password manager can be on at a time. Turning on {extensionName} turns off {replacedExtensionName} in ggmail and signs you out of it here. Your passwords stay in your {replacedExtensionName} account."
+msgstr "Only one password manager can be on at a time. Turning on {extensionName} turns off {replacedExtensionName} in ggmail and signs you out of it here. Your passwords stay in your {replacedExtensionName} account."
+
+#: packages/app/workspace-app.ts
+msgid "Only passkeys created in ggmail work here."
+msgstr "Only passkeys created in ggmail work here."
+
+#. Option of the When to copy setting: when a detected verification code is copied to the clipboard
+#: packages/shared/verification-codes.ts
+msgid "Only when you ask"
+msgstr "Only when you ask"
+
+#. Button on the download notification that opens the file
+#: packages/app/downloads.ts
+msgid "Open"
+msgstr "Open"
+
+#. Context menu item that loads an unloaded tab
+#: packages/app/ipc.ts
+msgctxt "context menu"
+msgid "Open"
+msgstr "Open"
+
+#. Button that opens the extension's own window, to sign in to it
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Open {extensionName}"
+msgstr "Open {extensionName}"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Open a new window to compose an email, instead of composing inside Gmail."
+msgstr "Open a new window to compose an email, instead of composing inside Gmail."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Open and unlock 1Password again."
+msgstr "Open and unlock 1Password again."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Open and unlock 1Password."
+msgstr "Open and unlock 1Password."
+
+#. Button in the vertical tabs strip that opens the launcher of Google Workspace apps
+#: packages/renderer/components/workspace-apps-launcher.tsx
+msgid "Open app"
+msgstr "Open app"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/components/attachments/files.tsx
+msgid "Open email"
+msgstr "Open email"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Open email source"
+msgstr "Open email source"
+
+#. Option of what a finished download's notification does
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Open file"
+msgstr "Open file"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Open folder when done"
+msgstr "Open folder when done"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Open Gmail settings to turn off out of office"
+msgstr "Open Gmail settings to turn off out of office"
+
+#: packages/app/assistant/mail-context.ts
+msgid "Open Gmail's All Mail view to search this account."
+msgstr "Open Gmail's All Mail view to search this account."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Open in app"
+msgstr "Open in app"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/context-menu.ts
+#: packages/app/ipc.ts
+msgid "Open in Default Browser"
+msgstr "Open in Default Browser"
+
+#. Button that opens the user styles file in the default text editor
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Open in editor"
+msgstr "Open in editor"
+
+#. Button that shows the user styles file in its folder
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Open in folder"
+msgstr "Open in folder"
+
+#. Open a suggested email in the Gmail composer
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Open in Gmail"
+msgstr "Open in Gmail"
+
+#: packages/app/url.ts
+msgid "Open link"
+msgstr "Open link"
+
+#. Button that makes this tab or window the one that opens the app's links
+#: packages/app/dialogs.ts
+msgid "Open links here"
+msgstr "Open links here"
+
+#. A pop-out is Gmail's own name for a reply in its own window, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Open replies and forwards in a pop-out instead of below the message."
+msgstr "Open replies and forwards in a pop-out instead of below the message."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Open the browser allowlist in an editor with root permissions."
+msgstr "Open the browser allowlist in an editor with root permissions."
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Open the folder containing the file when a download finishes."
+msgstr "Open the folder containing the file when a download finishes."
+
+#: packages/app/url.ts
+msgid "Open this link in your default browser?"
+msgstr "Open this link in your default browser?"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Open unified inbox"
+msgstr "Open unified inbox"
+
+#. Button that opens the Settings app of Windows at its default apps, named as Microsoft names it
+#: packages/renderer/routes/settings/general.tsx
+msgid "Open Windows Settings"
+msgstr "Open Windows Settings"
+
+#. Titlebar button that opens the launcher of Google Workspace apps
+#: packages/renderer/components/workspace-apps-launcher.tsx
+msgid "Open workspace app"
+msgstr "Open workspace app"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Open Workspace apps in the app instead of the external browser."
+msgstr "Open Workspace apps in the app instead of the external browser."
+
+#: packages/renderer/routes/settings/about.tsx
+msgid "Operating system"
+msgstr "Operating system"
+
+#. Heading of the account's switches in the account dialog
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Options"
+msgstr "Options"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Orange"
+msgstr "Orange"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Other files"
+msgstr "Other files"
+
+#. The unified inbox's current page and how many pages it has
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Page {currentPage} of {pageCount}"
+msgstr "Page {currentPage} of {pageCount}"
+
+#: packages/app/workspace-app.ts
+msgid "Passkey sign-in isn't supported on this platform yet."
+msgstr "Passkey sign-in isn't supported on this platform yet."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Passkeys need a password manager"
+msgstr "Passkeys need a password manager"
+
+#. Heading of the password manager extensions
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Password managers"
+msgstr "Password managers"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Paste"
+msgstr "Paste"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Paste"
+msgstr "Paste"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Paste"
+msgstr "Paste"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Paste and &Match Style"
+msgstr "Paste and &Match Style"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Paste and &Match Style"
+msgstr "Paste and &Match Style"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Paste and &Match Style"
+msgstr "Paste and &Match Style"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Paste and Match Style"
+msgstr "Paste and Match Style"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Paste and Match Style"
+msgstr "Paste and Match Style"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Paste and Match Style"
+msgstr "Paste and Match Style"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Persist zoom"
+msgstr "Persist zoom"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Phishing protection"
+msgstr "Phishing protection"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Pick color"
+msgstr "Pick color"
+
+#. Tooltip of the button that opens the emoji picker
+#: packages/renderer/components/emoji-picker-button.tsx
+msgid "Pick emoji"
+msgstr "Pick emoji"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Pin"
+msgstr "Pin"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Pink"
+msgstr "Pink"
+
+#. Setting for where the Workspace apps launcher and the bookmarks button sit
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Placement"
+msgstr "Placement"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Play a sound when showing a notification."
+msgstr "Play a sound when showing a notification."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Play sound"
+msgstr "Play sound"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Preparing your draft…"
+msgstr "Preparing your draft…"
+
+#: packages/renderer/components/attachments/files.tsx
+msgid "Preview in Gmail"
+msgstr "Preview in Gmail"
+
+#: packages/renderer/routes/attachments.tsx
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Previous page"
+msgstr "Previous page"
+
+#. Option of the Categories to monitor setting. Primary is Gmail's inbox category of that name, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Primary only"
+msgstr "Primary only"
+
+#: packages/renderer/routes/settings/phishing-protection.tsx
+msgid "Prompt for confirmation before opening links from untrusted hosts in your browser."
+msgstr "Prompt for confirmation before opening links from untrusted hosts in your browser."
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Purple"
+msgstr "Purple"
+
+#. Field for the Gmail search the saved search runs
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Query"
+msgstr "Query"
+
+#. Dialog button that quits ggmail
+#. Tray menu item that quits ggmail
+#: packages/app/lib/native-quit-label.ts
+#: packages/app/tray.ts
+msgctxt "Linux"
+msgid "Quit"
+msgstr "Quit"
+
+#. Dialog button that quits ggmail
+#: packages/app/lib/native-quit-label.ts
+msgctxt "macOS"
+msgid "Quit"
+msgstr "Quit"
+
+#. Dialog button that quits ggmail
+#: packages/app/lib/native-quit-label.ts
+msgctxt "Windows"
+msgid "Quit"
+msgstr "Quit"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Quit {appName}"
+msgstr "Quit {appName}"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+#: packages/app/tray.ts
+msgctxt "macOS"
+msgid "Quit {appName}"
+msgstr "Quit {appName}"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Quit {appName}"
+msgstr "Quit {appName}"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Quit 1Password."
+msgstr "Quit 1Password."
+
+#: packages/renderer/components/attachments/files.tsx
+msgid "Received"
+msgstr "Received"
+
+#: packages/renderer/recent-download-history.tsx
+msgid "Recent download history"
+msgstr "Recent download history"
+
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Recolor Gmail labels by their exact name. The text color defaults to whatever contrasts with the background, and can be set to white or black instead."
+msgstr "Recolor Gmail labels by their exact name. The text color defaults to whatever contrasts with the background, and can be set to white or black instead."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Redo"
+msgstr "Redo"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Redo"
+msgstr "Redo"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Redo"
+msgstr "Redo"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Refresh attachments"
+msgstr "Refresh attachments"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Reload"
+msgstr "Reload"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgctxt "context menu"
+msgid "Reload"
+msgstr "Reload"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Reload ChatGPT models"
+msgstr "Reload ChatGPT models"
+
+#: packages/renderer/components/titlebar.tsx
+msgid "Reload page"
+msgstr "Reload page"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Reload the model list to start a conversation."
+msgstr "Reload the model list to start a conversation."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Remember the zoom level of Workspace apps across restarts. Each app keeps its own zoom level, shared by all its tabs and windows."
+msgstr "Remember the zoom level of Workspace apps across restarts. Each app keeps its own zoom level, shared by all its tabs and windows."
+
+#. Button that removes a host from the trusted hosts
+#. Button that removes a site from the extension's sites
+#: packages/renderer/routes/settings/extensions.tsx
+#: packages/renderer/routes/settings/phishing-protection.tsx
+msgid "Remove"
+msgstr "Remove"
+
+#. Screen reader label of the button that takes a Workspace app out of the launcher; label is the app's name
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Remove {label} from launcher"
+msgstr "Remove {label} from launcher"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove {label}?"
+msgstr "Remove {label}?"
+
+#. Screen reader label of the button that removes a site; site is its address
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Remove {site}"
+msgstr "Remove {site}"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove account"
+msgstr "Remove account"
+
+#. Menu item that opens the dialog for removing the account
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove account…"
+msgstr "Remove account…"
+
+#. Button on a bookmark in the bookmarks popup that removes it
+#. Button that removes the bookmark of the page on display
+#. Button that removes the bookmark of the page on display
+#: packages/renderer/bookmarks.tsx
+#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/workspace-app.tsx
+msgid "Remove bookmark"
+msgstr "Remove bookmark"
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Remove Bookmark"
+msgstr "Remove Bookmark"
+
+#. Button that removes a download from the download history
+#: packages/renderer/components/download-history.tsx
+msgid "Remove from history"
+msgstr "Remove from history"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Remove time window"
+msgstr "Remove time window"
+
+#: packages/renderer/routes/settings/advanced.tsx
+msgid "Render with the GPU. This can improve performance, and can also cause compatibility problems on some systems."
+msgstr "Render with the GPU. This can improve performance, and can also cause compatibility problems on some systems."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Reopen Closed Tab"
+msgstr "Reopen Closed Tab"
+
+#: packages/app/ipc.ts
+msgctxt "context menu"
+msgid "Reopen Closed Tab"
+msgstr "Reopen Closed Tab"
+
+#. Button that turns on a password manager extension in place of the one that is on
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Replace"
+msgstr "Replace"
+
+#. Both are password manager extensions
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Replace {replacedExtensionName} with {extensionName}?"
+msgstr "Replace {replacedExtensionName} with {extensionName}?"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Reply stopped"
+msgstr "Reply stopped"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Report Issue…"
+msgstr "Report Issue…"
+
+#. Button in the Reset App dialog that erases ggmail's data
+#: packages/app/menu.ts
+msgid "Reset"
+msgstr "Reset"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Reset App"
+msgstr "Reset App"
+
+#: packages/app/menu.ts
+msgid "Reset ggmail to its original state?"
+msgstr "Reset ggmail to its original state?"
+
+#. Context menu item that resets the width of the vertical tabs strip
+#: packages/app/ipc.ts
+msgid "Reset Width"
+msgstr "Reset Width"
+
+#. Button on the toast after a setting changes, which restarts ggmail now
+#. Dialog button that restarts ggmail
+#. Dialog button that restarts ggmail
+#: packages/app/dialogs.ts
+#: packages/renderer/lib/toast.ts
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Restart"
+msgstr "Restart"
+
+#: packages/app/dialogs.ts
+#: packages/renderer/lib/toast.ts
+msgid "Restart ggmail to apply the changes."
+msgstr "Restart ggmail to apply the changes."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Restart ggmail."
+msgstr "Restart ggmail."
+
+#. Titlebar button that restarts ggmail to install a downloaded update
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Restart now"
+msgstr "Restart now"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Restrict minimum window size"
+msgstr "Restrict minimum window size"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Retry"
+msgstr "Retry"
+
+#: packages/app/assistant/chatgpt-auth.ts
+msgid "Return to ggmail to finish signing in."
+msgstr "Return to ggmail to finish signing in."
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Reverse conversation"
+msgstr "Reverse conversation"
+
+#. Label of the unified inbox's picker for how many messages a page lists
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Rows per page"
+msgstr "Rows per page"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Run the installed extensions. Turning this off stops them without uninstalling them."
+msgstr "Run the installed extensions. Turning this off stops them without uninstalling them."
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Sa&ve Image As…"
+msgstr "Sa&ve Image As…"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Sa&ve Image As…"
+msgstr "Sa&ve Image As…"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Sa&ve Image As…"
+msgstr "Sa&ve Image As…"
+
+#. Button that saves the account's changes in the dialog
+#. Button that saves the label color's changes in the dialog
+#. Button that saves the saved search's changes in the dialog
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Save"
+msgstr "Save"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Saved searches"
+msgstr "Saved searches"
+
+#: packages/renderer/routes/settings/advanced.tsx
+msgid "Screen sharing"
+msgstr "Screen sharing"
+
+#. Tab of the screen sharing picker listing the displays to share
+#: packages/renderer/desktop-sources.tsx
+msgid "Screens"
+msgstr "Screens"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Scroll accounts left"
+msgstr "Scroll accounts left"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Scroll accounts right"
+msgstr "Scroll accounts right"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Search attachments"
+msgstr "Search attachments"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Search files, senders, or subjects"
+msgstr "Search files, senders, or subjects"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Search this account for a message, a deadline, or a conversation you need to revisit."
+msgstr "Search this account for a message, a deadline, or a conversation you need to revisit."
+
+#. Placeholder of the emoji picker's search field
+#: packages/renderer/components/emoji-picker-button.tsx
+msgid "Search…"
+msgstr "Search…"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Searching All Mail…"
+msgstr "Searching All Mail…"
+
+#. Button in the folder picker that chooses where downloads are saved
+#: packages/app/ipc.ts
+msgid "Select"
+msgstr "Select"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Select &All"
+msgstr "Select &All"
+
+#. An item in the context menu of a page or a text field; & marks the access key on Windows and Linux
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Select &All"
+msgstr "Select &All"
+
+#: packages/renderer/routes/settings/languages.tsx
+msgid "Select additional languages for spellchecking alongside the system language."
+msgstr "Select additional languages for spellchecking alongside the system language."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Select All"
+msgstr "Select All"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Select All"
+msgstr "Select All"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Select All"
+msgstr "Select All"
+
+#. Shown at the foot of the emoji picker until an emoji is pointed at
+#: packages/renderer/components/emoji-picker-button.tsx
+msgid "Select an emoji…"
+msgstr "Select an emoji…"
+
+#. Browser and Add Browser are in 1Password's settings, so use the words 1Password shows in that language
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Select Browser, then select Add Browser."
+msgstr "Select Browser, then select Add Browser."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Select first unread account on click"
+msgstr "Select first unread account on click"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Select Next Account"
+msgstr "Select Next Account"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Select Next Tab"
+msgstr "Select Next Tab"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Select Previous Account"
+msgstr "Select Previous Account"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Select Previous Tab"
+msgstr "Select Previous Tab"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Select the application theme."
+msgstr "Select the application theme."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Select the sound to play for notifications."
+msgstr "Select the sound to play for notifications."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Select the Workspace apps that open in the external browser instead of the app."
+msgstr "Select the Workspace apps that open in the external browser instead of the app."
+
+#. Settings is the item in the 1Password app, so use the word 1Password shows in that language
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Select your account at the top of the sidebar, then select Settings."
+msgstr "Select your account at the top of the sidebar, then select Settings."
+
+#. Option of the Hibernate idle tabs setting: which Workspace app tabs are unloaded when idle
+#: packages/shared/workspace-apps.ts
+msgid "Selected tabs"
+msgstr "Selected tabs"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Send chat message"
+msgstr "Send chat message"
+
+#: packages/renderer/components/attachments/files.tsx
+msgid "Sender"
+msgstr "Sender"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Set ggmail as the default mail client to handle email links and related protocols."
+msgstr "Set ggmail as the default mail client to handle email links and related protocols."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Set the time windows when notifications are active. Outside them, notifications stay silent. Leave the list empty to allow notifications at any time."
+msgstr "Set the time windows when notifications are active. Outside them, notifications stay silent. Leave the list empty to allow notifications at any time."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Set the volume level for notification sounds."
+msgstr "Set the volume level for notification sounds."
+
+#. Button that opens the steps for connecting the extension to the 1Password desktop app
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Set up desktop app"
+msgstr "Set up desktop app"
+
+#. Title of the Settings window, in its titlebar
+#: packages/renderer/settings.tsx
+msgid "Settings"
+msgstr "Settings"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Settings…"
+msgstr "Settings…"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Settings…"
+msgstr "Settings…"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Settings…"
+msgstr "Settings…"
+
+#. A menu or a menu item in ggmail's menu bar
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/context-menu.ts
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Share"
+msgstr "Share"
+
+#. Button of the screen sharing picker that shares the window or screen picked
+#: packages/renderer/desktop-sources.tsx
+msgctxt "screen sharing"
+msgid "Share"
+msgstr "Share"
+
+#. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgctxt "Linux"
+msgid "Shift"
+msgstr "Shift"
+
+#. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgctxt "macOS"
+msgid "Shift"
+msgstr "Shift"
+
+#. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgctxt "Windows"
+msgid "Shift"
+msgstr "Shift"
+
+#. Option of the Window controls setting: whether the titlebar shows the close, minimize and maximize buttons
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show"
+msgstr "Show"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show a notification when a download finishes."
+msgstr "Show a notification when a download finishes."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show a test notification to see how notifications appear."
+msgstr "Show a test notification to see how notifications appear."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Show All"
+msgstr "Show All"
+
+#: packages/renderer/routes/settings/unified-inbox.tsx
+msgid "Show all unread messages from every account in a single unified inbox."
+msgstr "Show all unread messages from every account in a single unified inbox."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show an unread badge on the dock icon when there are unread emails."
+msgstr "Show an unread badge on the dock icon when there are unread emails."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show an unread count next to the menu bar icon when there are unread emails."
+msgstr "Show an unread count next to the menu bar icon when there are unread emails."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show app links badge"
+msgstr "Show app links badge"
+
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/vertical-tabs.tsx
+msgid "Show bookmarks"
+msgstr "Show bookmarks"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show bookmarks button"
+msgstr "Show bookmarks button"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show Do Not Disturb button"
+msgstr "Show Do Not Disturb button"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Show email conversations in reverse order, with the latest message at the top."
+msgstr "Show email conversations in reverse order, with the latest message at the top."
+
+#. Tray menu item that brings ggmail's window back
+#: packages/app/tray.ts
+msgctxt "Linux"
+msgid "Show ggmail"
+msgstr "Show ggmail"
+
+#. Tray menu item that brings ggmail's window back
+#: packages/app/tray.ts
+msgctxt "macOS"
+msgid "Show ggmail"
+msgstr "Show ggmail"
+
+#. Tray menu item that brings ggmail's window back
+#: packages/app/tray.ts
+msgctxt "Windows"
+msgid "Show ggmail"
+msgstr "Show ggmail"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show Gmail unread badge"
+msgstr "Show Gmail unread badge"
+
+#. Button on the download notification that shows the file in the file manager
+#: packages/app/downloads.ts
+msgid "Show in File Explorer"
+msgstr "Show in File Explorer"
+
+#. Button on the download notification that shows the file in the file manager
+#: packages/app/downloads.ts
+msgctxt "macOS"
+msgid "Show in Finder"
+msgstr "Show in Finder"
+
+#. Button in the download history that shows the file in the file manager
+#: packages/renderer/components/download-history.tsx
+msgid "Show in folder"
+msgstr "Show in folder"
+
+#. Option of what a finished download's notification does
+#: packages/renderer/routes/settings/notifications.tsx
+msgctxt "download action"
+msgid "Show in folder"
+msgstr "Show in folder"
+
+#. Button on the download notification that shows the file in the file manager
+#: packages/app/downloads.ts
+msgid "Show in your file manager"
+msgstr "Show in your file manager"
+
+#. Setting that shows a notification when a download finishes
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show notification"
+msgstr "Show notification"
+
+#. Setting that lets Workspace apps show notifications
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show notifications"
+msgstr "Show notifications"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show notifications for new emails."
+msgstr "Show notifications for new emails."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show notifications from Workspace apps such as Calendar, Meet, and Chat."
+msgstr "Show notifications from Workspace apps such as Calendar, Meet, and Chat."
+
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/workspace-app.tsx
+msgid "Show recent download history"
+msgstr "Show recent download history"
+
+#. Save As names the operating system's dialog that asks where to save a file
+#: packages/renderer/routes/settings/downloads.tsx
+msgctxt "Linux"
+msgid "Show Save As dialog before downloading"
+msgstr "Show Save As dialog before downloading"
+
+#. Save As names the operating system's dialog that asks where to save a file
+#: packages/renderer/routes/settings/downloads.tsx
+msgctxt "macOS"
+msgid "Show Save As dialog before downloading"
+msgstr "Show Save As dialog before downloading"
+
+#. Save As names the operating system's dialog that asks where to save a file
+#: packages/renderer/routes/settings/downloads.tsx
+msgctxt "Windows"
+msgid "Show Save As dialog before downloading"
+msgstr "Show Save As dialog before downloading"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Show saved searches"
+msgstr "Show saved searches"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show sender"
+msgstr "Show sender"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+#: packages/renderer/routes/settings/unified-inbox.tsx
+msgid "Show sender icons"
+msgstr "Show sender icons"
+
+#: packages/renderer/routes/settings/unified-inbox.tsx
+msgid "Show sender icons next to the senders in the unified inbox."
+msgstr "Show sender icons next to the senders in the unified inbox."
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Show sender icons next to the senders in your inbox."
+msgstr "Show sender icons next to the senders in your inbox."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show subject"
+msgstr "Show subject"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show summary"
+msgstr "Show summary"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show test notification"
+msgstr "Show test notification"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show the application icon in the dock."
+msgstr "Show the application icon in the dock."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show the application icon in the menu bar."
+msgstr "Show the application icon in the menu bar."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Linux"
+msgid "Show the application icon in the system tray."
+msgstr "Show the application icon in the system tray."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Windows"
+msgid "Show the application icon in the system tray."
+msgstr "Show the application icon in the system tray."
+
+#. Reset Width quotes the sidebar's context menu item and Width the setting above, so they match those messages' wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above."
+msgstr "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above."
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show the button that opens bookmarks."
+msgstr "Show the button that opens bookmarks."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show the button that turns Do Not Disturb on and off. Turning this off also turns Do Not Disturb off."
+msgstr "Show the button that turns Do Not Disturb on and off. Turning this off also turns Do Not Disturb off."
+
+#. Automatic is this setting's first option; dwm, i3 and sway are window managers
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show the close, minimize and maximize buttons in the titlebar. Automatic hides them on window managers without decorations, such as dwm, i3 and sway."
+msgstr "Show the close, minimize and maximize buttons in the titlebar. Automatic hides them on window managers without decorations, such as dwm, i3 and sway."
+
+#. ••• is the label of Gmail's button that shows trimmed content, kept as is
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Show the quoted text Gmail hides behind the ••• button."
+msgstr "Show the quoted text Gmail hides behind the ••• button."
+
+#. When another tab is active quotes this setting's option, so it matches that option's wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show the unread count on the Gmail tab. When another tab is active hides it while Gmail is in front, where the inbox already shows it. Accounts that need attention are still flagged whichever you pick."
+msgstr "Show the unread count on the Gmail tab. When another tab is active hides it while Gmail is in front, where the inbox already shows it. Accounts that need attention are still flagged whichever you pick."
+
+#. View entire message is the text of Gmail's own link under a clipped message, so it is written as Gmail writes it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Show the whole message when Gmail clips a long one, instead of a “View entire message” link."
+msgstr "Show the whole message when Gmail clips a long one, instead of a “View entire message” link."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show unread badge"
+msgstr "Show unread badge"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show unread badges"
+msgstr "Show unread badges"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show unread badges, following each account's own setting."
+msgstr "Show unread badges, following each account's own setting."
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show unread count"
+msgstr "Show unread count"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show width button"
+msgstr "Show width button"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Show windows"
+msgstr "Show windows"
+
+#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
+#: packages/shared/workspace-apps.ts
+msgid "Sidebar"
+msgstr "Sidebar"
+
+#: packages/app/assistant/connection.ts
+msgid "Sign in to ChatGPT again to continue."
+msgstr "Sign in to ChatGPT again to continue."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Sign in to Google with a passkey and Touch ID"
+msgstr "Sign in to Google with a passkey and Touch ID"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Sign in to Google with a passkey and Windows Hello"
+msgstr "Sign in to Google with a passkey and Windows Hello"
+
+#: packages/app/workspace-app.ts
+msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
+msgstr "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
+
+#: packages/app/assistant/connection.ts
+msgid "Signed out here. Open ChatGPT settings to revoke ggmail's access there."
+msgstr "Signed out here. Open ChatGPT settings to revoke ggmail's access there."
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Signs you out of this account."
+msgstr "Signs you out of this account."
+
+#. Screen reader label of the field for the address of a site to add
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Site to add"
+msgstr "Site to add"
+
+#. extensionName is a password manager extension's name
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Sites for {extensionName}"
+msgstr "Sites for {extensionName}"
+
+#: packages/renderer/components/attachments/files.tsx
+msgid "Size"
+msgstr "Size"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Sky"
+msgstr "Sky"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Some pages may load more slowly the next time."
+msgstr "Some pages may load more slowly the next time."
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Sort by"
+msgstr "Sort by"
+
+#. Heading of the Notifications section about notification sounds
+#. Setting that picks the notification sound
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Sound"
+msgstr "Sound"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Source Code"
+msgstr "Source Code"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Speech"
+msgstr "Speech"
+
+#. Setting that picks the languages the spellchecker checks
+#: packages/renderer/routes/settings/languages.tsx
+msgid "Spellchecker"
+msgstr "Spellchecker"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Spreadsheets"
+msgstr "Spreadsheets"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Start Speaking"
+msgstr "Start Speaking"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Start the application automatically when you log in to your computer."
+msgstr "Start the application automatically when you log in to your computer."
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Start the application minimized."
+msgstr "Start the application minimized."
+
+#. Heading of the Settings section about how ggmail starts
+#: packages/renderer/routes/settings/general.tsx
+msgid "Startup"
+msgstr "Startup"
+
+#: packages/renderer/components/titlebar.tsx
+msgid "Stop loading"
+msgstr "Stop loading"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Stop reply"
+msgstr "Stop reply"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Stop Speaking"
+msgstr "Stop Speaking"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Stop the application window from being resized below a usable minimum."
+msgstr "Stop the application window from being resized below a usable minimum."
+
+#: packages/app/assistant/chat.ts
+msgid "Stop the current reply before asking another question."
+msgstr "Stop the current reply before asking another question."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Summarize the open email and highlight anything I should know."
+msgstr "Summarize the open email and highlight anything I should know."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Summarize this email"
+msgstr "Summarize this email"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Swipe between pages"
+msgstr "Swipe between pages"
+
+#. The second Swipe between pages names the macOS setting of that name in System Settings, so it follows Apple's wording for it
+#: packages/renderer/routes/settings/general.tsx
+msgid "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings."
+msgstr "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings."
+
+#. Button that confirms switching the Mode setting to its New windows option, matching that option's wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Switch to New windows"
+msgstr "Switch to New windows"
+
+#. New windows quotes the Mode setting's option, so it matches that option's wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Switch to New windows?"
+msgstr "Switch to New windows?"
+
+#. Language picker option: follow the operating system's language
+#. Option of the Sound setting: the operating system's own notification sound
+#. Option of the Theme setting
+#. Option of the system tray icon's Color setting
+#: packages/renderer/routes/settings/appearance.tsx
+#: packages/renderer/routes/settings/language-field.tsx
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "System"
+msgstr "System"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Linux"
+msgid "System tray icon"
+msgstr "System tray icon"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Windows"
+msgid "System tray icon"
+msgstr "System tray icon"
+
+#. A menu or a menu item in ggmail's menu bar
+#. Option of the Workspace apps Mode setting: whether Workspace apps open as tabs in the main window or in windows of their own
+#: packages/app/menu.ts
+#: packages/shared/workspace-apps.ts
+msgid "Tabs"
+msgstr "Tabs"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Teal"
+msgstr "Teal"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Test notification"
+msgstr "Test notification"
+
+#. Setting for the color of a Gmail label's name
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Text color"
+msgstr "Text color"
+
+#: packages/app/assistant/responses.ts
+msgid "The ChatGPT reply was incomplete. Try again with a shorter request."
+msgstr "The ChatGPT reply was incomplete. Try again with a shorter request."
+
+#: packages/app/assistant/responses.ts
+msgid "The connection to ChatGPT ended before the reply finished."
+msgstr "The connection to ChatGPT ended before the reply finished."
+
+#. Message of the error box shown when a download fails; fileName is the file's name
+#: packages/app/downloads.ts
+msgid "The download of {fileName} was interrupted"
+msgstr "The download of {fileName} was interrupted"
+
+#: packages/app/lib/extension-window.ts
+msgid "The extension is running, but ggmail can't open a window for it."
+msgstr "The extension is running, but ggmail can't open a window for it."
+
+#: packages/app/lib/extension-window.ts
+msgid "The extension starts after ggmail restarts. Restart ggmail, then try again."
+msgstr "The extension starts after ggmail restarts. Restart ggmail, then try again."
+
+#: packages/app/assistant/chat.ts
+#: packages/app/assistant/mail-context.ts
+msgid "The mail view changed. Ask again to use the new view."
+msgstr "The mail view changed. Ask again to use the new view."
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "The unified inbox shows every unread message from your accounts in one place. A message leaves the list after you read it."
+msgstr "The unified inbox shows every unread message from your accounts in one place. A message leaves the list after you read it."
+
+#. Setting that picks a light or dark appearance
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Theme"
+msgstr "Theme"
+
+#: packages/renderer/components/attachments/files.tsx
+msgid "This attachment is unavailable. Refresh and try again."
+msgstr "This attachment is unavailable. Refresh and try again."
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "This deletes the saved search, not the mail it finds."
+msgstr "This deletes the saved search, not the mail it finds."
+
+#: packages/app/dialogs.ts
+msgid "This is the last version of ggmail for this Mac."
+msgstr "This is the last version of ggmail for this Mac."
+
+#: packages/app/ipc.ts
+msgid "This is what a new email notification looks like."
+msgstr "This is what a new email notification looks like."
+
+#: packages/app/assistant/connection.ts
+msgid "This sign-in used a different ChatGPT account. Use the account you originally connected."
+msgstr "This sign-in used a different ChatGPT account. Use the account you originally connected."
+
+#: packages/app/menu.ts
+msgid "This signs out of every account and clears all settings and data on this device. It can't be undone."
+msgstr "This signs out of every account and clears all settings and data on this device. It can't be undone."
+
+#. Heading of the Appearance section for the bar along the top of ggmail's window
+#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
+#: packages/renderer/routes/settings/appearance.tsx
+#: packages/shared/workspace-apps.ts
+msgid "Titlebar"
+msgstr "Titlebar"
+
+#. Sits between a start time field and an end time field, as in 09:00 to 17:00
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "to"
+msgstr "to"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Troubleshooting"
+msgstr "Troubleshooting"
+
+#. origin is the scheme and host of a website, such as https://example.com
+#: packages/app/url.ts
+msgid "Trust all links on {origin}"
+msgstr "Trust all links on {origin}"
+
+#: packages/renderer/routes/settings/phishing-protection.tsx
+msgid "Trusted hosts"
+msgstr "Trusted hosts"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Try again"
+msgstr "Try again"
+
+#: packages/app/dialogs.ts
+msgid "Try again later."
+msgstr "Try again later."
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Try updating again."
+msgstr "Try updating again."
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Turn Do Not Disturb off"
+msgstr "Turn Do Not Disturb off"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Turn Do Not Disturb on"
+msgstr "Turn Do Not Disturb on"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Turn off Do Not Disturb to show a test notification."
+msgstr "Turn off Do Not Disturb to show a test notification."
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Undo"
+msgstr "Undo"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Undo"
+msgstr "Undo"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Undo"
+msgstr "Undo"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Switch, and a badge on the account, for including the account in the unified inbox
+#. Title of the unified inbox page
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Unified inbox"
+msgstr "Unified inbox"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Unified Inbox"
+msgstr "Unified Inbox"
+
+#. Unpinned tabs and Selected tabs quote this setting's options and Hibernate When Idle the tab's context menu item, so they match those messages' wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place in the sidebar and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
+msgstr "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place in the sidebar and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
+
+#: packages/app/assistant/connection.ts
+msgid "Unlock your system credential store to connect ChatGPT."
+msgstr "Unlock your system credential store to connect ChatGPT."
+
+#. An item in the context menu of a Google Workspace app's tab
+#: packages/app/ipc.ts
+msgid "Unpin"
+msgstr "Unpin"
+
+#. Option of the Hibernate idle tabs setting: which Workspace app tabs are unloaded when idle
+#: packages/shared/workspace-apps.ts
+msgid "Unpinned tabs"
+msgstr "Unpinned tabs"
+
+#. Switch for showing the account's unread badge
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Unread badge"
+msgstr "Unread badge"
+
+#. Badge on an account's row in Settings when its unread badge is on: a short badge on a row that cannot wrap; keep it as short as possible
+#: packages/renderer/routes/settings/accounts.tsx
+msgctxt "account row badge"
+msgid "Unread badge"
+msgstr "Unread badge"
+
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Unread count preference"
+msgstr "Unread count preference"
+
+#. How long Do Not Disturb keeps notifications silenced, in its menu
+#: packages/app/do-not-disturb.ts
+msgid "Until Tomorrow"
+msgstr "Until Tomorrow"
+
+#. Titlebar button that shows the details of a downloaded update, ready to install
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Update available"
+msgstr "Update available"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Update extensions"
+msgstr "Update extensions"
+
+#. Titlebar button that shows the details of an update ggmail downloaded but couldn't verify
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Update not verified"
+msgstr "Update not verified"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Updates"
+msgstr "Updates"
+
+#. Setting that shares the screen through the operating system's own picker
+#: packages/renderer/routes/settings/advanced.tsx
+msgid "Use system picker"
+msgstr "Use system picker"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Use the expanded messages in this thread to summarize the exchange or prepare a reply."
+msgstr "Use the expanded messages in this thread to summarize the exchange or prepare a reply."
+
+#: packages/renderer/routes/settings/advanced.tsx
+msgid "Use the system's native screen sharing picker when sharing your screen."
+msgstr "Use the system's native screen sharing picker when sharing your screen."
+
+#. Setting for the user's own CSS, applied to Gmail
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "User styles"
+msgstr "User styles"
+
+#: packages/app/gmail/index.ts
+msgid "Verification code {verificationCode}"
+msgstr "Verification code {verificationCode}"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Verification codes"
+msgstr "Verification codes"
+
+#. Badge with the installed version of the extension
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Version {installedVersion}"
+msgstr "Version {installedVersion}"
+
+#. Heading of the settings for the vertical tabs sidebar
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Vertical tabs"
+msgstr "Vertical tabs"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "View"
+msgstr "View"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "View"
+msgstr "View"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "View"
+msgstr "View"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "View Logs"
+msgstr "View Logs"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Violet"
+msgstr "Violet"
+
+#. Title of the notification sound's volume slider; percent is the volume, such as 50%
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Volume {percent}"
+msgstr "Volume {percent}"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Waiting for the mail view…"
+msgstr "Waiting for the mail view…"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "What can I help you with?"
+msgstr "What can I help you with?"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Titlebar button beside a downloaded update that opens the version history
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/lib/settings-pages.ts
+msgid "What's new"
+msgstr "What's new"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "What's New"
+msgstr "What's New"
+
+#. Option of the Show Gmail unread badge setting: when the Gmail tab shows its unread count
+#: packages/shared/tabs.ts
+msgid "When another tab is active"
+msgstr "When another tab is active"
+
+#: packages/renderer/routes/settings/verification-codes.tsx
+msgid "When to copy"
+msgstr "When to copy"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Where downloaded files are saved."
+msgstr "Where downloaded files are saved."
+
+#. Auto, Sidebar and Titlebar quote this setting's options, so they match those options' wording
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times."
+msgstr "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times."
+
+#: packages/app/protocol/index.ts
+msgid "Which account should compose this email?"
+msgstr "Which account should compose this email?"
+
+#: packages/app/protocol/index.ts
+msgid "Which account should open this link?"
+msgstr "Which account should open this link?"
+
+#. Option of a label color's Text color setting
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "White"
+msgstr "White"
+
+#. Option of the Width setting for the vertical tabs sidebar
+#: packages/shared/tabs.ts
+msgid "Wide"
+msgstr "Wide"
+
+#: packages/renderer/components/vertical-tabs.tsx
+msgid "Widen the tab strip"
+msgstr "Widen the tab strip"
+
+#. Setting for how wide the vertical tabs sidebar is
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Width"
+msgstr "Width"
+
+#. Heading of the Appearance section about ggmail's window
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Window"
+msgstr "Window"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Window"
+msgstr "Window"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Window controls"
+msgstr "Window controls"
+
+#. Tab of the screen sharing picker listing the open application windows to share, never the Windows operating system
+#: packages/renderer/desktop-sources.tsx
+msgid "Windows"
+msgstr "Windows"
+
+#. A categorized inbox is Gmail's own inbox type of that name, with categories such as Primary and Promotions, so it follows Gmail's words for them
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "With a categorized inbox, choose which categories are watched for new email notifications and included in the unified inbox."
+msgstr "With a categorized inbox, choose which categories are watched for new email notifications and included in the unified inbox."
+
+#. Multiple inboxes is Gmail's own inbox type of that name, so it follows Gmail's word for it
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "With multiple inboxes, choose which sections count toward the unread count shown in the app. The default combines every section."
+msgstr "With multiple inboxes, choose which sections count toward the unread count shown in the app. The default combines every section."
+
+#. Example of a Gmail label's name, shown in the empty Label field
+#. Example of an account's label, shown in the empty Label field
+#: packages/renderer/routes/settings/accounts.tsx
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgid "Work"
+msgstr "Work"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Work with the email snippets visible in this Gmail view."
+msgstr "Work with the email snippets visible in this Gmail view."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Working on your request…"
+msgstr "Working on your request…"
+
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Heading of the Notifications section about notifications from Workspace apps
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Workspace apps"
+msgstr "Workspace apps"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Write a message…"
+msgstr "Write a message…"
+
+#. A color an account can be marked with, in the account form's Color picker
+#: packages/shared/accounts.ts
+msgid "Yellow"
+msgstr "Yellow"
+
+#. Accessible description of the unread badge on ggmail's taskbar button on Windows
+#: packages/app/ipc.ts
+msgid "You have unread messages"
+msgstr "You have unread messages"
+
+#: packages/app/assistant/responses.ts
+msgid "Your ChatGPT account or workspace hasn't enabled plan access for ggmail."
+msgstr "Your ChatGPT account or workspace hasn't enabled plan access for ggmail."
+
+#: packages/app/assistant/connection.ts
+msgid "Your ChatGPT session couldn't be renewed. Sign in again."
+msgstr "Your ChatGPT session couldn't be renewed. Sign in again."
+
+#: packages/app/assistant/chatgpt-auth.ts
+#: packages/app/assistant/responses.ts
+msgid "Your ChatGPT session expired. Sign in again."
+msgstr "Your ChatGPT session expired. Sign in again."
+
+#: packages/app/assistant/responses.ts
+msgid "Your ChatGPT usage limit was reached. Try again later."
+msgstr "Your ChatGPT usage limit was reached. Try again later."
+
+#. Subject of the sample email in the test notification
+#: packages/app/ipc.ts
+msgid "Your test notification request"
+msgstr "Your test notification request"
+
+#. Window menu item that toggles the window between its size and filling the screen
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Zoom"
+msgstr "Zoom"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Zoom In"
+msgstr "Zoom In"
+
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
+msgid "Zoom Out"
+msgstr "Zoom Out"

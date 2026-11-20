@@ -1,0 +1,428 @@
+import { postBridge } from "../facade/lib/bridge";
+import type { ChromeEventListener, ChromeNamespace } from "../facade/lib/chrome";
+import { withLastError } from "../facade/lib/last-error";
+import { NativeMessageDecoder } from "../native-messaging/framing";
+import {
+  MAX_RUNTIME_PROXY_FRAME_BYTES,
+  RECEIVING_END_ERROR,
+  type RuntimeProxyPageEnvelope,
+  type RuntimeProxySenderReport,
+  RUNTIME_PROXY_PATHS,
+} from "./bridge-protocol";
+import { createCleanEndBackoff, DEFAULT_CLEAN_END_WINDOW_MS } from "./clean-end-backoff";
+import { dispatchMessage, mirrorEvent } from "./message-dispatch";
+import { createRelayedPort, type RelayedPort, type RelayedPortTransport } from "./relayed-port";
+import type { RuntimeProxyStorageAreaName, RuntimeProxyStorageChanges } from "./storage-protocol";
+
+const DEFAULT_RETRY_DELAY_MS = 1000;
+
+/**
+ * Where the backoff stops. A shimmed session whose worker session was torn
+ * down is refused every park, and there may be dozens of frames doing it: a
+ * flat second between tries is permanent idle load in an app that is working
+ * perfectly well without that account. Backing off keeps the recovery — a
+ * session adopted as the worker later is picked up within half a minute — at
+ * a cost that decays to nothing.
+ */
+const MAX_RETRY_DELAY_MS = 30_000;
+
+/** What the log lines of this side of the proxy are prefixed with. */
+const LOG_LABEL = "runtime-proxy-page-stream";
+
+/** What a refused bridge call reads as, whatever the call was. */
+function bridgeAnsweredError(status: number) {
+  return `The runtime proxy bridge answered ${status}`;
+}
+
+export type CreatePageStreamClientOptions = {
+  /** What this context can truthfully say about where it runs. */
+  getSenderReport: () => RuntimeProxySenderReport;
+  /**
+   * Where a change of the worker's store goes: the storage half of the shim,
+   * which keeps the listeners the extension registered on `onChanged`
+   * (`storage-shim.ts`). Absent, changes arrive and are dropped, which is what
+   * a context with no storage shadow would make of them.
+   */
+  onStorageChanged?: (
+    area: RuntimeProxyStorageAreaName,
+    changes: RuntimeProxyStorageChanges,
+  ) => void;
+  /** How long a failed stream waits before it is parked again. */
+  retryDelayMs?: number;
+  /** Where the backoff after repeated failures stops. */
+  maxRetryDelayMs?: number;
+  /** How long a stream has to live for its clean end to count as ordinary. */
+  cleanEndWindowMs?: number;
+};
+
+/**
+ * The receiving end of a shimmed context: the half of the shim that hears what
+ * the worker starts, where the rest of the shim only ever calls out.
+ *
+ * It parks a streaming response at the bridge as the shim installs — the
+ * page-side mirror of the worker's job stream — and everything the worker
+ * addresses at this context arrives on it: a `tabs.sendMessage` or a
+ * `runtime.sendMessage` broadcast, and the ports a `tabs.connect` opens. So it
+ * has to know the listeners the extension registered, which it does the way the
+ * worker's relay client does: `onMessage` and `onConnect` are wrapped and their
+ * listeners mirrored, every one of them still registered natively too.
+ *
+ * The stream is parked whatever the extension listens for, and before it has
+ * registered anything: it carries more than `runtime` messaging — `storage`'s
+ * change events ride it too — and a context that parked only once something
+ * registered would be a switch shared between features that know nothing about
+ * each other.
+ */
+export function createPageStreamClient({
+  getSenderReport,
+  onStorageChanged,
+  retryDelayMs = DEFAULT_RETRY_DELAY_MS,
+  maxRetryDelayMs = MAX_RETRY_DELAY_MS,
+  cleanEndWindowMs = DEFAULT_CLEAN_END_WINDOW_MS,
+}: CreatePageStreamClientOptions) {
+  const messageListeners = new Set<ChromeEventListener>();
+
+  const connectListeners = new Set<ChromeEventListener>();
+
+  const ports = new Map<string, RelayedPort>();
+
+  const wrappedRuntimes: ChromeNamespace[] = [];
+
+  /**
+   * What the relay called this context when it parked, sent back on anything
+   * this context says about itself — which end of a port bound to several
+   * frames of a tab has hung up, above all.
+   */
+  let contextId: string | undefined;
+
+  /**
+   * The same, only while the stream that named it is still open: a port this
+   * context opens is bound to the stream its far end's traffic arrives on.
+   */
+  let parkedContextId: string | undefined;
+
+  const parkedContextWaiters = new Set<(parkedId: string | undefined) => void>();
+
+  /** The ports this context opened, which end with the stream they ride. */
+  const openedPortIds = new Set<string>();
+
+  let isStopped = false;
+
+  const postToBridge = (pathName: string, body: Record<string, unknown>) =>
+    postBridge(pathName, body).catch(() => undefined);
+
+  /**
+   * `lastError` around an emit, set on every runtime object this client
+   * wrapped, so a listener reads it whichever one it was written against.
+   */
+  const withRuntimesLastError = (error: string, emit: () => void) => {
+    let run = emit;
+
+    for (const runtime of wrappedRuntimes) {
+      const nextRun = run;
+
+      run = () => {
+        withLastError(runtime, error, nextRun);
+      };
+    }
+
+    run();
+  };
+
+  /**
+   * This context's end of a port the worker opened. Its posts take the same
+   * route a port this context opened itself takes, since the relay keeps both
+   * kinds as one record and tells them apart by the transport, not the caller.
+   * A post names this context, which is how a page of the worker's session
+   * answers on a port a content script opened to it beside the worker.
+   */
+  const createPort = (portId: string, name: string | undefined) => {
+    const transport: RelayedPortTransport = {
+      async post(message: unknown) {
+        const response = await postBridge(RUNTIME_PROXY_PATHS.portPost, {
+          portId,
+          contextId,
+          message,
+        });
+
+        if (!response.ok) {
+          throw new Error(bridgeAnsweredError(response.status));
+        }
+      },
+      disconnect() {
+        return postToBridge(RUNTIME_PROXY_PATHS.portDisconnect, { portId, contextId }).then(
+          () => undefined,
+        );
+      },
+    };
+
+    return createRelayedPort({
+      name: name ?? "",
+      open: () => Promise.resolve(transport),
+      withRuntimesLastError,
+      onClosed: () => {
+        ports.delete(portId);
+      },
+    });
+  };
+
+  const handleEnvelope = (envelope: RuntimeProxyPageEnvelope) => {
+    switch (envelope.kind) {
+      case "ready": {
+        contextId = envelope.contextId;
+
+        parkedContextId = envelope.contextId;
+
+        for (const waiter of parkedContextWaiters) {
+          waiter(parkedContextId);
+        }
+
+        parkedContextWaiters.clear();
+
+        break;
+      }
+
+      case "message": {
+        void dispatchMessage(messageListeners, envelope.message, envelope.sender, LOG_LABEL).then(
+          (result) =>
+            postToBridge(RUNTIME_PROXY_PATHS.pageReply, {
+              deliveryId: envelope.deliveryId,
+              result,
+            }),
+        );
+
+        break;
+      }
+
+      case "connect": {
+        const port = createPort(envelope.portId, envelope.name);
+
+        port.externalPort.sender = envelope.sender;
+
+        // Nothing here to hand the port to. Saying why is what puts Chrome's
+        // "receiving end does not exist" on the worker's `lastError` when this
+        // was the port's last frame; for a port bound to several it drops this
+        // frame rather than the port
+        if (connectListeners.size === 0) {
+          void postToBridge(RUNTIME_PROXY_PATHS.portDisconnect, {
+            portId: envelope.portId,
+            contextId,
+            reason: "noListener",
+          });
+
+          break;
+        }
+
+        ports.set(envelope.portId, port);
+
+        for (const listener of connectListeners) {
+          try {
+            listener(port.externalPort);
+          } catch (error) {
+            console.error(`[${LOG_LABEL}] onConnect listener threw`, error);
+          }
+        }
+
+        break;
+      }
+
+      case "portMessage": {
+        ports.get(envelope.portId)?.emitMessage(envelope.message);
+
+        break;
+      }
+
+      case "portDisconnect": {
+        ports.get(envelope.portId)?.emitDisconnect(envelope.error);
+
+        break;
+      }
+
+      // Nothing is posted back: an `onChanged` has no reply and no receiving
+      // end to be missing, so a context with no listener for it says nothing
+      case "storageChanged": {
+        onStorageChanged?.(envelope.area, envelope.changes);
+
+        break;
+      }
+    }
+  };
+
+  /**
+   * The stream this context's own ports rode is gone, and main closed them with
+   * it; a port waiting to open hears that there is nowhere to open it.
+   */
+  const endParkedContext = () => {
+    parkedContextId = undefined;
+
+    for (const waiter of parkedContextWaiters) {
+      waiter(undefined);
+    }
+
+    parkedContextWaiters.clear();
+
+    for (const portId of openedPortIds) {
+      ports.get(portId)?.emitDisconnect();
+    }
+  };
+
+  const waitForParkedContext = () =>
+    parkedContextId === undefined
+      ? new Promise<string | undefined>((resolve) => {
+          parkedContextWaiters.add(resolve);
+        })
+      : Promise.resolve(parkedContextId);
+
+  /**
+   * Parks the stream, and parks it again whenever it ends. A stream ends when
+   * the relay drops this context — the worker's session went away and took the
+   * relay's idea of this one with it — where the context itself is still very
+   * much alive and still has to hear the worker that comes back.
+   *
+   * A clean end is the relay having dropped the context deliberately, and this
+   * context hears nothing at all until it parks again, so it parks at once
+   * rather than waiting. The backoff behind that is load-bearing here: a
+   * context evicted by another park of the same frame re-parks and evicts that
+   * one in turn, which is a flap between live clients rather than a flapping
+   * main, and an unconditional re-park would make it a hot loop.
+   */
+  const runPageStream = async () => {
+    let failureCount = 0;
+
+    const cleanEndBackoff = createCleanEndBackoff({
+      ceilingMs: retryDelayMs,
+      windowMs: cleanEndWindowMs,
+    });
+
+    while (!isStopped) {
+      const parkedAt = Date.now();
+
+      let hasEndedCleanly = false;
+
+      try {
+        const response = await postBridge(RUNTIME_PROXY_PATHS.pageStream, {
+          sender: getSenderReport(),
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(bridgeAnsweredError(response.status));
+        }
+
+        failureCount = 0;
+
+        const reader = response.body.getReader();
+
+        const decoder = new NativeMessageDecoder(MAX_RUNTIME_PROXY_FRAME_BYTES);
+
+        for (;;) {
+          const { value, done } = await reader.read();
+
+          if (done) {
+            break;
+          }
+
+          for (const envelope of decoder.push(value) as RuntimeProxyPageEnvelope[]) {
+            handleEnvelope(envelope);
+          }
+        }
+
+        hasEndedCleanly = true;
+      } catch {
+        // A refused or broken stream is a context that hears nothing until it
+        // parks again, which is worth no more noise than the wait itself
+        failureCount += 1;
+      }
+
+      endParkedContext();
+
+      if (isStopped) {
+        return;
+      }
+
+      let delayMs: number;
+
+      if (hasEndedCleanly) {
+        delayMs = cleanEndBackoff.next(Date.now() - parkedAt);
+      } else {
+        cleanEndBackoff.reset();
+
+        delayMs = Math.min(retryDelayMs * 2 ** Math.max(failureCount - 1, 0), maxRetryDelayMs);
+      }
+
+      if (delayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  };
+
+  return {
+    /**
+     * Wraps `runtime.onMessage` and `runtime.onConnect` of one extension API
+     * object. Every object wrapped shares the one set of mirrored listeners.
+     */
+    wrapRuntime(extensionApi: ChromeNamespace) {
+      const runtime = extensionApi.runtime as ChromeNamespace | undefined;
+
+      if (!runtime) {
+        return;
+      }
+
+      wrappedRuntimes.push(runtime);
+
+      mirrorEvent(runtime, "onMessage", messageListeners, LOG_LABEL);
+
+      mirrorEvent(runtime, "onConnect", connectListeners, LOG_LABEL);
+    },
+
+    /**
+     * A port this context opens itself, whose far end's traffic arrives on this
+     * context's stream. `open` is handed the id the stream was parked as, and
+     * a port opened while no stream is parked waits for the next one.
+     */
+    openPort(
+      name: string,
+      open: (
+        parkedId: string,
+        portId: string,
+        port: RelayedPort,
+      ) => Promise<RelayedPortTransport> | RelayedPortTransport,
+    ) {
+      const portId = crypto.randomUUID();
+
+      // Initialized before `open` reads it, which is only past the first await
+      const port: RelayedPort = createRelayedPort({
+        name,
+        open: async () => {
+          const parkedId = await waitForParkedContext();
+
+          if (parkedId === undefined) {
+            throw new Error(RECEIVING_END_ERROR);
+          }
+
+          return open(parkedId, portId, port);
+        },
+        withRuntimesLastError,
+        onClosed: () => {
+          ports.delete(portId);
+
+          openedPortIds.delete(portId);
+        },
+      });
+
+      ports.set(portId, port);
+
+      openedPortIds.add(portId);
+
+      return port.externalPort;
+    },
+
+    /** Parks the receive stream at the bridge, and keeps it parked. */
+    start() {
+      void runPageStream();
+    },
+
+    stop() {
+      isStopped = true;
+    },
+  };
+}

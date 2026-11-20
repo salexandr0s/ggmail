@@ -1,0 +1,220 @@
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import { is, platform } from "@electron-toolkit/utils";
+import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
+import type { Config } from "@ggmail/shared/types";
+import {
+  app,
+  BrowserWindow,
+  type BrowserWindowConstructorOptions,
+  nativeTheme,
+  screen,
+  WebContentsView,
+} from "electron";
+import { appI18n } from "@/i18n";
+import { shouldOpenDevToolsOnLaunch } from "./dev-tools";
+import { isLinuxWindowControlsEnabled } from "./linux";
+import { loadUrl } from "./load-url";
+import { keepOnRendererPage } from "./renderer-page";
+
+const CASCADE_OFFSET = 30;
+
+export function getCascadedWindowBounds({ width, height }: { width: number; height: number }) {
+  const allWindows = BrowserWindow.getAllWindows();
+
+  if (!allWindows.length) {
+    return { width, height };
+  }
+
+  const reference = allWindows.reduce((mostRecent, current) =>
+    current.id > mostRecent.id ? current : mostRecent,
+  );
+
+  const referenceBounds = reference.getBounds();
+  const display = screen.getDisplayMatching(referenceBounds);
+  const workArea = display.workArea;
+
+  let x = referenceBounds.x + CASCADE_OFFSET;
+  let y = referenceBounds.y + CASCADE_OFFSET;
+
+  if (x + width > workArea.x + workArea.width || y + height > workArea.y + workArea.height) {
+    x = workArea.x + CASCADE_OFFSET;
+    y = workArea.y + CASCADE_OFFSET;
+  }
+
+  return { x, y, width, height };
+}
+
+export function isWindowVisibleOnConnectedDisplay(bounds: Config["window.lastState"]["bounds"]) {
+  if (typeof bounds.x !== "number" || typeof bounds.y !== "number") {
+    return true;
+  }
+
+  const windowX = bounds.x;
+  const windowY = bounds.y;
+  const windowWidth = bounds.width;
+  const windowHeight = bounds.height;
+
+  return screen.getAllDisplays().some((display) => {
+    const {
+      x: workAreaX,
+      y: workAreaY,
+      width: workAreaWidth,
+      height: workAreaHeight,
+    } = display.workArea;
+
+    return (
+      windowX < workAreaX + workAreaWidth &&
+      windowX + windowWidth > workAreaX &&
+      windowY < workAreaY + workAreaHeight &&
+      windowY + windowHeight > workAreaY
+    );
+  });
+}
+
+export function getPreloadPath(name: string) {
+  return path.join(__dirname, `preload-${name}.js`);
+}
+
+export function getBackgroundColor() {
+  return nativeTheme.shouldUseDarkColors ? "#0a0a0a" : "#ffffff";
+}
+
+// `hiddenInset` pins the buttons 11px from the top and skips the centering
+// `titleBarOverlay.height` would otherwise do, so centering them in a taller
+// titlebar takes an explicit position. The x inset repeats Electron's own so
+// only the vertical position moves.
+const MACOS_TRAFFIC_LIGHT_HEIGHT = 12;
+const MACOS_TRAFFIC_LIGHT_X = 12;
+
+export function getTitleBarOptions() {
+  const titleBarOverlay =
+    !platform.isLinux || isLinuxWindowControlsEnabled()
+      ? {
+          color: getBackgroundColor(),
+          symbolColor: nativeTheme.shouldUseDarkColors ? "#fafafa" : "#0a0a0a",
+          height: APP_TITLEBAR_HEIGHT - 1,
+        }
+      : false;
+
+  return {
+    titleBarStyle: platform.isMacOS ? ("hiddenInset" as const) : ("hidden" as const),
+    titleBarOverlay,
+    trafficLightPosition: platform.isMacOS
+      ? {
+          x: MACOS_TRAFFIC_LIGHT_X,
+          y: (APP_TITLEBAR_HEIGHT - MACOS_TRAFFIC_LIGHT_HEIGHT) / 2,
+        }
+      : undefined,
+  };
+}
+
+/** The window controls Windows and Linux draw follow the theme only when told to. */
+export function updateTitleBarOverlay(browserWindow: BrowserWindow) {
+  if (platform.isMacOS || browserWindow.isDestroyed()) {
+    return;
+  }
+
+  const { titleBarOverlay } = getTitleBarOptions();
+
+  if (typeof titleBarOverlay === "boolean") {
+    return;
+  }
+
+  browserWindow.setTitleBarOverlay(titleBarOverlay);
+}
+
+export function getCommonBrowserWindowOptions() {
+  return {
+    ...getTitleBarOptions(),
+    backgroundColor: getBackgroundColor(),
+    darkTheme: nativeTheme.shouldUseDarkColors,
+    webPreferences: {
+      preload: getPreloadPath("renderer"),
+    },
+  };
+}
+
+// Wayland sometimes never emits `ready-to-show` (electron/electron#48859)
+export function onceReadyToShow(browserWindow: BrowserWindow, callback: () => void) {
+  const onReady = () => {
+    browserWindow.off("ready-to-show", onReady);
+    browserWindow.webContents.off("did-finish-load", onReady);
+
+    callback();
+  };
+
+  browserWindow.on("ready-to-show", onReady);
+  browserWindow.webContents.on("did-finish-load", onReady);
+}
+
+export function createBrowserWindow(options: BrowserWindowConstructorOptions) {
+  const browserWindow = new BrowserWindow({
+    show: false,
+    ...options,
+  });
+
+  onceReadyToShow(browserWindow, () => {
+    browserWindow.show();
+  });
+
+  if (options.backgroundColor) {
+    const updateBackgroundColor = () => {
+      browserWindow.setBackgroundColor(getBackgroundColor());
+    };
+
+    nativeTheme.on("updated", updateBackgroundColor);
+
+    browserWindow.once("closed", () => {
+      nativeTheme.off("updated", updateBackgroundColor);
+    });
+  }
+
+  return browserWindow;
+}
+
+export type RendererPage =
+  | "main"
+  | "settings"
+  | "workspace-app"
+  | "desktop-sources"
+  | "recent-download-history"
+  | "bookmarks";
+
+type LoadRendererOptions = {
+  page: RendererPage;
+  searchParams?: URLSearchParams;
+  /** The hash route the page starts on. */
+  hash?: string;
+};
+
+export function loadRenderer(
+  window: BrowserWindow | WebContentsView,
+  options: LoadRendererOptions,
+) {
+  // oxlint-disable-next-line lingui/no-unlocalized-strings -- a file name
+  const pageFileName = `${options.page}.html`;
+
+  const searchParams = options.searchParams ?? new URLSearchParams();
+
+  searchParams.set("darkMode", nativeTheme.shouldUseDarkColors ? "true" : "false");
+
+  searchParams.set("locale", appI18n.locale);
+
+  // `||`, not `??`: an empty value is as unusable as an unset one, and
+  // keeping it loads the page with no origin to resolve against.
+  const pageFileUrl = is.dev
+    ? // oxlint-disable-next-line lingui/no-unlocalized-strings -- a URL
+      `${process.env.GGMAIL_RENDERER_URL || "http://localhost:3000/"}${pageFileName}`
+    : pathToFileURL(path.join(app.getAppPath(), "build-js", "renderer", pageFileName)).href;
+
+  const pageUrl = `${pageFileUrl}?${searchParams.toString()}${options.hash ? `#${options.hash}` : ""}`;
+
+  keepOnRendererPage(window.webContents, pageUrl);
+
+  loadUrl(window.webContents, pageUrl);
+
+  if (shouldOpenDevToolsOnLaunch) {
+    window.webContents.openDevTools({ mode: "detach" });
+  }
+}

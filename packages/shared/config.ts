@@ -1,0 +1,152 @@
+import { DEFAULT_ACCOUNT_LABEL } from "./accounts";
+import type { Config } from "./types";
+
+export const DEFAULT_WINDOW_STATE_BOUNDS = {
+  width: 1280,
+  height: 800,
+  x: undefined,
+  y: undefined,
+};
+
+/**
+ * The three values the default config can't compute for itself, because each
+ * one comes from the environment the app is running in.
+ */
+export type DefaultConfigEnvironment = {
+  /** The id of the account the config starts with. */
+  accountId: string;
+  /** Where downloads are saved, which is the platform's downloads directory. */
+  downloadsLocation: string;
+  /** Whether the tray icon starts on, which it does everywhere but macOS. */
+  trayEnabled: boolean;
+};
+
+/**
+ * The config every install starts from. It lives here rather than in the main
+ * process so that anything rendering the app's components outside Electron,
+ * such as the component playground, reads the same defaults the app ships with
+ * instead of a copy that drifts from them.
+ */
+export function createDefaultConfig({
+  accountId,
+  downloadsLocation,
+  trayEnabled,
+}: DefaultConfigEnvironment): Config {
+  return {
+    accounts: [
+      {
+        id: accountId,
+        label: DEFAULT_ACCOUNT_LABEL,
+        color: null,
+        selected: true,
+        notifications: true,
+        gmail: {
+          unreadBadge: true,
+          delegatedAccountId: null,
+          unifiedInbox: true,
+        },
+        workspaceApps: {
+          savedTabs: [],
+          bookmarks: [],
+        },
+      },
+    ],
+    "accounts.unreadBadge": true,
+    "app.hardwareAcceleration": true,
+    "app.language": "system",
+    launchMinimized: false,
+    launchAtLogin: false,
+    resetApp: false,
+    theme: "system",
+    "dock.enabled": true,
+    "dock.unreadBadge": true,
+    "externalLinks.confirm": true,
+    "externalLinks.trustedHosts": [],
+    "downloads.saveAs": false,
+    "downloads.openFolderWhenDone": false,
+    "downloads.location": downloadsLocation,
+    "downloads.history": [],
+    "notifications.enabled": true,
+    "notifications.newEmails": "all",
+    "notifications.showSender": true,
+    "notifications.showSubject": true,
+    "notifications.showSummary": true,
+    "notifications.playSound": true,
+    "notifications.allowFromWorkspaceApps": true,
+    "notifications.sound": "linen",
+    "notifications.volume": 1,
+    "notifications.downloadCompleted": true,
+    "notifications.onClickDownloadCompleted": "showInFolder",
+    "notifications.times": [],
+    "updates.autoCheck": true,
+    "updates.showNotifications": true,
+    "updates.channel": "stable",
+    "blocker.enabled": true,
+    "blocker.ads": true,
+    "blocker.tracking": true,
+    "tray.enabled": trayEnabled,
+    "tray.iconColor": "system",
+    "tray.unreadCount": true,
+    "tray.selectAccountWithUnread": false,
+    "gmail.hideGmailLogo": true,
+    "gmail.hideInboxFooter": true,
+    "gmail.hideOutOfOfficeBanner": false,
+    "gmail.hidePromoBanner": true,
+    "gmail.hideUpgradeButton": true,
+    "gmail.reverseConversation": false,
+    "gmail.savedSearches": [],
+    "gmail.labelColors": [],
+    "gmail.unreadCountPreference": "inbox",
+    "gmail.openComposeInNewWindow": false,
+    "gmail.showSenderIcons": true,
+    "gmail.moveAttachmentsToTop": false,
+    "gmail.showTrimmedContent": false,
+    "gmail.loadClippedMessages": false,
+    "gmail.closeComposeWindowAfterSend": false,
+    "gmail.replyForwardInPopOut": false,
+    "gmail.extendDarkTheme": false,
+    "gmail.inboxCategoriesToMonitor": "primary",
+    "screenShare.useSystemPicker": true,
+    "swipeNavigation.enabled": true,
+    "window.lastState": {
+      bounds: DEFAULT_WINDOW_STATE_BOUNDS,
+      fullscreen: false,
+      maximized: false,
+    },
+    "window.restrictMinimumSize": true,
+    "window.linuxWindowControls": "auto",
+    "workspaceApps.openInApp": true,
+    "workspaceApps.openInAppExcludedApps": [],
+    "workspaceApps.mode": "tabs",
+    "workspaceApps.launcherApps": [],
+    "workspaceApps.launcherDisplay": "auto",
+    "workspaceApps.launcherAndBookmarksPlacement": "auto",
+    "workspaceApps.showBookmarksButton": true,
+    "workspaceApps.persistZoom": true,
+    "workspaceApps.zoomFactors": {},
+    "workspaceApps.hidePasskeyDialog": false,
+    "workspaceApps.hibernation": "unpinned",
+    "workspaceApps.hibernationTimeout": "1h",
+    "verificationCodes.autoCopy": true,
+    "verificationCodes.copyMode": "notificationClick",
+    "verificationCodes.autoDelete": false,
+    "verificationCodes.autoMarkAsRead": false,
+    "doNotDisturb.enabled": false,
+    "doNotDisturb.duration": null,
+    "doNotDisturb.until": null,
+    "doNotDisturb.showTitlebarButton": true,
+    "unifiedInbox.enabled": true,
+    "unifiedInbox.showSenderIcons": true,
+    "attachments.layout": "list",
+    "unifiedInbox.rowsPerPage": 10,
+    "spellchecker.languages": [],
+    "verticalTabs.showWindows": true,
+    "verticalTabs.width": "auto",
+    "verticalTabs.showWidthToggle": true,
+    "verticalTabs.gmailUnreadBadge": "always",
+    "verticalTabs.showAppLinksBadge": true,
+    "extensions.enabled": false,
+    "extensions.installed": [],
+    "extensions.additionalSites": {},
+  };
+}

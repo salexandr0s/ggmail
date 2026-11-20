@@ -1,0 +1,9 @@
+{
+  "name": "@ggmail/app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "bun test --isolate",
+    "types": "tsc && tsc -p tsconfig.test.json"
+  }
+}

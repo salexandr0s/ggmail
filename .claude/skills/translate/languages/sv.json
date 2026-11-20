@@ -1,0 +1,1894 @@
+{
+  "platformWords": {
+    "severity": "wrong",
+    "reason": "An entry with a platform msgctxt takes that platform's word from the style sheet's Platform words table.",
+    "rows": [
+      {
+        "row": "File",
+        "macOS": [
+          {
+            "word": "Arkiv",
+            "source": "(AppKit `MenuCommands` `File`)",
+            "labels": ["File"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Arkiv",
+            "source": "(TBX `7285_185699_537022`)",
+            "labels": ["File"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Fil",
+            "source": "(gtk4 `File`)",
+            "labels": ["File"]
+          }
+        ]
+      },
+      {
+        "row": "View",
+        "macOS": [
+          {
+            "word": "Innehåll",
+            "source": "(AppKit `MenuCommands` `View`)",
+            "labels": ["View"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Visa",
+            "source": "(TBX `9201_185833_515423`)",
+            "labels": ["View"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Vy",
+            "source": "(nautilus `shortcuts dialog` `View`)",
+            "labels": ["View"]
+          }
+        ]
+      },
+      {
+        "row": "Edit, the menu",
+        "macOS": [
+          {
+            "word": "Redigera",
+            "source": "(Mail `MainMenu` `42.title`)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Redigera",
+            "source": "(TBX `9433_179566_1110624` _Menyn Redigera_, the Edit menu)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Redigera",
+            "source": "(gtk4 `_Edit`, GTK's Edit menu)",
+            "labels": ["Edit"]
+          }
+        ]
+      },
+      {
+        "row": "Undo",
+        "macOS": [
+          {
+            "word": "Ångra",
+            "source": "(Mail `MainMenu` `281.title`)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Ångra",
+            "source": "(TBX `5274_168784_168795`)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ångra",
+            "source": "(gtk4 `_Undo`)",
+            "labels": ["Undo"]
+          }
+        ]
+      },
+      {
+        "row": "Redo",
+        "macOS": [
+          {
+            "word": "Gör om",
+            "source": "(Mail `MainMenu` `282.title`)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Gör om",
+            "source": "(TBX `10268_169412_169422` _göra om_, as an imperative)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Gör om",
+            "source": "(gtk4 `_Redo`)",
+            "labels": ["Redo"]
+          }
+        ]
+      },
+      {
+        "row": "Cut, `Cu&t`",
+        "macOS": [
+          {
+            "word": "Klipp ut",
+            "source": "(AppKit `MenuCommands` `Cut`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Klipp ut",
+            "source": "(TBX `1735_41913_41926` _klippa ut_, as an imperative)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Klipp ut",
+            "source": "(gtk4 `Cu_t`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ]
+      },
+      {
+        "row": "Copy, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Kopiera",
+            "source": "(AppKit `MenuCommands` `Copy`)",
+            "labels": ["Copy"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Kopiera",
+            "source": "(TBX `11991_39848_39862` _kopiera_, as an imperative)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Kopiera",
+            "source": "(gtk4 `_Copy`)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ]
+      },
+      {
+        "row": "Paste, `&Paste`",
+        "macOS": [
+          {
+            "word": "Klistra in",
+            "source": "(AppKit `MenuCommands` `Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Klistra in",
+            "source": "(TBX `11068_91030_91044`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Klistra in",
+            "source": "(gtk4 `_Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ]
+      },
+      {
+        "row": "Paste and Match Style, `Paste and &Match Style`",
+        "macOS": [
+          {
+            "word": "Klistra in och matcha stilen",
+            "source": "(AppKit `MenuCommands` `Paste and Match Style`)",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Klistra in och matcha formatet",
+            "source": "inferred from TBX `11068_91030_91044` and `5511_55836_55852` _format_",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Klistra in och matcha stilen",
+            "source": "inferred from gtk4 `_Paste`",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ]
+      },
+      {
+        "row": "Select All, `Select &All`",
+        "macOS": [
+          {
+            "word": "Markera allt",
+            "source": "(AppKit `MenuCommands` `Select All`)",
+            "labels": ["Select All"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Markera allt",
+            "source": "(TBX `10476_185277_1379517`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Markera allt",
+            "source": "(gtk4 `Select _All`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ]
+      },
+      {
+        "row": "Delete, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Radera",
+            "source": "(AppKit `MenuCommands` `Delete`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Ta bort",
+            "source": "(TBX `5738_44359_44374` _ta bort_, as a label)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ta bort",
+            "source": "(gtk4 `_Delete`)",
+            "labels": ["Delete"]
+          }
+        ]
+      },
+      {
+        "row": "About {appName}",
+        "macOS": [
+          {
+            "word": "Om {appName}",
+            "source": "(Mail `MainMenu` `628.title`, _Om Mail_)",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Om {appName}",
+            "source": "(TBX `6036_211259_322579`, the About menu item)",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Om {appName}",
+            "source": "(gtk4 `About %s`)",
+            "labels": ["About {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Check for Updates…",
+        "macOS": [
+          {
+            "word": "Leta efter uppdateringar…",
+            "source": "(Software Update `Check for Updates`)",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Sök efter uppdateringar…",
+            "source": "inferred from TBX `1821_4592_4607` _uppdatera_, as GNOME Software writes it",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Sök efter uppdateringar…",
+            "source": "(gnome-software `Check for Updates`)",
+            "labels": ["Check for Updates…"]
+          }
+        ]
+      },
+      {
+        "row": "Settings, the app-menu item",
+        "macOS": [
+          {
+            "word": "Inställningar…",
+            "source": "(AppKit `MenuCommands` `Settings\\U2026`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Inställningar…",
+            "source": "(TBX `21910_780478_1048484`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Inställningar…",
+            "source": "(gtk4 `Settings`)",
+            "labels": ["Settings…"]
+          }
+        ]
+      },
+      {
+        "row": "Compose, the File menu item",
+        "macOS": [
+          {
+            "word": "Nytt mejl",
+            "source": "(Mail `MainMenu` `374.title`, New Message)",
+            "labels": ["Compose"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Nytt e-postmeddelande",
+            "source": "(TBX `34677_1998714_2004008`)",
+            "labels": ["Compose"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Nytt meddelande",
+            "source": "(geary `New Message`)",
+            "labels": ["Compose"]
+          }
+        ]
+      },
+      {
+        "row": "Save As, in `Sa&ve Image As…` and the Save As dialog",
+        "macOS": [
+          {
+            "word": "Spara som",
+            "source": "(AppKit `Document` `Save As\\U2026`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Spara bild som…",
+            "source": "inferred with Mail `Localizable` `CopyImageMenuItem`, _Kopiera bild_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Spara som",
+            "source": "(TBX `12985_534974_537055`)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Spara bild som…",
+            "source": "inferred with TBX `1294_64520_64535` _bild_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Spara som",
+            "source": "(gedit `Save _As…`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Spara bild som…",
+            "source": "inferred",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ]
+      },
+      {
+        "row": "Export, the save dialog's button",
+        "macOS": [
+          {
+            "word": "Exportera",
+            "source": "(AppKit `Document` `Export`)",
+            "labels": ["Export"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Exportera",
+            "source": "(TBX `7948_52504_52520`)",
+            "labels": ["Export"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Exportera",
+            "source": "inferred: no GNOME source has it",
+            "labels": ["Export"]
+          }
+        ]
+      },
+      {
+        "row": "Shift, the key",
+        "macOS": [
+          {
+            "word": "Skift",
+            "source": "(AppKit `FunctionKeyNames` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Skift",
+            "source": "(TBX `3412_112291_112309` _SKIFT-tangenten_, short as the glossary's Keyboard keys gives it)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Skift",
+            "source": "(gtk4 `keyboard label` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ]
+      },
+      {
+        "row": "Show ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Visa ggmail",
+            "source": "(AppKit `Common` `Show`, _Visa_)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Visa ggmail",
+            "source": "(TBX `19508_660023_2724716` _visa_)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Visa ggmail",
+            "source": "(gtk4 `Show`, _Visa_)",
+            "labels": ["Show ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Hide ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Göm ggmail",
+            "source": "(Mail `MainMenu` `632.title`, _Göm Mail_)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Dölj ggmail",
+            "source": "(TBX `20202_719546_1112806` _dölja_, as an imperative)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Dölj ggmail",
+            "source": "(gtk4 `Hide %s`)",
+            "labels": ["Hide ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, the tray item",
+        "macOS": "macOS shows the menu's Quit {appName}",
+        "Windows": [
+          {
+            "word": "Avsluta",
+            "source": "(TBX `11976_185681_537021`, the Exit item of a taskbar icon's menu)",
+            "labels": ["Exit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Avsluta",
+            "source": "inferred from gtk4 `Quit %s`, _Avsluta %s_: GTK has no standalone Quit, and the Microsoft Terminology Collection is no Linux source",
+            "labels": ["Quit"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Avsluta",
+            "source": "(AppKit `Document` `Quit`)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Avsluta",
+            "source": "(TBX `9679_334563_1111352` _avsluta_, to close a program, as a label)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Linux": "one message with the tray item's Quit, its word above"
+      },
+      {
+        "row": "System tray, in the Appearance settings",
+        "macOS": "macOS shows the menu bar instead: _menyrad_",
+        "Windows": [
+          {
+            "word": "systemfält",
+            "source": "(TBX `55084_3122863_3123119`, system tray, and Chrome's word; TBX `10299_85657_85677` gives _meddelandefält_ for the notification area)",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "systemfält",
+            "source": "inferred: GNOME has no tray",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ]
+      },
+      {
+        "row": "Hide {appName}",
+        "macOS": [
+          {
+            "word": "Göm {appName}",
+            "source": "(Mail `MainMenu` `632.title`, _Göm Mail_)",
+            "labels": ["Hide {appName}"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Hide Others",
+        "macOS": [
+          {
+            "word": "Göm övriga",
+            "source": "(Mail `MainMenu` `622.title`)",
+            "labels": ["Hide Others"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show All",
+        "macOS": [
+          {
+            "word": "Visa alla",
+            "source": "(Mail `MainMenu` `625.title`)",
+            "labels": ["Show All"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Quit {appName}",
+        "macOS": [
+          {
+            "word": "Avsluta {appName}",
+            "source": "(Mail `MainMenu` `631.title`, _Avsluta Mail_)",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Avsluta {appName}",
+            "source": "inferred from TBX `9679_334563_1111352` _avsluta_, to close a program",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Avsluta {appName}",
+            "source": "(gtk4 `Quit %s`)",
+            "labels": ["Quit {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Close Window",
+        "macOS": [
+          {
+            "word": "Stäng fönster",
+            "source": "(AppKit `MenuCommands` `Close Window`)",
+            "labels": ["Close Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Window, the menu",
+        "macOS": [
+          {
+            "word": "Fönster",
+            "source": "(AppKit `MenuCommands` `Window`)",
+            "labels": ["Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Minimize",
+        "macOS": [
+          {
+            "word": "Minimera",
+            "source": "(AppKit `MenuCommands` `Minimize`; Dictionary and Screen Sharing `MainMenu` `23.title`)",
+            "labels": ["Minimize"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Zoom, the window",
+        "macOS": [
+          {
+            "word": "Zooma",
+            "source": "(Mail `MainMenu` `295.title`)",
+            "labels": ["Zoom"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Bring All to Front",
+        "macOS": [
+          {
+            "word": "Lägg alla överst",
+            "source": "(AppKit `MenuCommands` `Bring All to Front`)",
+            "labels": ["Bring All to Front"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Speech",
+        "macOS": [
+          {
+            "word": "Tal",
+            "source": "(Mail `MainMenu` `1535.title`)",
+            "labels": ["Speech"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Start Speaking",
+        "macOS": [
+          {
+            "word": "Börja tala",
+            "source": "(Mail `MainMenu` `1536.title`)",
+            "labels": ["Start Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Stop Speaking",
+        "macOS": [
+          {
+            "word": "Sluta tala",
+            "source": "(Mail `MainMenu` `1537.title`)",
+            "labels": ["Stop Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Look Up “{selection}”",
+        "macOS": [
+          {
+            "word": "Slå upp ”{selection}”",
+            "source": "(AppKit `MenuCommands` `Look Up \\U201C%@\\U201D`)",
+            "labels": ["Look Up “{selection}”"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show in Finder",
+        "macOS": [
+          {
+            "word": "Visa i Finder",
+            "source": "(Mail `Preferences` `ShowExtensionApplicationInFinder`)",
+            "labels": ["Show in Finder"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "OK, a native dialog's button",
+        "macOS": [
+          {
+            "word": "OK",
+            "source": "(AppKit `Common` `OK`)",
+            "labels": ["OK"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "OK",
+            "source": "(TBX `43243_2447290_2774844`, the dialog button)",
+            "labels": ["OK"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "OK",
+            "source": "(gtk4 `_OK`, its access key dropped)",
+            "labels": ["OK"]
+          }
+        ]
+      },
+      {
+        "row": "Learn Spelling, `&Learn Spelling`",
+        "macOS": [
+          {
+            "word": "Lägg till stavning",
+            "source": "(WebKit `Localizable` `Learn Spelling`)",
+            "labels": ["&Learn Spelling"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Search with Google, `&Search with Google`",
+        "macOS": [
+          {
+            "word": "Sök med Google",
+            "source": "(WebKit `Localizable` `Search with %@`)",
+            "labels": ["&Search with Google"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy, `&Copy`",
+        "macOS": [
+          {
+            "word": "Kopiera",
+            "source": "(WebKit `Localizable` `Copy`)",
+            "labels": ["&Copy"]
+          }
+        ],
+        "Windows": "the Edit menu item's word, with its access key",
+        "Linux": "the Edit menu item's word, with its access key"
+      },
+      {
+        "row": "Copy Link Address, `Copy Link Addr&ess`",
+        "macOS": [
+          {
+            "word": "Kopiera länk",
+            "source": "(WebKit `Localizable` `Copy Link`, Safari's item for a link)",
+            "labels": ["Copy Link Addr&ess"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image, `Cop&y Image`",
+        "macOS": [
+          {
+            "word": "Kopiera bild",
+            "source": "(WebKit `Localizable` `Copy Image`)",
+            "labels": ["Cop&y Image"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image Address, `C&opy Image Address`",
+        "macOS": [
+          {
+            "word": "Kopiera bildadress",
+            "source": "inferred from WebKit `Localizable` `Copy Image` and Mail `Alerts` `CopyAddress`, _Kopiera adress_",
+            "labels": ["C&opy Image Address"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Help, the menu",
+        "macOS": [
+          {
+            "word": "Hjälp",
+            "source": "(AppKit `MenuCommands` `Help`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Hjälp",
+            "source": "(TBX `13846_61010_61038`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Hjälp",
+            "source": "(nautilus `_Help`)",
+            "labels": ["Help"]
+          }
+        ]
+      },
+      {
+        "row": "Close, the File menu item",
+        "macOS": "macOS shows Close Window",
+        "Windows": [
+          {
+            "word": "Stäng",
+            "source": "(TBX `26514_1275570_1333399`)",
+            "labels": ["Close"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Stäng",
+            "source": "(gtk4 `_Close`)",
+            "labels": ["Close"]
+          }
+        ]
+      },
+      {
+        "row": "Share, the share menu",
+        "macOS": [
+          {
+            "word": "Dela",
+            "source": "(AppKit `MenuCommands` `Share`)",
+            "labels": ["Share"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Cancel, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Avbryt",
+            "source": "(AppKit `Common` `Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Avbryt",
+            "source": "(TBX `20151_705248_776298`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Avbryt",
+            "source": "(gtk4 `_Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ]
+      }
+    ]
+  },
+  "banned": [
+    {
+      "id": "notis",
+      "pattern": "(?<!\\p{L})[Nn]otis\\p{L}*",
+      "severity": "wrong",
+      "reason": "A notification is an avisering, as Chrome writes it, never Apple's notis; notis is for a macOS label only (Chrome writes the banned form in none of its messages).",
+      "allow": {
+        "contexts": ["macOS"]
+      }
+    },
+    {
+      "id": "hamta",
+      "pattern": "(?<!\\p{L})[Hh]ämt\\p{L}*",
+      "severity": "wrong",
+      "reason": "Downloading is ladda ned, a download a nedladdning, as Chrome writes them, never hämta or hämtning. Fetching something that is not a download, such as a page or a code, can be hämta (Chrome writes the banned form in 32 messages).",
+      "allow": {
+        "contexts": ["macOS"],
+        "msgidPattern": "^(?!.*\\bdownload)"
+      }
+    },
+    {
+      "id": "mejl",
+      "pattern": "[Mm]ejl",
+      "severity": "wrong",
+      "reason": "An email is an e-postmeddelande, as Chrome writes it, never Apple's mejl; mejl is for a macOS label only (Chrome writes the banned form in none of its messages).",
+      "allow": {
+        "contexts": ["macOS"]
+      }
+    },
+    {
+      "id": "gom",
+      "pattern": "(?<!\\p{L})[Gg]öm(?:d|da|t|s|mer|ma|des)?(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "Hiding is dölja, as Chrome writes it: Dölj; Göm is Apple's word, for a macOS label only (Chrome writes the banned form in none of its messages).",
+      "allow": {
+        "contexts": ["macOS"]
+      }
+    },
+    {
+      "id": "nala",
+      "pattern": "[Nn]åla",
+      "severity": "wrong",
+      "reason": "Pinning is fästa, as Chrome writes it: Fäst, fäst flik (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "ni",
+      "pattern": "(?<![\\p{L}\\p{N}+])[Nn]i(?![\\p{L}\\p{N}+])",
+      "severity": "wrong",
+      "reason": "The user is du, never ni (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "quotes",
+      "pattern": "[\"“„]",
+      "severity": "wrong",
+      "reason": "Quotation marks are ”…” (U+201D on both sides), as Chrome writes them."
+    },
+    {
+      "id": "three-dots",
+      "pattern": "\\.\\.\\.",
+      "severity": "wrong",
+      "reason": "An ellipsis is one character, …, never three full stops."
+    },
+    {
+      "id": "ellipsis-space",
+      "pattern": "[ \\u00a0]…",
+      "severity": "wrong",
+      "reason": "An ellipsis follows the word without a space: Inställningar…"
+    },
+    {
+      "id": "unit-space",
+      "pattern": "(?<=[\\p{N}#}])[\\u00a0\\u202f](?=(?:sekunder?|minuter?|timmar?|timme|dagar?|dag|veckor?|vecka|månader?|månad|år|[kKMGT]B)(?!\\p{L}))",
+      "severity": "wrong",
+      "reason": "A number and its unit are parted by a plain space, as Chrome writes them: 5 minuter, # dagar (Chrome writes the banned form in 17 messages)."
+    },
+    {
+      "id": "apology",
+      "pattern": "(?<!\\p{L})(?:[Tt]yvärr|[Uu]rsäkta)(?!\\p{L})",
+      "severity": "style",
+      "reason": "Say what happened, without Tyvärr or Ursäkta."
+    }
+  ],
+  "pinned": [
+    {
+      "id": "download-history",
+      "msgidPattern": "\\bdownload history\\b",
+      "expect": "[Nn]edladdningshistorik",
+      "severity": "wrong",
+      "reason": "The download history is the nedladdningshistorik, as Chrome writes it, never Apple's hämtningshistorik (Chrome: 10 of 10 messages).",
+      "example": {
+        "msgid": "Download history",
+        "clean": "Nedladdningshistorik",
+        "fault": "Hämtningshistorik"
+      }
+    },
+    {
+      "id": "download",
+      "msgidPattern": "(?<!\\{)\\bdownload|(?<=\\{)download(?![\\p{L}\\p{N}_]*\\s*[,}])",
+      "expect": "[Nn]edladd|[Ll]add\\p{L}* ned",
+      "severity": "wrong",
+      "reason": "Downloading is ladda ned, a download a nedladdning, as Chrome writes them (Chrome: 216 of 224 messages).",
+      "example": {
+        "msgid": "Download history",
+        "clean": "Nedladdningshistorik",
+        "fault": "Hämtningshistorik"
+      }
+    },
+    {
+      "id": "bookmark",
+      "msgidPattern": "\\bbookmarks?\\b",
+      "expect": "[Bb]okmärk",
+      "severity": "wrong",
+      "reason": "A bookmark is a bokmärke (Chrome: 163 of 163 messages).",
+      "example": {
+        "msgid": "No bookmarks yet",
+        "fault": "Inga favoriter ännu"
+      }
+    },
+    {
+      "id": "notification",
+      "msgidPattern": "(?!Notifications$).*\\bnotifications?\\b",
+      "expect": "[Aa]viser",
+      "severity": "wrong",
+      "reason": "A notification is an avisering, as Chrome writes it. The bare Notifications is also the toasts' region, under the toast rule (Chrome: 124 of 127 messages).",
+      "example": {
+        "msgid": "Show a notification when a download finishes.",
+        "clean": "Visa en avisering när en nedladdning är klar.",
+        "fault": "Visa en notis när en nedladdning är klar."
+      }
+    },
+    {
+      "id": "extension",
+      "msgidPattern": "\\bextensions?\\b",
+      "expect": "[Tt]illägg",
+      "severity": "wrong",
+      "reason": "An extension is a tillägg (Chrome: 302 of 304 messages).",
+      "example": {
+        "msgid": "Extensions",
+        "fault": "Utökningar"
+      }
+    },
+    {
+      "id": "tab-strip",
+      "msgidPattern": "\\btab strip\\b",
+      "expect": "[Ff]likhuvud",
+      "severity": "wrong",
+      "reason": "The tab strip is the flikhuvud, as Chrome writes it (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Narrow the tab strip",
+        "fault": "Gör flikraden smalare"
+      }
+    },
+    {
+      "id": "do-not-disturb",
+      "msgidPattern": "\\bdo not disturb\\b",
+      "expect": "Stör ej",
+      "severity": "wrong",
+      "reason": "Do Not Disturb is Stör ej (Chrome: 5 of 6 messages).",
+      "example": {
+        "msgid": "Turn Do Not Disturb on",
+        "fault": "Aktivera Stör inte"
+      }
+    },
+    {
+      "id": "button",
+      "msgidPattern": "\\bbuttons?\\b",
+      "expect": "[Kk]napp",
+      "severity": "wrong",
+      "reason": "An on-screen button is a knapp, as Chrome writes it (Chrome: 139 of 141 messages).",
+      "example": {
+        "msgid": "Show width button",
+        "fault": "Visa breddreglage"
+      }
+    },
+    {
+      "id": "password-manager",
+      "msgidPattern": "\\bpassword managers?\\b",
+      "expect": "[Ll]ösenordshanter",
+      "severity": "wrong",
+      "reason": "A password manager is a lösenordshanterare, as Chrome writes it (Chrome: 76 of 77 messages).",
+      "example": {
+        "msgid": "Password managers",
+        "fault": "Lösenordsprogram"
+      }
+    },
+    {
+      "id": "passkey",
+      "msgidPattern": "\\bpasskeys?\\b",
+      "expect": "(?<!\\p{L})[Nn]yck",
+      "severity": "wrong",
+      "reason": "A passkey is a nyckel, as Chrome writes it (Chrome: 106 of 106 messages).",
+      "example": {
+        "msgid": "Only passkeys created in ggmail work here.",
+        "fault": "Endast lösennycklar som skapats i ggmail fungerar här."
+      }
+    },
+    {
+      "id": "default-browser",
+      "msgidPattern": "\\bdefault browser\\b",
+      "expect": "[Ss]tandardwebbläsare",
+      "severity": "wrong",
+      "reason": "The default browser is the standardwebbläsare, as Chrome writes it (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Open in Default Browser",
+        "fault": "Öppna i förvald webbläsare"
+      }
+    },
+    {
+      "id": "update",
+      "msgidPattern": "\\bupdat(?:e|es|ed|ing)\\b",
+      "expect": "[Uu]ppdater",
+      "severity": "wrong",
+      "reason": "An update is an uppdatering (Chrome: 233 of 234 messages).",
+      "example": {
+        "msgid": "Update available",
+        "fault": "Ny version finns"
+      }
+    },
+    {
+      "id": "restart",
+      "msgidPattern": "\\brestart",
+      "expect": "[Ss]tart\\p{L}* om|[Oo]mstart",
+      "severity": "wrong",
+      "reason": "Restarting is starta om, as Chrome writes it (Chrome: 44 of 47 messages).",
+      "example": {
+        "msgid": "Restart now",
+        "fault": "Boota om nu"
+      }
+    },
+    {
+      "id": "reload",
+      "msgidPattern": "\\breload\\b",
+      "expect": "[Ll]äs\\p{L}* in|[Ii]nläsning",
+      "severity": "wrong",
+      "reason": "Reloading is läsa in igen, as Chrome writes it, not Apple's Uppdatera, which is ggmail's word for an update (Chrome: 25 of 32 messages).",
+      "example": {
+        "msgid": "Reload",
+        "fault": "Uppdatera"
+      }
+    },
+    {
+      "id": "hard-reload",
+      "msgid": "Hard Reload",
+      "countEnglish": "^Hard reload$",
+      "countExpect": "^Läs in igen",
+      "expect": "^Läs in igen utan cache$",
+      "severity": "wrong",
+      "reason": "Hard Reload is Läs in igen utan cache, by a recorded call (source order 4b; Tim delegates language judgment to the lead): Chrome's one Hard Reload is the noun Hård inläsning, and sv.md's binding label forms give a menu bar item the imperative, so the item takes Chrome's Läs in igen, the reload pin's word, and says what makes it hard (Chrome: 0 of 1 messages).",
+      "call": {
+        "reason": "Läs in igen utan cache over Chrome's noun Hård inläsning, since a menu bar item takes the imperative.",
+        "date": "2026-11-02"
+      },
+      "example": {
+        "fault": "Hård inläsning"
+      }
+    },
+    {
+      "id": "titlebar",
+      "msgidPattern": "\\btitle ?bar\\b",
+      "expect": "[Nn]amnlist",
+      "severity": "wrong",
+      "reason": "The titlebar is the namnlist (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Titlebar",
+        "fault": "Titelfält"
+      }
+    },
+    {
+      "id": "menu-bar",
+      "msgidPattern": "\\bmenu bar\\b",
+      "expect": "[Mm]enyrad",
+      "severity": "wrong",
+      "reason": "The menu bar is the menyrad (Chrome: 2 of 3 messages).",
+      "example": {
+        "msgid": "Menu bar icon",
+        "fault": "Symbol i menyfältet"
+      }
+    },
+    {
+      "id": "verification-code",
+      "msgidPattern": "\\bverification codes?\\b",
+      "expect": "[Vv]erifieringskod",
+      "severity": "wrong",
+      "reason": "A verification code is a verifieringskod (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Verification codes",
+        "fault": "Bekräftelsekoder"
+      }
+    },
+    {
+      "id": "device-label",
+      "msgidPattern": "\\bdevice label\\b",
+      "countEnglish": "\\bdevice name\\b",
+      "expect": "[Ee]nhetsnamn",
+      "severity": "wrong",
+      "reason": "A device label is an enhetsnamn, Chrome's word for a device name, counted in Chrome's device name messages, the rest writing enhetens namn (Chrome: 7 of 11 messages).",
+      "example": {
+        "msgid": "Device label",
+        "fault": "Enhetsetikett"
+      }
+    },
+    {
+      "id": "spellcheck",
+      "msgidPattern": "\\bspell ?check",
+      "expect": "[Ss]tavningskontroll",
+      "severity": "wrong",
+      "reason": "Spellchecking is stavningskontroll (Chrome: 22 of 23 messages).",
+      "example": {
+        "msgid": "Spellchecker",
+        "fault": "Rättstavning"
+      }
+    },
+    {
+      "id": "dark-theme",
+      "msgidPattern": "\\bdark theme\\b",
+      "expect": "[Mm]örk\\p{L}* tema",
+      "severity": "wrong",
+      "reason": "The dark theme is the mörkt tema (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Extend dark theme",
+        "fault": "Utöka mörkt läge"
+      }
+    },
+    {
+      "id": "gmail-dark-option",
+      "msgidPattern": "\\bGmail's theme has to be set to dark\\b",
+      "expect": "inställt på Mörkt\\.",
+      "severity": "wrong",
+      "reason": "Gmail's theme picker names its dark option Mörkt, under Tema (Gmail Help, answer/112508, hl=sv, desktop: Öppna avsnittet Tema … Välj Mörkt för mörkt tema), so a sentence that asks for it quotes Gmail's option as Gmail shows it.",
+      "example": {
+        "msgid": "Extend Gmail's own dark theme to emails and the compose window. Gmail's theme has to be set to dark. The feature is in beta, so report anything it gets wrong.",
+        "clean": "Utöka Gmails eget mörka tema till e-postmeddelanden och skrivfönstret. Gmails tema måste vara inställt på Mörkt. Funktionen är i betaversion, så rapportera allt som blir fel.",
+        "fault": "Utöka Gmails eget mörka tema till e-postmeddelanden och skrivfönstret. Gmails tema måste vara inställt på mörkt. Funktionen är i betaversion, så rapportera allt som blir fel."
+      }
+    },
+    {
+      "id": "trusted-hosts",
+      "msgidPattern": "\\b(?:un)?trusted hosts?\\b",
+      "countEnglish": "\\btrusted\\b",
+      "expect": "[Bb]etro",
+      "severity": "wrong",
+      "reason": "Trusted hosts are betrodda värdar, untrusted ones ej betrodda värdar, with Chrome's betrodd for trusted (Chrome: 16 of 22 messages).",
+      "example": {
+        "msgid": "Trusted hosts",
+        "fault": "Pålitliga värdar"
+      }
+    },
+    {
+      "id": "release-channel",
+      "msgidPattern": "\\bchannel\\b",
+      "expect": "[Kk]anal",
+      "severity": "wrong",
+      "reason": "A release channel is a kanal: uppdateringskanal, betakanal (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Release channel",
+        "fault": "Versionsspår"
+      }
+    },
+    {
+      "id": "phishing-protection",
+      "msgidPattern": "\\bphishing protection\\b",
+      "countEnglish": "\\bphishing\\b",
+      "expect": "[Nn]ätfiske",
+      "severity": "wrong",
+      "reason": "Phishing protection is skydd mot nätfiske, with Chrome's nätfiske for phishing (Chrome: 4 of 4 messages).",
+      "example": {
+        "msgid": "Phishing protection",
+        "clean": "Skydd mot nätfiske",
+        "fault": "Phishingskydd"
+      }
+    },
+    {
+      "id": "clipboard",
+      "msgidPattern": "\\bclipboard\\b",
+      "expect": "[Uu]rklipp",
+      "severity": "wrong",
+      "reason": "The clipboard is urklipp, as Chrome writes it (Chrome: 44 of 44 messages).",
+      "example": {
+        "msgid": "Copy codes to clipboard",
+        "fault": "Kopiera koder till klippbordet"
+      }
+    },
+    {
+      "id": "folder",
+      "msgidPattern": "\\bfolders?\\b",
+      "expect": "[Mm]app",
+      "severity": "wrong",
+      "reason": "A folder is a mapp, as Chrome writes it (Chrome: 103 of 104 messages).",
+      "example": {
+        "msgid": "Open folder when done",
+        "fault": "Öppna katalogen när det är klart"
+      }
+    },
+    {
+      "id": "pin",
+      "msgidPattern": "^Pin$|\\b(?:un)?pinned\\b",
+      "expect": "[Ff]äst",
+      "severity": "wrong",
+      "reason": "Pinning is fästa, as Chrome writes it: Fäst, fäst flik (Chrome: 15 of 21 messages).",
+      "example": {
+        "msgid": "Pin",
+        "clean": "Fäst",
+        "fault": "Nåla fast"
+      }
+    },
+    {
+      "id": "upgrade-label",
+      "msgctxt": null,
+      "msgid": "Upgrade",
+      "origin": "packages/renderer/",
+      "expect": "[Uu]ppgradera",
+      "severity": "wrong",
+      "reason": "The standalone Upgrade label is Uppgradera, Gmail's own Upgrade wording for Google's paid storage, Uppgradera (glossary); the seven apps' word for upgrading in general is secondary (uppgradera: 5 of 7 (Thunderbird, Firefox, Android, Microsoft, Apple)).",
+      "example": {
+        "clean": "Uppgradera",
+        "fault": "Köp"
+      }
+    },
+    {
+      "id": "gmail-label",
+      "msgctxt": "Gmail label",
+      "msgidPattern": "\\blabel\\b",
+      "expect": "[Ee]tikett",
+      "severity": "wrong",
+      "reason": "A Gmail label is Gmail's etikett (glossary).",
+      "example": {
+        "msgid": "Label",
+        "clean": "Etikett",
+        "fault": "Märkning"
+      }
+    },
+    {
+      "id": "toast",
+      "msgidPattern": "\\btoasts?\\b",
+      "expect": "[Pp]opup",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: a toast is popup, never the notification word avisering (by step 4c's direct match: Microsoft's toast notification is popup, popup-meddelande and aviseringsbanderoll; the form with avisering is out, and popup remains).",
+      "example": {
+        "msgid": "Close toast",
+        "clean": "Stäng popup",
+        "fault": "Stäng avisering"
+      }
+    },
+    {
+      "id": "toast-heading",
+      "msgctxt": "toasts",
+      "msgid": "Notifications",
+      "expect": "[Pp]opup",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: a toast is popup, never the notification word avisering (by step 4c's direct match: Microsoft's toast notification is popup, popup-meddelande and aviseringsbanderoll; the form with avisering is out, and popup remains).",
+      "example": {
+        "clean": "Popup-meddelanden",
+        "fault": "Aviseringar"
+      }
+    },
+    {
+      "id": "toast-heading-gmail",
+      "msgctxt": null,
+      "msgid": "Notifications",
+      "origin": "packages/preload-gmail/",
+      "expect": "[Pp]opup",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: a toast is popup, never the notification word avisering (by step 4c's direct match: Microsoft's toast notification is popup, popup-meddelande and aviseringsbanderoll; the form with avisering is out, and popup remains).",
+      "example": {
+        "clean": "Popup-meddelanden",
+        "fault": "Aviseringar"
+      }
+    },
+    {
+      "id": "unread-badge",
+      "msgctxt": null,
+      "msgidPattern": "\\bunread badges?\\b",
+      "expect": "[Bb]rick",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: the unread badge is bricka, counted as ggmail uses it, an unread count on an app icon (the apps tie, Thunderbird märke, Microsoft aktivitetsikon, Apple bricka; Google has no word for a count; the most direct match is Apple's unread badge, oläst-bricka).",
+      "example": {
+        "msgid": "Show unread badge",
+        "clean": "Visa bricka för olästa",
+        "fault": "Visa antal olästa"
+      }
+    },
+    {
+      "id": "ggmail-label",
+      "msgctxt": null,
+      "msgid": "Label",
+      "expect": "[Nn]amn",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (namn: 6 of 7).",
+      "example": {
+        "clean": "Namn",
+        "fault": "Etikett"
+      }
+    },
+    {
+      "id": "ggmail-label-prompt",
+      "msgctxt": "saved search",
+      "msgid": "Enter a label",
+      "expect": "[Nn]amn",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (namn: 6 of 7).",
+      "example": {
+        "clean": "Ange ett namn",
+        "fault": "Ange en etikett"
+      }
+    },
+    {
+      "id": "out-of-office",
+      "msgidPattern": "\\bout[- ]of[- ]office\\b",
+      "expect": "[Aa]utosvar",
+      "severity": "wrong",
+      "reason": "Out of office is Gmail's own vacation responder, autosvar, as Gmail Help names its setting (Autosvar på; support.google.com/mail/answer/25922).",
+      "example": {
+        "msgid": "Open Gmail settings to turn off out of office",
+        "clean": "Öppna Gmail-inställningarna för att stänga av autosvaret",
+        "fault": "Öppna Gmail-inställningarna för att stänga av frånvaromeddelandet"
+      }
+    },
+    {
+      "id": "multiple-inboxes",
+      "msgidPattern": "\\bmultiple inboxes\\b",
+      "expect": "[Ff]lera inkorgar",
+      "severity": "wrong",
+      "reason": "Multiple inboxes is Gmail's own inbox type, flera inkorgar, as Gmail Help names it (support.google.com/mail/answer/9694882).",
+      "example": {
+        "msgid": "Multiple inboxes",
+        "fault": "Flerinkorg"
+      }
+    },
+    {
+      "id": "notify",
+      "msgidPattern": "\\bnotify\\b",
+      "expect": "[Mm]eddela",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (meddela: 6 of 7 (Thunderbird, Firefox, Android, LibreOffice, Microsoft, Apple)).",
+      "example": {
+        "msgid": "Notify for",
+        "clean": "Meddela för",
+        "fault": "Avisera för"
+      }
+    },
+    {
+      "id": "sound-breeze",
+      "msgid": "Breeze",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Bris$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bris, Klockspel, Duett, Knack and Linne, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "bris"
+      }
+    },
+    {
+      "id": "sound-chime",
+      "msgid": "Chime",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Klockspel$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bris, Klockspel, Duett, Knack and Linne, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "klockspel"
+      }
+    },
+    {
+      "id": "sound-duet",
+      "msgid": "Duet",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Duett$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bris, Klockspel, Duett, Knack and Linne, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "duett"
+      }
+    },
+    {
+      "id": "sound-knock",
+      "msgid": "Knock",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Knack$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bris, Klockspel, Duett, Knack and Linne, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "knack"
+      }
+    },
+    {
+      "id": "sound-linen",
+      "msgid": "Linen",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Linne$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bris, Klockspel, Duett, Knack and Linne, Linen translated as the user settled for German.",
+      "call": {
+        "reason": "Linen is translated, as Linne, following the user's call for German.",
+        "date": "2026-10-31"
+      },
+      "example": {
+        "fault": "Linen"
+      }
+    },
+    {
+      "id": "system-settings",
+      "msgidPattern": "\\bSystem Settings\\b",
+      "expect": "Systeminställningar",
+      "severity": "wrong",
+      "reason": "System Settings is Apple's Systeminställningar, the name of macOS's own app, in ggmail's own copy too (System Settings InfoPlist CFBundleDisplayName).",
+      "example": {
+        "msgid": "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings.",
+        "clean": "Svep åt vänster eller höger med två fingrar på en styrplatta för att gå bakåt eller framåt. Svep mellan sidor måste också vara på i Systeminställningar.",
+        "fault": "Svep åt vänster eller höger med två fingrar på en styrplatta för att gå bakåt eller framåt. Svep mellan sidor måste också vara på i Systempreferenser."
+      }
+    },
+    {
+      "id": "dock",
+      "msgidPattern": "\\bdock\\b",
+      "expect": "Dock",
+      "severity": "wrong",
+      "reason": "The Dock is Apple's Dock, with its capital, in ggmail's own copy too (DesktopSettings.appex Localizable Dock).",
+      "example": {
+        "msgid": "Dock icon",
+        "clean": "Dockikon",
+        "fault": "dockikon"
+      }
+    },
+    {
+      "id": "hibernation",
+      "msgidPattern": "\\bhibernat",
+      "countEnglish": "\\binactive tabs?\\b",
+      "expect": "[Ii]naktiv",
+      "severity": "wrong",
+      "reason": "A hibernated tab is what Chrome's Memory Saver calls an inactive tab, so it takes Chrome's inaktiv, as in Inaktiv flik, never the systems' Sleep word, counted in Chrome's inactive tab messages (Chrome: 8 of 8 messages).",
+      "example": {
+        "msgid": "Hibernate idle tabs",
+        "clean": "Gör oanvända flikar inaktiva",
+        "fault": "Försätt oanvända flikar i dvala"
+      }
+    },
+    {
+      "id": "launcher",
+      "msgidPattern": "\\blauncher\\b",
+      "expect": "[Aa]ppstartare",
+      "severity": "wrong",
+      "reason": "The launcher is the appstartare, as Chrome names ChromeOS's; Chrome's bare Launcher labels name the launcher key, starttangent, not the launcher (Chrome: 11 of 19 messages).",
+      "example": {
+        "msgid": "In launcher",
+        "clean": "I appstartaren",
+        "fault": "I startprogrammet"
+      }
+    },
+    {
+      "id": "back",
+      "msgidPattern": "^(Go )?[Bb]ack$",
+      "msgctxt": null,
+      "countEnglish": "^&Back$",
+      "countExpect": "^&Bakåt$",
+      "countKeepAccessKeys": true,
+      "expect": "^Bakåt$",
+      "severity": "wrong",
+      "reason": "Back and Go back are Bakåt, by a recorded call (source order 4b; Tim delegates language judgment to the lead): ggmail's Back is a navigation command, so it takes Chrome's View menu item &Back, &Bakåt, the narrowest-sense match, as Spanish and Dutch do, rather than Chrome's majority Föregående, a wizard's Previous (Chrome: 1 of 1 messages for &Back; the plain Back and Go back are Föregående 3 of 5).",
+      "call": {
+        "reason": "Bakåt, Chrome's View menu &Back, over its majority Föregående, which is a wizard's Previous.",
+        "date": "2026-11-02"
+      },
+      "example": {
+        "msgid": "Go back",
+        "fault": "Föregående"
+      }
+    },
+    {
+      "id": "forward",
+      "msgidPattern": "^(Go )?[Ff]orward$",
+      "msgctxt": null,
+      "expect": "^Framåt$",
+      "severity": "wrong",
+      "reason": "Forward and Go forward are Framåt, as Chrome writes Forward; it has no Go forward (Chrome: 4 of 4 messages).",
+      "example": {
+        "msgid": "Go forward",
+        "fault": "Gå framåt"
+      }
+    },
+    {
+      "id": "done",
+      "msgid": "Done",
+      "countEnglish": "^Done$",
+      "msgctxt": null,
+      "expect": "^Klart$",
+      "severity": "wrong",
+      "reason": "Done is Klart, as Chrome writes it (Chrome: 3 of 3 messages), never Klar.",
+      "example": {
+        "msgid": "Done",
+        "fault": "Klar"
+      }
+    },
+    {
+      "id": "scroll",
+      "msgidPattern": "\\bscroll",
+      "expect": "[Ss]crolla",
+      "severity": "wrong",
+      "reason": "Scrolling is scrolla, as Chrome writes it, against rulla in 3 (Chrome: 27 of 51 messages).",
+      "example": {
+        "msgid": "Scroll accounts left",
+        "fault": "Rulla konton åt vänster"
+      }
+    },
+    {
+      "id": "emerald",
+      "msgid": "Emerald",
+      "expect": "^Smaragd$",
+      "severity": "wrong",
+      "reason": "The account color Emerald is Smaragd, Apple's Emerald, the app message whose English is the color's name alone: Chrome has no Emerald (Chrome 0/0), the vote is too thin (agent-chosen: smaragd: 1 of 7 (Apple), fewer than 3 apps) and Google names no such color.",
+      "example": {
+        "msgid": "Emerald",
+        "fault": "Smaragdgrön"
+      }
+    },
+    {
+      "id": "inspect-element",
+      "msgid": "Inspect Element",
+      "countEnglish": "^Inspect elements?$",
+      "expect": "^Inspektera element$",
+      "severity": "wrong",
+      "reason": "Inspect Element is Inspektera element: Chrome's exact Inspect splits 1-1, so its messages that are exactly Inspect Element(s) decide (Chrome: 3 of 3 messages).",
+      "example": {
+        "msgid": "Inspect Element",
+        "fault": "Kontrollera element"
+      }
+    },
+    {
+      "id": "unified-inbox",
+      "msgidPattern": "\\bunified inbox\\b",
+      "expect": "Alla inkorgar",
+      "severity": "wrong",
+      "reason": "The unified inbox is Alla inkorgar, the Gmail app's name for its every-account inbox (Gmail Help answer/6078445, hl=sv), capitalized as a view's name; the app count leaves the concept unresolved, so the source order's fallback takes Google's wording (glossary, Unified inbox).",
+      "example": {
+        "msgid": "Open unified inbox",
+        "clean": "Öppna Alla inkorgar",
+        "fault": "Öppna samlad inkorg"
+      }
+    },
+    {
+      "id": "auto-launcher-display",
+      "msgid": "Auto",
+      "msgctxt": "launcher display",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Launcher display setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); the clipped form takes no agreement, so it reads the same beside every setting's noun, never Automatisk or Automatiskt.",
+      "example": {
+        "fault": "Automatisk"
+      }
+    },
+    {
+      "id": "auto-placement",
+      "msgid": "Auto",
+      "msgctxt": "placement",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Placement setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); the clipped form takes no agreement, so it reads the same beside every setting's noun, never Automatisk or Automatiskt.",
+      "example": {
+        "fault": "Automatisk"
+      }
+    },
+    {
+      "id": "auto-width",
+      "msgid": "Auto",
+      "msgctxt": "width",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Width setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); the clipped form takes no agreement, so it reads the same beside every setting's noun, never Automatisk or Automatiskt.",
+      "example": {
+        "fault": "Automatisk"
+      }
+    },
+    {
+      "id": "auto-text-color",
+      "msgid": "Auto",
+      "msgctxt": "text color",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Text color setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); the clipped form takes no agreement, so it reads the same beside every setting's noun, never Automatisk or Automatiskt.",
+      "example": {
+        "fault": "Automatisk"
+      }
+    },
+    {
+      "id": "auto-in-sentences",
+      "msgidPattern": "\\bAuto (?:expands|switches|moves)\\b",
+      "expect": "(?<!\\p{L})Auto(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "A description that names a setting's Auto option names it as the select shows it, Auto (the auto pins), never Automatiskt.",
+      "example": {
+        "msgid": "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times.",
+        "clean": "Var appstartaren och bokmärkesknappen sitter. Auto flyttar dem längst ned i sidofältet med vertikala flikar när det visas. Sidofält håller dem där och sidofältet öppet även med en enda flik, och Namnlist håller dem alltid i namnlisten.",
+        "fault": "Var appstartaren och bokmärkesknappen sitter. Automatiskt flyttar dem längst ned i sidofältet med vertikala flikar när det visas. Sidofält håller dem där och sidofältet öppet även med en enda flik, och Namnlist håller dem alltid i namnlisten."
+      }
+    },
+    {
+      "id": "none-account-color",
+      "msgid": "None",
+      "msgctxt": "account color",
+      "expect": "^Ingen$",
+      "countEnglish": "^None$",
+      "countExpect": "^Ing(?:en|et|a)$",
+      "severity": "wrong",
+      "reason": "The account's color when none is picked is Ingen, Chrome's Inga agreeing with en färg (Chrome 3/3 in Chromium 156.0.8078.49's .xtb files, each Inga).",
+      "example": {
+        "fault": "Inget"
+      }
+    },
+    {
+      "id": "none-excluded-apps",
+      "msgid": "None",
+      "msgctxt": "excluded apps",
+      "expect": "^Inga$",
+      "countEnglish": "^None$",
+      "countExpect": "^Ing(?:en|et|a)$",
+      "severity": "wrong",
+      "reason": "The Excluded apps field with no app excluded is Inga, as Chrome writes it, the plural agreeing with appar (Chrome 3/3 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "fault": "Ingen"
+      }
+    },
+    {
+      "id": "tray-icon-light",
+      "msgid": "Light",
+      "msgctxt": "tray icon color",
+      "expect": "^Ljus$",
+      "countEnglish": "^Light$",
+      "countExpect": "^Ljust?$",
+      "severity": "wrong",
+      "reason": "The system tray icon's Light is Ljus, Chrome's Ljust agreeing with en färg (Chrome 3/4 in Chromium 156.0.8078.49's .xtb files, the fourth Lätt, a weight); the Theme setting's Light stays Ljust, agreeing with ett tema.",
+      "example": {
+        "fault": "Ljust"
+      }
+    },
+    {
+      "id": "tray-icon-dark",
+      "msgid": "Dark",
+      "msgctxt": "tray icon color",
+      "expect": "^Mörk$",
+      "countEnglish": "^Dark$",
+      "countExpect": "^Mörkt?$",
+      "severity": "wrong",
+      "reason": "The system tray icon's Dark is Mörk, Chrome's Mörk and Mörkt agreeing with en färg (Chrome 4/4 in Chromium 156.0.8078.49's .xtb files); the Theme setting's Dark stays Mörkt, agreeing with ett tema.",
+      "example": {
+        "fault": "Mörkt"
+      }
+    },
+    {
+      "id": "theme-light",
+      "msgid": "Light",
+      "msgctxt": null,
+      "expect": "^Ljust$",
+      "countEnglish": "^Light$",
+      "severity": "wrong",
+      "reason": "The Theme setting's Light is Ljust, as Chrome writes it, agreeing with ett tema (Chrome 3/4 in Chromium 156.0.8078.49's .xtb files, the fourth Lätt, a weight); the system tray icon's Light is Ljus, agreeing with en färg.",
+      "example": {
+        "fault": "Ljus"
+      }
+    },
+    {
+      "id": "theme-dark",
+      "msgid": "Dark",
+      "msgctxt": null,
+      "expect": "^Mörkt$",
+      "countEnglish": "^Dark$",
+      "countExpect": "^Mörkt?$",
+      "severity": "wrong",
+      "reason": "The Theme setting's Dark is Mörkt, Chrome's Mörk and Mörkt agreeing with ett tema (Chrome 4/4 in Chromium 156.0.8078.49's .xtb files); the system tray icon's Dark is Mörk, agreeing with en färg.",
+      "example": {
+        "fault": "Mörk"
+      }
+    },
+    {
+      "id": "download-action-show-in-folder",
+      "msgid": "Show in folder",
+      "msgctxt": "download action",
+      "expect": "^Visa i mapp$",
+      "severity": "wrong",
+      "reason": "The download notification's Show in folder is Visa i mapp, as Chrome writes it (Chrome 4/4 in Chromium 156.0.8078.49's .xtb files, its title-case Show in Folder included); sentence style needs no other form for a select option, so the download history's button of the same English reads the same.",
+      "example": {
+        "fault": "Visa i mappen"
+      }
+    },
+    {
+      "id": "show-in-folder",
+      "msgid": "Show in folder",
+      "msgctxt": null,
+      "expect": "^Visa i mapp$",
+      "severity": "wrong",
+      "reason": "The download history's Show in folder button is Visa i mapp, as Chrome writes it (Chrome 4/4 in Chromium 156.0.8078.49's .xtb files), the same words as the download notification's option.",
+      "example": {
+        "fault": "Visa i Finder"
+      }
+    },
+    {
+      "id": "width",
+      "msgid": "Width",
+      "expect": "^Bredd$",
+      "countEnglish": "\\bwidth\\b",
+      "countExpect": "[Bb]redd",
+      "severity": "wrong",
+      "reason": "The Width setting is Bredd, as Chrome writes width (Chrome 5/5 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "fault": "Storlek"
+      }
+    },
+    {
+      "id": "width-in-labels",
+      "msgidPattern": "\\bwidth\\b",
+      "expect": "[Bb]redd",
+      "severity": "wrong",
+      "reason": "Every label and sentence that names the Width setting or its button names it bredd, as the width pin does (Chrome 5/5 in Chromium 156.0.8078.49's .xtb files), as in Återställ bredd.",
+      "example": {
+        "msgid": "Reset Width",
+        "clean": "Återställ bredd",
+        "fault": "Återställ storlek"
+      }
+    },
+    {
+      "id": "wide",
+      "msgid": "Wide",
+      "expect": "^Bred$",
+      "severity": "wrong",
+      "reason": "The Width setting's Wide option is Bred, agreeing with en bredd, and never equal to Width's own Bredd. Chrome's one Wide is Reading mode's letter spacing, beside Very wide, Mycket brett, so it is out under the narrowest sense, and the apps' word decides (agent-chosen: bred: 3 of 7 (Thunderbird, Firefox, LibreOffice), with Width's bredd out of the vote).",
+      "example": {
+        "fault": "Brett"
+      }
+    },
+    {
+      "id": "narrow",
+      "msgid": "Narrow",
+      "expect": "^Smal$",
+      "severity": "wrong",
+      "reason": "The Width setting's Narrow option is Smal, agreeing with en bredd and pairing with Bred; Chrome has no Narrow (Chrome 0/0), so the most direct app message decides: LibreOffice's Narrow, Smal, paired with its Wide, Bred (agent-chosen).",
+      "example": {
+        "fault": "Smalt"
+      }
+    },
+    {
+      "id": "wide-in-sentences",
+      "msgidPattern": "\\bnarrow and wide\\b",
+      "expect": "(?<!\\p{L})smal och bred(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "A sentence that names the Width setting's options names them as the select shows them, Smal and Bred (the wide and narrow pins), never agreeing with sidofältet as smalt och brett.",
+      "example": {
+        "msgid": "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
+        "clean": "Visa knappen längst ned i sidofältet som växlar mellan smal och bred. Om det här är av använder du Återställ bredd i sidofältets snabbmeny eller inställningen Bredd ovan.",
+        "fault": "Visa knappen längst ned i sidofältet som växlar mellan smalt och brett. Om det här är av använder du Återställ bredd i sidofältets snabbmeny eller inställningen Bredd ovan."
+      }
+    },
+    {
+      "id": "app-links-badge",
+      "msgidPattern": "\\bapp links badge\\b",
+      "expect": "(?<!\\p{L})[Mm]ärke",
+      "severity": "wrong",
+      "reason": "The app links badge marks a tab rather than counting anything, so it is a märke, never the unread badge's bricka; Chrome has no word for a badge (Chrome 0/0), and the apps' word for a badge that marks, with bricka out of the vote, is märke (agent-chosen: märke: 4 of 7 (Thunderbird, Android, Microsoft, Apple)).",
+      "example": {
+        "msgid": "Show app links badge",
+        "clean": "Visa märke på fliken för applänkar",
+        "fault": "Visa bricka på fliken för applänkar"
+      }
+    }
+  ],
+  "accessKeys": {
+    "style": "inline",
+    "severity": "wrong",
+    "reason": "A label whose English has an & keeps one & inline, before a letter of the Swedish word; a macOS label drops it."
+  },
+  "families": []
+}

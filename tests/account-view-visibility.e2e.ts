@@ -1,0 +1,48 @@
+/*
+ * A single account's view stays on screen.
+ *
+ * The view the app re-adds on every show and restore can come back underneath
+ * the window's own page, on an Electron whose Chromium stacks a re-added view at
+ * the bottom on Linux (electron/electron#54626). Gmail then stays blank from
+ * launch, and again after the window is closed and reopened. Two accounts are
+ * in `account-switch-visibility.e2e.ts`.
+ */
+import { test } from "@playwright/test";
+import { seedAccount } from "./lib/accounts";
+import { useUnattachedApp } from "./lib/unattached-app";
+import {
+  closeAndReopen,
+  expectOnScreen,
+  minimizeAndRestore,
+  waitForAccountViews,
+} from "./lib/visibility";
+import { useWindowManagerDisplay } from "./lib/window-manager";
+
+const ACCOUNT_ID = "only-account";
+
+// Minimizing needs a window manager, and each test gets its own.
+useWindowManagerDisplay();
+
+const ggmail = useUnattachedApp({
+  accounts: [seedAccount({ id: ACCOUNT_ID, label: "Personal" })],
+});
+
+test.beforeEach(async () => {
+  await waitForAccountViews(ggmail, [ACCOUNT_ID]);
+});
+
+test("the account is on screen at launch", async () => {
+  await expectOnScreen(ggmail, [ACCOUNT_ID], ACCOUNT_ID);
+});
+
+test("the account is on screen after minimizing and restoring", async () => {
+  await minimizeAndRestore(ggmail, [ACCOUNT_ID]);
+
+  await expectOnScreen(ggmail, [ACCOUNT_ID], ACCOUNT_ID);
+});
+
+test("the account is on screen after closing the window and launching again", async () => {
+  await closeAndReopen(ggmail, [ACCOUNT_ID]);
+
+  await expectOnScreen(ggmail, [ACCOUNT_ID], ACCOUNT_ID);
+});

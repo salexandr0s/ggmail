@@ -1,0 +1,164 @@
+import {
+  ALARMS_PATHS,
+  type AlarmCreateInfo,
+  type AlarmDetails,
+  type AlarmFrame,
+} from "../../alarms/bridge-protocol";
+import { getAlarmClampWarning } from "../../alarms/schedule";
+import { postBridge } from "../lib/bridge";
+import type { ChromeEventListener, ChromeNamespace } from "../lib/chrome";
+import { createEvent } from "../lib/event";
+import { createEventStream } from "../lib/event-stream";
+import { defineMember, readMember } from "../lib/fill";
+import { createBridgedMethod } from "../lib/method";
+
+/**
+ * Chrome takes `create(alarmInfo)` as well as `create(name, alarmInfo)`, and an
+ * alarm made without a name is the alarm named `""`.
+ *
+ * An explicit `undefined` or `null` where the name goes is Chrome leaving the
+ * parameter out rather than passing it, so `create(undefined, alarmInfo)` is
+ * the alarm named `""` — not, as reading the first argument alone would have
+ * it, a create carrying no `alarmInfo` at all. A wrapper forwarding an optional
+ * name is how an extension gets there.
+ */
+function parseCreateArguments(callArguments: unknown[]) {
+  const [firstArgument, secondArgument] = callArguments;
+
+  const hasName = typeof firstArgument === "string";
+
+  return {
+    name: hasName ? firstArgument : "",
+    alarmInfo: (hasName || secondArgument !== undefined ? secondArgument : firstArgument) as
+      | AlarmCreateInfo
+      | undefined,
+  };
+}
+
+function readName(callArguments: unknown[]) {
+  const [name] = callArguments;
+
+  return typeof name === "string" ? name : "";
+}
+
+/**
+ * A call the main process answers, with the answer Chrome gives for "nothing
+ * there" standing in whenever the bridge cannot be reached — `undefined` for a
+ * `get`, an empty list for a `getAll`, `false` for a `clear`.
+ *
+ * Chrome's alarms have no failure of their own to report and no `lastError` on
+ * any of these, so a bridge that is gone is told as an empty answer rather than
+ * as a rejection the extension has no handler for.
+ */
+function createAlarmQuery<QueryResult>(pathName: string, emptyResult: QueryResult) {
+  return createBridgedMethod(async (callArguments) => {
+    try {
+      const response = await postBridge(pathName, { name: readName(callArguments) });
+
+      if (!response.ok) {
+        return emptyResult;
+      }
+
+      const result = (await response.json()) as QueryResult | null;
+
+      // JSON carries no `undefined`, so a missing alarm arrives as `null`
+      return result ?? emptyResult;
+    } catch {
+      return emptyResult;
+    }
+  });
+}
+
+/**
+ * `chrome.alarms`, scheduled in the main process and delivered over the
+ * extension bridge (`alarms/alarms.ts`).
+ *
+ * Electron's own alarms are replaced rather than filled in around, in every
+ * context, so that every context of an extension reads and clears the one
+ * store main keeps. Chromium's own would also deliver `onAlarm` into the
+ * service worker (`alarms/alarms.ts` says what each implementation does).
+ *
+ * The events stream is parked by the first `onAlarm` listener rather than at
+ * startup, so a context that never listens never opens one.
+ */
+export function createAlarms(): ChromeNamespace {
+  const { emit: emitAlarm, addListener: addAlarmListener, ...alarmEvent } = createEvent();
+
+  /**
+   * The alarm names this context has already warned about, kept for as long as
+   * the namespace lives.
+   *
+   * A deliberate departure from Chrome, which warns on every `create`: an
+   * extension that recreates a debounce alarm on a timer repeats the line
+   * forever — 1Password remakes `sync-xam-backend-accounts` four to six times
+   * per worker boot, per account — and the second warning tells the extension
+   * nothing the first one did not.
+   */
+  const warnedAlarmNames = new Set<string>();
+
+  const listenForAlarms = createEventStream<AlarmFrame>(
+    ALARMS_PATHS.events,
+    (frame) => {
+      if (frame.type === "alarm") {
+        emitAlarm(frame.alarm satisfies AlarmDetails);
+      }
+    },
+    { label: "alarms" },
+  );
+
+  return {
+    create: createBridgedMethod(async (callArguments) => {
+      const { name, alarmInfo } = parseCreateArguments(callArguments);
+
+      const clampWarning = getAlarmClampWarning(name, alarmInfo);
+
+      if (clampWarning && !warnedAlarmNames.has(name)) {
+        warnedAlarmNames.add(name);
+
+        console.warn(`[chrome-facade] ${clampWarning}`);
+      }
+
+      try {
+        await postBridge(ALARMS_PATHS.create, { name, alarmInfo });
+      } catch {
+        // Chrome's `create` reports nothing and answers nothing
+      }
+
+      return undefined;
+    }),
+
+    get: createAlarmQuery<AlarmDetails | undefined>(ALARMS_PATHS.get, undefined),
+    getAll: createAlarmQuery<AlarmDetails[]>(ALARMS_PATHS.getAll, []),
+    clear: createAlarmQuery<boolean>(ALARMS_PATHS.clear, false),
+    clearAll: createAlarmQuery<boolean>(ALARMS_PATHS.clearAll, false),
+
+    onAlarm: {
+      ...alarmEvent,
+      addListener(listener: ChromeEventListener, ...eventOptions: unknown[]) {
+        addAlarmListener(listener, ...eventOptions);
+
+        void listenForAlarms();
+      },
+    },
+  };
+}
+
+/**
+ * Replaces Electron's `alarms` with the facade's, in every context that has one
+ * — the service worker, where delivery is broken, and extension pages, where it
+ * works. Both, because one store is the whole point: an alarm the worker
+ * created has to be what a page's `getAll` sees and what its `clear` clears,
+ * and Electron's alarms live in Chromium's own store where nothing here can
+ * reach them.
+ *
+ * A context Chromium gives no `alarms` at all keeps none. That is what tells a
+ * content script apart from a privileged context, and Chrome exposes no alarms
+ * to a content script either.
+ */
+export function installAlarms(extensionApi: ChromeNamespace, alarms: ChromeNamespace) {
+  if (readMember(extensionApi, "alarms") === undefined) {
+    return;
+  }
+
+  defineMember(extensionApi, "alarms", alarms);
+}

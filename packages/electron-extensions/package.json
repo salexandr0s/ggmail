@@ -1,0 +1,19 @@
+{
+  "name": "@ggmail/electron-extensions",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./index.ts",
+    "./crx": "./crx/index.ts",
+    "./derive/manifest": "./derive/manifest.ts",
+    "./install": "./install/index.ts",
+    "./fixture/catalog": "./fixture/catalog.ts",
+    "./fixture/id": "./fixture/id.ts",
+    "./fixture/probes": "./fixture/probes.ts",
+    "./runtime-proxy/window-close-rejection": "./runtime-proxy/window-close-rejection.ts"
+  },
+  "scripts": {
+    "test": "bun test --isolate",
+    "types": "tsc && tsc -p tsconfig.test.json"
+  }
+}

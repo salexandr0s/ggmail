@@ -1,0 +1,48 @@
+import { GMAIL_PRELOAD_ARGUMENTS } from "@ggmail/shared/gmail";
+import { $, $$ } from "select-dom";
+import {
+  createElementAttributeFromPreloadArgument,
+  createNotMatchingAttributeSelector,
+  reEmitClickWithShiftKey,
+} from "./lib/utils";
+
+const isReplyForwardInPopOutEnabled = process.argv.includes(
+  GMAIL_PRELOAD_ARGUMENTS.replyForwardInPopOut,
+);
+
+const replyForwardElementAttribute = createElementAttributeFromPreloadArgument(
+  GMAIL_PRELOAD_ARGUMENTS.replyForwardInPopOut,
+);
+
+const replyForwardElementSelector = createNotMatchingAttributeSelector(
+  ".amn:has(> span[role='link']:nth-child(2))",
+  replyForwardElementAttribute,
+);
+
+export function replyForwardInPopOut() {
+  if (!isReplyForwardInPopOutEnabled) {
+    return;
+  }
+
+  const replyForwardElement = $(replyForwardElementSelector);
+
+  if (!replyForwardElement) {
+    return;
+  }
+
+  replyForwardElement.setAttribute(replyForwardElementAttribute, "");
+
+  const replyForwardButtons = $$("span[role='link']", replyForwardElement);
+
+  if (replyForwardButtons.length !== 2) {
+    console.warn("Unexpected number of buttons in reply/forward element", {
+      replyForwardButtons,
+    });
+
+    return;
+  }
+
+  for (const replyForwardButton of replyForwardButtons) {
+    reEmitClickWithShiftKey(replyForwardButton);
+  }
+}

@@ -1,0 +1,1900 @@
+{
+  "platformWords": {
+    "severity": "wrong",
+    "reason": "An entry with a platform msgctxt takes that platform's word from the style sheet's Platform words table.",
+    "rows": [
+      {
+        "row": "File",
+        "macOS": [
+          {
+            "word": "Plik",
+            "source": "(AppKit `MenuCommands` `File`)",
+            "labels": ["File"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Plik",
+            "source": "(TBX `7285_185699_344600`)",
+            "labels": ["File"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Plik",
+            "source": "(gtk4 `File`)",
+            "labels": ["File"]
+          }
+        ]
+      },
+      {
+        "row": "View",
+        "macOS": [
+          {
+            "word": "Widok",
+            "source": "(AppKit `MenuCommands` `View`)",
+            "labels": ["View"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Widok",
+            "source": "(TBX `9201_185833_344729`)",
+            "labels": ["View"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Widok",
+            "source": "(nautilus `shortcuts dialog` `View`)",
+            "labels": ["View"]
+          }
+        ]
+      },
+      {
+        "row": "Edit, the menu",
+        "macOS": [
+          {
+            "word": "Edycja",
+            "source": "(Mail `MainMenu` `42.title`)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Edycja",
+            "source": "(TBX `9433_179566_715677` _menu Edycja_, the Edit menu)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Edycja",
+            "source": "(gtk4 `_Edit`, GTK's Edit menu)",
+            "labels": ["Edit"]
+          }
+        ]
+      },
+      {
+        "row": "Undo",
+        "macOS": [
+          {
+            "word": "Cofnij",
+            "source": "(Mail `MainMenu` `281.title`)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Cofnij",
+            "source": "(TBX `5274_168784_168798` _cofnąć_, as an imperative)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Cofnij",
+            "source": "(gtk4 `_Undo`)",
+            "labels": ["Undo"]
+          }
+        ]
+      },
+      {
+        "row": "Redo",
+        "macOS": [
+          {
+            "word": "Przywróć",
+            "source": "(Mail `MainMenu` `282.title`)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Wykonaj ponownie",
+            "source": "(TBX `10268_169412_169425` _wykonać ponownie_, as an imperative)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ponów",
+            "source": "(gtk4 `_Redo`)",
+            "labels": ["Redo"]
+          }
+        ]
+      },
+      {
+        "row": "Cut, `Cu&t`",
+        "macOS": [
+          {
+            "word": "Wytnij",
+            "source": "(AppKit `MenuCommands` `Cut`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Wytnij",
+            "source": "(TBX `1735_41913_41923` _wyciąć_, as an imperative)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Wytnij",
+            "source": "(gtk4 `Cu_t`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ]
+      },
+      {
+        "row": "Copy, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Kopiuj",
+            "source": "(AppKit `MenuCommands` `Copy`)",
+            "labels": ["Copy"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Kopiuj",
+            "source": "(TBX `11991_39848_39859` _kopiować_, as an imperative)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Skopiuj",
+            "source": "(gtk4 `_Copy`)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ]
+      },
+      {
+        "row": "Paste, `&Paste`",
+        "macOS": [
+          {
+            "word": "Wklej",
+            "source": "(AppKit `MenuCommands` `Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Wklej",
+            "source": "(TBX `11068_91030_91039` _wkleić_, as an imperative)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Wklej",
+            "source": "(gtk4 `_Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ]
+      },
+      {
+        "row": "Paste and Match Style, `Paste and &Match Style`",
+        "macOS": [
+          {
+            "word": "Wklej i dostosuj styl",
+            "source": "(AppKit `MenuCommands` `Paste and Match Style`)",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Wklej i dopasuj format",
+            "source": "inferred from TBX `11068_91030_91039` and `5511_55836_55846` _format_",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Wklej i dopasuj styl",
+            "source": "inferred from gtk4 `_Paste`",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ]
+      },
+      {
+        "row": "Select All, `Select &All`",
+        "macOS": [
+          {
+            "word": "Zaznacz wszystko",
+            "source": "(AppKit `MenuCommands` `Select All`)",
+            "labels": ["Select All"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Zaznacz wszystko",
+            "source": "(TBX `10476_185277_344685`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Zaznacz wszystko",
+            "source": "(gtk4 `Select _All`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ]
+      },
+      {
+        "row": "Delete, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Usuń",
+            "source": "(AppKit `MenuCommands` `Delete`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Usuń",
+            "source": "(TBX `5396_185654_344583`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Usuń",
+            "source": "(gtk4 `_Delete`)",
+            "labels": ["Delete"]
+          }
+        ]
+      },
+      {
+        "row": "About {appName}",
+        "macOS": [
+          {
+            "word": "{appName}…",
+            "source": "(Mail `MainMenu` `628.title`, _Poczta…_; Apple's Polish names the app alone, as in _Kalkulator…_ and _Słownik…_)",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "{appName} – informacje",
+            "source": "inferred from TBX `6036_211259_326305` _informacje_, the About menu item",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "O aplikacji {appName}",
+            "source": "(gtk4 `About %s`)",
+            "labels": ["About {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Check for Updates…",
+        "macOS": [
+          {
+            "word": "Sprawdź uaktualnienia…",
+            "source": "(Software Update `Check for Updates`)",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Sprawdź aktualizacje…",
+            "source": "inferred from TBX `14473_3621_3635` _aktualizacja_ and `4233_30878_30886` _sprawdzać_",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Wyszukaj aktualizacje…",
+            "source": "inferred from gnome-software `Check for Updates`, _Wyszukanie aktualizacji_, as an imperative",
+            "labels": ["Check for Updates…"]
+          }
+        ]
+      },
+      {
+        "row": "Settings, the app-menu item",
+        "macOS": [
+          {
+            "word": "Ustawienia…",
+            "source": "(AppKit `MenuCommands` `Settings\\U2026`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Ustawienia…",
+            "source": "(TBX `21910_780478_1041571`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ustawienia…",
+            "source": "(gtk4 `Settings`)",
+            "labels": ["Settings…"]
+          }
+        ]
+      },
+      {
+        "row": "Compose, the File menu item",
+        "macOS": [
+          {
+            "word": "Nowa wiadomość",
+            "source": "(Mail `MainMenu` `374.title`, New Message)",
+            "labels": ["Compose"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Nowa wiadomość e-mail",
+            "source": "inferred from TBX `3547_1385987_683451` _wiadomość e-mail_",
+            "labels": ["Compose"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Nowa wiadomość",
+            "source": "(geary `New Message`)",
+            "labels": ["Compose"]
+          }
+        ]
+      },
+      {
+        "row": "Save As, in `Sa&ve Image As…` and the Save As dialog",
+        "macOS": [
+          {
+            "word": "Zachowaj jako",
+            "source": "(AppKit `Document` `Save As\\U2026`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Zachowaj obraz jako…",
+            "source": "inferred with Mail `Localizable` `CopyImageMenuItem`, _Kopiuj obraz_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Zapisz jako",
+            "source": "(TBX `12985_534974_536123`)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Zapisz obraz jako…",
+            "source": "inferred with TBX `1294_64520_64530` _obraz_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Zapisz jako",
+            "source": "(gedit `Save _As…`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Zapisz obraz jako…",
+            "source": "inferred",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ]
+      },
+      {
+        "row": "Export, the save dialog's button",
+        "macOS": [
+          {
+            "word": "Eksport",
+            "source": "(AppKit `Document` `Export`)",
+            "labels": ["Export"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Eksportuj",
+            "source": "(TBX `7948_52504_52514` _eksportować_, as an imperative)",
+            "labels": ["Export"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Eksportuj",
+            "source": "inferred: no GNOME source has it",
+            "labels": ["Export"]
+          }
+        ]
+      },
+      {
+        "row": "Shift, the key",
+        "macOS": [
+          {
+            "word": "Shift",
+            "source": "(AppKit `FunctionKeyNames` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Shift",
+            "source": "(TBX `3412_112291_112303` _klawisz SHIFT_, short as the glossary's Keyboard keys gives it)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Shift",
+            "source": "(gtk4 `keyboard label` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ]
+      },
+      {
+        "row": "Show ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Pokaż ggmail",
+            "source": "(AppKit `Common` `Show`, _Pokaż_)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Wyświetl ggmail",
+            "source": "inferred from TBX `19903_690620_720428` _wyświetlać_; the Polish TBX has no _show_",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Wyświetl aplikację ggmail",
+            "source": "inferred from gtk4 `Show All`, _Wyświetl wszystkie_, and `Hide %s`",
+            "labels": ["Show ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Hide ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Ukryj ggmail",
+            "source": "(Mail `MainMenu` `632.title`, _Ukryj Pocztę_)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Ukryj ggmail",
+            "source": "(TBX `20202_719546_722999` _ukryć_, as an imperative)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ukryj aplikację ggmail",
+            "source": "(gtk4 `Hide %s`)",
+            "labels": ["Hide ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, the tray item",
+        "macOS": "macOS shows the menu's Quit {appName}",
+        "Windows": [
+          {
+            "word": "Zakończ",
+            "source": "(TBX `11976_185681_344590`, the Exit item of a taskbar icon's menu)",
+            "labels": ["Exit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Zakończ",
+            "source": "inferred from gtk4 `Quit %s`, _Zakończ aplikację %s_: GTK has no standalone Quit, and the Microsoft Terminology Collection is no Linux source",
+            "labels": ["Quit"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Zakończ",
+            "source": "(AppKit `Document` `Quit`)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Zakończ",
+            "source": "(TBX `9679_334563_607917` _zakończyć_, to close a program, as a label)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Linux": "one message with the tray item's Quit, its word above"
+      },
+      {
+        "row": "System tray, in the Appearance settings",
+        "macOS": "macOS shows the menu bar instead: _pasek menu_",
+        "Windows": [
+          {
+            "word": "obszar",
+            "source": "the stem every case keeps of _obszar powiadomień_ (TBX `10299_85657_610829`, notification area, and Chrome's word; TBX `55084_3122863_3123017` gives _zasobnik systemowy_ for the system tray)",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "obszar",
+            "source": "the stem of _obszar powiadomień_, inferred: GNOME has no tray",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ]
+      },
+      {
+        "row": "Hide {appName}",
+        "macOS": [
+          {
+            "word": "Ukryj {appName}",
+            "source": "(Mail `MainMenu` `632.title`, _Ukryj Pocztę_)",
+            "labels": ["Hide {appName}"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Hide Others",
+        "macOS": [
+          {
+            "word": "Ukryj pozostałe",
+            "source": "(Mail `MainMenu` `622.title`)",
+            "labels": ["Hide Others"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show All",
+        "macOS": [
+          {
+            "word": "Pokaż wszystkie",
+            "source": "(Mail `MainMenu` `625.title`)",
+            "labels": ["Show All"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Quit {appName}",
+        "macOS": [
+          {
+            "word": "Zakończ {appName}",
+            "source": "(Mail `MainMenu` `631.title`, _Zakończ Pocztę_)",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Zakończ {appName}",
+            "source": "inferred from TBX `11976_185681_344590` _Zakończ_, the Exit menu item",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Zakończ aplikację {appName}",
+            "source": "(gtk4 `Quit %s`)",
+            "labels": ["Quit {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Close Window",
+        "macOS": [
+          {
+            "word": "Zamknij okno",
+            "source": "(AppKit `MenuCommands` `Close Window`)",
+            "labels": ["Close Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Window, the menu",
+        "macOS": [
+          {
+            "word": "Okno",
+            "source": "(AppKit `MenuCommands` `Window`)",
+            "labels": ["Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Minimize",
+        "macOS": [
+          {
+            "word": "Minimalizuj okno",
+            "source": "(AppKit `MenuCommands` `Minimize`; Dictionary and Screen Sharing `MainMenu` `23.title`)",
+            "labels": ["Minimize"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Zoom, the window",
+        "macOS": [
+          {
+            "word": "Zoom",
+            "source": "(Mail `MainMenu` `295.title`)",
+            "labels": ["Zoom"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Bring All to Front",
+        "macOS": [
+          {
+            "word": "Umieść wszystko na wierzchu",
+            "source": "(AppKit `MenuCommands` `Bring All to Front`)",
+            "labels": ["Bring All to Front"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Speech",
+        "macOS": [
+          {
+            "word": "Mowa",
+            "source": "(Mail `MainMenu` `1535.title`)",
+            "labels": ["Speech"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Start Speaking",
+        "macOS": [
+          {
+            "word": "Rozpocznij mówienie",
+            "source": "(Mail `MainMenu` `1536.title`)",
+            "labels": ["Start Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Stop Speaking",
+        "macOS": [
+          {
+            "word": "Zakończ mówienie",
+            "source": "(Mail `MainMenu` `1537.title`)",
+            "labels": ["Stop Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Look Up “{selection}”",
+        "macOS": [
+          {
+            "word": "Sprawdź „{selection}”",
+            "source": "(AppKit `MenuCommands` `Look Up \\U201C%@\\U201D`)",
+            "labels": ["Look Up “{selection}”"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show in Finder",
+        "macOS": [
+          {
+            "word": "Pokaż w Finderze",
+            "source": "(Mail `Preferences` `ShowExtensionApplicationInFinder`)",
+            "labels": ["Show in Finder"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "OK, a native dialog's button",
+        "macOS": [
+          {
+            "word": "OK",
+            "source": "(AppKit `Common` `OK`)",
+            "labels": ["OK"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "OK",
+            "source": "(TBX `43243_2447290_2774190`, the dialog button)",
+            "labels": ["OK"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "OK",
+            "source": "(gtk4 `_OK`, its access key dropped)",
+            "labels": ["OK"]
+          }
+        ]
+      },
+      {
+        "row": "Learn Spelling, `&Learn Spelling`",
+        "macOS": [
+          {
+            "word": "Zapamiętaj pisownię",
+            "source": "(WebKit `Localizable` `Learn Spelling`)",
+            "labels": ["&Learn Spelling"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Search with Google, `&Search with Google`",
+        "macOS": [
+          {
+            "word": "Szukaj w Google",
+            "source": "(WebKit `Localizable` `Search with %@`)",
+            "labels": ["&Search with Google"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy, `&Copy`",
+        "macOS": [
+          {
+            "word": "Kopiuj",
+            "source": "(WebKit `Localizable` `Copy`)",
+            "labels": ["&Copy"]
+          }
+        ],
+        "Windows": "the Edit menu item's word, with its access key",
+        "Linux": "the Edit menu item's word, with its access key"
+      },
+      {
+        "row": "Copy Link Address, `Copy Link Addr&ess`",
+        "macOS": [
+          {
+            "word": "Kopiuj łącze",
+            "source": "(WebKit `Localizable` `Copy Link`, Safari's item for a link)",
+            "labels": ["Copy Link Addr&ess"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image, `Cop&y Image`",
+        "macOS": [
+          {
+            "word": "Kopiuj obraz",
+            "source": "(WebKit `Localizable` `Copy Image`)",
+            "labels": ["Cop&y Image"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image Address, `C&opy Image Address`",
+        "macOS": [
+          {
+            "word": "Kopiuj adres obrazu",
+            "source": "inferred from WebKit `Localizable` `Copy Image` and Mail `Alerts` `CopyAddress`, _Kopiuj adres_",
+            "labels": ["C&opy Image Address"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Help, the menu",
+        "macOS": [
+          {
+            "word": "Pomoc",
+            "source": "(AppKit `MenuCommands` `Help`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Pomoc",
+            "source": "(TBX `13846_61010_391437`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Pomoc",
+            "source": "(nautilus `_Help`)",
+            "labels": ["Help"]
+          }
+        ]
+      },
+      {
+        "row": "Close, the File menu item",
+        "macOS": "macOS shows Close Window",
+        "Windows": [
+          {
+            "word": "Zamknij",
+            "source": "(TBX `26514_1275570_1314330`)",
+            "labels": ["Close"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Zamknij",
+            "source": "(gtk4 `_Close`)",
+            "labels": ["Close"]
+          }
+        ]
+      },
+      {
+        "row": "Share, the share menu",
+        "macOS": [
+          {
+            "word": "Udostępnij",
+            "source": "(AppKit `MenuCommands` `Share`)",
+            "labels": ["Share"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Cancel, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Anuluj",
+            "source": "(AppKit `Common` `Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Anuluj",
+            "source": "(TBX `20151_705248_772772`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Anuluj",
+            "source": "(gtk4 `_Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ]
+      }
+    ]
+  },
+  "banned": [
+    {
+      "id": "lowercase-ci",
+      "pattern": "(?<!\\p{L})ci(?!\\p{L})",
+      "severity": "doubtful",
+      "reason": "The short dative for the user is capitalized, Ci, as every form of the pronoun is. Lower-case ci is also the plural these (ci użytkownicy), so a match asks rather than fails."
+    },
+    {
+      "id": "uaktualnienie",
+      "pattern": "[Uu]aktualni",
+      "severity": "wrong",
+      "reason": "An update is an aktualizacja, as Chrome writes it; uaktualnienie is Apple's word, for a macOS label only (Chrome writes the banned form in 2 messages).",
+      "allow": {
+        "contexts": ["macOS"]
+      }
+    },
+    {
+      "id": "pasek-tytulowy",
+      "pattern": "[Pp]as\\p{L}* tytułow",
+      "severity": "wrong",
+      "reason": "The titlebar is the pasek tytułu, as Chrome writes it, never pasek tytułowy (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "lacze",
+      "pattern": "(?<!\\p{L})[Łł]ącz(?:e|em|u|a)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "A link is a link, as Chrome writes it, never Apple's łącze (Chrome writes the banned form in none of its messages). The macOS context menu's Copy Link Address keeps WebKit's Kopiuj łącze, its platform word.",
+      "allow": {
+        "entries": [
+          {
+            "msgctxt": "macOS",
+            "msgid": "Copy Link Addr&ess"
+          }
+        ]
+      }
+    },
+    {
+      "id": "restart-calque",
+      "pattern": "(?<!\\p{L})[Zz]?[Rr]estart\\p{L}*",
+      "severity": "wrong",
+      "reason": "Restarting is uruchomić ponownie, as Chrome writes it: Uruchom ponownie (Chrome writes the banned form in 4 messages)."
+    },
+    {
+      "id": "katalog",
+      "pattern": "(?<!\\p{L})[Kk]atalog\\p{L}*",
+      "severity": "wrong",
+      "reason": "A folder is a folder, as Chrome writes it, never katalog (Chrome writes the banned form in 15 messages)."
+    },
+    {
+      "id": "lowercase-pronoun",
+      "pattern": "(?<!\\p{L})(?:twój|twoja|twoje|twojego|twojej|twojemu|twoim|twoją|twoich|twoimi|ciebie|cię|tobie|tobą)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "Every form of the pronoun for the user is capitalized: Twój, Ciebie, Cię, Tobie (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "formal-address",
+      "pattern": "(?<!\\p{L})(?:Pan|Pani|Panu|Panią|Pana|Panów|Państwo|Państwa|Państwu|Państwem)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "The user is addressed informally, never as Pan, Pani or Państwo."
+    },
+    {
+      "id": "quotes",
+      "pattern": "[\"“]",
+      "severity": "wrong",
+      "reason": "Quotation marks are „…” (U+201E, U+201D), as Chrome writes them (Chrome writes the banned form in 9 messages)."
+    },
+    {
+      "id": "one-letter-word",
+      "pattern": "(?<![\\p{L}\\p{N}])[wiozauWIOZAU] (?=[\\p{L}\\p{N}{])",
+      "severity": "wrong",
+      "reason": "A one-letter word is joined to the next by a no-break space (U+00A0), as Chrome and Apple write it: w Gmailu (Chrome writes the banned form in 627 messages)."
+    },
+    {
+      "id": "unit-space",
+      "pattern": "(?<=[\\p{N}#}]) (?=(?:sekund\\p{L}*|minut\\p{L}*|godzin\\p{L}*|dni|dzień|dnia|tygodni\\p{L}*|tydzień|miesi\\p{L}*|lat|lata|rok\\p{L}*|[kKMGT]B)(?!\\p{L}))",
+      "severity": "wrong",
+      "reason": "A number and its unit are joined by a no-break space (U+00A0), as Chrome writes them: 5 minut, # dni (Chrome writes the banned form in 27 messages)."
+    },
+    {
+      "id": "three-dots",
+      "pattern": "\\.\\.\\.",
+      "severity": "wrong",
+      "reason": "An ellipsis is one character, …, never three full stops."
+    },
+    {
+      "id": "ellipsis-space",
+      "pattern": "[ \\u00a0]…",
+      "severity": "wrong",
+      "reason": "An ellipsis follows the word without a space: Ustawienia…"
+    },
+    {
+      "id": "apology",
+      "pattern": "(?<!\\p{L})(?:[Nn]iestety|[Pp]rzepraszamy)(?!\\p{L})",
+      "severity": "style",
+      "reason": "Say what happened, without Niestety or Przepraszamy."
+    }
+  ],
+  "pinned": [
+    {
+      "id": "download-history",
+      "msgidPattern": "\\bdownload history\\b",
+      "expect": "[Hh]istori\\p{L}* pobierania",
+      "severity": "wrong",
+      "reason": "The download history is the historia pobierania (Chrome: 10 of 10 messages).",
+      "example": {
+        "msgid": "Download history",
+        "clean": "Historia pobierania",
+        "fault": "Pobrane pliki"
+      }
+    },
+    {
+      "id": "bookmark",
+      "msgidPattern": "\\bbookmarks?\\b",
+      "expect": "[Zz]akład",
+      "severity": "wrong",
+      "reason": "A bookmark is a zakładka (Chrome: 163 of 163 messages).",
+      "example": {
+        "msgid": "No bookmarks yet",
+        "fault": "Brak ulubionych"
+      }
+    },
+    {
+      "id": "notification",
+      "msgidPattern": "(?!Notifications$).*\\bnotifications?\\b",
+      "expect": "[Pp]owiadom",
+      "severity": "wrong",
+      "reason": "A notification is a powiadomienie. The bare Notifications is also the toasts' region, under the toast rule (Chrome: 125 of 127 messages).",
+      "example": {
+        "msgid": "Show a notification when a download finishes.",
+        "fault": "Pokaż komunikat po zakończeniu pobierania."
+      }
+    },
+    {
+      "id": "extension",
+      "msgidPattern": "\\bextensions?\\b",
+      "expect": "[Rr]ozszerze",
+      "severity": "wrong",
+      "reason": "An extension is a rozszerzenie (Chrome: 303 of 304 messages; the one left is the URL chrome://extensions).",
+      "example": {
+        "msgid": "Extensions",
+        "fault": "Dodatki"
+      }
+    },
+    {
+      "id": "tab-strip",
+      "msgidPattern": "\\btab strip\\b",
+      "expect": "[Pp]as\\p{L}* kart",
+      "severity": "wrong",
+      "reason": "The tab strip is the pasek kart, as Chrome writes it (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Narrow the tab strip",
+        "fault": "Zwęź listwę kart"
+      }
+    },
+    {
+      "id": "do-not-disturb",
+      "msgidPattern": "\\bdo not disturb\\b",
+      "expect": "Nie przeszkadzać",
+      "severity": "wrong",
+      "reason": "Do Not Disturb is Nie przeszkadzać (Chrome: 6 of 6 messages).",
+      "example": {
+        "msgid": "Turn Do Not Disturb on",
+        "fault": "Włącz tryb cichy"
+      }
+    },
+    {
+      "id": "titlebar",
+      "msgidPattern": "\\btitle ?bar\\b",
+      "expect": "[Pp]as\\p{L}* tytułu",
+      "severity": "wrong",
+      "reason": "The titlebar is the pasek tytułu, as Chrome writes it (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Titlebar",
+        "fault": "Pasek tytułowy"
+      }
+    },
+    {
+      "id": "button",
+      "msgidPattern": "\\bbuttons?\\b",
+      "expect": "[Pp]rzycisk",
+      "severity": "wrong",
+      "reason": "An on-screen button is a przycisk, as Chrome writes it (Chrome: 141 of 141 messages).",
+      "example": {
+        "msgid": "Show width button",
+        "fault": "Pokaż suwak szerokości"
+      }
+    },
+    {
+      "id": "password-manager",
+      "msgidPattern": "\\bpassword managers?\\b",
+      "expect": "[Mm]enedżer\\p{L}* haseł",
+      "severity": "wrong",
+      "reason": "A password manager is a menedżer haseł, as Chrome writes it (Chrome: 77 of 77 messages).",
+      "example": {
+        "msgid": "Password managers",
+        "fault": "Programy do haseł"
+      }
+    },
+    {
+      "id": "passkey",
+      "msgidPattern": "\\bpasskeys?\\b",
+      "expect": "[Kk]lucz\\p{L}* dostępu",
+      "severity": "wrong",
+      "reason": "A passkey is a klucz dostępu, as Chrome writes it (Chrome: 89 of 106 messages).",
+      "example": {
+        "msgid": "Only passkeys created in ggmail work here.",
+        "fault": "Tutaj działają tylko passkeye utworzone przez ggmail."
+      }
+    },
+    {
+      "id": "default-browser",
+      "msgidPattern": "\\bdefault browser\\b",
+      "expect": "[Dd]omyśln\\p{L}* przeglądar|[Pp]rzeglądar\\p{L}* domyśln",
+      "severity": "wrong",
+      "reason": "The default browser is the domyślna przeglądarka, as Chrome writes it (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Open in Default Browser",
+        "fault": "Otwórz w przeglądarce systemowej"
+      }
+    },
+    {
+      "id": "update",
+      "msgctxt": null,
+      "msgidPattern": "\\bupdat(?:e|es|ed|ing)\\b",
+      "expect": "[Aa]ktualiz",
+      "severity": "wrong",
+      "reason": "An update is an aktualizacja, and updating is aktualizować, as Chrome writes them. A platform label takes its platform's word instead (Chrome: 220 of 234 messages).",
+      "example": {
+        "msgid": "Update available",
+        "fault": "Dostępne uaktualnienie"
+      }
+    },
+    {
+      "id": "restart",
+      "msgidPattern": "\\brestart",
+      "expect": "[Pp]onown",
+      "severity": "wrong",
+      "reason": "Restarting is uruchomić ponownie, as Chrome writes it: Uruchom ponownie, po ponownym uruchomieniu (Chrome: 42 of 47 messages).",
+      "example": {
+        "msgid": "Restart now",
+        "fault": "Zrestartuj teraz"
+      }
+    },
+    {
+      "id": "menu-bar",
+      "msgidPattern": "\\bmenu bar\\b",
+      "expect": "[Pp]as\\p{L}* menu",
+      "severity": "wrong",
+      "reason": "The menu bar is the pasek menu (Chrome: 3 of 3 messages).",
+      "example": {
+        "msgid": "Menu bar icon",
+        "fault": "Ikona w menu"
+      }
+    },
+    {
+      "id": "verification-code",
+      "msgidPattern": "\\bverification codes?\\b",
+      "expect": "[Kk]od\\p{L}* weryfikacyjn",
+      "severity": "wrong",
+      "reason": "A verification code is a kod weryfikacyjny (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Verification codes",
+        "fault": "Kody potwierdzające"
+      }
+    },
+    {
+      "id": "device-label",
+      "msgidPattern": "\\bdevice label\\b",
+      "expect": "[Nn]azw\\p{L}* urządzenia",
+      "countEnglish": "\\bdevice name\\b",
+      "severity": "wrong",
+      "reason": "A device label is a nazwa urządzenia, Chrome's words for a device name (Chrome: 10 of 11 messages).",
+      "example": {
+        "msgid": "Device label",
+        "fault": "Etykieta urządzenia"
+      }
+    },
+    {
+      "id": "spellcheck",
+      "msgidPattern": "\\bspell ?check",
+      "expect": "[Ss]prawdzani\\p{L}* pisowni",
+      "severity": "wrong",
+      "reason": "Spellchecking is sprawdzanie pisowni (Chrome: 22 of 23 messages).",
+      "example": {
+        "msgid": "Spellchecker",
+        "fault": "Korektor pisowni"
+      }
+    },
+    {
+      "id": "dark-theme",
+      "msgidPattern": "\\bdark theme\\b",
+      "expect": "[Cc]iemn\\p{L}* motyw|[Mm]otyw\\p{L}* ciemn",
+      "severity": "wrong",
+      "reason": "The dark theme is the ciemny motyw (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Extend dark theme",
+        "fault": "Rozszerz tryb ciemny"
+      }
+    },
+    {
+      "id": "trusted-hosts",
+      "msgidPattern": "\\b(?:un)?trusted hosts?\\b",
+      "expect": "[Zz]aufan",
+      "countEnglish": "\\btrusted\\b",
+      "severity": "wrong",
+      "reason": "Trusted hosts are zaufane hosty, untrusted ones niezaufane hosty, as Chrome writes trusted (Chrome: 19 of 22 messages).",
+      "example": {
+        "msgid": "Trusted hosts",
+        "fault": "Bezpieczne hosty"
+      }
+    },
+    {
+      "id": "release-channel",
+      "msgidPattern": "\\bchannel\\b",
+      "expect": "[Kk]anał",
+      "severity": "wrong",
+      "reason": "A release channel is a kanał: kanał aktualizacji, kanał beta (Chrome: 8 of 11 messages).",
+      "example": {
+        "msgid": "Release channel",
+        "fault": "Wersja wydań"
+      }
+    },
+    {
+      "id": "link",
+      "msgidPattern": "\\blinks?\\b",
+      "expect": "[Ll]ink",
+      "severity": "wrong",
+      "reason": "A link is a link, as Chrome writes it (Chrome: 158 of 164 messages; the six left are the verb, to link data or an account, połączyć). The macOS context menu's Copy Link Address keeps WebKit's Kopiuj łącze, its platform word.",
+      "allow": {
+        "entries": [
+          {
+            "msgctxt": "macOS",
+            "msgid": "Copy Link Addr&ess"
+          }
+        ]
+      },
+      "example": {
+        "msgid": "Copy Message Link",
+        "clean": "Kopiuj link do wiadomości",
+        "fault": "Kopiuj łącze do wiadomości"
+      }
+    },
+    {
+      "id": "clipboard",
+      "msgidPattern": "\\bclipboard\\b",
+      "expect": "[Ss]chow",
+      "severity": "wrong",
+      "reason": "The clipboard is the schowek, as Chrome writes it (Chrome: 44 of 44 messages).",
+      "example": {
+        "msgid": "Copy codes to clipboard",
+        "fault": "Kopiuj kody do pamięci"
+      }
+    },
+    {
+      "id": "folder",
+      "msgidPattern": "\\bfolders?\\b",
+      "expect": "[Ff]older",
+      "severity": "wrong",
+      "reason": "A folder is a folder, as Chrome writes it (Chrome: 104 of 104 messages).",
+      "example": {
+        "msgid": "Open folder when done",
+        "fault": "Otwórz katalog po zakończeniu"
+      }
+    },
+    {
+      "id": "save",
+      "msgctxt": null,
+      "msgid": "Save",
+      "expect": "^Zapisz$",
+      "countEnglish": "^Save$",
+      "severity": "wrong",
+      "reason": "Save is Zapisz, as Chrome writes its Save button, not Apple's Zachowaj (Chrome: 2 of 2 messages).",
+      "example": {
+        "fault": "Zachowaj"
+      }
+    },
+    {
+      "id": "saved-search",
+      "msgidPattern": "\\bsaved search(?:es)?\\b",
+      "expect": "[Zz]apisan",
+      "severity": "wrong",
+      "reason": "A saved search is a zapisane wyszukiwanie (Chrome 1/1 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Add saved search",
+        "fault": "Dodaj wyszukiwanie"
+      }
+    },
+    {
+      "id": "upgrade-label",
+      "msgctxt": null,
+      "msgid": "Upgrade",
+      "origin": "packages/renderer/",
+      "expect": "[Zz]mień na Pro",
+      "severity": "wrong",
+      "reason": "The standalone Upgrade label is Zmień na Pro, Gmail's own Upgrade wording for Google's paid storage, Zmień na większy pakiet (glossary); the seven apps' word for upgrading in general is secondary (uaktualnić: 4 of 7 (Firefox, VS Code, Microsoft, Apple)).",
+      "example": {
+        "clean": "Zmień na Pro",
+        "fault": "Kup"
+      }
+    },
+    {
+      "id": "gmail-label",
+      "msgctxt": "Gmail label",
+      "msgidPattern": "\\blabel\\b",
+      "expect": "[Ee]tykiet",
+      "severity": "wrong",
+      "reason": "A Gmail label is Gmail's etykieta (glossary).",
+      "example": {
+        "msgid": "Label",
+        "clean": "Etykieta",
+        "fault": "Znacznik"
+      }
+    },
+    {
+      "id": "toast",
+      "msgidPattern": "\\btoasts?\\b",
+      "expect": "[Kk]omunikat",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count: Microsoft's toast notification is wyskakujące powiadomienie, baner and transparent powiadomienia; the forms with powiadomienie are out, and baner is a banner form, no direct match for a toast; nothing remains, so the existing komunikat stays; never powiadomienie.",
+      "example": {
+        "msgid": "Close toast",
+        "clean": "Zamknij komunikat",
+        "fault": "Zamknij powiadomienie"
+      }
+    },
+    {
+      "id": "toast-heading",
+      "msgctxt": "toasts",
+      "msgid": "Notifications",
+      "expect": "[Kk]omunikat",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count: Microsoft's toast notification is wyskakujące powiadomienie, baner and transparent powiadomienia; the forms with powiadomienie are out, and baner is a banner form, no direct match for a toast; nothing remains, so the existing komunikat stays; never powiadomienie.",
+      "example": {
+        "clean": "Komunikaty",
+        "fault": "Powiadomienia"
+      }
+    },
+    {
+      "id": "toast-heading-gmail",
+      "msgctxt": null,
+      "msgid": "Notifications",
+      "origin": "packages/preload-gmail/",
+      "expect": "[Kk]omunikat",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count: Microsoft's toast notification is wyskakujące powiadomienie, baner and transparent powiadomienia; the forms with powiadomienie are out, and baner is a banner form, no direct match for a toast; nothing remains, so the existing komunikat stays; never powiadomienie.",
+      "example": {
+        "clean": "Komunikaty",
+        "fault": "Powiadomienia"
+      }
+    },
+    {
+      "id": "unread-badge",
+      "msgctxt": null,
+      "msgidPattern": "\\bunread badges?\\b",
+      "expect": "[Pp]lakietk",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: the unread badge is plakietka, counted as ggmail uses it, an unread count on an app icon (plakietka: 2 of 7 (Thunderbird, Apple), thin; the most direct match is Apple's unread badge, plakietka nieprzeczytanych).",
+      "example": {
+        "msgid": "Show unread badge",
+        "clean": "Pokaż plakietkę z liczbą nieprzeczytanych",
+        "fault": "Pokaż licznik nieprzeczytanych"
+      }
+    },
+    {
+      "id": "ggmail-label",
+      "msgctxt": null,
+      "msgid": "Label",
+      "expect": "[Nn]azw",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (nazwa: 7 of 7).",
+      "example": {
+        "clean": "Nazwa",
+        "fault": "Etykieta"
+      }
+    },
+    {
+      "id": "ggmail-label-prompt",
+      "msgctxt": "saved search",
+      "msgid": "Enter a label",
+      "expect": "[Nn]azw",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (nazwa: 7 of 7).",
+      "example": {
+        "clean": "Wpisz nazwę",
+        "fault": "Wpisz etykietę"
+      }
+    },
+    {
+      "id": "out-of-office",
+      "msgidPattern": "\\bout[- ]of[- ]office\\b",
+      "expect": "[Ww]iadomoś\\p{L}* o[ \\u00a0]nieobecności",
+      "severity": "wrong",
+      "reason": "Out of office is Gmail's own vacation responder, wiadomość o nieobecności, as Gmail Help names its setting (Wiadomość o nieobecności włączona; support.google.com/mail/answer/25922).",
+      "example": {
+        "msgid": "Open Gmail settings to turn off out of office",
+        "clean": "Otwórz ustawienia Gmaila, aby wyłączyć wiadomość o nieobecności",
+        "fault": "Otwórz ustawienia Gmaila, aby wyłączyć odpowiedź urlopową"
+      }
+    },
+    {
+      "id": "multiple-inboxes",
+      "msgidPattern": "\\bmultiple inboxes\\b",
+      "expect": "[Ww]iele skrzynek odbiorczych",
+      "severity": "wrong",
+      "reason": "Multiple inboxes is Gmail's own inbox type, wiele skrzynek odbiorczych, as Gmail Help names it (support.google.com/mail/answer/9694882).",
+      "example": {
+        "msgid": "Multiple inboxes",
+        "fault": "Kilka skrzynek"
+      }
+    },
+    {
+      "id": "notify",
+      "msgidPattern": "\\bnotify\\b",
+      "expect": "[Pp]owiadam",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (powiadamiać: 7 of 7). The Notify for setting's label is a noun phrase instead (the notify-for pin), since its options follow it.",
+      "allow": {
+        "entries": [
+          {
+            "msgctxt": null,
+            "msgid": "Notify for"
+          }
+        ]
+      },
+      "example": {
+        "msgid": "Notify when updates are available",
+        "fault": "Informuj o dostępnych aktualizacjach"
+      }
+    },
+    {
+      "id": "sound-breeze",
+      "msgid": "Breeze",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Bryza$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bryza, Dzwonek, Duet, Pukanie and Len, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "bryza"
+      }
+    },
+    {
+      "id": "sound-chime",
+      "msgid": "Chime",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Dzwonek$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bryza, Dzwonek, Duet, Pukanie and Len, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "dzwonek"
+      }
+    },
+    {
+      "id": "sound-duet",
+      "msgid": "Duet",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Duet$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bryza, Dzwonek, Duet, Pukanie and Len, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "duet"
+      }
+    },
+    {
+      "id": "sound-knock",
+      "msgid": "Knock",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Pukanie$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bryza, Dzwonek, Duet, Pukanie and Len, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "pukanie"
+      }
+    },
+    {
+      "id": "sound-linen",
+      "msgid": "Linen",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Len$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bryza, Dzwonek, Duet, Pukanie and Len, Linen translated as the user settled for German.",
+      "call": {
+        "reason": "Linen is translated, as Len, following the user's call for German.",
+        "date": "2026-10-31"
+      },
+      "example": {
+        "fault": "Linen"
+      }
+    },
+    {
+      "id": "system-settings",
+      "msgidPattern": "\\bSystem Settings\\b",
+      "expect": "Ustawie\\p{L}* systemow",
+      "severity": "wrong",
+      "reason": "System Settings is Apple's Ustawienia systemowe, the name of macOS's own app, in ggmail's own copy too (System Settings InfoPlist CFBundleDisplayName).",
+      "example": {
+        "msgid": "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings.",
+        "clean": "Przesuń dwoma palcami w lewo lub w prawo na gładziku, aby przejść wstecz lub dalej. W Ustawieniach systemowych musi być też włączona opcja Zmiana strony przesunięciem.",
+        "fault": "Włącz to także w Preferencjach systemowych."
+      }
+    },
+    {
+      "id": "dock",
+      "msgidPattern": "\\bdock\\b",
+      "expect": "Dock",
+      "severity": "wrong",
+      "reason": "The Dock is Apple's Dock, with its capital, in ggmail's own copy too (DesktopSettings.appex Localizable Dock).",
+      "example": {
+        "msgid": "Dock icon",
+        "clean": "Ikona w Docku",
+        "fault": "Ikona w doku"
+      }
+    },
+    {
+      "id": "hibernation",
+      "msgidPattern": "\\bhibernat",
+      "expect": "[Nn]ieaktywn",
+      "countEnglish": "\\binactive tabs?\\b",
+      "severity": "wrong",
+      "reason": "A hibernated tab is what Chrome's Memory Saver calls an inactive tab, so it takes Chrome's nieaktywna, as in Karta nieaktywna, never the systems' Sleep word (Chrome: 8 of 8 messages).",
+      "example": {
+        "msgid": "Hibernate idle tabs",
+        "clean": "Ustawiaj nieużywane karty jako nieaktywne",
+        "fault": "Hibernuj nieużywane karty"
+      }
+    },
+    {
+      "id": "launcher",
+      "msgidPattern": "\\blauncher\\b",
+      "expect": "[Mm]enu z[ \\u00a0]aplikacjami",
+      "severity": "wrong",
+      "reason": "The launcher is the menu z aplikacjami, as Chrome names ChromeOS's (Chrome: 17 of 19 messages; the two left are program uruchamiający).",
+      "example": {
+        "msgid": "In launcher",
+        "clean": "W menu z aplikacjami",
+        "fault": "W menu aplikacji"
+      }
+    },
+    {
+      "id": "phishing",
+      "msgidPattern": "\\bphishing\\b",
+      "expect": "[Ww]yłudz",
+      "severity": "wrong",
+      "reason": "Phishing is wyłudzanie informacji, as Chrome writes it: ochrona przed wyłudzaniem informacji (Chrome: 3 of 4 messages).",
+      "example": {
+        "msgid": "Phishing protection",
+        "clean": "Ochrona przed wyłudzaniem informacji",
+        "fault": "Ochrona przed phishingiem"
+      }
+    },
+    {
+      "id": "unified-inbox",
+      "msgidPattern": "\\bunified inbox\\b",
+      "expect": "Wszystki\\p{L}* skrzyn\\p{L}* odbiorcz",
+      "severity": "wrong",
+      "reason": "The unified inbox is Wszystkie skrzynki odbiorcze, the Gmail app's name for its every-account inbox (Gmail Help answer/6078445, hl=pl), capitalized as a view's name and declined, as we Wszystkich skrzynkach odbiorczych; the app count leaves the concept unresolved, so the source order's fallback takes Google's wording, never łączona skrzynka odbiorcza (glossary, Unified inbox).",
+      "example": {
+        "msgid": "Open unified inbox",
+        "clean": "Otwórz Wszystkie skrzynki odbiorcze",
+        "fault": "Otwórz łączoną skrzynkę odbiorczą"
+      }
+    },
+    {
+      "id": "auto-width",
+      "msgid": "Auto",
+      "msgctxt": "width",
+      "expect": "^Automatycznie$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Width setting's Auto is Automatycznie, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside szerokość as in every other setting, never an adjective agreeing with it or the English Auto.",
+      "example": {
+        "fault": "Automatyczna"
+      }
+    },
+    {
+      "id": "auto-placement",
+      "msgid": "Auto",
+      "msgctxt": "placement",
+      "expect": "^Automatycznie$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Placement setting's Auto is Automatycznie, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside umieszczenie as in every other setting, never an adjective agreeing with it or the English Auto.",
+      "example": {
+        "fault": "Automatyczne"
+      }
+    },
+    {
+      "id": "auto-launcher-display",
+      "msgid": "Auto",
+      "msgctxt": "launcher display",
+      "expect": "^Automatycznie$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Launcher display setting's Auto is Automatycznie, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside wyświetlanie as in every other setting, never an adjective agreeing with it or the English Auto.",
+      "example": {
+        "fault": "Auto"
+      }
+    },
+    {
+      "id": "auto-text-color",
+      "msgid": "Auto",
+      "msgctxt": "text color",
+      "expect": "^Automatycznie$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Text color setting's Auto is Automatycznie, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside kolor as in every other setting, never an adjective agreeing with it or the English Auto.",
+      "example": {
+        "fault": "Automatyczny"
+      }
+    },
+    {
+      "id": "none-account-color",
+      "msgid": "None",
+      "msgctxt": "account color",
+      "expect": "^Brak$",
+      "countEnglish": "^None$",
+      "severity": "wrong",
+      "reason": "The account's color when none is picked is Brak, as Chrome writes None (Chrome: 3 of 3 messages): a noun, so it agrees with no noun, never Żaden agreeing with kolor.",
+      "example": {
+        "fault": "Żaden"
+      }
+    },
+    {
+      "id": "none-excluded-apps",
+      "msgid": "None",
+      "msgctxt": "excluded apps",
+      "expect": "^Brak$",
+      "countEnglish": "^None$",
+      "severity": "wrong",
+      "reason": "The Excluded apps field with no app excluded is Brak, as Chrome writes None (Chrome: 3 of 3 messages): a noun, so it agrees with no noun, never Żadne agreeing with aplikacje.",
+      "example": {
+        "fault": "Żadne"
+      }
+    },
+    {
+      "id": "tray-icon-light",
+      "msgid": "Light",
+      "msgctxt": "tray icon color",
+      "expect": "^Jasny$",
+      "countEnglish": "^Light$",
+      "severity": "wrong",
+      "reason": "The system tray icon's Light is Jasny, as Chrome writes Light (Chrome: 3 of 4 messages; the one left, Mała, is a font weight), agreeing with kolor, as the Theme setting's Jasny agrees with motyw; never Jasna, agreeing with the icon, ikona.",
+      "example": {
+        "fault": "Jasna"
+      }
+    },
+    {
+      "id": "tray-icon-dark",
+      "msgid": "Dark",
+      "msgctxt": "tray icon color",
+      "expect": "^Ciemny$",
+      "countEnglish": "^Dark$",
+      "severity": "wrong",
+      "reason": "The system tray icon's Dark is Ciemny, as Chrome writes Dark (Chrome: 3 of 4 messages; the one left is Ciemna), agreeing with kolor, as the Theme setting's Ciemny agrees with motyw; never Ciemna, agreeing with the icon, ikona.",
+      "example": {
+        "fault": "Ciemna"
+      }
+    },
+    {
+      "id": "download-action-show-in-folder",
+      "msgid": "Show in folder",
+      "msgctxt": "download action",
+      "expect": "^Pokaż w[ \\u00a0]folderze$",
+      "countEnglish": "^Show in folder$",
+      "countExpect": "^Pokaż w[ \\u00a0]folderze$",
+      "severity": "wrong",
+      "reason": "The download notification's Show in folder is Pokaż w folderze, as Chrome writes it (Chrome: 4 of 4 messages); a Polish label is sentence style, so it reads the same as the download history's button of the same English, never Otwórz folder, which opens the folder rather than showing the file in it.",
+      "example": {
+        "fault": "Otwórz folder"
+      }
+    },
+    {
+      "id": "width",
+      "msgid": "Width",
+      "expect": "^Szerokość$",
+      "countEnglish": "\\bwidth\\b",
+      "countExpect": "[Ss]zerokoś",
+      "severity": "wrong",
+      "reason": "The vertical tabs sidebar's Width setting is Szerokość, as Chrome writes width (Chrome: 5 of 5 messages).",
+      "example": {
+        "fault": "Rozmiar"
+      }
+    },
+    {
+      "id": "wide",
+      "msgid": "Wide",
+      "expect": "^Szeroka$",
+      "severity": "wrong",
+      "reason": "The Width setting's Wide option is Szeroka, agreeing with szerokość: Chrome's one Wide, Szeroko, is Reading mode's letter spacing (IDS_READING_MODE_SPACING_COMBOBOX_WIDE, beside Bardzo szeroko), not a sidebar's size, so it is out under the narrowest sense, and the apps' word decides (agent-chosen: szeroki: 4 of 7 (Thunderbird, Firefox, LibreOffice, Apple), with Width's szerokość out of the vote). It shares a root with the setting's label but is not its word, so the select never shows its label as an option.",
+      "example": {
+        "fault": "Szeroko"
+      }
+    },
+    {
+      "id": "narrow",
+      "msgid": "Narrow",
+      "expect": "^Wąska$",
+      "severity": "wrong",
+      "reason": "The Width setting's Narrow option is Wąska, agreeing with szerokość and pairing with Szeroka (the wide pin); Chrome has no Narrow option of its own.",
+      "example": {
+        "fault": "Wąski"
+      }
+    },
+    {
+      "id": "wide-in-sentences",
+      "msgidPattern": "\\bnarrow and wide\\b",
+      "expect": "[Ww]ąsk(?:ą|a|iej) (?:a|i)[ \\u00a0]szerok(?:ą|a|iej)",
+      "severity": "wrong",
+      "reason": "A sentence that names the Width setting's options names them as the select shows them, agreeing with szerokość: między wąską a szeroką (the wide and narrow pins).",
+      "example": {
+        "msgid": "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
+        "clean": "Pokaż u dołu paska bocznego przycisk, który przełącza jego szerokość między wąską a szeroką. Gdy ta opcja jest wyłączona, użyj polecenia Resetuj szerokość w menu kontekstowym paska bocznego lub ustawienia Szerokość powyżej.",
+        "fault": "Pokaż u dołu paska bocznego przycisk, który przełącza go między wąskim a szerokim. Gdy ta opcja jest wyłączona, użyj polecenia Resetuj szerokość w menu kontekstowym paska bocznego lub ustawienia Szerokość powyżej."
+      }
+    },
+    {
+      "id": "app-links-badge",
+      "msgidPattern": "\\bapp links badge\\b",
+      "expect": "[Pp]lakietk",
+      "severity": "wrong",
+      "reason": "The app links badge marks a tab rather than counting anything, so it takes the apps' word for a badge that marks, plakietka, which names a badge of either kind and counts nothing, as the unread badge's plakietka z liczbą nieprzeczytanych spells its count out; Chrome has no word for a badge (Chrome 0/0), never the counter licznik (agent-chosen: plakietka: 4 of 7 (Thunderbird, Android, LibreOffice, Apple)).",
+      "example": {
+        "msgid": "Show app links badge",
+        "clean": "Pokaż plakietkę karty linków aplikacji",
+        "fault": "Pokaż licznik karty linków aplikacji"
+      }
+    },
+    {
+      "id": "auto-in-sentences",
+      "msgidPattern": "\\bAuto (?:expands|switches|moves)\\b",
+      "expect": "Automatycznie",
+      "severity": "wrong",
+      "reason": "A sentence that names a setting's Auto option names it as the select shows it, Automatycznie (the auto pins), as its translator comment asks.",
+      "example": {
+        "msgid": "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times.",
+        "clean": "Gdzie znajdują się menu z aplikacjami i przycisk zakładek. Opcja Automatycznie przenosi je na dół paska bocznego z kartami pionowymi, gdy jest on widoczny. Opcja Pasek boczny trzyma je tam i nie zamyka paska bocznego nawet przy jednej karcie, a opcja Pasek tytułu zawsze trzyma je na pasku tytułu.",
+        "fault": "Gdzie znajdują się menu z aplikacjami i przycisk zakładek. Tryb automatyczny przenosi je na dół paska bocznego z kartami pionowymi, gdy jest on widoczny. Opcja Pasek boczny trzyma je tam i nie zamyka paska bocznego nawet przy jednej karcie, a opcja Pasek tytułu zawsze trzyma je na pasku tytułu."
+      }
+    },
+    {
+      "id": "show-in-folder",
+      "msgid": "Show in folder",
+      "msgctxt": null,
+      "expect": "^Pokaż w[ \\u00a0]folderze$",
+      "countEnglish": "^Show in folder$",
+      "countExpect": "^Pokaż w[ \\u00a0]folderze$",
+      "severity": "wrong",
+      "reason": "The download history's Show in folder button is Pokaż w folderze, as Chrome writes it (Chrome: 4 of 4 messages), the same words as the download notification's option (the download-action-show-in-folder pin).",
+      "example": {
+        "fault": "Otwórz folder"
+      }
+    },
+    {
+      "id": "width-in-sentences",
+      "msgidPattern": "\\b[Ww]idth\\b",
+      "expect": "[Ss]zerokoś",
+      "countEnglish": "\\bwidth\\b",
+      "countExpect": "[Ss]zerokoś",
+      "severity": "wrong",
+      "reason": "Every message that names the sidebar's width, the Reset Width item, the width button and the Width setting among them, names it szerokość, as Chrome writes width (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Show width button",
+        "clean": "Pokaż przycisk szerokości",
+        "fault": "Pokaż przycisk rozmiaru"
+      }
+    },
+    {
+      "id": "hibernate-after",
+      "msgctxt": null,
+      "msgid": "Hibernate after",
+      "expect": "^Czas do ustawienia karty jako nieaktywnej$",
+      "severity": "wrong",
+      "reason": "The Hibernate after setting is a noun phrase, Czas do ustawienia karty jako nieaktywnej, so its nominative options, 30 minut and 1 godzina, read as its value; po would need them in the locative, po 30 minutach, which an option can't take. Chrome has no such duration setting to follow, and writes its tab settings as noun phrases, as Wygląd nieaktywnych kart.",
+      "example": {
+        "fault": "Ustawiaj jako nieaktywne po"
+      }
+    },
+    {
+      "id": "notify-for",
+      "msgctxt": null,
+      "msgid": "Notify for",
+      "expect": "^Zakres powiadomień$",
+      "severity": "wrong",
+      "reason": "The Notify for setting is a noun phrase, Zakres powiadomień, as Chrome names its notification settings with the noun's genitive, Ustawienia powiadomień, so its nominative options, Wszystkie nowe e-maile and Tylko ważne, read as its value; Powiadamiaj o would need them in the locative. Chrome has no setting of its own that picks which notifications show.",
+      "example": {
+        "fault": "Powiadamiaj o"
+      }
+    },
+    {
+      "id": "release-stable",
+      "msgctxt": null,
+      "msgid": "Stable",
+      "expect": "^Stabilny$",
+      "countEnglish": "^Stable$",
+      "severity": "wrong",
+      "reason": "The Release channel setting's Stable is Stabilny, as Chrome writes its capitalized Stable (Chrome: 1 of 2 messages; the other, a lower-case stable, is stabilna), agreeing with kanał aktualizacji, as a sentence's kanał stabilny does; Beta stays Beta, a noun that agrees with nothing.",
+      "example": {
+        "fault": "Stabilna"
+      }
+    },
+    {
+      "id": "emoji",
+      "msgidPattern": "\\bemoji\\b",
+      "expect": "[Ee]motikon",
+      "severity": "wrong",
+      "reason": "An emoji is an emotikon, as Chrome writes it (Chrome: 4 of 4 messages).",
+      "example": {
+        "msgid": "Pick emoji",
+        "clean": "Wybierz emotikon",
+        "fault": "Wybierz emoji"
+      }
+    },
+    {
+      "id": "logs",
+      "msgidPattern": "\\blogs\\b|^View Logs$|^Logs$",
+      "expect": "(?<!\\p{L})[Ll]og",
+      "countEnglish": "\\blogs?\\b",
+      "severity": "wrong",
+      "reason": "Logs are logi, as Chrome writes them more often than dziennik (Chrome: 26 of 54 messages, dziennik in 22).",
+      "example": {
+        "msgid": "Export logs",
+        "clean": "Eksportuj logi",
+        "fault": "Eksportuj dzienniki"
+      }
+    },
+    {
+      "id": "hard-reload",
+      "msgctxt": null,
+      "msgid": "Hard Reload",
+      "expect": "^Wymuś ponowne załadowanie$",
+      "countEnglish": "^Hard Reload$",
+      "severity": "wrong",
+      "reason": "Chrome's own Hard Reload (Chrome 1/1).",
+      "example": {
+        "clean": "Wymuś ponowne załadowanie",
+        "fault": "Wymuś odświeżenie"
+      }
+    },
+    {
+      "id": "user-agent",
+      "msgidPattern": "\\buser agent\\b",
+      "expect": "[Kk]lient(?:a|em)? użytkownika",
+      "countEnglish": "\\buser[- ]agent\\b",
+      "countExpect": "^Klient$",
+      "severity": "wrong",
+      "reason": "A user agent is a klient użytkownika, built on Chrome's Klient (Chrome: 1 of 1 messages, User agent, Klient), by the lead's recorded call (source order 4b; Tim delegates these calls to the lead): Chrome's one message renders the bare term, Klient, which in ggmail's sentences, Wysyłaj klienta…, loses its meaning and collides with Domyślny klient poczty; klient użytkownika is built on Chrome's word and names the concept. Never the bare klient, nor the apps' agent użytkownika.",
+      "call": {
+        "reason": "Klient użytkownika, built on Chrome's Klient, since the bare Klient names no user agent in ggmail's sentences and collides with Domyślny klient poczty.",
+        "date": "2026-11-02"
+      },
+      "example": {
+        "msgid": "Use default user agent",
+        "clean": "Używaj domyślnego klienta użytkownika",
+        "fault": "Używaj domyślnego klienta"
+      }
+    },
+    {
+      "id": "inspect-element",
+      "msgctxt": null,
+      "msgid": "Inspect Element",
+      "expect": "^Zbadaj element$",
+      "countEnglish": "^I&nspect$",
+      "countExpect": "^&Zbadaj$",
+      "countKeepAccessKeys": true,
+      "severity": "wrong",
+      "reason": "Inspect Element is a context-menu item, so it takes Chrome's context-menu I&nspect, Zbadaj (Chrome 1/1), never its plain Inspect, Sprawdź.",
+      "example": {
+        "clean": "Zbadaj element",
+        "fault": "Sprawdź element"
+      }
+    }
+  ],
+  "accessKeys": {
+    "style": "inline",
+    "severity": "wrong",
+    "reason": "A label whose English has an & keeps one & inline, before a letter of the Polish word; a macOS label drops it."
+  },
+  "families": []
+}

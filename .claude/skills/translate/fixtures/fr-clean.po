@@ -1,0 +1,150 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: fr\n"
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Open app"
+msgstr "Ouvrir l’appli"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "New emails"
+msgstr "Nouveaux e-mails"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Enter a website address, like {exampleSite}."
+msgstr "Saisissez l’adresse d’un site Web, par exemple {exampleSite}."
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Learn More…"
+msgstr "En savoir plus…"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Remove {label}?"
+msgstr "Supprimer {label} ?"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Device ID: {deviceId}"
+msgstr "ID de l’appareil : {deviceId}"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "30 minutes"
+msgstr "30 minutes"
+
+#: packages/renderer/routes/settings/license.tsx
+msgid "{trialDaysLeft, plural, one {Pro trial ends in # day} other {Pro trial ends in # days}}"
+msgstr "{trialDaysLeft, plural, one {L’essai Pro se termine dans # jour} many {L’essai Pro se termine dans # jours} other {L’essai Pro se termine dans # jours}}"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Delete “{label}”?"
+msgstr "Supprimer « {label} » ?"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Rename “{label}”"
+msgstr "Renommer « {label} »"
+
+#: packages/app/menu.ts
+msgid "Close Tab"
+msgstr "Fermer l’onglet"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Are you sure you want to delete this message?"
+msgstr "Voulez-vous vraiment supprimer ce message ?"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Couldn't add the account."
+msgstr "Impossible d’ajouter le compte."
+
+#: packages/renderer/components/downloads.tsx
+msgid "Full download history"
+msgstr "Historique complet des téléchargements"
+
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "View"
+msgstr "Affichage"
+
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Cu&t"
+msgstr "Co&uper"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Delete {label}?"
+msgstr "Supprimer {label} ?"
+
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Paste and &Match Style"
+msgstr "Coller et adapter le &style"
+
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Cu&t"
+msgstr "Couper"
+
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Look Up “{selection}”"
+msgstr "Rechercher « {selection} »"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgctxt "macOS"
+msgid "Show Save As dialog before downloading"
+msgstr "Afficher la fenêtre « Enregistrer sous » avant de télécharger"
+
+#: packages/app/context-menu.ts
+msgid "Copy Email Address"
+msgstr "Copier l’adresse e-mail"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Signed in as {email}"
+msgstr "Connecté en tant que {email}"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "{name}: {reason}"
+msgstr "{name} : {reason}"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Snooze until 10:30"
+msgstr "Mettre en attente jusqu’à 10:30"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Open https://example.com"
+msgstr "Ouvrir https://example.com"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Show recent download history"
+msgstr "Afficher l’historique des téléchargements récents"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Get the apps"
+msgstr "Obtenir les applis Google"
+
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Settings…"
+msgstr "Réglages…"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Website"
+msgstr "Site Web"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Use a security key such as Te2 or Ta+"
+msgstr "Utilisez une clé de sécurité comme Te2 ou Ta+"
+
+#: packages/app/menu.ts
+msgid "Back"
+msgstr "Retour"
+
+#: packages/renderer/components/titlebar.tsx
+msgid "Go forward"
+msgstr "Avancer"
+
+#: packages/app/menu.ts
+msgid "Reset App"
+msgstr "Réinitialiser l’application"

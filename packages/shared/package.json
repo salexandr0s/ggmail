@@ -1,0 +1,8 @@
+{
+  "name": "@ggmail/shared",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "types": "tsc && tsc -p tsconfig.test.json"
+  }
+}

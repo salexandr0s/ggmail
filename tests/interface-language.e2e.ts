@@ -1,0 +1,75 @@
+/*
+ * The interface language: what the picker offers, what it writes, the restart
+ * it asks for, and the `lang` every renderer page carries at first paint.
+ *
+ * Seeded with `"system"` rather than the `"en"` every other launch takes, so
+ * that picking English is a change the config has to record. The system
+ * resolution lands on English on a machine set to English, as CI's runners
+ * are, and the `lang` checks below expect it there.
+ */
+import { expect, type Page, test } from "@playwright/test";
+import { useApp } from "./lib/app";
+import { openSettingsPage } from "./lib/settings";
+
+const ggmail = useApp({ "app.language": "system" });
+
+function readDocumentLanguage(page: Page) {
+  return page.evaluate(() => document.documentElement.lang);
+}
+
+test("the language field offers the shipped languages, writes the one picked and asks for a restart", async () => {
+  const settings = await ggmail.openSettings();
+
+  await openSettingsPage(settings, "General");
+
+  const language = settings.locator('[id="app.language"]');
+
+  // Contained rather than equal, because the trigger renders its own chevron
+  // alongside the value.
+  await expect(language).toContainText("System");
+
+  await language.click();
+
+  await expect(settings.getByRole("option", { name: "System" })).toBeVisible();
+
+  const english = settings.getByRole("option", { name: "English" });
+
+  await expect(english).toBeVisible();
+
+  await english.click();
+
+  // Polled against the file the main process writes, not the trigger: what is
+  // proved is the round trip through IPC to disk.
+  await expect.poll(async () => (await ggmail.readConfig())["app.language"]).toBe("en");
+
+  await expect(language).toContainText("English");
+
+  const restartRequired = settings
+    .getByRole("listitem")
+    .filter({ hasText: "Restart ggmail to apply the changes." });
+
+  await expect(restartRequired).toBeVisible();
+
+  await expect(restartRequired.getByRole("button", { name: "Restart" })).toBeVisible();
+
+  await restartRequired.getByRole("button", { name: "Later" }).click();
+
+  await expect(restartRequired).toBeHidden();
+});
+
+test("every renderer page carries the active language", async () => {
+  await expect.poll(() => readDocumentLanguage(ggmail.renderer)).toBe("en");
+
+  // A popup is its own page, loaded when it opens, so it takes the language
+  // from the search parameters `loadRenderer` puts there rather than from the
+  // page that opened it.
+  const openingPopup = ggmail.app.waitForEvent("window", (window) =>
+    window.url().includes("recent-download-history.html"),
+  );
+
+  await ggmail.renderer.getByTitle("Show recent download history").click();
+
+  const popup = await openingPopup;
+
+  await expect.poll(() => readDocumentLanguage(popup)).toBe("en");
+});

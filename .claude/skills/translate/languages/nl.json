@@ -1,0 +1,1826 @@
+{
+  "platformWords": {
+    "severity": "wrong",
+    "reason": "An entry with a platform msgctxt takes that platform's word from the style sheet's Platform words table.",
+    "rows": [
+      {
+        "row": "File",
+        "macOS": [
+          {
+            "word": "Archief",
+            "source": "(AppKit `MenuCommands` `File`)",
+            "labels": ["File"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Bestand",
+            "source": "(TBX `7285_185699_346733`)",
+            "labels": ["File"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Bestand",
+            "source": "(gtk4 `File`)",
+            "labels": ["File"]
+          }
+        ]
+      },
+      {
+        "row": "View",
+        "macOS": [
+          {
+            "word": "Weergave",
+            "source": "(AppKit `MenuCommands` `View`)",
+            "labels": ["View"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Weergave",
+            "source": "(TBX `9201_185833_3019773`)",
+            "labels": ["View"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Weergave",
+            "source": "(nautilus `shortcuts dialog` `View`)",
+            "labels": ["View"]
+          }
+        ]
+      },
+      {
+        "row": "Edit, the menu",
+        "macOS": [
+          {
+            "word": "Wijzig",
+            "source": "(Mail `MainMenu` `42.title`)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Bewerken",
+            "source": "(TBX `9433_179566_1103955` _menu Bewerken_, the Edit menu)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Bewerken",
+            "source": "(gnome-text-editor `shortcut window` `Editing`, the group of editing commands: gtk4 has no `_Edit`, GTK's Edit menu, in this language)",
+            "labels": ["Edit"]
+          }
+        ]
+      },
+      {
+        "row": "Undo",
+        "macOS": [
+          {
+            "word": "Herstel",
+            "source": "(Mail `MainMenu` `281.title`)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Ongedaan maken",
+            "source": "(TBX `5274_168784_168801`)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ongedaan maken",
+            "source": "(gtk4 `_Undo`)",
+            "labels": ["Undo"]
+          }
+        ]
+      },
+      {
+        "row": "Redo",
+        "macOS": [
+          {
+            "word": "Opnieuw",
+            "source": "(Mail `MainMenu` `282.title`)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Opnieuw",
+            "source": "(TBX `10268_169412_169428`)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Opnieuw",
+            "source": "(gtk4 `_Redo`)",
+            "labels": ["Redo"]
+          }
+        ]
+      },
+      {
+        "row": "Cut, `Cu&t`",
+        "macOS": [
+          {
+            "word": "Knip",
+            "source": "(AppKit `MenuCommands` `Cut`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Knippen",
+            "source": "(TBX `1735_41913_41930`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Knippen",
+            "source": "(gtk4 `Cu_t`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ]
+      },
+      {
+        "row": "Copy, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Kopieer",
+            "source": "(AppKit `MenuCommands` `Copy`)",
+            "labels": ["Copy"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Kopiëren",
+            "source": "(TBX `11991_39848_39866`)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Kopiëren",
+            "source": "(gtk4 `_Copy`)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ]
+      },
+      {
+        "row": "Paste, `&Paste`",
+        "macOS": [
+          {
+            "word": "Plak",
+            "source": "(AppKit `MenuCommands` `Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Plakken",
+            "source": "(TBX `11068_91030_91049`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Plakken",
+            "source": "(gtk4 `_Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ]
+      },
+      {
+        "row": "Paste and Match Style, `Paste and &Match Style`",
+        "macOS": [
+          {
+            "word": "Plak en pas stijl aan",
+            "source": "(AppKit `MenuCommands` `Paste and Match Style`)",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Plakken en opmaak aanpassen",
+            "source": "inferred from TBX `11068_91030_91049` and `15917_56091_56100` _opmaak_, formatting",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Plakken en stijl aanpassen",
+            "source": "inferred from gtk4 `_Paste`",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ]
+      },
+      {
+        "row": "Select All, `Select &All`",
+        "macOS": [
+          {
+            "word": "Selecteer alles",
+            "source": "(AppKit `MenuCommands` `Select All`)",
+            "labels": ["Select All"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Alles selecteren",
+            "source": "(TBX `10476_185277_346821`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Alles selecteren",
+            "source": "(gtk4 `Select _All`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ]
+      },
+      {
+        "row": "Delete, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Verwijder",
+            "source": "(AppKit `MenuCommands` `Delete`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Verwijderen",
+            "source": "(TBX `5396_185654_346716`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Verwijderen",
+            "source": "(gtk4 `_Delete`)",
+            "labels": ["Delete"]
+          }
+        ]
+      },
+      {
+        "row": "About {appName}",
+        "macOS": [
+          {
+            "word": "Over {appName}",
+            "source": "(Mail `MainMenu` `628.title`, _Over Mail_)",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Info over {appName}",
+            "source": "(TBX `6036_211259_323135`, the About menu item)",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Info {appName}",
+            "source": "(gtk4 `About %s`)",
+            "labels": ["About {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Check for Updates…",
+        "macOS": [
+          {
+            "word": "Zoek naar updates…",
+            "source": "(Software Update `Check for Updates`)",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Controleren op updates…",
+            "source": "inferred from TBX `4233_30878_30885` _controleren_, as GNOME Software writes it",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Controleren op updates…",
+            "source": "(gnome-software `Check for Updates`)",
+            "labels": ["Check for Updates…"]
+          }
+        ]
+      },
+      {
+        "row": "Settings, the app-menu item",
+        "macOS": [
+          {
+            "word": "Instellingen…",
+            "source": "(AppKit `MenuCommands` `Settings\\U2026`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Instellingen…",
+            "source": "(TBX `21910_780478_1043479`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Instellingen…",
+            "source": "(gtk4 `Settings`)",
+            "labels": ["Settings…"]
+          }
+        ]
+      },
+      {
+        "row": "Compose, the File menu item",
+        "macOS": [
+          {
+            "word": "Nieuw bericht",
+            "source": "(Mail `MainMenu` `374.title`, New Message)",
+            "labels": ["Compose"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Nieuwe e-mail",
+            "source": "inferred: TBX `34677_1998714_2000363` gives _nieuwe e-mail_ for mail received",
+            "labels": ["Compose"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Nieuw bericht",
+            "source": "(geary `New Message`)",
+            "labels": ["Compose"]
+          }
+        ]
+      },
+      {
+        "row": "Save As, in `Sa&ve Image As…` and the Save As dialog",
+        "macOS": [
+          {
+            "word": "Bewaar als",
+            "source": "(AppKit `Document` `Save As\\U2026`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Bewaar afbeelding als…",
+            "source": "inferred with Mail `Localizable` `CopyImageMenuItem`, _Kopieer afbeelding_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Opslaan als",
+            "source": "(TBX `12985_534974_535915`)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Afbeelding opslaan als…",
+            "source": "inferred with TBX `1294_64520_64539` _afbeelding_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Opslaan als",
+            "source": "(gedit `Save _As…`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Afbeelding opslaan als…",
+            "source": "inferred",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ]
+      },
+      {
+        "row": "Export, the save dialog's button",
+        "macOS": [
+          {
+            "word": "Exporteer",
+            "source": "(AppKit `Document` `Export`)",
+            "labels": ["Export"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Exporteren",
+            "source": "(TBX `7948_52504_52513`)",
+            "labels": ["Export"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Exporteren",
+            "source": "inferred: no GNOME source has it",
+            "labels": ["Export"]
+          }
+        ]
+      },
+      {
+        "row": "Shift, the key",
+        "macOS": [
+          {
+            "word": "Shift",
+            "source": "(AppKit `FunctionKeyNames` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Shift",
+            "source": "(TBX `3412_112291_112301` _SHIFT-toets_, short as the glossary's Keyboard keys gives it)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Shift",
+            "source": "(gtk4 `keyboard label` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ]
+      },
+      {
+        "row": "Show ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Toon ggmail",
+            "source": "(AppKit `Common` `Show`, _Toon_)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "ggmail weergeven",
+            "source": "(TBX `19508_660023_2724980` _weergeven_)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "ggmail tonen",
+            "source": "(gtk4 `Show`, _Tonen_)",
+            "labels": ["Show ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Hide ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Verberg ggmail",
+            "source": "(Mail `MainMenu` `632.title`, _Verberg Mail_)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "ggmail verbergen",
+            "source": "(TBX `20202_719546_1103980` _verbergen_)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "ggmail verbergen",
+            "source": "(gtk4 `Hide %s`)",
+            "labels": ["Hide ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, the tray item",
+        "macOS": "macOS shows the menu's Quit {appName}",
+        "Windows": [
+          {
+            "word": "Afsluiten",
+            "source": "(TBX `11976_185681_346729`, the Exit item of a taskbar icon's menu)",
+            "labels": ["Exit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Afsluiten",
+            "source": "inferred from gtk4 `Quit %s`, _%s afsluiten_: GTK has no standalone Quit, and the Microsoft Terminology Collection is no Linux source",
+            "labels": ["Quit"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Stop",
+            "source": "(AppKit `Document` `Quit`)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Afsluiten",
+            "source": "(TBX `9679_334563_1103965` _afsluiten_, to close a program, as a label)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Linux": "one message with the tray item's Quit, its word above"
+      },
+      {
+        "row": "System tray, in the Appearance settings",
+        "macOS": "macOS shows the menu bar instead: _menubalk_",
+        "Windows": [
+          {
+            "word": "systeemvak",
+            "source": "(TBX `10299_85657_85670`, notification area, and Chrome's word; TBX `55084_3122863_3123066` gives _systeembalk_ for the system tray)",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "systeemvak",
+            "source": "inferred: GNOME has no tray",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ]
+      },
+      {
+        "row": "Hide {appName}",
+        "macOS": [
+          {
+            "word": "Verberg {appName}",
+            "source": "(Mail `MainMenu` `632.title`, _Verberg Mail_)",
+            "labels": ["Hide {appName}"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Hide Others",
+        "macOS": [
+          {
+            "word": "Verberg andere",
+            "source": "(Mail `MainMenu` `622.title`)",
+            "labels": ["Hide Others"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show All",
+        "macOS": [
+          {
+            "word": "Toon alles",
+            "source": "(Mail `MainMenu` `625.title`)",
+            "labels": ["Show All"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Quit {appName}",
+        "macOS": [
+          {
+            "word": "Stop {appName}",
+            "source": "(Mail `MainMenu` `631.title`, _Stop Mail_)",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "{appName} afsluiten",
+            "source": "inferred from TBX `9679_334563_1103965` _afsluiten_, to close a program",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "{appName} afsluiten",
+            "source": "(gtk4 `Quit %s`)",
+            "labels": ["Quit {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Close Window",
+        "macOS": [
+          {
+            "word": "Sluit venster",
+            "source": "(AppKit `MenuCommands` `Close Window`)",
+            "labels": ["Close Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Window, the menu",
+        "macOS": [
+          {
+            "word": "Venster",
+            "source": "(AppKit `MenuCommands` `Window`)",
+            "labels": ["Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Minimize",
+        "macOS": [
+          {
+            "word": "Minimaliseer",
+            "source": "(AppKit `MenuCommands` `Minimize`; Dictionary and Screen Sharing `MainMenu` `23.title`)",
+            "labels": ["Minimize"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Zoom, the window",
+        "macOS": [
+          {
+            "word": "Vergroot/verklein",
+            "source": "(Mail `MainMenu` `295.title`)",
+            "labels": ["Zoom"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Bring All to Front",
+        "macOS": [
+          {
+            "word": "Alles op voorgrond",
+            "source": "(AppKit `MenuCommands` `Bring All to Front`)",
+            "labels": ["Bring All to Front"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Speech",
+        "macOS": [
+          {
+            "word": "Spraak",
+            "source": "(Mail `MainMenu` `1535.title`)",
+            "labels": ["Speech"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Start Speaking",
+        "macOS": [
+          {
+            "word": "Start spraakfunctie",
+            "source": "(Mail `MainMenu` `1536.title`)",
+            "labels": ["Start Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Stop Speaking",
+        "macOS": [
+          {
+            "word": "Stop spraakfunctie",
+            "source": "(Mail `MainMenu` `1537.title`)",
+            "labels": ["Stop Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Look Up “{selection}”",
+        "macOS": [
+          {
+            "word": "Zoek ‘{selection}’ op",
+            "source": "(AppKit `MenuCommands` `Look Up \\U201C%@\\U201D`, with this sheet's quotation marks for Apple's straight ones)",
+            "labels": ["Look Up “{selection}”"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show in Finder",
+        "macOS": [
+          {
+            "word": "Toon in Finder",
+            "source": "(Mail `Preferences` `ShowExtensionApplicationInFinder`)",
+            "labels": ["Show in Finder"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "OK, a native dialog's button",
+        "macOS": [
+          {
+            "word": "OK",
+            "source": "(AppKit `Common` `OK`)",
+            "labels": ["OK"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "OK",
+            "source": "(TBX `43243_2447290_2773551`, the dialog button)",
+            "labels": ["OK"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ok",
+            "source": "(gtk4 `_OK`, its access key dropped)",
+            "labels": ["OK"]
+          }
+        ]
+      },
+      {
+        "row": "Learn Spelling, `&Learn Spelling`",
+        "macOS": [
+          {
+            "word": "Voeg spelling toe",
+            "source": "(WebKit `Localizable` `Learn Spelling`)",
+            "labels": ["&Learn Spelling"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Search with Google, `&Search with Google`",
+        "macOS": [
+          {
+            "word": "Zoeken met Google",
+            "source": "(WebKit `Localizable` `Search with %@`)",
+            "labels": ["&Search with Google"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy, `&Copy`",
+        "macOS": [
+          {
+            "word": "Kopieer",
+            "source": "(WebKit `Localizable` `Copy`)",
+            "labels": ["&Copy"]
+          }
+        ],
+        "Windows": "the Edit menu item's word, with its access key",
+        "Linux": "the Edit menu item's word, with its access key"
+      },
+      {
+        "row": "Copy Link Address, `Copy Link Addr&ess`",
+        "macOS": [
+          {
+            "word": "Kopieer link",
+            "source": "(WebKit `Localizable` `Copy Link`, Safari's item for a link)",
+            "labels": ["Copy Link Addr&ess"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image, `Cop&y Image`",
+        "macOS": [
+          {
+            "word": "Kopieer afbeelding",
+            "source": "(WebKit `Localizable` `Copy Image`)",
+            "labels": ["Cop&y Image"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image Address, `C&opy Image Address`",
+        "macOS": [
+          {
+            "word": "Kopieer adres van afbeelding",
+            "source": "inferred from WebKit `Localizable` `Copy Image` and Mail `Alerts` `CopyAddress`, _Kopieer adres_",
+            "labels": ["C&opy Image Address"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Help, the menu",
+        "macOS": [
+          {
+            "word": "Help",
+            "source": "(AppKit `MenuCommands` `Help`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Help",
+            "source": "(TBX `13846_61010_61025`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Hulp",
+            "source": "(nautilus `_Help`)",
+            "labels": ["Help"]
+          }
+        ]
+      },
+      {
+        "row": "Close, the File menu item",
+        "macOS": "macOS shows Close Window",
+        "Windows": [
+          {
+            "word": "Sluiten",
+            "source": "(TBX `26514_1275570_1336093`)",
+            "labels": ["Close"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Sluiten",
+            "source": "(gtk4 `_Close`)",
+            "labels": ["Close"]
+          }
+        ]
+      },
+      {
+        "row": "Share, the share menu",
+        "macOS": [
+          {
+            "word": "Deel",
+            "source": "(AppKit `MenuCommands` `Share`)",
+            "labels": ["Share"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Cancel, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Annuleer",
+            "source": "(AppKit `Common` `Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Annuleren",
+            "source": "(TBX `20151_705248_773126`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Annuleren",
+            "source": "(gtk4 `_Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ]
+      }
+    ]
+  },
+  "banned": [
+    {
+      "id": "bladwijzer",
+      "pattern": "[Bb]ladwijzer",
+      "severity": "wrong",
+      "reason": "A bookmark is a bookmark, as Chrome writes it, never Apple's bladwijzer (Chrome writes the banned form in 2 messages)."
+    },
+    {
+      "id": "notificatie",
+      "pattern": "[Nn]otificatie",
+      "severity": "wrong",
+      "reason": "A notification is a melding, as Chrome and Apple write it, never notificatie (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "bewaren",
+      "pattern": "(?<!\\p{L})(?:[Bb]ewaar\\p{L}*|[Bb]ewaard\\p{L}*)",
+      "severity": "wrong",
+      "reason": "Saving is opslaan, as Chrome writes it: Sla op, opgeslagen. Bewaar is Apple's word, for a macOS label only (Chrome writes the banned form in 14 messages).",
+      "allow": {
+        "contexts": ["macOS"]
+      }
+    },
+    {
+      "id": "vastmaken",
+      "pattern": "(?<!\\p{L})(?:[Vv]astgemaakt\\p{L}*|[Vv]astmaken|[Mm]aak (?:\\p{L}+ )?vast)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "Pinning is vastzetten, as Chrome writes it: Zet vast, vastgezet tabblad; vastmaken is Apple's word (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "bijwerken",
+      "pattern": "[Bb]ijwerk|[Bb]ijgewerkt",
+      "severity": "wrong",
+      "reason": "Updating is updaten, with update for the noun, as Chrome writes it (Chrome writes the banned form in 7 messages)."
+    },
+    {
+      "id": "u",
+      "pattern": "(?<![\\p{L}\\p{N}+])(?:[Uu]|[Uu]w)(?![\\p{L}\\p{N}+])",
+      "severity": "wrong",
+      "reason": "The user is je, with jouw or je, never u or uw (Chrome writes the banned form in 8 messages)."
+    },
+    {
+      "id": "quotes",
+      "pattern": "[\"“”„]|(?<![\\p{L}\\p{N}])'(?=[\\p{L}\\p{N}{])[^'\\n]*'(?![\\p{L}\\p{N}])",
+      "severity": "wrong",
+      "reason": "Quotation marks are ‘…’ (U+2018, U+2019), never straight or double quotes."
+    },
+    {
+      "id": "three-dots",
+      "pattern": "\\.\\.\\.",
+      "severity": "wrong",
+      "reason": "An ellipsis is one character, …, never three full stops."
+    },
+    {
+      "id": "ellipsis-space",
+      "pattern": "[ \\u00a0]…",
+      "severity": "wrong",
+      "reason": "An ellipsis follows the word without a space: Instellingen…"
+    },
+    {
+      "id": "unit-space",
+      "pattern": "(?<=[\\p{N}#}])[\\u00a0\\u202f](?=(?:seconden?|minuten?|minuut|uur|uren|dagen?|weken?|week|maanden?|maand|jaar|jaren|[kKMGT]B)(?!\\p{L}))",
+      "severity": "wrong",
+      "reason": "A number and its unit are parted by a plain space, as Chrome writes them: 5 minuten, # dagen (Chrome writes the banned form in 9 messages)."
+    },
+    {
+      "id": "apology",
+      "pattern": "(?<!\\p{L})(?:[Hh]elaas|[Ss]orry)(?!\\p{L})",
+      "severity": "style",
+      "reason": "Say what happened, without helaas or sorry."
+    }
+  ],
+  "pinned": [
+    {
+      "id": "download-history",
+      "msgidPattern": "\\bdownload history\\b",
+      "expect": "[Dd]ownloadgeschiedenis",
+      "severity": "wrong",
+      "reason": "The download history is downloadgeschiedenis, as Chrome writes it (Chrome: 10 of 10 messages).",
+      "example": {
+        "msgid": "Download history",
+        "clean": "Downloadgeschiedenis",
+        "fault": "Downloadoverzicht"
+      }
+    },
+    {
+      "id": "bookmark",
+      "msgidPattern": "\\bbookmarks?\\b",
+      "expect": "[Bb]ookmark",
+      "severity": "wrong",
+      "reason": "A bookmark is a bookmark, as Chrome writes it (Chrome: 161 of 163 messages).",
+      "example": {
+        "msgid": "No bookmarks yet",
+        "fault": "Nog geen bladwijzers"
+      }
+    },
+    {
+      "id": "notification",
+      "msgidPattern": "(?!Notifications$).*\\bnotifications?\\b",
+      "expect": "[Mm]elding",
+      "severity": "wrong",
+      "reason": "A notification is a melding. The bare Notifications is also the toasts' region, under the toast rule (Chrome: 127 of 127 messages).",
+      "example": {
+        "msgid": "Show a notification when a download finishes.",
+        "clean": "Toon een melding wanneer een download klaar is.",
+        "fault": "Toon een notificatie wanneer een download klaar is."
+      }
+    },
+    {
+      "id": "extension",
+      "msgidPattern": "\\bextensions?\\b",
+      "expect": "[Ee]xtensie",
+      "severity": "wrong",
+      "reason": "An extension is an extensie (Chrome 303/304 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Extensions",
+        "fault": "Uitbreidingen"
+      }
+    },
+    {
+      "id": "tab-strip",
+      "msgidPattern": "\\btab strip\\b",
+      "expect": "[Tt]abbladstrook",
+      "severity": "wrong",
+      "reason": "The tab strip is the tabbladstrook, as Chrome writes it (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Narrow the tab strip",
+        "fault": "Maak de tabbalk smaller"
+      }
+    },
+    {
+      "id": "do-not-disturb",
+      "msgidPattern": "\\bdo not disturb\\b",
+      "expect": "Niet storen",
+      "severity": "wrong",
+      "reason": "Do Not Disturb is Niet storen (Chrome: 6 of 6 messages).",
+      "example": {
+        "msgid": "Turn Do Not Disturb on",
+        "fault": "Zet Stilte aan"
+      }
+    },
+    {
+      "id": "button",
+      "msgidPattern": "\\bbuttons?\\b",
+      "expect": "[Kk]nop",
+      "severity": "wrong",
+      "reason": "An on-screen button is a knop, as Chrome writes it (Chrome: 141 of 141 messages).",
+      "example": {
+        "msgid": "Show width button",
+        "fault": "Toon breedteschakelaar"
+      }
+    },
+    {
+      "id": "password-manager",
+      "msgidPattern": "\\bpassword managers?\\b",
+      "expect": "[Ww]achtwoordmanager",
+      "severity": "wrong",
+      "reason": "A password manager is a wachtwoordmanager, as Chrome writes it (Chrome: 77 of 77 messages).",
+      "example": {
+        "msgid": "Password managers",
+        "fault": "Wachtwoordbeheerders"
+      }
+    },
+    {
+      "id": "passkey",
+      "msgidPattern": "\\bpasskeys?\\b",
+      "expect": "[Tt]oegangssleutel",
+      "severity": "wrong",
+      "reason": "A passkey is a toegangssleutel, as Chrome writes it (Chrome: 89 of 106 messages).",
+      "example": {
+        "msgid": "Only passkeys created in ggmail work here.",
+        "fault": "Alleen passkeys die in ggmail zijn gemaakt, werken hier."
+      }
+    },
+    {
+      "id": "default-browser",
+      "msgidPattern": "\\bdefault browser\\b",
+      "expect": "[Ss]tandaardbrowser",
+      "severity": "wrong",
+      "reason": "The default browser is the standaardbrowser, as Chrome writes it (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Open in Default Browser",
+        "fault": "Open in standaardwebbrowser"
+      }
+    },
+    {
+      "id": "update",
+      "msgidPattern": "\\bupdat(?:e|es|ed|ing)\\b",
+      "expect": "[Uu]pdat|üpdat",
+      "severity": "wrong",
+      "reason": "An update is an update, and updating is updaten, as Chrome writes them (Chrome: 229 of 234 messages).",
+      "example": {
+        "msgid": "{name} updated to {version}",
+        "fault": "{name} bijgewerkt naar {version}"
+      }
+    },
+    {
+      "id": "restart",
+      "msgidPattern": "\\brestart",
+      "expect": "[Oo]pnieuw",
+      "severity": "wrong",
+      "reason": "Restarting is opnieuw starten, as Chrome writes it most: Start ggmail opnieuw (Chrome: 47 of 47 messages).",
+      "example": {
+        "msgid": "Restart now",
+        "fault": "Herstart nu"
+      }
+    },
+    {
+      "id": "titlebar",
+      "msgidPattern": "\\btitle ?bar\\b",
+      "expect": "[Tt]itelbalk",
+      "severity": "wrong",
+      "reason": "The titlebar is the titelbalk (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Titlebar",
+        "fault": "Kopbalk"
+      }
+    },
+    {
+      "id": "menu-bar",
+      "msgidPattern": "\\bmenu bar\\b",
+      "expect": "[Mm]enubalk",
+      "severity": "wrong",
+      "reason": "The menu bar is the menubalk (Chrome: 3 of 3 messages).",
+      "example": {
+        "msgid": "Menu bar icon",
+        "fault": "Pictogram in de menuregel"
+      }
+    },
+    {
+      "id": "verification-code",
+      "msgidPattern": "\\bverification codes?\\b",
+      "expect": "[Vv]erificatiecode",
+      "severity": "wrong",
+      "reason": "A verification code is a verificatiecode (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Verification codes",
+        "fault": "Bevestigingscodes"
+      }
+    },
+    {
+      "id": "device-label",
+      "msgidPattern": "\\bdevice label\\b",
+      "expect": "[Aa]pparaatna(?:a)?m",
+      "countEnglish": "\\bdevice name\\b",
+      "severity": "wrong",
+      "reason": "A device label is an apparaatnaam, Chrome's word for a device name (Chrome 9/11 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Device label",
+        "fault": "Apparaatlabel"
+      }
+    },
+    {
+      "id": "spellcheck",
+      "msgidPattern": "\\bspell ?check",
+      "expect": "[Ss]pellingcontrole",
+      "severity": "wrong",
+      "reason": "Spellchecking is spellingcontrole (Chrome: 22 of 23 messages).",
+      "example": {
+        "msgid": "Spellchecker",
+        "fault": "Spellingchecker"
+      }
+    },
+    {
+      "id": "dark-theme",
+      "msgidPattern": "\\bdark theme\\b",
+      "expect": "[Dd]onker\\p{L}* thema",
+      "severity": "wrong",
+      "reason": "The dark theme is the donker thema (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Extend dark theme",
+        "fault": "Breid donkere modus uit"
+      }
+    },
+    {
+      "id": "trusted-hosts",
+      "msgidPattern": "\\b(?:un)?trusted hosts?\\b",
+      "expect": "[Vv]ertrouwd",
+      "countEnglish": "\\btrusted\\b",
+      "severity": "wrong",
+      "reason": "Trusted hosts are vertrouwde hosts, untrusted ones niet-vertrouwde hosts, as Chrome writes trusted (Chrome 21/22 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Trusted hosts",
+        "fault": "Betrouwbare hosts"
+      }
+    },
+    {
+      "id": "release-channel",
+      "msgidPattern": "\\bchannel\\b",
+      "expect": "[Kk]anaal",
+      "severity": "wrong",
+      "reason": "A release channel is a kanaal: updatekanaal, bètakanaal (Chrome: 10 of 11 messages).",
+      "example": {
+        "msgid": "Release channel",
+        "fault": "Releaseversie"
+      }
+    },
+    {
+      "id": "phishing-protection",
+      "msgidPattern": "\\bphishing protection\\b",
+      "expect": "[Pp]hishing",
+      "countEnglish": "\\bphishing\\b",
+      "severity": "wrong",
+      "reason": "Phishing protection is phishingbescherming; Chrome keeps phishing (Chrome 4/4 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Phishing protection",
+        "fault": "Bescherming tegen oplichting"
+      }
+    },
+    {
+      "id": "clipboard",
+      "msgidPattern": "\\bclipboard\\b",
+      "expect": "[Kk]lembord",
+      "severity": "wrong",
+      "reason": "The clipboard is the klembord, as Chrome writes it (Chrome: 44 of 44 messages).",
+      "example": {
+        "msgid": "Copy codes to clipboard",
+        "fault": "Kopieer codes naar plakbord"
+      }
+    },
+    {
+      "id": "folder",
+      "msgidPattern": "\\bfolders?\\b",
+      "expect": "[Mm]ap",
+      "severity": "wrong",
+      "reason": "A folder is a map, as Chrome writes it (Chrome 104/104 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Open folder when done",
+        "fault": "Open directory na afloop"
+      }
+    },
+    {
+      "id": "save",
+      "msgctxt": null,
+      "msgid": "Save",
+      "expect": "^Sla op$",
+      "countEnglish": "^Save$",
+      "countExpect": "^Opslaan$",
+      "severity": "wrong",
+      "reason": "Save is Sla op, Chrome's Opslaan in this sheet's imperative (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "fault": "Opslaan"
+      }
+    },
+    {
+      "id": "saved-search",
+      "msgidPattern": "\\bsaved search(?:es)?\\b",
+      "expect": "[Oo]pgeslagen zoekopdracht",
+      "countEnglish": "\\bsaved\\b",
+      "countExpect": "[Oo]pgeslagen",
+      "severity": "wrong",
+      "reason": "A saved search is an opgeslagen zoekopdracht, with Chrome's opgeslagen for saved (Chrome 281/289 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Add saved search",
+        "fault": "Voeg zoekopdracht toe"
+      }
+    },
+    {
+      "id": "edit",
+      "msgctxt": null,
+      "msgidPattern": "^Edit\\b",
+      "expect": "[Bb]ewerk",
+      "severity": "wrong",
+      "reason": "Edit is Bewerk, Chrome's bewerken in this sheet's imperative (Chrome 64/66 in Chromium 156.0.8078.49's .xtb files); the Edit menu, a platform label, takes its platform's word instead.",
+      "example": {
+        "msgid": "Edit account",
+        "fault": "Wijzig account"
+      }
+    },
+    {
+      "id": "pin",
+      "msgidPattern": "^Pin$|\\b(?:un)?pinned\\b",
+      "expect": "[Vv]ast(?:ge)?ze?t|[Zz]et (?:\\p{L}+ )?vast",
+      "severity": "wrong",
+      "reason": "Pinning is vastzetten, as Chrome writes it: Vastzetten in the tab context menu, vastgezet tabblad (Chrome: 17 of 21 messages).",
+      "example": {
+        "msgid": "Pin",
+        "clean": "Vastzetten",
+        "fault": "Vastmaken"
+      }
+    },
+    {
+      "id": "upgrade-label",
+      "msgctxt": null,
+      "msgid": "Upgrade",
+      "origin": "packages/renderer/",
+      "expect": "[Uu]pgrade",
+      "severity": "wrong",
+      "reason": "The standalone Upgrade label is Upgrade, Gmail's own Upgrade wording for Google's paid storage, Upgraden (glossary); the seven apps' word for upgrading in general is secondary (upgrade/upgraden: 4 of 7 (Thunderbird, Firefox, Android, Microsoft)).",
+      "example": {
+        "clean": "Upgrade",
+        "fault": "Koop"
+      }
+    },
+    {
+      "id": "gmail-label",
+      "msgctxt": "Gmail label",
+      "msgidPattern": "\\blabel\\b",
+      "expect": "[Ll]abel",
+      "severity": "wrong",
+      "reason": "A Gmail label is Gmail's label (glossary).",
+      "example": {
+        "msgid": "Label",
+        "clean": "Label",
+        "fault": "Etiket"
+      }
+    },
+    {
+      "id": "toast",
+      "msgidPattern": "\\btoasts?\\b",
+      "expect": "[Pp]op-up",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: a toast is pop-up, never the notification word melding (by step 4c's direct match: Microsoft's toast notification is pop-up, pop-upmelding, banner and meldingsbanner; the forms with melding are out, and pop-up remains).",
+      "example": {
+        "msgid": "Close toast",
+        "clean": "Sluit pop-up",
+        "fault": "Sluit melding"
+      }
+    },
+    {
+      "id": "toast-heading",
+      "msgctxt": "toasts",
+      "msgid": "Notifications",
+      "expect": "[Pp]op-up",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: a toast is pop-up, never the notification word melding (by step 4c's direct match: Microsoft's toast notification is pop-up, pop-upmelding, banner and meldingsbanner; the forms with melding are out, and pop-up remains).",
+      "example": {
+        "clean": "Pop-ups",
+        "fault": "Meldingen"
+      }
+    },
+    {
+      "id": "toast-heading-gmail",
+      "msgctxt": null,
+      "msgid": "Notifications",
+      "origin": "packages/preload-gmail/",
+      "expect": "[Pp]op-up",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: a toast is pop-up, never the notification word melding (by step 4c's direct match: Microsoft's toast notification is pop-up, pop-upmelding, banner and meldingsbanner; the forms with melding are out, and pop-up remains).",
+      "example": {
+        "clean": "Pop-ups",
+        "fault": "Meldingen"
+      }
+    },
+    {
+      "id": "unread-badge",
+      "msgctxt": null,
+      "msgidPattern": "\\bunread badges?\\b",
+      "expect": "[Bb]adge",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen: the unread badge is badge, counted as ggmail uses it, an unread count on an app icon (badge: 3 of 7 (Thunderbird, Microsoft, Apple)).",
+      "example": {
+        "msgid": "Show unread badge",
+        "clean": "Toon badge voor ongelezen e-mails",
+        "fault": "Toon aantal ongelezen"
+      }
+    },
+    {
+      "id": "ggmail-label",
+      "msgctxt": null,
+      "msgid": "Label",
+      "expect": "[Nn]aam",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (naam: 6 of 7).",
+      "example": {
+        "clean": "Naam",
+        "fault": "Label"
+      }
+    },
+    {
+      "id": "ggmail-label-prompt",
+      "msgctxt": "saved search",
+      "msgid": "Enter a label",
+      "expect": "[Nn]aam",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (naam: 6 of 7).",
+      "example": {
+        "clean": "Voer een naam in",
+        "fault": "Voer een label in"
+      }
+    },
+    {
+      "id": "out-of-office",
+      "msgidPattern": "\\bout[- ]of[- ]office\\b",
+      "expect": "[Aa]utomatisch antwoord",
+      "severity": "wrong",
+      "reason": "Out of office is Gmail's own vacation responder, automatisch antwoord, as Gmail Help names its setting (Automatisch antwoord staat aan; support.google.com/mail/answer/25922).",
+      "example": {
+        "msgid": "Open Gmail settings to turn off out of office",
+        "clean": "Open Gmail-instellingen om het automatisch antwoord uit te zetten",
+        "fault": "Open Gmail-instellingen om het vakantiebericht uit te zetten"
+      }
+    },
+    {
+      "id": "multiple-inboxes",
+      "msgidPattern": "\\bmultiple inboxes\\b",
+      "expect": "[Mm]eerdere inboxen",
+      "severity": "wrong",
+      "reason": "Multiple inboxes is Gmail's own inbox type, meerdere inboxen, as Gmail Help names it (support.google.com/mail/answer/9694882).",
+      "example": {
+        "msgid": "Multiple inboxes",
+        "fault": "Meervoudige inbox"
+      }
+    },
+    {
+      "id": "notify",
+      "msgidPattern": "\\bnotify\\b",
+      "expect": "[Mm]eld",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (melden: 4 of 7 (Android, LibreOffice, Microsoft, Apple)).",
+      "example": {
+        "msgid": "Notify for",
+        "fault": "Waarschuw voor"
+      }
+    },
+    {
+      "id": "sound-breeze",
+      "msgid": "Breeze",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Bries$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bries, Klokkenspel, Duet, Klop and Linnen, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "bries"
+      }
+    },
+    {
+      "id": "sound-chime",
+      "msgid": "Chime",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Klokkenspel$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bries, Klokkenspel, Duet, Klop and Linnen, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "klokkenspel"
+      }
+    },
+    {
+      "id": "sound-duet",
+      "msgid": "Duet",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Duet$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bries, Klokkenspel, Duet, Klop and Linnen, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "duet"
+      }
+    },
+    {
+      "id": "sound-knock",
+      "msgid": "Knock",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Klop$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bries, Klokkenspel, Duet, Klop and Linnen, Linen translated as the user settled for German.",
+      "example": {
+        "fault": "klop"
+      }
+    },
+    {
+      "id": "sound-linen",
+      "msgid": "Linen",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Linnen$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Bries, Klokkenspel, Duet, Klop and Linnen, Linen translated as the user settled for German.",
+      "call": {
+        "reason": "Linen is translated, as Linnen, following the user's call for German.",
+        "date": "2026-10-31"
+      },
+      "example": {
+        "fault": "Linen"
+      }
+    },
+    {
+      "id": "system-settings",
+      "msgidPattern": "\\bSystem Settings\\b",
+      "expect": "Systeeminstellingen",
+      "severity": "wrong",
+      "reason": "System Settings is Apple's Systeeminstellingen, the name of macOS's own app, in ggmail's own copy too (System Settings InfoPlist CFBundleDisplayName).",
+      "example": {
+        "msgid": "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings.",
+        "clean": "Veeg met twee vingers naar links of rechts op een trackpad om terug of vooruit te gaan. ‘Vegen tussen pagina's’ moet ook aanstaan in Systeeminstellingen.",
+        "fault": "Veeg met twee vingers naar links of rechts op een trackpad om terug of vooruit te gaan. ‘Vegen tussen pagina's’ moet ook aanstaan in Systeemvoorkeuren."
+      }
+    },
+    {
+      "id": "dock",
+      "msgidPattern": "\\bdock\\b",
+      "expect": "Dock",
+      "severity": "wrong",
+      "reason": "The Dock is Apple's Dock, with its capital, in ggmail's own copy too (DesktopSettings.appex Localizable Dock).",
+      "example": {
+        "msgid": "Dock icon",
+        "clean": "Dock-pictogram",
+        "fault": "dockpictogram"
+      }
+    },
+    {
+      "id": "hibernation",
+      "msgidPattern": "\\bhibernat",
+      "expect": "[Ii]nactie",
+      "countEnglish": "\\binactive tabs?\\b",
+      "severity": "wrong",
+      "reason": "A hibernated tab is what Chrome's Memory Saver calls an inactive tab, so it takes Chrome's inactief, as in Inactief tabblad, never the systems' Sleep word (Chrome 8/8 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Hibernate idle tabs",
+        "clean": "Maak ongebruikte tabbladen inactief",
+        "fault": "Zet ongebruikte tabbladen in winterslaap"
+      }
+    },
+    {
+      "id": "launcher",
+      "msgidPattern": "\\blauncher\\b",
+      "expect": "[Ll]auncher",
+      "severity": "wrong",
+      "reason": "The launcher is the launcher, as Chrome names ChromeOS's (Chrome 19/19 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "In launcher",
+        "clean": "In launcher",
+        "fault": "In starter"
+      }
+    },
+    {
+      "id": "sidebar",
+      "msgidPattern": "\\bsidebar\\b",
+      "expect": "[Zz]ijbalk",
+      "severity": "wrong",
+      "reason": "The sidebar is the zijbalk, as Chrome writes it in Toggle sidebar; Chrome's zijvenster is its side panel, a different thing (Chrome 1/1 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Sidebar",
+        "clean": "Zijbalk",
+        "fault": "Navigatiekolom"
+      }
+    },
+    {
+      "id": "file-manager",
+      "msgidPattern": "\\bfile manager\\b",
+      "expect": "[Bb]estandsbeheer\\b",
+      "severity": "wrong",
+      "reason": "The file manager shows only on Linux, so it takes GNOME's word, bestandsbeheer, as Files writes it (GNOME, nautilus `_Open in File Manager`, _Openen met bestandsbeheer_), never bestandsbeheerder or the English file manager.",
+      "example": {
+        "msgid": "Show in your file manager",
+        "clean": "Toon in bestandsbeheer",
+        "fault": "Toon in je bestandsbeheerder"
+      }
+    },
+    {
+      "id": "auto-width",
+      "msgid": "Auto",
+      "msgctxt": "width",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Width setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); Dutch's adjective takes no agreement with the setting's noun, and Chrome's Automatisch is its Automatic, never its Auto.",
+      "example": {
+        "fault": "Automatisch"
+      }
+    },
+    {
+      "id": "auto-placement",
+      "msgid": "Auto",
+      "msgctxt": "placement",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Placement setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); Dutch's adjective takes no agreement with the setting's noun, and Chrome's Automatisch is its Automatic, never its Auto.",
+      "example": {
+        "fault": "Automatisch"
+      }
+    },
+    {
+      "id": "auto-launcher-display",
+      "msgid": "Auto",
+      "msgctxt": "launcher display",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Launcher display setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); Dutch's adjective takes no agreement with the setting's noun, and Chrome's Automatisch is its Automatic, never its Auto.",
+      "example": {
+        "fault": "Automatische weergave"
+      }
+    },
+    {
+      "id": "auto-text-color",
+      "msgid": "Auto",
+      "msgctxt": "text color",
+      "expect": "^Auto$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Text color setting's Auto is Auto, as Chrome writes it (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files); Dutch's adjective takes no agreement with the setting's noun, and Chrome's Automatisch is its Automatic, never its Auto.",
+      "example": {
+        "fault": "Automatisch"
+      }
+    },
+    {
+      "id": "none-account-color",
+      "msgid": "None",
+      "msgctxt": "account color",
+      "expect": "^Geen$",
+      "countEnglish": "^None$",
+      "severity": "wrong",
+      "reason": "An account without a color shows Geen, as Chrome writes it (Chrome 3/3 in Chromium 156.0.8078.49's .xtb files); Dutch's Geen takes no agreement with the noun it stands for.",
+      "example": {
+        "fault": "Geen kleur"
+      }
+    },
+    {
+      "id": "none-excluded-apps",
+      "msgid": "None",
+      "msgctxt": "excluded apps",
+      "expect": "^Geen$",
+      "countEnglish": "^None$",
+      "severity": "wrong",
+      "reason": "The Excluded apps field with nothing excluded shows Geen, as Chrome writes it (Chrome 3/3 in Chromium 156.0.8078.49's .xtb files); Dutch's Geen takes no agreement with the noun it stands for.",
+      "example": {
+        "fault": "Niets"
+      }
+    },
+    {
+      "id": "width",
+      "msgidPattern": "\\bwidth\\b",
+      "expect": "[Bb]reedte",
+      "severity": "wrong",
+      "reason": "Width is breedte, as Chrome writes it (Chrome 5/5 in Chromium 156.0.8078.49's .xtb files).",
+      "example": {
+        "msgid": "Width",
+        "clean": "Breedte",
+        "fault": "Wijdte"
+      }
+    },
+    {
+      "id": "wide",
+      "msgid": "Wide",
+      "expect": "^Breed$",
+      "countEnglish": "\\bnow \\{\\} wide\\b",
+      "countExpect": "\\bbreed\\b",
+      "severity": "wrong",
+      "reason": "The Width setting's Wide option is Breed, as Chrome writes the width of a part of its window, a tab strip, a window or a view now {} wide (Chrome 3/3 in Chromium 156.0.8078.49's .xtb files), never Wijd: Chrome's plain Wide and Very wide, Wijd and Erg wijd, are Reading mode's letter spacing (IDS_READING_MODE_SPACING_COMBOBOX_WIDE), not a size. The apps agree (agent-chosen: breed: 4 of 7 (Thunderbird, Firefox, LibreOffice, Apple)). Breed is not Width's breedte, so the select never shows its label as one of its options.",
+      "example": {
+        "fault": "Wijd"
+      }
+    },
+    {
+      "id": "narrow",
+      "msgid": "Narrow",
+      "expect": "^Smal$",
+      "severity": "wrong",
+      "reason": "The Width setting's Narrow option is Smal. Chrome has no Narrow (Chrome 0/0), and of the apps only LibreOffice has one, Smal, beside its Wide, Breed (agent-chosen, unresolved by the app count: LibreOffice smal, the others none; Google's own wording was not checked).",
+      "example": {
+        "fault": "Nauw"
+      }
+    },
+    {
+      "id": "app-links-badge",
+      "msgidPattern": "\\bapp links badge\\b",
+      "expect": "[Bb]adge",
+      "severity": "wrong",
+      "reason": "The app links badge marks a tab rather than counting anything, and Dutch's badge names a badge of either kind, so it takes the unread badge's word, badge; Chrome has no word for a badge (Chrome 0/0), and the apps' word for a badge that marks is badge (agent-chosen: badge: 4 of 7 (Android, LibreOffice, Microsoft, Apple)), never markering.",
+      "example": {
+        "msgid": "Show app links badge",
+        "clean": "Toon badge voor app-links",
+        "fault": "Toon markering voor app-links"
+      }
+    },
+    {
+      "id": "auto-in-sentences",
+      "msgidPattern": "\\bAuto (?:expands|switches|moves)\\b",
+      "expect": "(?<!\\p{L})Auto(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "A description that names a setting's Auto option names it as the select shows it, Auto, never Automatisch (the auto pins).",
+      "example": {
+        "msgid": "How launcher apps are shown in the titlebar. Auto expands up to three apps into individual buttons and collapses beyond that. Collapsed always keeps them behind a single button, and Expanded always shows them as individual buttons.",
+        "clean": "Hoe launcher-apps in de titelbalk worden getoond. Auto toont tot drie apps als afzonderlijke knoppen en vouwt ze daarboven samen. Samengevouwen houdt ze altijd achter één knop, en Uitgevouwen toont ze altijd als afzonderlijke knoppen.",
+        "fault": "Hoe launcher-apps in de titelbalk worden getoond. Automatisch toont tot drie apps als afzonderlijke knoppen en vouwt ze daarboven samen. Samengevouwen houdt ze altijd achter één knop, en Uitgevouwen toont ze altijd als afzonderlijke knoppen."
+      }
+    },
+    {
+      "id": "wide-in-sentences",
+      "msgidPattern": "\\bnarrow and wide\\b",
+      "expect": "smal en breed",
+      "severity": "wrong",
+      "reason": "A sentence that names the Width setting's options names them as the select shows them, Smal and Breed, so wide is breed there too, never wijd (the narrow and wide pins).",
+      "example": {
+        "msgid": "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
+        "clean": "Toon de knop onder in de zijbalk waarmee je wisselt tussen smal en breed. Als dit uit staat, gebruik je Breedte resetten in het contextmenu van de zijbalk of de instelling Breedte hierboven.",
+        "fault": "Toon de knop onder in de zijbalk waarmee je wisselt tussen smal en wijd. Als dit uit staat, gebruik je Breedte resetten in het contextmenu van de zijbalk of de instelling Breedte hierboven."
+      }
+    },
+    {
+      "id": "teal",
+      "msgid": "Teal",
+      "expect": "^Blauwgroen$",
+      "countEnglish": "\\bteal\\b",
+      "countExpect": "blauwgroen",
+      "severity": "wrong",
+      "reason": "The account color Teal is Blauwgroen, as Chrome writes teal in Light teal, Dark teal and its default teal avatar (Chrome 3/4 in Chromium 156.0.8078.49's .xtb files; the fourth, Light teal and white, is Lichtdonkergroen/wit). Chrome comes before the apps' groenblauw: 2 of 7 (Microsoft, Apple).",
+      "example": {
+        "fault": "Groenblauw"
+      }
+    },
+    {
+      "id": "show-option",
+      "msgid": "Show",
+      "msgctxt": null,
+      "expect": "^Tonen$",
+      "countEnglish": "^Show$",
+      "severity": "wrong",
+      "reason": "A select option that names an action is Chrome's infinitive, so Window controls' Show is Tonen (Chrome 1/1 in Chromium 156.0.8078.49's .xtb files), never a button's Toon.",
+      "example": {
+        "fault": "Toon"
+      }
+    },
+    {
+      "id": "hide-option",
+      "msgid": "Hide",
+      "msgctxt": null,
+      "expect": "^Verbergen$",
+      "countEnglish": "^Hide$",
+      "severity": "wrong",
+      "reason": "A select option that names an action is Chrome's infinitive, so Window controls' Hide is Verbergen (Chrome 2/2 in Chromium 156.0.8078.49's .xtb files), never a button's Verberg.",
+      "example": {
+        "fault": "Verberg"
+      }
+    },
+    {
+      "id": "zoom-in",
+      "msgid": "Zoom In",
+      "expect": "^Zoom in$",
+      "countEnglish": "^Zoom In$",
+      "countExpect": "^Inzoomen$",
+      "severity": "wrong",
+      "reason": "The View menu's Zoom In is Zoom in, Chrome's View menu item Zoom &In, Inzoomen, in this sheet's imperative (Chrome 2/3 in Chromium 156.0.8078.49's .xtb files, the menu item and the sentence-case Zoom in; the title-case Zoom In is Groter), never Groter.",
+      "example": {
+        "fault": "Groter"
+      }
+    },
+    {
+      "id": "zoom-out",
+      "msgid": "Zoom Out",
+      "expect": "^Zoom uit$",
+      "countEnglish": "^Zoom Out$",
+      "countExpect": "^Uitzoomen$",
+      "severity": "wrong",
+      "reason": "The View menu's Zoom Out is Zoom uit, Chrome's View menu item Zoom &Out, Uitzoomen, in this sheet's imperative (Chrome 2/3 in Chromium 156.0.8078.49's .xtb files, the menu item and the sentence-case Zoom out; the title-case Zoom Out is Kleiner), never Kleiner.",
+      "example": {
+        "fault": "Kleiner"
+      }
+    },
+    {
+      "id": "actual-size",
+      "msgid": "Actual Size",
+      "expect": "^Werkelijke grootte$",
+      "countEnglish": "^Actual Size$",
+      "countExpect": "^Werkelijke grootte$",
+      "severity": "wrong",
+      "reason": "The View menu's Actual Size is Werkelijke grootte, as Chrome's View menu item A&ctual Size writes it (Chrome 1/3 in Chromium 156.0.8078.49's .xtb files; the title-case Actual Size is Normaal and the sentence-case Actual size Werkelijk formaat), never Normaal.",
+      "example": {
+        "fault": "Normaal"
+      }
+    },
+    {
+      "id": "emerald",
+      "msgid": "Emerald",
+      "expect": "^Smaragd$",
+      "severity": "wrong",
+      "reason": "The account color Emerald is Smaragd, Apple's Emerald, the app message whose English is the color's name alone: Chrome has no Emerald (Chrome 0/0) and the vote is too thin (agent-chosen: smaragd: 1 of 7 (Apple), fewer than 3 apps).",
+      "example": {
+        "fault": "Smaragdgroen"
+      }
+    },
+    {
+      "id": "security-updates",
+      "msgidPattern": "\\bsecurity fixes\\b",
+      "expect": "beveiligingsupdates",
+      "countEnglish": "\\bsecurity updates?\\b",
+      "countExpect": "beveiligingsupdate",
+      "severity": "wrong",
+      "reason": "Fixes, security fixes among them, are updates and beveiligingsupdates, as Chrome writes security updates (Chrome 10/10 in Chromium 156.0.8078.49's .xtb files), never fixes or beveiligingsfixes, which neither Chrome nor Apple writes.",
+      "example": {
+        "msgid": "Updates need macOS 13 or later, so ggmail won't check for them on this Mac. This version keeps working, but it gets no further fixes, security fixes included, so using it long term is at your own risk.",
+        "clean": "Updates vereisen macOS 13 of nieuwer, dus ggmail controleert op deze Mac niet op updates. Deze versie blijft werken, maar krijgt geen updates meer, ook geen beveiligingsupdates, dus als je deze versie lang blijft gebruiken, is dat op eigen risico.",
+        "fault": "Updates vereisen macOS 13 of nieuwer, dus ggmail controleert op deze Mac niet op updates. Deze versie blijft werken, maar krijgt geen verdere fixes meer, ook geen beveiligingsfixes, dus als je deze versie lang blijft gebruiken, is dat op eigen risico."
+      }
+    },
+    {
+      "id": "unified-inbox",
+      "msgidPattern": "\\bunified inbox\\b",
+      "expect": "[Gg]ecombineerde inbox",
+      "severity": "wrong",
+      "reason": "The unified inbox is the gecombineerde inbox, after Gmail's inbox (agent-chosen, unresolved by the app count). Google's wording checked: the Gmail app's every-account view is Alle e-mail (Gmail Help answer/6078445, hl=nl), which is Gmail's All Mail folder name (answer/6576, hl=nl), so it is out (glossary, Unified inbox).",
+      "example": {
+        "msgid": "Open unified inbox",
+        "clean": "Open gecombineerde inbox",
+        "fault": "Open Alle e-mail"
+      }
+    }
+  ],
+  "accessKeys": {
+    "style": "inline",
+    "severity": "wrong",
+    "reason": "A label whose English has an & keeps one & inline, before a letter of the Dutch word; a macOS label drops it."
+  },
+  "families": []
+}

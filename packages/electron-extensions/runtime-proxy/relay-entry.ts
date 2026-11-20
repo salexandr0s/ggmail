@@ -1,0 +1,108 @@
+import type { ChromeNamespace } from "../facade/lib/chrome";
+import {
+  RUNTIME_PROXY_LOCAL_STORAGE_DEFAULTS_GLOBAL,
+  RUNTIME_PROXY_RELAY_START_GLOBAL,
+  RUNTIME_PROXY_STATIC_CONTENT_SCRIPTS_GLOBAL,
+  RUNTIME_PROXY_STORAGE_SYNTHESIS_GLOBAL,
+  type RuntimeProxyStaticContentScript,
+} from "./bridge-protocol";
+import { createDynamicUrlRewrite } from "./dynamic-url";
+import { createRelayClient } from "./relay-client";
+import { seedLocalStorageDefaults } from "./storage-defaults";
+import { createStorageRelay } from "./storage-relay";
+import { installStorageSynthesis } from "./storage-synthesis";
+import { wrapScripting } from "./worker-scripting";
+
+type StorageChangeDispatch = ReturnType<typeof installStorageSynthesis>["dispatchReported"];
+
+/**
+ * Entry point of the runtime proxy's worker-side relay client. It is bundled
+ * on its own and imported by the derived service worker wrapper between the
+ * facade and the extension's own background script, so its wrapped `onMessage`
+ * and `onConnect` are what the extension registers its listeners on, and its
+ * shadowed `tabs.sendMessage`, `tabs.connect` and `runtime.sendMessage` are
+ * what the extension calls to reach the sessions it has no worker in.
+ *
+ * The same client answers the other sessions' `chrome.storage` calls against
+ * this session's own store, which is the one store the shared instance keeps.
+ * That store stays native: the relay reads and writes it through the same API
+ * the extension does, and shadows nothing on it but `setAccessLevel`, whose
+ * value Chrome offers no way to read back and which the relay has to know to
+ * refuse a content script the call Chromium would have refused it. Its
+ * `onChanged` is only listened to, not shadowed, and what it hears is fanned
+ * out to the sessions whose own stores no longer change — unless the extension
+ * is opted into synthesis, which shadows the writes and the events both.
+ */
+const workerGlobals = globalThis as unknown as Record<string, ChromeNamespace | undefined>;
+
+// The facade ran first and took `browser` away, so `chrome` is the one object
+const extensionApis = workerGlobals.chrome ? [workerGlobals.chrome] : [];
+
+const storageRelay = createStorageRelay(extensionApis);
+
+let dispatchPageStorageChange: StorageChangeDispatch | undefined;
+
+const relayClient = createRelayClient({
+  runStorageCall: storageRelay.run,
+  rewriteOutgoing: createDynamicUrlRewrite(extensionApis[0]),
+  onStorageChanged: (area, changes) => {
+    void dispatchPageStorageChange?.(area, changes);
+  },
+});
+
+const staticContentScripts = (workerGlobals as unknown as Record<string, unknown>)[
+  RUNTIME_PROXY_STATIC_CONTENT_SCRIPTS_GLOBAL
+] as RuntimeProxyStaticContentScript[] | undefined;
+
+for (const extensionApi of extensionApis) {
+  relayClient.wrapRuntime(extensionApi);
+
+  relayClient.wrapTabs(extensionApi);
+
+  // Only for an extension that declared scripts of its own: for any other, an
+  // `executeScript` into an account's tab stays the failure it really is
+  if (staticContentScripts) {
+    wrapScripting(extensionApi, staticContentScripts);
+  }
+}
+
+// Before the extension's own background script runs, so its own boot-time call
+// is the first one the relay sees
+storageRelay.mirrorAccessLevels();
+
+// Ahead of `watchChanges`, so the relay's listener lands on the synthesized
+// event and fans out what it dispatches, rather than on the native one
+if (workerGlobals[RUNTIME_PROXY_STORAGE_SYNTHESIS_GLOBAL]) {
+  dispatchPageStorageChange = installStorageSynthesis(extensionApis).dispatchReported;
+}
+
+// And before its boot-time writes, so a change made while the worker is still
+// evaluating reaches whichever contexts are already listening
+storageRelay.watchChanges();
+
+// After synthesis and the relay's listener, so a default written here reaches
+// the extension and the other sessions as any other change would
+const localStorageDefaults = (workerGlobals as unknown as Record<string, unknown>)[
+  RUNTIME_PROXY_LOCAL_STORAGE_DEFAULTS_GLOBAL
+] as Record<string, unknown> | undefined;
+
+if (localStorageDefaults) {
+  for (const extensionApi of extensionApis) {
+    void seedLocalStorageDefaults(extensionApi, localStorageDefaults);
+  }
+}
+
+/*
+ * The stream is parked by the derived wrapper, as the last thing it does,
+ * rather than here. Parking during this module's evaluation would take jobs
+ * before the extension's own top-level code had run — before the
+ * `setAccessLevel` an extension calls at startup, in particular — where Chrome
+ * dispatches nothing to a worker until its script has finished evaluating.
+ *
+ * Only the parking may be deferred. Everything above it shadows what the
+ * extension is about to read and has to have run by the time its own script
+ * does, so a later refactor must not pull the wrapping behind this global too.
+ */
+(workerGlobals as unknown as Record<string, () => void>)[RUNTIME_PROXY_RELAY_START_GLOBAL] = () => {
+  relayClient.start();
+};

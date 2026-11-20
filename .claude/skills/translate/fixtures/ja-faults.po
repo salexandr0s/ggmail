@@ -1,0 +1,239 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ja\n"
+
+# fault: banned:uindou
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Open in a new window"
+msgstr "新しいウインドウで開く"
+
+# fault: banned:long-vowel-browser
+#: packages/renderer/routes/settings/general.tsx
+msgid "Open in browser"
+msgstr "ブラウザーで開く"
+
+# A macOS label takes Chrome's spelling too, which is Apple's.
+# fault: banned:long-vowel-folder
+# fault: pinned:show-in-folder
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Open in folder"
+msgstr "フォルダーで開く"
+
+# fault: banned:long-vowel-user
+# fault: pinned:user-agent
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "User agent"
+msgstr "ユーザエージェント"
+
+# fault: banned:long-vowel-manager
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Only one password manager can be on at a time."
+msgstr "一度にオンにできるパスワードマネージャは1つだけです。"
+
+# fault: banned:long-vowel-editor
+#: packages/app/lib/browser-allowlist.ts
+msgid "Open the browser allowlist in an editor with root permissions."
+msgstr "root権限でエディターを使って、許可リストを開いてください。"
+
+# fault: banned:kinou-kakuchou
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "Extensions"
+msgstr "機能拡張"
+
+# fault: banned:anata
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Your accounts"
+msgstr "あなたのアカウント"
+
+# fault: banned:full-width-marks
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove {label}?"
+msgstr "{label}を削除しますか？"
+
+# fault: banned:quotes
+#: packages/renderer/components/search.tsx
+msgid "Search “{query}”"
+msgstr "「{query}」を検索"
+
+# fault: banned:half-width-punctuation
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Couldn't add the account."
+msgstr "アカウントを追加できませんでした."
+
+# fault: banned:apology
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Something went wrong."
+msgstr "申し訳ありません。問題が発生しました。"
+
+# fault: platform-word:Undo
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Undo"
+msgstr "元に戻す"
+
+# fault: access-key:suffix
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Cu&t"
+msgstr "切り取り"
+
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Cmd"
+msgstr "command"
+
+# A Shift without a platform context shows on macOS too, so it is held to macOS's lower case beside command.
+# fault: family:key-names
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Shift"
+msgstr "Shift"
+
+# fault: catalog:plural category unused
+#: packages/renderer/components/app-titlebar.tsx
+msgid "{count, plural, one {# tab} other {# tabs}}"
+msgstr "{count, plural, one {#個のタブ} other {#個のタブ}}"
+
+# fault: banned:latin-spacing
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Add an account to ggmail"
+msgstr "ggmail にアカウントを追加"
+
+# fault: banned:long-vowel-browser
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 1"
+msgstr "ブラウザー"
+
+# fault: banned:long-vowel-folder
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 2"
+msgstr "フォルダー"
+
+# fault: banned:long-vowel-computer
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 3"
+msgstr "コンピューター"
+
+# fault: banned:long-vowel-editor
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 4"
+msgstr "エディター"
+
+# fault: banned:long-vowel-provider
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 5"
+msgstr "プロバイダー"
+
+# fault: banned:long-vowel-printer
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 6"
+msgstr "プリンター"
+
+# fault: banned:long-vowel-viewer
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 7"
+msgstr "ビューアー"
+
+# fault: banned:long-vowel-driver
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 8"
+msgstr "ドライバー"
+
+# fault: banned:long-vowel-parameter
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 9"
+msgstr "パラメーター"
+
+# fault: banned:long-vowel-security
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 10"
+msgstr "セキュリティー"
+
+# fault: banned:long-vowel-category
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 11"
+msgstr "カテゴリー"
+
+# fault: banned:long-vowel-memory
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 12"
+msgstr "メモリー"
+
+# fault: banned:long-vowel-user
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 13"
+msgstr "ユーザ名"
+
+# fault: banned:long-vowel-server
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 14"
+msgstr "サーバ名"
+
+# fault: banned:long-vowel-manager
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 15"
+msgstr "マネージャ名"
+
+# fault: banned:long-vowel-developer
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 16"
+msgstr "デベロッパ名"
+
+# fault: banned:long-vowel-launcher
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 17"
+msgstr "ランチャ名"
+
+# fault: banned:long-vowel-center
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 18"
+msgstr "センタ名"
+
+# fault: banned:long-vowel-reader
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 19"
+msgstr "リーダ名"
+
+# fault: banned:long-vowel-header
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 20"
+msgstr "ヘッダ名"
+
+# fault: banned:long-vowel-footer
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 21"
+msgstr "フッタ名"
+
+# fault: banned:long-vowel-tracker
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 22"
+msgstr "トラッカ名"
+
+# fault: banned:long-vowel-explorer
+#: packages/renderer/routes/settings/general.tsx
+msgid "Long vowel sample 23"
+msgstr "エクスプローラ名"
+
+# fault: banned:interface
+#: packages/renderer/routes/settings/gmail/index.tsx
+msgid "Add your own CSS to personalize the Gmail interface further."
+msgstr "独自のCSSを追加して、Gmailのインターフェースをさらにカスタマイズします。"
+
+# fault: banned:website-latin
+# fault: pinned:website
+#: packages/app/menu.ts
+msgid "Website"
+msgstr "Webサイト"
+
+# fault: banned:em-dash
+#: packages/renderer/components/vertical-tabs.tsx
+msgid "{tabTitle} — opens {appName} links"
+msgstr "{tabTitle}—{appName}のリンクを開きます"
+
+# fault: banned:range-mark
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "to"
+msgstr "～"

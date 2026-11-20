@@ -1,0 +1,75 @@
+/*
+ * Builds the app for the machine it is on, then runs the end-to-end suite
+ * against what it built.
+ *
+ * Unpacked and one architecture: the tests launch the app rather than
+ * installing it, so packing installers would be time spent on output nothing
+ * opens. Building here rather than in CI is what keeps `bun run test:e2e` a
+ * single command on every platform.
+ */
+import { spawn } from "bun";
+import { E2E_FUSE_OVERRIDES } from "./lib/e2e-fuses";
+import { SIGNING_ENV_VARS } from "./signing-env";
+
+const BUILDS = {
+  darwin: { script: "build:mac", args: ["--arm64"] },
+  linux: { script: "build:linux", args: ["--x64"] },
+  win32: { script: "build:win", args: ["--x64", "-c.win.signExecutable=false"] },
+} as const;
+
+const build = BUILDS[process.platform as keyof typeof BUILDS];
+
+if (!build) {
+  throw new Error(
+    `No app build is defined for ${process.platform}. Build the app and point GGMAIL_EXECUTABLE at it.`,
+  );
+}
+
+async function run(command: string[], env: Record<string, string | undefined> = {}) {
+  const { exited } = spawn(command, {
+    stdout: "inherit",
+    stderr: "inherit",
+    env: { ...process.env, ...env },
+  });
+
+  return await exited;
+}
+
+// Skipped when GGMAIL_EXECUTABLE names an app already built, so that a rerun
+// against the same build costs nothing, and when GGMAIL_SKIP_BUILD says one is
+// already in dist. The second exists because the tests resolve that path per
+// platform themselves: naming it again to skip a build would be the same three
+// paths written down in a second place, free to drift from the first.
+if (!process.env.GGMAIL_EXECUTABLE && !process.env.GGMAIL_SKIP_BUILD) {
+  const buildStatus = await run(
+    [
+      "bun",
+      "run",
+      build.script,
+      "--",
+      "--dir",
+      ...build.args,
+      "--publish",
+      "never",
+      // The suite drives a build that differs from a release in these fuses
+      // and in carrying the pseudo-locale, and in nothing else: a config
+      // override merges into the `electronFuses` block rather than replacing it.
+      ...Object.entries(E2E_FUSE_OVERRIDES).map(
+        ([fuse, value]) => `-c.electronFuses.${fuse}=${value}`,
+      ),
+    ],
+    {
+      // Signing and notarising would only slow down an app launched in place,
+      // so the test bundle is built without signing credentials.
+      ...Object.fromEntries(SIGNING_ENV_VARS.mac.map((name) => [name, undefined])),
+      GGMAIL_PSEUDO_LOCALE_CATALOG: "1",
+    },
+  );
+
+  if (buildStatus !== 0) {
+    process.exit(buildStatus);
+  }
+}
+
+// Arguments carry through, so `bun run test:e2e --ui` and friends still work.
+process.exit(await run(["bunx", "playwright", "test", ...Bun.argv.slice(2)]));

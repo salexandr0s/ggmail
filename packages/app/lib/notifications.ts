@@ -1,0 +1,40 @@
+import { ms } from "@ggmail/shared/ms";
+import { timeToMinutes } from "@ggmail/shared/time";
+import type { NotificationTime } from "@ggmail/shared/types";
+
+export function checkWithinNotificationTimes(times: NotificationTime[], now: Date) {
+  if (!times.length) {
+    return true;
+  }
+
+  const current = now.getHours() * 60 + now.getMinutes();
+
+  return times.some(({ start, end, days }) => {
+    const startMinutes = timeToMinutes(start);
+    const endMinutes = timeToMinutes(end);
+
+    const withinTime =
+      endMinutes > startMinutes
+        ? current >= startMinutes && current < endMinutes
+        : current >= startMinutes || current < endMinutes;
+
+    if (!withinTime) {
+      return false;
+    }
+
+    if (!days || days.length === 0) {
+      return true;
+    }
+
+    return days.includes(now.getDay());
+  });
+}
+
+const NEW_EMAIL_SOUND_QUIET_PERIOD = ms("5s");
+
+export function shouldPlayNewEmailSound(now: number, lastNewEmailNotificationAt?: number) {
+  return (
+    lastNewEmailNotificationAt === undefined ||
+    now - lastNewEmailNotificationAt >= NEW_EMAIL_SOUND_QUIET_PERIOD
+  );
+}

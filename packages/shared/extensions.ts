@@ -1,0 +1,416 @@
+/** The class an extension belongs to, which is what the page can speak about. */
+export type CuratedExtensionCategory = "passwordManager";
+
+export type DeclaredContentScript = {
+  js: string[];
+  matches: string[];
+  excludeMatches?: string[];
+  runAt?: "document_start" | "document_end" | "document_idle";
+  allFrames?: boolean;
+  world?: "ISOLATED" | "MAIN";
+  /**
+   * Files the worker may ask `executeScript` for that these scripts already
+   * cover, for an extension choosing between variants of one bundle where the
+   * one declared is the superset of the rest.
+   */
+  standsInFor?: string[];
+};
+
+export type WindowCloseFallbackRejection = {
+  /** The `command` of each message from a content script whose reply may be rewritten. */
+  commands: string[];
+  /** The property set to `true` on the reply's `error` when it asks for the browser's fallback. */
+  fallbackMarker: string;
+  /** What the reply's `error` becomes. */
+  error: { name: string; message: string };
+};
+
+export type CuratedExtension = {
+  /** The Chrome Web Store id, which every package has to be signed for. */
+  id: string;
+  name: string;
+  description: string;
+  category: CuratedExtensionCategory;
+  /**
+   * Match patterns the derive writes over every `content_scripts[].matches` of
+   * the extension, so its content scripts only reach the sites it is offered
+   * for. Absent leaves the manifest's own patterns in place, and the sites the
+   * user adds in settings never start a clamp — they are appended to this one.
+   */
+  contentScriptMatches?: string[];
+  /**
+   * The extension's telemetry, crash-reporting and log-collection endpoints, as
+   * match patterns. Requests to them are canceled in the session the
+   * extension's service worker runs in, which is where an extension of this
+   * size does its reporting from.
+   *
+   * Only what the product does not need: an endpoint the extension depends on
+   * belongs nowhere near this list, since a cancel here is indistinguishable
+   * from the network being down.
+   *
+   * Host-exact, never a wildcard over a domain. 1Password serves certificate
+   * revocation from `crl.1passwordservices.com`, the same second-level domain
+   * as two of the hosts below, so a pattern that widened to the domain would
+   * take a working password manager with it.
+   */
+  telemetryUrls?: string[];
+  /**
+   * Optional permissions `chrome.permissions.request` may grant the extension,
+   * which is the whole of what it can ever hold beyond the required permissions
+   * its manifest declares. A request for anything else is answered the way
+   * Chrome answers a prompt the user declined.
+   *
+   * A grant is an answer rather than a capability: Chromium grants nothing, so
+   * what the permission names still has to work through the facade or not at
+   * all. Only a permission whose feature ggmail already serves belongs here —
+   * one that merely reads as granted sends an extension down a path that then
+   * fails for reasons it cannot see.
+   */
+  grantableOptionalPermissions?: string[];
+  /**
+   * Synthesizes `chrome.storage.onChanged` in the extension's service worker,
+   * in place of the native event, from the writes that pass through
+   * `chrome.storage` there. For an extension whose worker state is fed by that
+   * event and stays stale without it.
+   *
+   * Opt-in because it reads the touched keys before and after every write: an
+   * extension that never listens in its worker pays that for nothing.
+   */
+  synthesizeStorageChanges?: boolean;
+  /**
+   * Whether `chrome.windows.create` opens the extension's own pages in a ggmail
+   * window. Nothing else is ever opened through it, and without this the call
+   * opens nothing at all and answers the way it always has.
+   *
+   * An opt-in because the namespace is a view of a browser ggmail is not: an
+   * extension whose popup entries open detached windows of their own reaches
+   * for one wherever its page cannot do the job, and 1Password's is the
+   * half-working detached popup the popup surface was taken away for. One
+   * belongs here only where the window is the extension's whole way in — a
+   * password manager whose unlock and sign-in surfaces are popouts has no other
+   * — and where its pages have been seen to work in one.
+   */
+  opensExtensionWindows?: boolean;
+  /**
+   * The extension's own page the settings item opens in a window, relative to
+   * the package, for an extension whose sign-in has no other way in. Needs
+   * `opensExtensionWindows`, which is what opens it.
+   */
+  windowPagePath?: string;
+  /**
+   * Delivers `chrome.webNavigation`'s `onBeforeNavigate`, `onCommitted`,
+   * `onDOMContentLoaded` and `onCompleted` to the extension's worker and pages,
+   * synthesized in main from the account pages, where Electron fires none.
+   *
+   * Opt-in because main listens to every account page's loads while one of
+   * those events has a listener, and an extension that never reads them would
+   * pay that for nothing.
+   */
+  deliversNavigationEvents?: boolean;
+  /**
+   * Scripts the extension's worker injects at runtime, with
+   * `chrome.scripting.executeScript` or `registerContentScripts`, declared as
+   * static content scripts of every account session's copy instead. Neither
+   * call reaches an account: the worker runs in another session, where
+   * Chromium knows none of an account's tabs, and nothing can carry a script
+   * file across. Declared, a script is already in the page when the worker
+   * asks, and the worker's `executeScript` for one of these files is answered
+   * as though it had run.
+   *
+   * Each entry is a manifest `content_scripts` entry in the catalog's own
+   * casing, clamped like the extension's own entries. Each costs every matched
+   * frame the script whether the extension would have injected it or not, so
+   * declare only what the extension injects into the sites it is offered for.
+   */
+  declaredContentScripts?: DeclaredContentScript[];
+  /**
+   * Values written into the extension's `chrome.storage.local` for any key it
+   * holds no value for, each time its service worker starts. For a setting an
+   * extension keeps in storage whose default ggmail needs to differ from the
+   * extension's own, without touching its code: a value the user chose is a
+   * value the key holds, so it is never written over.
+   *
+   * The keys and the shape of the values are the extension's private storage
+   * format, which an update can change without notice, so an entry here is
+   * checked against each new version the way its content scripts are.
+   */
+  localStorageDefaults?: Record<string, unknown>;
+  /**
+   * Turns the extension's reply asking for the browser's own WebAuthn into a
+   * rejection, when the user closed a window the extension opened for that
+   * request before it answered. Needs `opensExtensionWindows`.
+   *
+   * Electron's native WebAuthn shows no dialog and answers only after 180
+   * seconds, so a password manager that falls back to it when the user closes
+   * its passkey popout leaves the page waiting three minutes. Every other
+   * fallback reply still reaches the page, since native is the route that
+   * works for a security key or a site the extension leaves alone.
+   *
+   * The command names, the reply's shape and how the page script treats the
+   * error are the extension's private code, which an update can change without
+   * notice, so an entry here is checked against each new version.
+   */
+  rejectFallbackOnWindowClose?: WindowCloseFallbackRejection;
+  /**
+   * Error lines the extension's service worker writes that say nothing an
+   * embedder can act on, as prefixes matched against the start of the message.
+   * The worker's console is forwarded to ggmail's log, and a line named here
+   * goes out at debug instead of error: still there in development, where the
+   * worker's console is the only trace of what the extension is doing, and off
+   * the disk of every shipped install.
+   *
+   * A prefix rather than the whole line, because the tail is the extension's
+   * own detail — a redacted payload, a request id — and differs line to line.
+   *
+   * Only lines that carry no diagnostic: this is the last place a worker's
+   * failure surfaces, so a prefix wider than the one benign line it was
+   * written for takes real errors down to debug with it.
+   */
+  benignWorkerConsoleErrors?: string[];
+};
+
+/** The 1Password Chrome Web Store id, which app and settings both single out. */
+export const ONEPASSWORD_EXTENSION_ID = "aeblfdkhhhdcdjpifhhbdiojplfjncoa";
+
+export const BITWARDEN_EXTENSION_ID = "nngceckbapebfimnlniiiahkandclblb";
+
+/**
+ * The extensions ggmail offers, the only ones it installs. An id outside this
+ * list is refused before anything is downloaded, and the settings page is a
+ * view of it.
+ */
+export const curatedExtensions: CuratedExtension[] = [
+  {
+    id: ONEPASSWORD_EXTENSION_ID,
+    name: "1Password",
+    // ggmail builds for the Google sign-in flows and nothing else, so the copy
+    // names only what works rather than the full extension feature set:
+    // content scripts stop at the two hosts below, `commands`, `contextMenus`
+    // and `notifications` are facade noops, and `tabs.create` is
+    // unimplemented, so a popup entry that opens one of the extension's own
+    // pages — its settings, its full item view — does nothing at all.
+    //
+    // The desktop-app requirement is named because it decides whether any of
+    // this works: the extension fills nothing until it is connected, and a
+    // user who installs without it sees an extension that does nothing rather
+    // than one ggmail limited. How to connect the two is the setup dialog's job,
+    // and the button that opens it sits directly under this text, so the copy
+    // states the requirement and stops there.
+    description:
+      "Fills and generates passwords and passkeys for your Google Account. Needs the 1Password desktop app, connected to ggmail.",
+    category: "passwordManager",
+    // Sign-in runs on accounts.google.com, and account settings — creating a
+    // passkey, changing a password — on myaccount.google.com. Both hosts, not
+    // the settings paths alone: Google reshuffles those and redirects between
+    // them, and a path that falls outside the clamp offers nothing, silently.
+    // A Workspace account behind third-party single sign-on redirects off both
+    // hosts mid-sign-in, which is what the sites the user adds in settings are
+    // for; the app appends them here
+    contentScriptMatches: ["https://accounts.google.com/*", "https://myaccount.google.com/*"],
+    telemetryUrls: [
+      // Observability: every console line the worker writes, forwarded as a
+      // metric over Connect, and log entries carrying account uuids beside them
+      "https://client-log-forwarder.1password.com/*",
+      "https://client-log-forwarder.1password.ca/*",
+      "https://client-log-forwarder.1password.eu/*",
+      // Snowplow product telemetry, and the Snowplow Mini collector the
+      // extension's own policy also allows it to reach
+      "https://telemetry.1passwordservices.com/*",
+      "https://com-1password-prod1.mini.snplow.net/*",
+      // Sentry error reporting, initialized as the worker starts
+      "https://b5x-sentry.1passwordservices.com/*",
+    ],
+    benignWorkerConsoleErrors: [
+      // 1Password re-arms its log-metrics flush every thirty seconds whatever
+      // happened to the last one, so the forwarder above being canceled costs
+      // two error lines a minute in every shipped log. The line reports ggmail's
+      // own decision back to it — nothing to act on, and nothing a user could
+      // do about it — while a worker error that is not this one still matters
+      "[LogManager] Failed to send log metrics",
+      // A subframe asking its top frame for configuration, and a subframe
+      // telling it to drop an inline button. On the inbox the top frame is
+      // outside the content-script clamp so nothing can answer, and on sign-in
+      // pages the top frame's handler may not have loaded yet — 1Password's
+      // own race, which it catches. Both are deterministic, cost nothing, and
+      // name the request they are, so a real relay fault under a different
+      // request name — `<autofill-item>`, which once was one — still surfaces
+      "[Messaging] Exception while handling request <get-nested-frame-configuration>",
+      "[Messaging] Exception while handling request <remove-inline-button>",
+    ],
+  },
+  {
+    id: BITWARDEN_EXTENSION_ID,
+    name: "Bitwarden",
+    // Standalone, unlike 1Password: it signs in to its own server from the
+    // window the settings item opens, so the only outside requirement left to
+    // name is the desktop app biometric unlock talks to
+    description:
+      "Fills and generates passwords and passkeys for your Google Account. Unlocking with biometrics needs the Bitwarden desktop app.",
+    category: "passwordManager",
+    // The same two hosts as 1Password, for the same reasons
+    contentScriptMatches: ["https://accounts.google.com/*", "https://myaccount.google.com/*"],
+    // Its account state reaches its worker only through `storage.onChanged`
+    synthesizeStorageChanges: true,
+    // Sign-in, unlock and passkey confirmation are all popouts of its own pages
+    opensExtensionWindows: true,
+    windowPagePath: "popup/index.html",
+    // Its save and update prompt waits on `onCompleted` when the page after a
+    // login is still loading 1.5 seconds after the submit
+    deliversNavigationEvents: true,
+    // Biometric unlock, through the Bitwarden desktop app's native host
+    grantableOptionalPermissions: ["nativeMessaging"],
+    // What its `runtime.onInstalled` handler sets in Chrome, which never fires
+    // here: the inline menu on field focus, in Bitwarden's own serialized form.
+    // Without it the menu is off, and logged out or locked it is the only way
+    // to the unlock popout from a page
+    localStorageDefaults: {
+      global_autofillSettingsLocal_inlineMenuVisibility: { __json__: true, value: "2" },
+    },
+    // Its worker hears `windows.onRemoved` for a passkey popout the user closed
+    // and answers the request with its `FallbackRequestedError` spread into
+    // the reply. Its page script falls back to native WebAuthn on
+    // `fallbackRequested`, and turns an error named `NotAllowedError` into the
+    // `DOMException` Chrome rejects with when the user dismisses its own
+    // passkey dialog.
+    //
+    // The popout's own buttons, Cancel among them, send a non-fallback abort
+    // and then close it with `window.close()`, which counts as the user's
+    // close: the abort normally answers first and is left alone, and if the
+    // close wins, a rejection is what a cancel should get anyway. Its "Use
+    // your device or hardware key" menu asks for the fallback, and the worker
+    // then closes the popout with `windows.remove`, which keeps the fallback
+    rejectFallbackOnWindowClose: {
+      commands: ["fido2RegisterCredentialRequest", "fido2GetCredentialRequest"],
+      fallbackMarker: "fallbackRequested",
+      error: {
+        name: "NotAllowedError",
+        message: "The operation either timed out or was not allowed.",
+      },
+    },
+    declaredContentScripts: [
+      // What its worker injects into every frame to fill. It picks one of four
+      // bootstrap bundles by the inline-menu and notification settings, and
+      // this one is the superset of the other three. The matches are the
+      // manifest's own, clamped to the hosts above like every entry
+      {
+        js: ["content/bootstrap-autofill-overlay.js", "content/contextMenuHandler.js"],
+        standsInFor: [
+          "content/bootstrap-autofill.js",
+          "content/bootstrap-autofill-overlay-menu.js",
+          "content/bootstrap-autofill-overlay-notifications.js",
+        ],
+        matches: ["*://*/*"],
+        excludeMatches: ["*://*/*.xml*"],
+        runAt: "document_start",
+        allFrames: true,
+      },
+      // What it registers with `registerContentScripts` for passkeys: the
+      // override of the page's own `navigator.credentials`, and the isolated
+      // script it talks to the worker through
+      {
+        js: ["content/fido2-page-script.js"],
+        matches: ["https://*/*"],
+        excludeMatches: ["https://*/*.xml*"],
+        runAt: "document_start",
+        allFrames: true,
+        world: "MAIN",
+      },
+      {
+        js: ["content/fido2-content-script.js"],
+        matches: ["https://*/*"],
+        excludeMatches: ["https://*/*.xml*"],
+        runAt: "document_start",
+        allFrames: true,
+      },
+    ],
+  },
+];
+
+export function isCuratedExtensionId(extensionId: string) {
+  return curatedExtensions.some((curatedExtension) => curatedExtension.id === extensionId);
+}
+
+export function getCuratedExtension(extensionId: string) {
+  return curatedExtensions.find((curatedExtension) => curatedExtension.id === extensionId);
+}
+
+/**
+ * The installed extensions that turning on `extensionId` turns off. Only one
+ * password manager runs at a time: two would each draw an inline menu on the
+ * same field, and both override `navigator.credentials` in the page in an order
+ * Chromium doesn't define.
+ */
+export function getConflictingExtensionIds(extensionId: string, installedExtensionIds: string[]) {
+  if (getCuratedExtension(extensionId)?.category !== "passwordManager") {
+    return [];
+  }
+
+  return installedExtensionIds.filter(
+    (installedExtensionId) =>
+      installedExtensionId !== extensionId &&
+      getCuratedExtension(installedExtensionId)?.category === "passwordManager",
+  );
+}
+
+/**
+ * The password managers to drop when a config lists more than one, which a
+ * version of ggmail without the one-at-a-time rule can leave behind: every one
+ * but the last listed. An install appends its id, so the last listed is the
+ * one the user chose most recently.
+ */
+export function getSkippedPasswordManagerIds(installedExtensionIds: string[]) {
+  const passwordManagerIds = installedExtensionIds.filter(
+    (extensionId) => getCuratedExtension(extensionId)?.category === "passwordManager",
+  );
+
+  const keptExtensionId = passwordManagerIds.at(-1);
+
+  return [...new Set(passwordManagerIds)].filter((extensionId) => extensionId !== keptExtensionId);
+}
+
+/** The pattern a site the user added stands for: every path of it over HTTPS. */
+export function hostnameToMatchPattern(hostname: string) {
+  return `https://${hostname}/*`;
+}
+
+const SCHEME = /^[a-z][a-z0-9+.-]*:\/\//;
+
+const HOSTNAME_LABEL = /^[a-z0-9-]+$/;
+
+/**
+ * The hostname a site the user typed holds, lowercased, or `undefined` when what
+ * they typed carries more than a hostname can: a port, credentials, a wildcard,
+ * a scheme other than HTTPS. A whole URL is taken as well as a bare hostname,
+ * since the address of the sign-in page is what a user has at hand.
+ *
+ * The result reaches a manifest inside a match pattern, and Chromium refuses an
+ * entire manifest over one pattern it can't parse, so only a hostname `URL`
+ * itself produced ever gets stored.
+ */
+export function normalizeExtensionSiteHostname(site: string) {
+  const input = site.trim().toLowerCase();
+
+  if (!input) {
+    return;
+  }
+
+  let url: URL;
+
+  try {
+    url = new URL(SCHEME.test(input) ? input : `https://${input}`);
+  } catch {
+    return;
+  }
+
+  if (url.protocol !== "https:" || url.port || url.username || url.password) {
+    return;
+  }
+
+  const labels = url.hostname.split(".");
+
+  if (labels.length < 2 || !labels.every((label) => HOSTNAME_LABEL.test(label))) {
+    return;
+  }
+
+  return url.hostname;
+}

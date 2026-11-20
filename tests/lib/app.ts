@@ -1,0 +1,891 @@
+/*
+ * The harness every end-to-end test launches through.
+ *
+ * `bun run test:e2e` builds the app before running them, so there is nothing to
+ * do first beyond having a display. On a machine without one, wrap the command:
+ * `xvfb-run -a bun run test:e2e`. The -a matters, because it picks a free
+ * display number rather than colliding on :99 with another run.
+ */
+import { type ChildProcess, execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { cp, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import type { Config } from "@ggmail/shared/types";
+import { expect, test, type TestInfo } from "@playwright/test";
+import { _electron, type ElectronApplication, type Page } from "playwright";
+import { killProcessTree, readProcessTree, waitForProcessesToExit } from "./process-tree";
+import { startTestServer, type TestServer } from "./server";
+import {
+  acquireProfileLock,
+  flushAndCheckSignedIn,
+  isWriteBackArtifact,
+  writeBackSession,
+} from "./signed-in-session";
+
+// Where electron-builder leaves the unpacked app, per platform. macOS and
+// Windows name it after productName, "ggmail"; Linux lowercases it. Getting that
+// case wrong is invisible on a Mac and on Windows, whose filesystems match it
+// either way, and breaks nowhere until someone runs on a case-sensitive one.
+const UNPACKED_PATHS: Record<string, string[]> = {
+  darwin: ["mac-arm64", "ggmail.app", "Contents", "MacOS", "ggmail"],
+  linux: ["linux-unpacked", "ggmail"],
+  win32: ["win-unpacked", "ggmail.exe"],
+};
+
+function resolveExecutablePath() {
+  if (process.env.GGMAIL_EXECUTABLE) {
+    return process.env.GGMAIL_EXECUTABLE;
+  }
+
+  const unpackedPath = UNPACKED_PATHS[process.platform];
+
+  if (!unpackedPath) {
+    throw new Error(
+      `No unpacked app path is known for ${process.platform}. Set GGMAIL_EXECUTABLE to the built app.`,
+    );
+  }
+
+  return path.join(process.cwd(), "dist", ...unpackedPath);
+}
+
+export const EXECUTABLE_PATH = resolveExecutablePath();
+
+const CLOSE_TIMEOUT = 15_000;
+
+const DIAGNOSTICS_TIMEOUT = 10_000;
+
+const SIGNED_IN_CHECK_TIMEOUT = 15_000;
+
+/**
+ * Exported so that a second instance spawned to deliver a deep link is started
+ * exactly as the app under test was — the user data directory above all, since
+ * it is what the single instance lock is scoped to.
+ */
+export function launchArguments(userDataDir: string) {
+  const args = [`--user-data-dir=${userDataDir}`];
+
+  // chrome-sandbox ships without its setuid bit outside an installed package,
+  // so an unpacked Linux build cannot use the sandbox. The packaged apps on the
+  // other platforms can, and are left alone.
+  if (process.platform === "linux") {
+    args.push("--no-sandbox");
+  }
+
+  // Hosted runners have no GPU worth using, and Chromium spends a while finding
+  // that out for itself.
+  if (process.env.CI) {
+    args.push("--disable-gpu");
+  }
+
+  return args;
+}
+
+/**
+ * Every Gmail account and workspace app is a window of its own as far as
+ * Playwright is concerned, so the app's own window has to be picked out by the
+ * page it loaded. `firstWindow()` is not that window — it returns whichever one
+ * appeared first, which is usually an account. Nor does asking whether a page
+ * has a `BrowserWindow` separate them, because `BrowserWindow.fromWebContents`
+ * resolves a `WebContentsView` to the window that owns it.
+ */
+async function findRendererWindow(app: ElectronApplication) {
+  await expect
+    .poll(() => app.windows().some((window) => window.url().includes("main.html")))
+    .toBe(true);
+
+  const renderer = app.windows().find((window) => window.url().includes("main.html")) as Page;
+
+  /*
+   * Waiting for the window's URL only says the page was told to load. React
+   * mounts long after that, and the listeners it registers as it imports are
+   * what receive `navigate` from the main process — a menu command issued
+   * before them is delivered to nobody and simply does not happen.
+   *
+   * The root having children is that moment. It is markup rather than anything
+   * a user would look for, which is the trade: a gate that asserts nothing and
+   * only has to be true on every platform, against a piece of the interface
+   * that might not be drawn on all three.
+   */
+  await expect(renderer.locator("#root > *").first()).toBeAttached();
+
+  return renderer;
+}
+
+export type UseAppOptions = {
+  /**
+   * Extra environment for the launched app, on top of the runner's own rather
+   * than in place of it — the launch needs DISPLAY and friends either way.
+   * What the extension tests use to set the fixture and shared-instance flags.
+   */
+  env?: Record<string, string>;
+  /** Extra command-line arguments for the launched app, after the suite's own. */
+  args?: string[];
+  /**
+   * A user data directory to copy in before the app is launched, so that it
+   * comes up with everything in it — a signed-in Gmail account above all, which
+   * nothing in this suite can produce for itself. `useSignedInApp` is what
+   * sets it, and `signedInProfile` has where the directory comes from.
+   */
+  signedInProfileDir?: string;
+  /**
+   * How long the Gmail stand-in holds an account view's load before answering
+   * it, for a test that needs the gap between a view being attached and its
+   * page arriving.
+   */
+  gmailStandInDelay?: number;
+};
+
+type LaunchedApp = {
+  app: ElectronApplication;
+  /** Kept from the launch, because `app.process()` throws once the app has quit. */
+  mainProcess: ChildProcess;
+  /** Unset until the app has shown its window, which it may never do. */
+  renderer: Page | undefined;
+  userDataDir: string;
+  /** Set for a launch on a copy of the signed-in profile, which holds its lock. */
+  releaseProfile?: () => Promise<void>;
+};
+
+/** Resolves true when the work finishes in time, false when it runs over. */
+export async function withTimeout(work: Promise<unknown>, timeout: number) {
+  let timer: NodeJS.Timeout | undefined;
+
+  try {
+    return await Promise.race([
+      work.then(() => true),
+      new Promise<boolean>((resolve) => {
+        timer = setTimeout(() => resolve(false), timeout);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * What a test seeds the config with. A function, when what it seeds has to
+ * depend on the directory the app is about to run in — a download location
+ * inside it, say — which is made per test and so is not there to be named
+ * while the file is being read.
+ */
+export type SeedConfig =
+  | Partial<Config>
+  | ((context: { userDataDir: string }) => Partial<Config> | Promise<Partial<Config>>);
+
+async function readProfileConfigFile(configPath: string) {
+  const contents = await readFile(configPath, "utf8").catch(() => undefined);
+
+  return contents === undefined ? undefined : (JSON.parse(contents) as Partial<Config>);
+}
+
+/*
+ * Drops the two kinds of state a copied profile must not bring with it.
+ *
+ * Service worker registrations never run again once copied: the Gmail view
+ * hangs on its first navigation for thirty seconds and then fails with
+ * ERR_FAILED, every time and whichever tool made the copy. Losing them costs
+ * nothing, because Gmail registers its worker again on the page that follows,
+ * and the view then loads the way it does on a profile nobody copied.
+ *
+ * The `Singleton*` entries are the single instance lock, left behind on Linux by
+ * an app that is still running or that crashed — copied along, they point the
+ * launch at the pid that holds them, and it hands over its argv and exits as a
+ * second instance rather than coming up as the app under test.
+ */
+async function dropRuntimeState(userDataDir: string) {
+  const partitionsDir = path.join(userDataDir, "Partitions");
+
+  const partitions = await readdir(partitionsDir).catch(() => []);
+
+  const entries = await readdir(userDataDir).catch(() => []);
+
+  await Promise.all([
+    ...[userDataDir, ...partitions.map((partition) => path.join(partitionsDir, partition))].map(
+      (directory) => rm(path.join(directory, "Service Worker"), { recursive: true, force: true }),
+    ),
+    ...entries
+      .filter((entry) => entry.startsWith("Singleton"))
+      .map((entry) => rm(path.join(userDataDir, entry), { recursive: true, force: true })),
+  ]);
+}
+
+/**
+ * Copies a signed-in profile into the directory the app is about to run on, and
+ * hands back the config that came with it.
+ *
+ * Copied rather than run on where it lies, so that a test is still a fresh app
+ * on a directory of its own — one it may write to and one the teardown may
+ * delete — and the single directory somebody signed in by hand is never the
+ * thing a test mutates.
+ *
+ * Both config file names are read back because `is.dev` picks between them: a
+ * profile made by `bun run dev --profile` holds `config.dev.json` and one made
+ * by a built app holds `config.json`. Everything else about the two layouts is
+ * the same, sessions included, which is what makes either reusable here.
+ */
+async function copySignedInProfile(profileDir: string, userDataDir: string) {
+  await cp(profileDir, userDataDir, {
+    recursive: true,
+    filter: (source) => !isWriteBackArtifact(source),
+  });
+
+  await dropRuntimeState(userDataDir);
+
+  const profileConfig =
+    (await readProfileConfigFile(path.join(userDataDir, "config.json"))) ??
+    (await readProfileConfigFile(path.join(userDataDir, "config.dev.json")));
+
+  if (!profileConfig) {
+    throw new Error(
+      `${profileDir} holds neither config.json nor config.dev.json, so it is not a ggmail user data directory.`,
+    );
+  }
+
+  return profileConfig;
+}
+
+async function launchApp(seedConfig: SeedConfig, options: UseAppOptions): Promise<LaunchedApp> {
+  if (!options.signedInProfileDir) {
+    return launchOnFreshUserDataDir(seedConfig, options);
+  }
+
+  const releaseProfile = await acquireProfileLock(options.signedInProfileDir);
+
+  try {
+    return { ...(await launchOnFreshUserDataDir(seedConfig, options)), releaseProfile };
+  } catch (error) {
+    await releaseProfile();
+
+    throw error;
+  }
+}
+
+async function launchOnFreshUserDataDir(
+  seedConfig: SeedConfig,
+  options: UseAppOptions,
+): Promise<LaunchedApp> {
+  /*
+   * A user data directory of its own, for two reasons. The app takes a single
+   * instance lock scoped to that directory and quits when it loses, so runs
+   * sharing one cannot overlap — and several agents do work on this repository
+   * at once. It is also where the config lives, so a fresh directory is what
+   * makes a local run start from the same empty config CI gets.
+   */
+  const userDataDir = await mkdtemp(path.join(tmpdir(), "ggmail-e2e-"));
+
+  /*
+   * Resolved here rather than where the file is read, so a seed can name the
+   * directory the app is about to run in.
+   *
+   * A copy or a seed that throws takes the directory with it. Nothing has been
+   * assigned to `launched` yet, so `afterEach` would throw "The app has not been
+   * launched yet" over the top of the real error and leave the directory behind
+   * on every test in the file.
+   */
+  let profileConfig: Partial<Config> = {};
+
+  let seededConfig: Partial<Config>;
+
+  try {
+    if (options.signedInProfileDir) {
+      profileConfig = await copySignedInProfile(options.signedInProfileDir, userDataDir);
+    }
+
+    seededConfig =
+      typeof seedConfig === "function" ? await seedConfig({ userDataDir }) : seedConfig;
+  } catch (error) {
+    await rm(userDataDir, { recursive: true, force: true });
+
+    throw error;
+  }
+
+  await writeFile(
+    path.join(userDataDir, "config.json"),
+    JSON.stringify({ ...profileConfig, "app.language": "en", ...seededConfig }, null, "\t"),
+  );
+
+  return launchOnUserDataDir(userDataDir, options);
+}
+
+/**
+ * Launches the app on a user data directory that is already there, with the
+ * config in it left exactly as it stands — the first launch's seed, plus
+ * whatever the app itself has written since. It is what a restart is, and the
+ * only way to prove that state outliving a launch does: an extension permission
+ * grant, say, which is the main process's rather than the config's.
+ */
+async function launchOnUserDataDir(
+  userDataDir: string,
+  options: UseAppOptions,
+): Promise<LaunchedApp> {
+  // The built binary, not `electron .`: only a packaged app has isPackaged
+  // true, which is what sends loadRenderer down its production `file://`
+  // branch. Running the app the way it ships is the point.
+  const app = await _electron.launch({
+    executablePath: EXECUTABLE_PATH,
+    args: [...launchArguments(userDataDir), ...(options.args ?? [])],
+    cwd: process.cwd(),
+    // Other sessions share this machine's desktop, and a test has no use for
+    // its foreground.
+    env: {
+      ...(process.env as Record<string, string>),
+      GGMAIL_TEST_BACKGROUND: "1",
+      ...options.env,
+    },
+  });
+
+  /*
+   * Started by hand rather than through the `trace` option, which only covers
+   * contexts the runner creates itself, and this one is launched here.
+   */
+  await app.context().tracing.start({ screenshots: true, snapshots: true, sources: true });
+
+  return { app, mainProcess: app.process(), renderer: undefined, userDataDir };
+}
+
+function hasExited(mainProcess: ChildProcess) {
+  return mainProcess.exitCode !== null || mainProcess.signalCode !== null;
+}
+
+/*
+ * A Google page's query or fragment can carry the signed-in address, as a
+ * sign-in page's does, and diagnostics end up in public CI logs.
+ */
+export function redactGoogleUrl(url: string) {
+  try {
+    const { hostname, origin, pathname } = new URL(url);
+
+    return hostname === "google.com" || hostname.endsWith(".google.com")
+      ? `${origin}${pathname}`
+      : url;
+  } catch {
+    return url;
+  }
+}
+
+async function attachDiagnostics({ app, renderer }: LaunchedApp, testInfo: TestInfo) {
+  /*
+   * The renderer's own HTML. Gmail and workspace apps are separate views
+   * painted above it by the compositor, so they come out as blank rectangles
+   * here — that is the protocol, not a broken app.
+   *
+   * There may be no renderer at all: an app that came up and never showed a
+   * window is one of the failures worth reporting on, not a reason to report
+   * nothing.
+   */
+  if (renderer) {
+    await testInfo.attach("renderer", {
+      body: await renderer.screenshot(),
+      contentType: "image/png",
+    });
+  }
+
+  const windowUrls = app.windows().map((window) => redactGoogleUrl(window.url()));
+
+  await testInfo.attach("windows", {
+    body: windowUrls.join("\n"),
+    contentType: "text/plain",
+  });
+
+  // Also to stdout, not only the attachments: a job that is killed for running
+  // long never uploads its artifacts, and that is exactly the run whose state
+  // is worth seeing.
+  console.log(`[e2e] windows: ${JSON.stringify(windowUrls)}`);
+
+  const mainProcessWindows = await app
+    .evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows().map((window) => ({
+        title: window.getTitle(),
+        url: window.webContents.getURL(),
+        isVisible: window.isVisible(),
+        isLoading: window.webContents.isLoading(),
+        crashed: window.webContents.isCrashed(),
+      })),
+    )
+    .then((windows) => windows.map((window) => ({ ...window, url: redactGoogleUrl(window.url) })))
+    .catch((error: Error) => `unreachable: ${error.message}`);
+
+  console.log(`[e2e] main process: ${JSON.stringify(mainProcessWindows)}`);
+}
+
+/**
+ * Capped, because the main process can stop answering while staying up, and
+ * `evaluate` then never returns. Spending a hook's whole budget waiting costs
+ * the trace and the teardown that come after it, which is more than the
+ * diagnostics are worth.
+ */
+async function collectDiagnostics(launched: LaunchedApp, testInfo: TestInfo) {
+  const attached = await withTimeout(
+    attachDiagnostics(launched, testInfo),
+    DIAGNOSTICS_TIMEOUT,
+  ).catch((error: Error) => {
+    console.log(`[e2e] could not collect diagnostics: ${error.message}`);
+
+    return true;
+  });
+
+  if (!attached) {
+    console.log(`[e2e] diagnostics did not finish within ${DIAGNOSTICS_TIMEOUT}ms`);
+  }
+}
+
+/**
+ * Quitting can hang, and Playwright's own close() takes no timeout until after
+ * 1.62, so the app gets killed rather than left to stall the worker for its
+ * whole teardown budget.
+ *
+ * Resolves only once every process the app was made of has exited, killed or
+ * not, because the user data directory is deleted next and Windows will not
+ * delete a file one of them still has open. Resolves true when the app quit by
+ * itself with exit code 0, which is what says Chromium wrote out its stores,
+ * also for an app the test already quit.
+ */
+async function closeApp({ app, mainProcess }: LaunchedApp) {
+  if (hasExited(mainProcess)) {
+    return mainProcess.exitCode === 0;
+  }
+
+  const tree = await readProcessTree(mainProcess.pid as number);
+
+  const closed = await withTimeout(app.close(), CLOSE_TIMEOUT).catch(() => false);
+
+  if (!closed) {
+    console.log(`[e2e] the app did not quit within ${CLOSE_TIMEOUT}ms; killing it`);
+
+    tree.push(...(await killProcessTree(tree)));
+  }
+
+  await waitForProcessesToExit(tree);
+
+  return closed && mainProcess.exitCode === 0;
+}
+
+/*
+ * Logged rather than thrown, because a session that could not be written back
+ * leaves the profile as it was before the run, which the next run can still
+ * use. The test that needs it signed in is what fails when it is not.
+ */
+async function reportWriteBack(
+  profileDir: string,
+  userDataDir: string,
+  { isSignedIn, quitCleanly }: { isSignedIn: boolean; quitCleanly: boolean },
+) {
+  if (!isSignedIn || !quitCleanly) {
+    console.log(
+      `[e2e] signed-in profile left as it was: ${isSignedIn ? "the app did not quit cleanly" : "the run was not signed in to Gmail at quit"}`,
+    );
+
+    return;
+  }
+
+  try {
+    const { written, skipped } = await writeBackSession(profileDir, userDataDir);
+
+    console.log(
+      `[e2e] signed-in profile: wrote back ${written.length} rotated session(s)${skipped.length ? `; left ${skipped.join("; ")}` : ""}`,
+    );
+  } catch (error) {
+    console.log(`[e2e] signed-in profile left as it was: ${(error as Error).message}`);
+  }
+}
+
+export type GgmailApp = {
+  readonly app: ElectronApplication;
+  readonly renderer: Page;
+  readonly userDataDir: string;
+  /**
+   * Runs a menu command the way the menu bar would, and reports whether it was
+   * there. Found by its label, or by its accelerator, which is the same in
+   * every interface language.
+   */
+  runMenuCommand(command: string | { accelerator: string }): Promise<boolean>;
+  /**
+   * Quits through the menu, and resolves with the main process's exit code, or
+   * null when it has not exited within the close timeout.
+   *
+   * What makes a quit assertable at all: teardown kills an app that does not
+   * quit, so a hang would otherwise pass.
+   */
+  quit(): Promise<number | null>;
+  /**
+   * Quits the app, unless `quit()` already has, and starts it again on the same
+   * user data directory, which is the only shape a restart can take: the single
+   * instance lock is scoped to that directory, so the second launch has to wait
+   * for the first to be gone.
+   *
+   * Everything the test held from before — a window, a `WebContents` id —
+   * belongs to the app that quit, so a test asks the new one for its own.
+   */
+  relaunch(): Promise<void>;
+  /**
+   * Opens settings through the menu, and hands back the page of the window it
+   * opens in. `renderer` stays the main window's.
+   */
+  openSettings(): Promise<Page>;
+  /** Closes the settings window, and waits for it to be gone. */
+  closeSettings(): Promise<void>;
+  /** The config as it stands on disk, which is where the main process wrote it. */
+  readConfig(): Promise<Partial<Config>>;
+  /**
+   * The server standing in for Gmail, which this app's account views load
+   * instead of it. Throws for a launch on a signed-in profile, which loads the
+   * real thing — there is nothing else a signed-in account could be signed in
+   * to.
+   */
+  readonly gmailStandIn: TestServer;
+};
+
+/**
+ * Launches the app for every test in the file that calls this, and hands each
+ * one a window of its own.
+ *
+ * One app per test rather than per file, because Playwright asks that "each test
+ * should be completely isolated from another test and should run independently
+ * with its own local storage, session storage, data, cookies etc." A shared app
+ * gave that up for about a second a test: a test that wrote to the config left
+ * it written for everything after it, and a retry — which Playwright runs in a
+ * fresh worker — saw a freshly seeded app where the first attempt had seen a
+ * mutated one. Two runs of the same test that disagree about the state they
+ * started from is the thing the rule exists to prevent, and it is worth more
+ * than the ten seconds it costs across this suite.
+ */
+export function useApp(seedConfig: SeedConfig = {}, options: UseAppOptions = {}): GgmailApp {
+  let launched: LaunchedApp | undefined;
+
+  let hasFailed = false;
+
+  function current() {
+    if (!launched) {
+      throw new Error("The app has not been launched yet");
+    }
+
+    return launched;
+  }
+
+  let gmailStandIn: TestServer | undefined;
+
+  /*
+   * One stand-in server for the whole file, started before the first launch in
+   * it. Nothing about it is per test: it serves the same two pages whoever
+   * asks, and the app is handed its address rather than sharing any state with
+   * it, so the isolation one app per test buys is untouched.
+   *
+   * Not for a signed-in profile, whose accounts are signed in to Gmail itself
+   * and would come up signed out against anything else.
+   */
+  if (!options.signedInProfileDir) {
+    test.beforeAll(async () => {
+      gmailStandIn = await startTestServer();
+    });
+
+    test.afterAll(async () => {
+      await gmailStandIn?.close();
+
+      gmailStandIn = undefined;
+    });
+  }
+
+  /*
+   * The caller's own environment wins, so a test that wants an account view
+   * somewhere else — or at Gmail — can still say so.
+   */
+  function launchOptions(): UseAppOptions {
+    if (!gmailStandIn) {
+      return options;
+    }
+
+    const gmailUrl = options.gmailStandInDelay
+      ? gmailStandIn.slowGmailUrl(options.gmailStandInDelay)
+      : gmailStandIn.gmailUrl;
+
+    return {
+      ...options,
+      env: { GGMAIL_TEST_GMAIL_URL: gmailUrl, ...options.env },
+    };
+  }
+
+  // Playwright resolves which fixtures to set up from the destructuring
+  // pattern, so the empty one is the framework's contract for depending on
+  // nothing.
+  // oxlint-disable-next-line no-empty-pattern
+  test.beforeEach(async ({}, testInfo) => {
+    hasFailed = false;
+
+    launched = await launchApp(seedConfig, launchOptions());
+
+    try {
+      launched.renderer = await findRendererWindow(launched.app);
+    } catch (error) {
+      hasFailed = true;
+
+      await collectDiagnostics(current(), testInfo);
+
+      throw error;
+    }
+  });
+
+  // oxlint-disable-next-line no-empty-pattern
+  test.afterEach(async ({}, testInfo) => {
+    if (testInfo.status !== testInfo.expectedStatus) {
+      hasFailed = true;
+
+      await collectDiagnostics(current(), testInfo);
+    }
+
+    const { app, mainProcess, userDataDir, releaseProfile } = current();
+
+    try {
+      // An app the test quit has nothing left to trace or close.
+      if (hasExited(mainProcess)) {
+        return;
+      }
+
+      // Written only when the test failed; a passing run has nothing worth
+      // uploading.
+      if (hasFailed) {
+        const tracePath = testInfo.outputPath("trace.zip");
+
+        await app.context().tracing.stop({ path: tracePath });
+
+        await testInfo.attach("trace", { path: tracePath, contentType: "application/zip" });
+      } else {
+        await app.context().tracing.stop();
+      }
+    } finally {
+      // Whatever the trace did. A test fails because the app is in a bad way,
+      // which is exactly when stopping the trace throws — and leaving the app
+      // running would take the next test's launch down with it through the
+      // single instance lock.
+      if (!hasExited(mainProcess)) {
+        const { signedInProfileDir } = options;
+
+        let isSignedIn = false;
+
+        if (signedInProfileDir) {
+          await withTimeout(
+            flushAndCheckSignedIn(app).then((result) => {
+              isSignedIn = result;
+            }),
+            SIGNED_IN_CHECK_TIMEOUT,
+          ).catch(() => false);
+        }
+
+        const quitCleanly = await closeApp(current());
+
+        if (signedInProfileDir) {
+          await reportWriteBack(signedInProfileDir, userDataDir, { isSignedIn, quitCleanly });
+        }
+      }
+
+      await rm(userDataDir, { recursive: true, force: true });
+
+      // Not reached when the app could not be stopped, which is when releasing
+      // would let another run start beside it. The lock then breaks once this
+      // worker exits.
+      await releaseProfile?.();
+
+      launched = undefined;
+    }
+  });
+
+  function currentRenderer() {
+    const { renderer } = current();
+
+    if (!renderer) {
+      throw new Error("The app has not shown its window");
+    }
+
+    return renderer;
+  }
+
+  return {
+    get app() {
+      return current().app;
+    },
+    get renderer() {
+      return currentRenderer();
+    },
+    get userDataDir() {
+      return current().userDataDir;
+    },
+    get gmailStandIn() {
+      if (!gmailStandIn) {
+        throw new Error("This app's account views load Gmail itself, so there is no stand-in");
+      }
+
+      return gmailStandIn;
+    },
+    async relaunch() {
+      const previous = current();
+
+      // The trace of the launch that is going away is dropped rather than kept
+      // beside the next one's: `afterEach` writes one trace, and the app a
+      // failure is read off is the one still running
+      await previous.app
+        .context()
+        .tracing.stop()
+        .catch(() => undefined);
+
+      await closeApp(previous);
+
+      launched = {
+        ...(await launchOnUserDataDir(previous.userDataDir, launchOptions())),
+        releaseProfile: previous.releaseProfile,
+      };
+
+      try {
+        launched.renderer = await findRendererWindow(launched.app);
+      } catch (error) {
+        hasFailed = true;
+
+        throw error;
+      }
+    },
+    runMenuCommand(command) {
+      return current().app.evaluate(({ Menu }, wanted) => {
+        const find = (menuItems: Electron.MenuItem[]): Electron.MenuItem | undefined => {
+          for (const menuItem of menuItems) {
+            if (
+              typeof wanted === "string"
+                ? menuItem.label === wanted
+                : menuItem.accelerator === wanted.accelerator
+            ) {
+              return menuItem;
+            }
+
+            const found = menuItem.submenu ? find(menuItem.submenu.items) : undefined;
+
+            if (found) {
+              return found;
+            }
+          }
+
+          return undefined;
+        };
+
+        const menuItem = find(Menu.getApplicationMenu()?.items ?? []);
+
+        /*
+         * Clicked on the next tick rather than here. A command that navigates
+         * rebuilds the application menu as it goes, and the item this call is
+         * standing in — along with the reply it owes the test — goes with the
+         * menu it belonged to, which reaches the runner as a collected promise.
+         * Letting the reply leave first sidesteps that entirely.
+         */
+        if (menuItem) {
+          setImmediate(() => {
+            menuItem.click();
+          });
+        }
+
+        return Boolean(menuItem);
+      }, command);
+    },
+    async quit() {
+      const { mainProcess } = current();
+
+      const exited = new Promise((resolve) => {
+        mainProcess.once("exit", resolve);
+      });
+
+      expect(await this.runMenuCommand("Quit ggmail")).toBe(true);
+
+      return (await withTimeout(exited, CLOSE_TIMEOUT)) ? mainProcess.exitCode : null;
+    },
+    async openSettings() {
+      // The menu bar is the way in, and the only one the app offers. Setting the
+      // fragment by hand would reach the same page while proving nothing about
+      // whether anyone could get there.
+      // By accelerator, so a launch in any interface language finds it.
+      expect(await this.runMenuCommand({ accelerator: "CommandOrControl+," })).toBe(true);
+
+      const { app } = current();
+
+      const isSettingsPage = (page: Page) => page.url().includes("settings.html");
+
+      await expect.poll(() => app.windows().some(isSettingsPage)).toBe(true);
+
+      const settings = app.windows().find(isSettingsPage) as Page;
+
+      // Waiting for the sidebar is also what proves the command arrived.
+      await expect(settings.getByTestId("settings-nav")).toBeVisible();
+
+      return settings;
+    },
+    async closeSettings() {
+      const { app } = current();
+
+      const readSettingsWindowCount = () =>
+        app.evaluate(
+          ({ BrowserWindow }) =>
+            BrowserWindow.getAllWindows()
+              .filter((window) => !window.webContents.isDestroyed())
+              .filter((window) => window.webContents.getURL().includes("settings.html")).length,
+        );
+
+      await app.evaluate(({ BrowserWindow }) => {
+        for (const window of BrowserWindow.getAllWindows().filter(
+          (window) => !window.webContents.isDestroyed(),
+        )) {
+          if (window.webContents.getURL().includes("settings.html")) {
+            window.close();
+          }
+        }
+      });
+
+      await expect.poll(readSettingsWindowCount).toBe(0);
+    },
+    async readConfig() {
+      const configPath = path.join(current().userDataDir, "config.json");
+
+      /*
+       * Retried once. The config is written by replacing the file, so a read
+       * landing between the two halves of that rename fails rather than
+       * returning half a file — and on Windows it fails as a sharing violation.
+       * A throw here would end a poll rather than let it come round again.
+       */
+      try {
+        return JSON.parse(await readFile(configPath, "utf8"));
+      } catch {
+        return JSON.parse(await readFile(configPath, "utf8"));
+      }
+    },
+  };
+}
+
+export function signedInProfile() {
+  const directory =
+    process.env.GGMAIL_TEST_PROFILE_DIR ??
+    path.join(
+      execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], {
+        encoding: "utf8",
+      }).trim(),
+      "../.ggmail/e2e-signed-in",
+    );
+
+  const email = process.env.GGMAIL_TEST_ACCOUNT_EMAIL;
+
+  return directory && email && existsSync(directory) ? { directory, email } : undefined;
+}
+
+/**
+ * Launches Pro on a copy of the signed-in profile, and is `useApp` in every
+ * other way.
+ *
+ * The accounts come from that profile rather than from a seed, which is why the
+ * seed here cannot name them: an account's session is partitioned on its id, so
+ * an account invented by a test would come up signed out beside the one that
+ * actually signed in. Everything else seeds as it always does.
+ *
+ * With no profile named this is a plain Pro launch on an empty directory. The
+ * tests that need one skip at file scope, which is what keeps that case from
+ * arising — and an ordinary app is a better thing to leave behind than a throw
+ * from module scope on every machine that has no profile.
+ */
+export function useSignedInApp(
+  seedConfig: Partial<Omit<Config, "accounts">> = {},
+  options: UseAppOptions = {},
+): GgmailApp {
+  return useApp(seedConfig, { ...options, signedInProfileDir: signedInProfile()?.directory });
+}
