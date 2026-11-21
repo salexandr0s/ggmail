@@ -62,13 +62,14 @@ test("evicts the least recently used thumbnails at the mailbox byte limit", asyn
   const cache = new AttachmentThumbnails();
   const { signal } = new AbortController();
   const read = mock(async () => ({ bytes: new ArrayBuffer(1024 * 1024), mime: "image/png" }));
-  const entries = Array.from({ length: 9 }, (_, index) => savedEntry("msg-a:r" + index));
-  const [first, second, ...rest] = entries;
-  if (!first || !second) {throw new Error("Missing test entries");}
+  const first = savedEntry("msg-a:r0");
+  const second = savedEntry("msg-a:r1");
   await cache.get(first, signal, read);
   await cache.get(second, signal, read);
   await cache.get(first, signal, read);
-  for (const entry of rest) {await cache.get(entry, signal, read);}
+  for (let index = 2; index < 9; index++) {
+    await cache.get(savedEntry("msg-a:r" + index), signal, read);
+  }
   await cache.get(first, signal, read);
   expect(read).toHaveBeenCalledTimes(9);
   await cache.get(second, signal, read);
