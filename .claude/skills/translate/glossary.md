@@ -10,7 +10,6 @@ Every word here follows the source order in `.claude/skills/translate/source-ord
 
 ## Terms that stay English
 
-
 ## Settings
 
 The window and ggmail's own copy, also the Settings section of the language's style sheet. The app-menu item has a platform `msgctxt`: on macOS it is AppKit's word with AppKit's ellipsis, named below, and on Windows and Linux the platform's word with the English's ellipsis, from the style sheet.
@@ -179,6 +178,7 @@ The one tab per app that every link to that app opens in. The badge setting read
 The badge that marks it, in _Show app links badge_. It marks a tab rather than counting, so the word for a badge under [Unread badge](#unread-badge) holds only where it names a badge of either kind, and every language has a line of its own.
 
 - de: Kennzeichen (_Kennzeichen für App-Links anzeigen_), the unread badge's word
+- el: σήμα (_Εμφάνιση σήματος συνδέσμων εφαρμογής_)
 - fr: pastille (_Afficher la pastille de l’onglet des liens d’appli_), the unread badge's word, never _indicateur_
 - it: badge (_Mostra il badge della scheda dei link dell’app_), the unread badge's word
 - es: insignia (_Mostrar insignia de enlaces de la aplicación_), the unread badge's word
@@ -971,7 +971,6 @@ A reply or forward opened in a window of its own. Gmail Help calls it a new wind
 - ja: 新しいウィンドウ; _新しいウィンドウで返信_ (Gmail)
 
 ### View entire message, Upgrade
-
 
 - de: Vollständige Nachricht ansehen; Upgraden (Gmail)
 - fr: Afficher l’intégralité du message; Mettre à niveau (Gmail)

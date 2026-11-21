@@ -31,11 +31,12 @@ import {
   SquareIcon,
   TextIcon,
 } from "lucide-react";
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Answer } from "./answer";
 import { AssistantActivity } from "./assistant-activity";
 import { AssistantReply, DraftCard } from "./assistant-reply";
 import { ModelLogo } from "./model-logo";
+import { SourcePreview } from "./source-preview";
 
 type PromptOrigin = "starter" | "written";
 type Preview = {
@@ -82,6 +83,11 @@ export function AssistantConversation({
   onInserted: () => void;
 }) {
   const { t } = useLingui();
+  const [source, setSource] = useState<{
+    citation: Reply["citations"][number];
+    citations: Reply["citations"];
+    occurrence: number;
+  } | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [prompt, setPrompt] = useState("");
   const [composerOrigin, setComposerOrigin] = useState<PromptOrigin>("written");
@@ -92,6 +98,27 @@ export function AssistantConversation({
   const latestPreview = useRef<Preview>({ text: "" });
   const composer = useRef<HTMLTextAreaElement>(null);
   const transcript = useRef<HTMLDivElement>(null);
+  // Markdown can recreate inline citation buttons. Resolve the same occurrence after Back.
+  const citationButtons = useCallback(
+    (id: string) =>
+      Array.from(
+        transcript.current?.querySelectorAll<HTMLButtonElement>(
+          // oxlint-disable-next-line lingui/no-unlocalized-strings -- DOM selector for the citation trigger.
+          `button[data-source-id="${CSS.escape(id)}"]`,
+        ) ?? [],
+      ),
+    [],
+  );
+  const showSource = useCallback(
+    (
+      citation: Reply["citations"][number],
+      citations: Reply["citations"],
+      trigger: HTMLButtonElement,
+    ) => {
+      setSource({ citation, citations, occurrence: citationButtons(citation.id).indexOf(trigger) });
+    },
+    [citationButtons],
+  );
   const latestTurn = useRef<HTMLDivElement>(null);
   const scrollMode = useRef<"start" | "end" | "reading">("start");
   const lastScrollTop = useRef(0);
@@ -276,7 +303,21 @@ export function AssistantConversation({
 
   return (
     <>
-      <div className="relative min-h-0 flex-1">
+      {source && (
+        <SourcePreview
+          initial={source.citation}
+          citations={source.citations}
+          onBack={() => {
+            setSource(null);
+            requestAnimationFrame(() =>
+              (citationButtons(source.citation.id)[source.occurrence] ?? composer.current)?.focus({
+                preventScroll: true,
+              }),
+            );
+          }}
+        />
+      )}
+      <div hidden={!!source} className="relative min-h-0 flex-1">
         <div
           ref={transcript}
           className="h-full overflow-y-auto overscroll-contain px-5 [overflow-anchor:none]"
@@ -355,6 +396,7 @@ export function AssistantConversation({
                       reply={entry.reply}
                       contextKey={contextKey}
                       inThread={scope === "thread"}
+                      onSource={showSource}
                       onInserted={onInserted}
                     />
                   )}
@@ -424,6 +466,7 @@ export function AssistantConversation({
         )}
       </div>
       <form
+        hidden={!!source}
         onSubmit={(event) => {
           event.preventDefault();
           submit();

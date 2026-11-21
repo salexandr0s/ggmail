@@ -842,6 +842,7 @@ test("the inbox assistant searches later result pages and reads a deadline from 
     throw new Error("Gmail inbox unavailable");
   }
   const printRequests: string[] = [];
+  let previewBody = "";
   const deadline = "27 November at 16:30";
   const workDeadline = "30 November at 09:15";
   const subject = "Workshop approval";
@@ -853,7 +854,10 @@ test("the inbox assistant searches later result pages and reads a deadline from 
         return;
       }
       return [
-        ["Mira", "Please approve the layout by " + (work ? workDeadline : deadline) + "."],
+        [
+          "Mira &lt;mira@studio.example&gt;",
+          "Please approve the layout by " + (work ? workDeadline : deadline) + "." + previewBody,
+        ],
         ["Sam", "Thanks for the update."],
       ]
         .map(
@@ -955,7 +959,8 @@ test("the inbox assistant searches later result pages and reads a deadline from 
               arguments: JSON.stringify(args),
             };
           };
-          const context = JSON.parse(input[0].content).mail;
+          const turn = input.findLast((entry: { role: string }) => entry.role === "user");
+          const context = JSON.parse(turn.content).mail;
           const last = input.at(-1);
           const work = context.accounts.find(
             (account: { label: string }) => account.label === "Work",
@@ -971,7 +976,19 @@ test("the inbox assistant searches later result pages and reads a deadline from 
               callId,
             );
           let item;
-          if (last.type !== "function_call_output") {
+          if (
+            String(last.content).includes("Did anyone change that date?") &&
+            input.some(
+              (entry: { role: string; content: string }) =>
+                entry.role === "assistant" && entry.content.includes(workDeadline),
+            )
+          ) {
+            item = {
+              type: "message",
+              role: "assistant",
+              content: [{ type: "output_text", text: "The original dates still apply." }],
+            };
+          } else if (last.type !== "function_call_output") {
             item = search(context.selectedAccountId, 1, "page1");
           } else {
             const result = JSON.parse(last.output);
@@ -1041,14 +1058,74 @@ test("the inbox assistant searches later result pages and reads a deadline from 
       "When do I need to approve the workshop layouts in my personal and work mailboxes?",
     );
     await composer.press("Enter");
-    const answer = panel.locator(".assistant-answer");
+    const answer = panel.locator(".assistant-answer").first();
     await expect(answer).toContainText(deadline, { timeout: 25_000 });
     await expect(answer).toContainText(workDeadline);
     const citations = answer.getByRole("button", { name: /Workshop approval/ });
     await expect(citations).toHaveCount(2);
     expect(printRequests).toEqual(["personal/" + threadId, "work/" + threadId]);
     await expect(inbox).toHaveURL(server.gmailUrl + "#inbox");
+    const followUp = "Did anyone change that date?";
+    await composer.fill(followUp);
+    previewBody = " Details.".repeat(2200) + " End of original source.";
     await citations.last().click();
+    const preview = panel.getByRole("region", { name: "Email source" });
+    await expect(preview).toContainText(workDeadline);
+    await expect(preview.getByRole("heading", { name: "Mira", exact: true })).toBeVisible();
+    await expect(preview.getByText("mira@studio.example", { exact: true })).toBeVisible();
+    await expect(preview.getByRole("button", { name: "Open in Gmail" })).toBeInViewport({
+      ratio: 1,
+    });
+    const readsAtOpen = printRequests.length;
+    previewBody = " The thread changed after the preview opened.";
+    await preview.getByRole("button", { name: "Load more" }).click();
+    await expect(preview).toContainText("End of original source.");
+    await expect(preview.getByRole("button", { name: "Back to answer" })).toBeInViewport({
+      ratio: 1,
+    });
+    await expect(preview.getByRole("button", { name: "Open in Gmail" })).toBeInViewport({
+      ratio: 1,
+    });
+    expect(printRequests.length).toBe(readsAtOpen);
+    await expect(preview.getByRole("heading", { name: "Sam" })).toBeVisible();
+    await preview.getByRole("button", { name: "Back to answer" }).press("Escape");
+    await expect(citations.last()).toBeFocused();
+    await expect(composer).toHaveValue(followUp);
+    await citations.last().press("Enter");
+    await expect(preview).toContainText("The thread changed after the preview opened.");
+    const previousSource = preview.getByRole("button", { name: "Previous source" });
+    const nextSource = preview.getByRole("button", { name: "Next source" });
+    await expect(nextSource).toBeDisabled();
+    await previousSource.press("Enter");
+    await expect(preview).toContainText(deadline);
+    await expect(preview).not.toContainText(workDeadline);
+    await expect(previousSource).toBeDisabled();
+    const mira = preview.getByRole("button", { name: "Mira", exact: true });
+    const bodyId = await mira.getAttribute("aria-controls");
+    expect(bodyId).toBeTruthy();
+    const message = preview.locator(`[id="${bodyId}"]`);
+    await mira.press("Space");
+    await expect(mira).toHaveAttribute("aria-expanded", "false");
+    await expect(message).toBeHidden();
+    await mira.press("Enter");
+    await expect(message).toBeVisible();
+    await nextSource.click();
+    await expect(preview).toContainText(workDeadline);
+    await previousSource.click();
+    await expect(preview).toContainText(deadline);
+    await expect(inbox).toHaveURL(server.gmailUrl + "#inbox");
+    await preview.getByRole("button", { name: "Back to answer" }).click();
+    await expect(citations.last()).toBeFocused();
+    await expect(composer).toHaveValue(followUp);
+    await composer.press("Enter");
+    await expect(panel.locator(".assistant-answer")).toHaveCount(2);
+    await expect(panel.locator(".assistant-answer").last()).toContainText(
+      "The original dates still apply.",
+    );
+    await citations.first().click();
+    await nextSource.click();
+    await expect(preview).toContainText(workDeadline);
+    await preview.getByRole("button", { name: "Open in Gmail" }).click();
     await expect
       .poll(
         async () => (await ggmail.readConfig()).accounts?.find((account) => account.selected)?.id,
@@ -1151,6 +1228,10 @@ test("inbox answers show sender identities, fit the panel, and open the cited th
   await expect(panel.locator('[data-slot="avatar"]')).toHaveCount(0);
   await expect(source.getByText("Design team")).toBeVisible();
   await source.click();
+  await panel
+    .getByRole("region", { name: "Email source" })
+    .getByRole("button", { name: "Open in Gmail" })
+    .click();
   await expect(mail).toHaveURL(new RegExp("#all/" + secondId + "$"));
 });
 

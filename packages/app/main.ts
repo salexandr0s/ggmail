@@ -7,7 +7,7 @@ import { accounts } from "@/accounts";
 import { watchForAppMenuKey } from "@/app-menu-shortcut";
 import { pauseAttachmentReads } from "@/attachments/library";
 import { config } from "@/config";
-import { clearUnifiedSearches } from "@/gmail/unified-search";
+import { pauseUnifiedSearches } from "@/gmail/unified-search";
 import {
   getCommonBrowserWindowOptions,
   isWindowVisibleOnConnectedDisplay,
@@ -15,6 +15,7 @@ import {
   onceReadyToShow,
 } from "@/lib/window";
 import { appMenu } from "@/menu";
+import { shellHistory } from "@/shell-history";
 import { ipc } from "./ipc";
 
 class Main {
@@ -63,9 +64,13 @@ class Main {
     }
 
     if (this.location === "/unified-inbox" && location !== this.location) {
-      clearUnifiedSearches();
+      pauseUnifiedSearches();
+    }
+    if (location !== this.location) {
+      shellHistory.record();
     }
     this.location = location;
+    shellHistory.record();
 
     const isAccountLocation = location === "/";
 
@@ -190,10 +195,16 @@ class Main {
       this.setLocation(`/${new URL(url).hash.replace(/^#?\/?/, "")}`);
     });
 
-    // A reload fires this again, and resolving a settled promise does nothing,
-    // which is the intent: what waits on it only ever waits for the first load.
     this.window.webContents.on("did-finish-load", () => {
-      this.resolveRendererReady?.();
+      if (this.resolveRendererReady) {
+        this.resolveRendererReady();
+        this.resolveRendererReady = undefined;
+      } else {
+        accounts.sendAccountsChangedToRenderer();
+        for (const { instance } of accounts.getAccounts()) {
+          instance.gmail.refreshUnifiedInbox();
+        }
+      }
     });
 
     this.window.on("close", (event) => {

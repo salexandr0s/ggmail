@@ -2,11 +2,18 @@ import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import { Dialog, DialogContent, DialogTitle } from "@ggmail/ui/components/dialog";
 import { useLingui } from "@lingui/react/macro";
-import { DownloadIcon, Loader2Icon } from "lucide-react";
+import { DownloadIcon, Loader2Icon, MailIcon } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { FileMark } from "./file-mark";
 import type { LibraryFile } from "./files";
 
-function usePreview(account: string, id: string, size: "full" | "thumbnail", enabled: boolean) {
+function usePreview(
+  account: string,
+  mailboxKey: string,
+  id: string,
+  size: "full" | "thumbnail",
+  enabled: boolean,
+) {
   const [preview, setPreview] = useState<{ mime: string; url: string; text?: string } | null>();
   useEffect(() => {
     if (!enabled) {
@@ -15,7 +22,7 @@ function usePreview(account: string, id: string, size: "full" | "thumbnail", ena
     let active = true;
     let url: string | undefined;
     ipc.main
-      .invoke("attachments.preview", account, id, size)
+      .invoke("attachments.preview", account, mailboxKey, id, size)
       .then((file) => {
         if (!active) {
           return;
@@ -42,7 +49,7 @@ function usePreview(account: string, id: string, size: "full" | "thumbnail", ena
         URL.revokeObjectURL(url);
       }
     };
-  }, [account, id, size, enabled]);
+  }, [account, mailboxKey, id, size, enabled]);
   return preview;
 }
 
@@ -70,7 +77,7 @@ export function FileThumbnail({
     }
     return () => observer.disconnect();
   }, []);
-  const preview = usePreview(item.account.id, item.id, "thumbnail", visible);
+  const preview = usePreview(item.account.id, item.mailboxKey, item.id, "thumbnail", visible);
   return (
     <span
       ref={element}
@@ -90,15 +97,19 @@ export function FilePreview({
   item,
   onClose,
   onDownload,
+  onOpenEmail,
+  received,
   returnFocus,
 }: {
   item: LibraryFile;
   onClose: () => void;
   onDownload: () => void;
+  onOpenEmail: () => void;
+  received: string;
   returnFocus: RefObject<HTMLButtonElement | null>;
 }) {
   const { t } = useLingui();
-  const file = usePreview(item.account.id, item.id, "full", true);
+  const file = usePreview(item.account.id, item.mailboxKey, item.id, "full", true);
   const [failed, setFailed] = useState(false);
   return (
     <Dialog
@@ -114,15 +125,20 @@ export function FilePreview({
         finalFocus={returnFocus}
         className="flex max-h-[90vh] w-[min(64rem,94vw)] flex-col gap-0 overflow-hidden p-0 sm:max-w-none"
       >
-        <header className="flex min-h-12 shrink-0 items-center gap-2 border-b ps-4 pe-12">
-          <DialogTitle className="min-w-0 flex-1 truncate" title={item.name}>
-            {item.name}
-          </DialogTitle>
-          <Button size="icon-sm" variant="ghost" aria-label={t`Download`} onClick={onDownload}>
-            <DownloadIcon />
-          </Button>
+        <header className="flex min-w-0 shrink-0 items-center gap-3 border-b py-3 ps-4 pe-12">
+          <FileMark name={item.name} />
+          <div className="min-w-0">
+            <DialogTitle className="truncate leading-snug" title={item.name}>
+              {item.name}
+            </DialogTitle>
+            {item.subject && (
+              <div className="attachment-subject" title={item.subject}>
+                {item.subject}
+              </div>
+            )}
+          </div>
         </header>
-        <div className="flex h-[min(75vh,52rem)] min-h-0 items-center justify-center bg-muted/40">
+        <div className="attachment-preview-stage" data-unavailable={file === null || failed}>
           {file === undefined ? (
             <Loader2Icon
               role="status"
@@ -130,7 +146,13 @@ export function FilePreview({
               className="size-6 motion-safe:animate-spin"
             />
           ) : !file || failed ? (
-            <p role="status" className="text-muted-foreground">{t`No preview available`}</p>
+            <div
+              role="status"
+              className="flex flex-col items-center gap-4 text-sm text-muted-foreground"
+            >
+              <FileMark name={item.name} large />
+              {t`No preview available`}
+            </div>
           ) : file.mime === "application/pdf" ? (
             <embed
               src={file.url + "#navpanes=0"}
@@ -161,6 +183,28 @@ export function FilePreview({
             />
           )}
         </div>
+        <footer className="attachment-preview-footer">
+          <span className="min-w-0 truncate text-xs text-muted-foreground" title={item.sender}>
+            {item.sender} · {received}
+            {item.size && ` · ${item.size}`}
+          </span>
+          <div className="flex shrink-0 gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label={t`Open email`}
+              title={t`Open email`}
+              onClick={onOpenEmail}
+            >
+              <MailIcon />
+              <span className="hidden sm:inline">{t`Open email`}</span>
+            </Button>
+            <Button size="sm" aria-label={t`Download`} onClick={onDownload}>
+              <DownloadIcon />
+              {t`Download`}
+            </Button>
+          </div>
+        </footer>
       </DialogContent>
     </Dialog>
   );

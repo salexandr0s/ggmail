@@ -115,7 +115,7 @@ export function Answer({
 }: {
   text: string;
   citations?: Citation[];
-  openSource?: (id: string) => void;
+  openSource?: (id: string, trigger: HTMLButtonElement) => void;
   showSenderIcons?: boolean;
 }) {
   const { t } = useLingui();
@@ -175,7 +175,8 @@ export function Answer({
                     .filter(Boolean)
                     .join(" · ")}
                   aria-label={`${source.number}. ${label}`}
-                  onClick={() => openSource(source.id)}
+                  data-source-id={source.id}
+                  onClick={(event) => openSource(source.id, event.currentTarget)}
                 >
                   {showSenderIcons && source.senders?.[0] && (
                     <SenderAvatar sender={source.senders[0]} className="size-4 text-sm" />

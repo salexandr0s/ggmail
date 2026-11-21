@@ -12,15 +12,12 @@ import {
   ChevronRightIcon,
   CircleAlertIcon,
   DownloadIcon,
-  InboxIcon,
   MailSearchIcon,
   MoonIcon,
-  PaperclipIcon,
   SparklesIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { navigate } from "wouter/use-hash-location";
 import { AppMenuButton } from "@/components/app-menu-button";
 import { FindInPage as UiFindInPage } from "@/components/find-in-page";
 import {
@@ -39,7 +36,14 @@ import { useVerticalTabs } from "@/lib/hooks";
 import { useConfig } from "@/lib/react-query";
 import { submitUnifiedSearch } from "@/lib/unified-search";
 import { HOST_HANDOVER_FADE_CLASS_NAME } from "@/lib/utils";
-import { useAccountsStore, useAppUpdaterStore, useFindInPageStore } from "../lib/stores";
+import {
+  useShellHistory,
+  useDownloadActivity,
+  useAccountsStore,
+  useAppUpdaterStore,
+  useFindInPageStore,
+} from "../lib/stores";
+import { MailViewNavigation } from "./mail-view-navigation";
 
 function BookmarksButton() {
   const { t } = useLingui();
@@ -64,6 +68,10 @@ function BookmarksButton() {
 
 function RecentDownloadHistoryButton() {
   const { t } = useLingui();
+  const active = useDownloadActivity((state) => state.active);
+  if (!active) {
+    return null;
+  }
 
   return (
     <TitlebarIconButton
@@ -107,7 +115,7 @@ function DoNotDisturb() {
 
   const { config } = useConfig();
 
-  if (!config || !config["doNotDisturb.showTitlebarButton"]) {
+  if (!config?.["doNotDisturb.enabled"] || !config["doNotDisturb.showTitlebarButton"]) {
     return;
   }
 
@@ -554,6 +562,7 @@ export function AppTitlebar({
 }) {
   const { t } = useLingui();
 
+  const history = useShellHistory();
   const accounts = useAccountsStore((state) => state.accounts);
 
   const accountRow = useAccountRow(accounts);
@@ -584,7 +593,8 @@ export function AppTitlebar({
 
   const isUnifiedInboxLocation = location === "/unified-inbox";
   const isAttachmentsLocation = location === "/attachments";
-  const isMailLibraryLocation = isUnifiedInboxLocation || isAttachmentsLocation;
+  const waiting = location === "/waiting";
+  const isMailLibraryLocation = isUnifiedInboxLocation || isAttachmentsLocation || waiting;
 
   const shouldShowWorkspaceAppsLauncher = config["workspaceApps.launcherApps"].length > 0;
 
@@ -618,14 +628,13 @@ export function AppTitlebar({
       <Button
         key={account.config.id}
         data-account-id={account.config.id}
+        aria-pressed={account.config.selected && isAccountLocation}
         variant={account.config.selected && isAccountLocation ? "secondary" : "ghost"}
         size="sm"
         tabIndex={-1}
         className="draggable-none"
         onClick={() => {
-          navigate("/");
-
-          ipc.main.send("accounts.selectAccount", account.config.id);
+          ipc.main.send("accounts.selectAccount", account.config.id, true);
         }}
       >
         {account.config.color && (
@@ -753,10 +762,10 @@ export function AppTitlebar({
         <TitlebarLeft>
           <TitlebarButtonGroup className="shrink-0">
             <TitlebarNavigationControls
-              canGoBack={Boolean(activeTab?.navigationHistory.canGoBack)}
-              canGoForward={Boolean(activeTab?.navigationHistory.canGoForward)}
+              canGoBack={history.canGoBack}
+              canGoForward={history.canGoForward}
               isLoading={Boolean(activeTab?.loading)}
-              disabled={isMailLibraryLocation}
+              disabled={!isAccountLocation}
               onGoBack={() => {
                 ipc.main.send("workspaceApp.goBack");
               }}
@@ -771,36 +780,9 @@ export function AppTitlebar({
               }}
             />
           </TitlebarButtonGroup>
-          <TitlebarButtonGroup className="shrink-0">
-            <TitlebarIconButton
-              tabIndex={0}
-              id="attachments-toggle"
-              title={t`Attachments`}
-              aria-pressed={isAttachmentsLocation}
-              variant={isAttachmentsLocation ? "secondary" : "ghost"}
-              onClick={() => navigate("/attachments")}
-            >
-              <PaperclipIcon />
-            </TitlebarIconButton>
-          </TitlebarButtonGroup>
-          {shouldShowUnifiedInboxButton && (
-            <TitlebarButtonGroup className="shrink-0">
-              <Button
-                variant={isUnifiedInboxLocation ? "secondary" : "ghost"}
-                size="icon"
-                tabIndex={-1}
-                className="size-7 draggable-none"
-                onClick={() => {
-                  navigate("/unified-inbox");
-                }}
-                title={t`Open unified inbox`}
-              >
-                <InboxIcon />
-              </Button>
-            </TitlebarButtonGroup>
-          )}
+          <MailViewNavigation location={location} unified={shouldShowUnifiedInboxButton} />
           {(shouldShowOutOfOfficeButton || accountButtons) && (
-            <TitlebarButtonGroup className="min-w-0 flex-1">
+            <TitlebarButtonGroup className="hidden min-w-0 flex-1 before:me-1 before:h-4 before:w-px before:shrink-0 before:bg-border sm:flex">
               {shouldShowOutOfOfficeButton && (
                 <Button
                   variant="ghost"
@@ -942,7 +924,9 @@ export function AppTitlebar({
                 icon={<MailSearchIcon />}
                 side="left"
                 disabled={
-                  isAttachmentsLocation || (!isUnifiedInboxLocation && isWorkspaceAppTabActive)
+                  waiting ||
+                  isAttachmentsLocation ||
+                  (!isUnifiedInboxLocation && isWorkspaceAppTabActive)
                 }
                 isOpen={isGmailSavedSearchesOpen}
                 onOpenChange={setIsGmailSavedSearchesOpen}

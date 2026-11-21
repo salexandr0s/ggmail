@@ -18,6 +18,7 @@ export {
 export const CATALOG_NAMES: Record<CatalogTag, string> = {
   en: "English",
   de: "Deutsch",
+  el: "Ελληνικά",
   fr: "Français",
   it: "Italiano",
   es: "Español (España)",
@@ -40,6 +41,7 @@ export type CatalogLoaders = Partial<Record<LocaleTag, () => Promise<{ messages:
 
 const catalogLoaders: CatalogLoaders = {
   de: () => import("./locales/de"),
+  el: () => import("./locales/el"),
   fr: () => import("./locales/fr"),
   it: () => import("./locales/it"),
   es: () => import("./locales/es"),

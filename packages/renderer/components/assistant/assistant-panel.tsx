@@ -187,7 +187,7 @@ function AssistantPanel({
       ref={panel}
       tabIndex={-1}
       aria-label={t`Mail assistant`}
-      className="absolute inset-y-0 left-0 flex min-w-0 flex-col border-l border-sidebar-border bg-background outline-none"
+      className="group/panel absolute inset-y-0 left-0 flex min-w-0 flex-col border-l border-sidebar-border bg-background outline-none"
       style={{ width }}
       onKeyDown={(event) => {
         if (
@@ -257,7 +257,7 @@ function AssistantPanel({
           </div>
         </div>
         {ready && context && showContext && (
-          <p className="flex min-w-0 items-center gap-2 border-t border-border/70 px-5 py-2 text-xs text-muted-foreground">
+          <p className="flex min-w-0 items-center gap-2 border-t border-border/70 px-5 py-2 text-xs text-muted-foreground group-has-[[data-source-preview]]/panel:hidden">
             {context.kind === "thread" ? (
               <MailOpenIcon aria-hidden="true" className="size-3.5 shrink-0" />
             ) : (

@@ -132,7 +132,7 @@ test("a menu command drives the window", async () => {
 test("a command with nothing to act on is disabled", async () => {
   const menuItems = await readMenuItems();
 
-  expect(menuItems.find(({ label }) => label === "Unified Inbox")?.enabled).toBe(false);
+  expect(menuItems.find(({ label }) => label === "All Mail")?.enabled).toBe(false);
 
   // The other half of the claim: something unconditional stays enabled, so a
   // menu that came up dead all over would not read as this passing.

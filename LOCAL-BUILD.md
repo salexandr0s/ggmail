@@ -30,7 +30,7 @@ Open the mail assistant using the sparkle button in the title bar.
 Choose a model below the message field. The panel remembers your choice and
 shows the active Gmail view and account in its header.
 
-From the inbox, an open thread, or the unified inbox, ask the assistant to find a message or check a deadline. It can search signed-in accounts, read the messages in a conversation, and open a cited thread in its original mailbox. You can name a specific account or ask it to search all accounts. Switching Gmail views or accounts starts a fresh conversation.
+From the inbox, an open thread, or All Mail, ask the assistant to find a message or check a deadline. It can search signed-in accounts, read the messages in a conversation, and open a cited thread in its original mailbox. You can name a specific account or ask it to search all accounts. Switching Gmail views or accounts starts a fresh conversation.
 
 Ask for a draft, then ask for changes to its wording or length. In an open thread, **Insert into reply** places the draft above any existing reply text. Gmail handles recipients and threading. Review the reply and send it when ready. You can also copy the body or choose **Open in Gmail** for a separate message.
 **Stop reply** keeps the text received so far. **Try again** repeats the last
@@ -41,14 +41,18 @@ the selected provider. You can close the sidebar and reopen it in the same mail 
 
 ## Attachments
 
-Choose **View → Attachments** or click the paperclip in the title bar. Search by filename,
-sender or subject. Choose a file type or account in the sidebar, or open **Filters** in a
-narrow window. Switch between list and grid with the controls beside the sort menu.
+Choose **View → Attachments**, select **Attachments** in the title bar, or open it from **Mail views** in a compact window. Search across filenames, senders and subjects. Words can appear in any order and in different fields. Enclose a phrase in quotation marks to keep its words together.
+
+Choose any number of categories, accounts and file types. For example, selecting **Invoice** and **Receipt** together with **PDF** shows PDFs in either category. The count beside each option reflects the other filters. Open **More filters** to enter a sender’s name or email, choose an exact extension, set either or both received dates, or select a size range. Both dates include the whole day in your local time zone. Size ranges use the size Gmail displays.
+
+In a narrow window, open **Filters** for all controls and the live result count. Remove an active filter with its × button or choose **Clear filters** to clear the search and all selections. Switch between list and grid with the controls beside the sort menu.
+
 Select a row or card to preview its file in the library. Gmail supplies thumbnails when available. The envelope opens its conversation, and the
 download button uses your normal download settings.
 
-The library loads older mail while the view is open and keeps its file list in memory
-for the current mailbox session. **Refresh attachments** checks for new or removed files.
+ggmail recognizes invoices, receipts, contracts, tickets, reservations, bank statements, orders and price quotes in English, German, Spanish, Greek, Italian and French. Detection runs locally using document names and common numbered exports. For example, “Reçu de paiement pour la facture 429” is a receipt referring to an invoice. When filenames are generic, the library looks for text that names the individual file, even when several documents arrive together. An explicit enclosure description can identify a single document. Paired details such as an amount paid and a transaction reference can also identify a receipt. Detection uses the email metadata already loaded by the library. The library also checks the subject when it belongs to a single-message thread with one document. Conflicting or insufficient evidence leaves the file under **Uncategorized**. Change the category on a row or card, or choose **Automatic** to restore detection. Manual choices stay on this device across refreshes and restarts.
+
+The library saves file metadata on this device as it discovers each conversation. When you reopen it, each signed-in mailbox restores its saved files and checks Gmail for new, changed or removed conversations. You can search and filter those files while the check runs. Previews and downloads still use Gmail. **Retry** checks unfinished mail, and **Refresh attachments** rechecks the mailbox. Removing an account clears its saved index.
 
 ## Verification
 

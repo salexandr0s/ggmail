@@ -60,11 +60,11 @@ test("both accounts survive into the app", async () => {
   expect(accountLabels).toEqual(["Personal", "Work"]);
 });
 
-test("Unified Inbox is enabled with two accounts", async () => {
+test("All Mail is enabled with two accounts", async () => {
   const unifiedInbox = await ggmail.app.evaluate(({ Menu }) => {
     const find = (menuItems: Electron.MenuItem[]): Electron.MenuItem | undefined => {
       for (const menuItem of menuItems) {
-        if (menuItem.label === "Unified Inbox") {
+        if (menuItem.label === "All Mail") {
           return menuItem;
         }
 
@@ -110,9 +110,9 @@ test("both accounts are in the titlebar, and switching writes back", async () =>
     .toBe("Work");
 });
 
-test("the unified inbox opens from the titlebar", async () => {
+test("All Mail opens from the titlebar", async () => {
   const unifiedInbox = ggmail.renderer.getByRole("button", {
-    name: "Open unified inbox",
+    name: "All Mail",
   });
 
   await expect(unifiedInbox).toBeVisible();
@@ -120,6 +120,43 @@ test("the unified inbox opens from the titlebar", async () => {
   await unifiedInbox.click();
 
   await expect.poll(() => new URL(ggmail.renderer.url()).hash).toBe("#/unified-inbox");
+});
+
+test("Back and Forward retrace libraries and account switches at both toolbar widths", async () => {
+  const info = test.info();
+  const page = ggmail.renderer;
+  const navigation = page.getByRole("navigation", { name: "Mail views" });
+  await navigation.getByRole("button", { name: "Attachments" }).click();
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+  await expect(navigation.getByRole("button", { name: "Attachments" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await page.screenshot({ path: info.outputPath("wide-shell.png") });
+  await navigation.getByRole("button", { name: "Waiting for reply" }).click();
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(page.getByRole("heading", { name: "Attachments", exact: true })).toBeVisible();
+  expect(await ggmail.runMenuCommand("Forward")).toBe(true);
+  await expect(page.getByRole("heading", { name: "Waiting for reply" })).toBeVisible();
+  await page.locator('[data-account-id="second-account"]').click();
+  await expect(page.locator('[data-account-id="second-account"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(page.getByRole("heading", { name: "Waiting for reply" })).toBeVisible();
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("main.html"))
+      ?.setSize(920, 640);
+  });
+  const selector = navigation.getByRole("button", { name: "Mail views" });
+  await expect(selector).toHaveText("Waiting for reply");
+  await selector.click();
+  await page.getByRole("menuitem", { name: "Attachments" }).click();
+  await expect(selector).toHaveText("Attachments");
+  await expect(page.getByRole("button", { name: "Go forward" })).toBeDisabled();
+  await page.screenshot({ path: info.outputPath("compact-shell.png") });
 });
 
 test("settings opens without an activation page and survives restart", async () => {

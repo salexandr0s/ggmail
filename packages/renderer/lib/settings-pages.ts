@@ -19,7 +19,7 @@ export const settingsPageLabels = {
   notifications: msg`Notifications`,
   phishingProtection: msg`Phishing protection`,
   savedSearches: msg`Saved searches`,
-  unifiedInbox: msg`Unified inbox`,
+  unifiedInbox: msg`All Mail`,
   updates: msg`Updates`,
   verificationCodes: msg`Verification codes`,
   advanced: msg`Advanced`,

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 import { useApp } from "./lib/app";
 
 const env: Record<string, string> = {};
@@ -34,7 +34,7 @@ const mail = {
       ],
     },
     [older]: {
-      subject: "Handover documents",
+      subject: "Contrat de prestation",
       sender: "Lena Morris &lt;lena@example.test&gt;",
       date: "2026-11-12",
       files: [["Project handover.pdf", "1.2 MB"]],
@@ -62,20 +62,53 @@ const mail = {
       date: "2026-11-13",
       files: [
         ["Workshop outline.docx", "92 KB"],
-        ["Materials list.csv", "12 KB"],
+        ["Τιμολόγιο_2026.csv", "12 KB"],
       ],
     },
   },
 };
 type ThreadId = keyof typeof mail.Work;
 
+const mixedDocuments = [
+  ["01.pdf", "invoice"],
+  ["02.pdf", "receipt"],
+  ["Acuerdo de confidencialidad.pdf", "contract"],
+  ["Bordkarte zur Buchung Q5.pkpass", "ticket"],
+  ["Επιβεβαίωση κράτησης.pdf", "booking"],
+  ["Estratto conto corrente.pdf", "statement"],
+  ["Purchase order for quotation 310.xlsx", "order"],
+  ["Devis de réparation.pdf", "quote"],
+  ["Ticket de soporte 94.pdf", "uncategorized"],
+] as const;
+let useMixedDocuments = false;
 let failThread = false;
+let rejectWorkMailbox = false;
+let oneBadThreadOnFirstPage = false;
+let failOnce = false;
+let staleOlderPage = false;
+let holdPersonalOlder: Promise<void> | undefined;
+let holdWorkRecovery: Promise<void> | undefined;
+const workPrints: string[] = [];
 let emptyMailbox = false;
+let holdListing = false;
+let changedWork = false;
+let workListings = 0;
 let fileRequests = 0;
 
 test.beforeEach(() => {
+  useMixedDocuments = false;
   failThread = false;
+  rejectWorkMailbox = false;
+  oneBadThreadOnFirstPage = false;
+  failOnce = false;
+  staleOlderPage = false;
+  holdPersonalOlder = undefined;
+  holdWorkRecovery = undefined;
+  workPrints.length = 0;
   emptyMailbox = false;
+  holdListing = false;
+  changedWork = false;
+  workListings = 0;
   fileRequests = 0;
 });
 
@@ -119,7 +152,21 @@ const server = createServer(async (request, response) => {
   response.setHeader("Content-Type", "text/html; charset=utf-8");
   if (url.searchParams.get("view") === "pt") {
     const id = url.searchParams.get("th");
-    if (failThread && id === second && work) {
+    if (work && id) {
+      workPrints.push(id);
+    }
+    if (work && rejectWorkMailbox) {
+      response.writeHead(403).end();
+      return;
+    }
+    if (!work && id === older) {
+      await holdPersonalOlder;
+    }
+    if (work && id === second) {
+      await holdWorkRecovery;
+    }
+    if ((failThread || failOnce) && id === second && work) {
+      failOnce = false;
       response.writeHead(503);
       response.end();
       return;
@@ -130,31 +177,56 @@ const server = createServer(async (request, response) => {
       response.end();
       return;
     }
-    const tiles = thread.files
+    const mixed = useMixedDocuments && work && id === first;
+    const body = mixed ? "<div>Facture : 01.pdf et reçu pour la facture : 02.pdf.</div>" : "";
+    const files = mixed ? mixedDocuments.map(([name]) => [name, "12 KB"]) : thread.files;
+    const currentFiles =
+      changedWork && work && id === first ? [["New invoice.pdf", "11 KB"]] : files;
+    const tiles = currentFiles
       .map(
         ([name, size], index) =>
           `<table class="att"><tr><td><table><tr><td><a href="?view=att&amp;th=${id}&amp;attid=0.${index + 1}"><img></a></td><td><b>${name}</b><br>${size}</td></tr></table></td></tr></table>`,
       )
       .join("");
     response.end(
-      `<table class="message"><tr><td>${work && id === first ? `<img src="${senderPhoto}">` : ""}${thread.sender}</td><td>${thread.date}T12:00:00Z</td></tr><tr><td>${tiles}</td></tr></table>`,
+      `<table class="message"><tr><td>${work && id === first ? `<img src="${senderPhoto}">` : ""}${thread.sender}</td><td>${thread.date}T12:00:00Z</td></tr><tr><td>${body}${tiles}</td></tr></table>`,
     );
+    return;
+  }
+  if (url.pathname === "/mail/u/0/listing") {
+    if (work) {
+      workListings++;
+    }
+    response.setHeader("Content-Type", "application/json");
+    response.end(JSON.stringify({ hold: holdListing }));
     return;
   }
   if (emptyMailbox) {
     response.end('<main role="main"><div class="TC">No conversations</div></main>');
     return;
   }
-  response.end(`<main role="main"><table><tbody></tbody></table></main><script>
+  response.end(`<main role="main"><table><tbody></tbody></table></main><script>(async () => {
     if(location.hash.startsWith('#search/')) {
+      while ((await (await fetch('/mail/u/0/listing')).json()).hold) await new Promise(resolve => setTimeout(resolve, 100));
       const older = location.hash.endsWith('/p2');
       const subjects = ${JSON.stringify(Object.fromEntries(Object.entries(threads).map(([id, thread]) => [id, thread.subject])))};
-      for(const id of older ? ['${older}'] : ['${first}','${second}']) {
-        document.querySelector('tbody').insertAdjacentHTML('beforeend','<tr class="zA"><td><span data-legacy-thread-id="#'+id+'" class="bog">'+subjects[id]+'</span></td></tr>');
+      const firstPage = ${JSON.stringify(work && oneBadThreadOnFirstPage ? [second] : [first, second])};
+      if (${!!work && changedWork}) subjects['${first}'] = 'Updated studio planning session';
+      function rows(ids) {
+        document.querySelector('tbody').replaceChildren();
+        for (const id of ids) {
+          document.querySelector('tbody').insertAdjacentHTML('beforeend','<tr class="zA"><td><span data-legacy-thread-id="#'+id+'" class="bog">'+subjects[id]+'</span></td></tr>');
+        }
+      }
+      if (older && ${work && staleOlderPage}) {
+        rows(firstPage);
+        setTimeout(()=>rows(['${older}']),750);
+      } else {
+        rows(older ? ['${older}'] : firstPage);
       }
       document.querySelector('main').insertAdjacentHTML('beforeend','<button aria-disabled="'+older+'"><span class="amJ">Older</span></button>');
     }
-  </script>`);
+  })();</script>`);
 });
 
 test.beforeAll(async () => {
@@ -165,9 +237,60 @@ test.afterAll(async () => {
   await new Promise<void>((resolve) => server.close(() => resolve()));
 });
 
+const languages = [
+  {
+    tag: "en",
+    more: "More filters",
+    extension: "File extension",
+    attachments: "Attachments",
+    invoice: "Invoice",
+  },
+  {
+    tag: "de",
+    more: "Weitere Filter",
+    extension: "Dateiendung",
+    attachments: "Anhänge",
+    invoice: "Rechnung",
+  },
+  {
+    tag: "es",
+    more: "Más filtros",
+    extension: "Extensión de archivo",
+    attachments: "Archivos adjuntos",
+    invoice: "Factura",
+  },
+  {
+    tag: "el",
+    more: "Περισσότερα φίλτρα",
+    extension: "Επέκταση αρχείου",
+    attachments: "Συνημμένα",
+    invoice: "Τιμολόγιο",
+  },
+  {
+    tag: "it",
+    more: "Altri filtri",
+    extension: "Estensione del file",
+    attachments: "Allegati",
+    invoice: "Fattura",
+  },
+  {
+    tag: "fr",
+    more: "Plus de filtres",
+    extension: "Extension du fichier",
+    attachments: "Pièces jointes",
+    invoice: "Facture",
+  },
+] as const;
+
 const ggmail = useApp(
   ({ userDataDir }) => ({
     theme: "light",
+    "app.language":
+      languages.find(({ tag }) =>
+        test
+          .info()
+          .annotations.some((entry) => entry.type === "language" && entry.description === tag),
+      )?.tag ?? "en",
     "window.restrictMinimumSize": false,
     accounts: ["Personal", "Work"].map((label, index) => ({
       id: label,
@@ -201,6 +324,11 @@ async function identifyWorkMailbox() {
       .fromPartition("persist:Work")
       .cookies.set({ url: base, name: "library", value: "work" });
   }, env.GGMAIL_TEST_GMAIL_URL ?? "");
+}
+
+async function choose(trigger: Locator, name: string | RegExp) {
+  await trigger.click();
+  await ggmail.renderer.getByRole("option", { name, exact: typeof name === "string" }).click();
 }
 
 test("browse, filter, preview, and download attachments in their own account", async () => {
@@ -242,7 +370,8 @@ test("browse, filter, preview, and download attachments in their own account", a
   const sidebar = page.getByRole("complementary", { name: "Filters" });
   await sidebar.getByRole("button", { name: "Work", exact: true }).click();
   await expect(page.getByText("5 files", { exact: true })).toBeVisible();
-  await sidebar.getByRole("button", { name: "PDF", exact: true }).click();
+  const formats = page.getByRole("group", { name: "File type" });
+  await formats.getByRole("button", { name: "PDF", exact: true }).click();
   await expect(page.getByRole("button", { name: "Project handover.pdf" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Notes.txt" })).toHaveCount(0);
   await page.getByRole("button", { name: "Grid view" }).click();
@@ -275,11 +404,11 @@ test("browse, filter, preview, and download attachments in their own account", a
     "aria-pressed",
     "true",
   );
-  await expect(sidebar.getByRole("button", { name: "PDF", exact: true })).toHaveAttribute(
+  await expect(formats.getByRole("button", { name: "PDF", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await sidebar.getByRole("button", { name: "All files", exact: true }).click();
+  await formats.getByRole("button", { name: "All files", exact: true }).click();
   await page.getByRole("searchbox").fill("planning session");
   await expect(page.getByText("2 files", { exact: true })).toBeVisible();
   const row = page
@@ -302,7 +431,267 @@ test("browse, filter, preview, and download attachments in their own account", a
       ),
     )
     .toBe(true);
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeHidden();
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(page.getByRole("searchbox")).toHaveValue("planning session");
+  await expect(row.getByRole("button", { name: "Notes.txt" })).toBeFocused();
+  await page.getByRole("button", { name: "Go forward" }).click();
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeHidden();
+  expect(await ggmail.runMenuCommand("Back")).toBe(true);
+  await expect(row.getByRole("button", { name: "Notes.txt" })).toBeFocused();
 });
+
+test("combines categories with format, account and search and remembers corrections", async () => {
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("10 files")).toBeVisible();
+  const filters = page.getByRole("complementary", { name: "Filters" });
+  const filter = (name: string) => filters.getByRole("button", { name, exact: true });
+  await filter("Invoice").click();
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await expect(page.getByRole("listitem")).toContainText("Τιμολόγιο");
+  await filter("Contract").click();
+  await expect(page.getByRole("listitem")).toHaveCount(2);
+  await page
+    .getByRole("group", { name: "File type" })
+    .getByRole("button", { name: "PDF", exact: true })
+    .click();
+  await expect(filter("Invoice")).toHaveAccessibleDescription("0");
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await page.getByRole("button", { name: "Remove filter “Contract”" }).press("Enter");
+  await expect(page.getByText("No matching files")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Remove filter “Invoice”" })).toBeFocused();
+  await filter("Contract").click();
+  await filter("Personal").click();
+  await expect(page.getByText("No matching files")).toBeVisible();
+  await page.getByRole("button", { name: "Clear filters" }).click();
+
+  const work = page
+    .getByRole("listitem")
+    .filter({ hasText: "Míra Chen" })
+    .filter({ hasText: "Notes.txt" });
+  const picker = work.getByRole("combobox", { name: "Category for Notes.txt" });
+  await choose(picker, "Receipt");
+  await filter("Receipt").click();
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await expect(work).toBeVisible();
+  await page.getByRole("button", { name: "Refresh attachments" }).click();
+  await expect(picker).toHaveText("Receipt");
+  await page.getByRole("button", { name: "Grid view" }).click();
+  await expect(picker).toHaveText("Receipt");
+  await page.getByRole("searchbox").fill("studio");
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await choose(picker, /^Automatic/);
+  await expect(page.getByText("No matching files")).toBeVisible();
+  await page.getByRole("button", { name: "Clear filters" }).click();
+  await expect(picker).toHaveText("Uncategorized");
+  expect(fileRequests).toBe(0);
+});
+
+test("Back from a source email restores the filtered file and its scroll position", async () => {
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("10 files", { exact: true })).toBeVisible();
+  await page
+    .getByRole("group", { name: "Filter by account" })
+    .getByRole("button", { name: "Work", exact: true })
+    .click();
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("main.html"))
+      ?.setSize(1080, 360);
+  });
+  const row = page.getByRole("listitem").filter({ hasText: "Project handover.pdf" });
+  const source = row.getByRole("button", { name: "Open email" });
+  await source.scrollIntoViewIfNeeded();
+  const scrollTop = () => row.evaluate((el) => el.closest(".overflow-y-auto")?.scrollTop ?? 0);
+  const before = await scrollTop();
+  expect(before).toBeGreaterThan(0);
+  await source.click();
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeHidden();
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(row.getByRole("button", { name: "Project handover.pdf" })).toBeFocused();
+  await expect(
+    page
+      .getByRole("group", { name: "Filter by account" })
+      .getByRole("button", { name: "Work", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(scrollTop).toBe(before);
+});
+
+test("combines multiple accounts and formats, with counts for each available alternative", async () => {
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("10 files", { exact: true })).toBeVisible();
+  const account = page.getByRole("group", { name: "Filter by account", exact: true });
+  const formats = page.getByRole("group", { name: "File type", exact: true });
+  for (const name of ["Work", "Personal"]) {
+    await account.getByRole("button", { name, exact: true }).click();
+  }
+  for (const name of ["PDF", "Spreadsheets"]) {
+    await formats.getByRole("button", { name, exact: true }).click();
+  }
+  await expect(page.getByRole("listitem")).toHaveCount(4);
+  await expect(
+    account.getByRole("button", { name: "Work", exact: true }),
+  ).toHaveAccessibleDescription("3");
+  await expect(
+    account.getByRole("button", { name: "Personal", exact: true }),
+  ).toHaveAccessibleDescription("1");
+  await account.getByRole("button", { name: "Personal", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(3);
+  await expect(
+    formats.getByRole("button", { name: "Images", exact: true }),
+  ).toHaveAccessibleDescription("1");
+  await page.getByRole("searchbox").fill('budget "planning session" mira');
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await expect(page.getByRole("listitem")).toContainText("Studio budget.xlsx");
+  await page.getByRole("button", { name: "Clear filters", exact: true }).click();
+  await expect(page.getByRole("searchbox")).toBeFocused();
+  await expect(page.getByRole("listitem")).toHaveCount(10);
+  expect(fileRequests).toBe(0);
+});
+
+test("filters by exact extension, sender, size and received dates, and recovers from conflicting choices", async () => {
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("10 files", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "More filters", exact: true }).click();
+  const menu = page.getByRole("dialog", { name: "More filters" });
+  const sender = menu.getByRole("textbox", { name: "Sender", exact: true });
+  const ext = menu.getByLabel("File extension", { exact: true });
+  const size = menu.getByLabel("Size", { exact: true });
+  const from = menu.getByLabel("Received from");
+  const through = menu.getByLabel("Received through");
+  await sender.fill("chen mira");
+  await ext.press("Enter");
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(ext).toBeFocused();
+  await expect(menu).toBeVisible();
+  const gap = await ext.evaluate((button) => {
+    const value = button.querySelector('[data-slot="select-value"]');
+    const arrow = button.querySelector("svg");
+    if (!value || !arrow) {
+      throw new Error("Missing select value or chevron");
+    }
+    return arrow.getBoundingClientRect().left - value.getBoundingClientRect().right;
+  });
+  expect(gap).toBeGreaterThanOrEqual(3);
+  expect(gap).toBeLessThanOrEqual(10);
+  await choose(ext, /^\.xlsx /);
+  await choose(size, /^Under 1 MB/);
+  await from.fill("2026-11-17");
+  await through.fill("2026-11-17");
+  await expect(menu.getByText("1 file", { exact: true })).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await expect(page.getByRole("listitem")).toContainText("Studio budget.xlsx");
+  await page.screenshot({ path: test.info().outputPath("attachment-detail-filters.png") });
+  await from.fill("2026-11-18");
+  await expect(menu.getByRole("alert")).toBeVisible();
+  await expect(menu.getByText("0 files", { exact: true })).toBeVisible();
+  await from.fill("2026-11-17");
+  await expect(menu.getByRole("alert")).toHaveCount(0);
+  await choose(size, /^10 MB or more/);
+  await expect(menu.getByText("0 files", { exact: true })).toBeVisible();
+  await menu.getByRole("button", { name: "Done" }).click();
+  await expect(page.getByText("No matching files")).toBeVisible();
+  await page.locator(".attachment-filter-chip").last().press("Enter");
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await page.getByRole("button", { name: "Grid view" }).click();
+  await page.getByRole("button", { name: "Refresh attachments" }).click();
+  await expect(page.locator(".attachment-card")).toHaveCount(1);
+  await page.getByRole("button", { name: "Go back" }).click();
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await page.getByRole("button", { name: "More filters", exact: true }).click();
+  await expect(ext).toContainText(".xlsx");
+  await menu.getByRole("button", { name: "Clear filters" }).click();
+  await expect(menu.getByText("10 files", { exact: true })).toBeVisible();
+  await expect(from).toHaveValue("");
+  await expect(sender).toHaveValue("");
+  expect(fileRequests).toBe(0);
+});
+
+test("categorizes a mixed-language message per attachment and uses those categories in filters", async () => {
+  useMixedDocuments = true;
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  for (const [name, category] of mixedDocuments) {
+    const row = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("button", { name, exact: true }) });
+    await expect(row.locator(".attachment-category-picker")).toHaveAttribute(
+      "data-attachment-category",
+      category,
+    );
+  }
+  await page.getByRole("button", { name: "Receipt", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await expect(page.getByRole("listitem")).toContainText("02.pdf");
+  expect(fileRequests).toBe(0);
+});
+
+test("an explicit Uncategorized survives restart until automatic detection is restored", async () => {
+  await identifyWorkMailbox();
+  const open = () =>
+    ggmail.renderer.getByRole("button", { name: "Attachments", exact: true }).click();
+  const category = () =>
+    ggmail.renderer.getByRole("combobox", { name: "Category for Project handover.pdf" });
+  await open();
+  await choose(category(), "Uncategorized");
+  await expect(category()).toHaveText("Uncategorized");
+  await ggmail.relaunch();
+  await identifyWorkMailbox();
+  await open();
+  await expect(category()).toHaveText("Uncategorized");
+  await choose(category(), /^Automatic/);
+  await ggmail.renderer.getByRole("button", { name: "Contract", exact: true }).click();
+  await expect(category()).toHaveText("Contract");
+  await expect(ggmail.renderer.getByRole("listitem")).toHaveCount(1);
+});
+
+for (const { tag, attachments, invoice, more, extension } of languages) {
+  test(
+    `filter a Greek invoice in the ${tag} interface`,
+    {
+      annotation: { type: "language", description: tag },
+    },
+    async () => {
+      await identifyWorkMailbox();
+      const page = ggmail.renderer;
+      await page.getByRole("button", { name: attachments, exact: true }).click();
+      await expect(page.locator("html")).toHaveAttribute("lang", tag);
+      await page.getByRole("button", { name: invoice, exact: true }).click();
+      await expect(page.getByRole("listitem")).toHaveCount(1);
+      await expect(
+        page.getByRole("listitem").getByRole("button", { name: "Τιμολόγιο_2026.csv" }),
+      ).toBeVisible();
+      await page.getByRole("button", { name: more, exact: true }).click();
+      const advanced = page.getByRole("dialog", { name: more });
+      await choose(advanced.getByRole("combobox", { name: extension, exact: true }), /^\.csv /);
+      await advanced.press("Escape");
+      await expect(page.getByRole("listitem")).toHaveCount(1);
+      await page.locator(".attachment-filter-chip").filter({ hasText: ".csv" }).press("Enter");
+      await ggmail.app.evaluate(({ BrowserWindow }) => {
+        BrowserWindow.getAllWindows()
+          .find((window) => window.webContents.getURL().includes("main.html"))
+          ?.setSize(320, 600);
+      });
+      const chip = page.locator(".attachment-filter-chip");
+      await expect(chip).toContainText(invoice);
+      await expect(chip).toBeInViewport();
+      await chip.press("Enter");
+      await expect(page.getByRole("searchbox")).toBeFocused();
+      await expect(page.getByRole("listitem")).toHaveCount(10);
+    },
+  );
+}
 
 test("a file without a Gmail preview keeps its download action", async () => {
   const page = ggmail.renderer;
@@ -319,19 +708,48 @@ test("a file without a Gmail preview keeps its download action", async () => {
   await page.keyboard.press("Escape");
   await expect(preview).toBeHidden();
   await expect(page.getByRole("searchbox")).toHaveValue("City walks.zip");
+  await card.getByRole("button", { name: "City walks.zip" }).press("Enter");
+  await preview.getByRole("button", { name: "Open email" }).click();
+  await expect(page.getByRole("heading", { name: "Attachments" })).toHaveCount(0);
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(({ webContents }) =>
+        webContents
+          .getAllWebContents()
+          .some((view) => view.getURL().endsWith("#all/194a92f8c0000001")),
+      ),
+    )
+    .toBe(true);
 });
 
-test("retains partial results, retries unreadable mail, and refreshes to an empty mailbox", async () => {
+test("retains partial results, retries only unreadable mail, and refreshes to an empty mailbox", async () => {
   await identifyWorkMailbox();
   failThread = true;
   const page = ggmail.renderer;
   await page.getByRole("button", { name: "Attachments", exact: true }).click();
   await expect(page.getByText("8 files")).toBeVisible();
-  await expect(page.getByRole("status")).toContainText("Work");
+  await expect(page.getByRole("status")).toHaveText(
+    /Some messages in Work couldn’t be checked.*Previously loaded files are still available/,
+  );
+  await page.getByRole("searchbox").fill("no such attachment");
+  await expect(page.getByRole("status")).toContainText("Previously loaded files");
+  await page.getByRole("searchbox").fill("");
+  const successfulRequests = workPrints.filter((id) => id !== second);
   failThread = false;
-  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  const recovery = Promise.withResolvers<void>();
+  holdWorkRecovery = recovery.promise;
+  try {
+    await page.getByRole("button", { name: "Retry", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Retry", exact: true })).toHaveCount(0);
+    await expect(page.getByText("8 files")).toBeVisible();
+    await expect(page.getByRole("listitem")).toHaveCount(8);
+  } finally {
+    recovery.resolve();
+  }
   await expect(page.getByText("10 files")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Retry", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("listitem")).toHaveCount(10);
+  await expect(page.getByRole("status")).toHaveCount(0);
+  expect(workPrints.filter((id) => id !== second)).toEqual(successfulRequests);
   await page.getByRole("button", { name: "Grid view" }).click();
   await ggmail.app.evaluate(({ nativeTheme }) => {
     nativeTheme.themeSource = "dark";
@@ -346,6 +764,145 @@ test("retains partial results, retries unreadable mail, and refreshes to an empt
   await expect(page.getByRole("heading", { name: "Attachments" })).toHaveCount(0);
 });
 
+async function identifyProfiles(workEmail = "work@example.test") {
+  await identifyWorkMailbox();
+  await ggmail.app.evaluate(({ session, webContents, ipcMain }, email) => {
+    for (const [account, address] of [
+      ["Work", email],
+      ["Personal", "personal@example.test"],
+    ]) {
+      const partition = session.fromPartition("persist:" + account);
+      const view = webContents
+        .getAllWebContents()
+        .find((w) => w.session === partition && w.getURL().includes("/mail/u/0"));
+      if (!view) {
+        throw new Error("Missing fixture mailbox");
+      }
+      // The Gmail preload reads the profile meta tag only on mail.google.com.
+      ipcMain.emit("gmail.setUserEmail", { sender: view }, address);
+    }
+  }, workEmail);
+}
+
+test("restores files before Gmail responds and refreshes only changed conversations", async () => {
+  await identifyProfiles();
+  const open = () =>
+    ggmail.renderer.getByRole("button", { name: "Attachments", exact: true }).click();
+  await open();
+  await expect(ggmail.renderer.getByText("10 files", { exact: true })).toBeVisible();
+  const indexed = [...workPrints];
+  workListings = 0;
+  changedWork = true;
+  holdListing = true;
+  await ggmail.relaunch();
+  await identifyProfiles();
+  await open();
+  try {
+    await expect(ggmail.renderer.getByText("10 files", { exact: true })).toBeVisible();
+    await expect.poll(() => workListings).toBeGreaterThan(0);
+    expect(workPrints).toEqual(indexed);
+    await ggmail.renderer.getByRole("searchbox").fill("studio budget");
+    await expect(ggmail.renderer.getByRole("listitem")).toHaveCount(1);
+    await ggmail.renderer.getByRole("searchbox").fill("");
+  } finally {
+    holdListing = false;
+  }
+  await expect(ggmail.renderer.getByText("9 files", { exact: true })).toBeVisible();
+  await expect(
+    ggmail.renderer.getByRole("button", { name: "New invoice.pdf", exact: true }),
+  ).toBeVisible();
+  await expect(ggmail.renderer.getByText("Studio budget.xlsx", { exact: true })).toHaveCount(0);
+  expect(workPrints).toEqual([...indexed, first]);
+  // Cached file actions still use the correct account and fresh Gmail credentials.
+  await ggmail.renderer.getByRole("button", { name: "Project handover.pdf", exact: true }).click();
+  await expect(
+    ggmail.renderer.getByRole("dialog").locator('embed[type="application/pdf"]'),
+  ).toBeVisible();
+  await ggmail.renderer.keyboard.press("Escape");
+  holdListing = true;
+  await ggmail.relaunch();
+  await identifyProfiles("different@example.test");
+  await open();
+  try {
+    await expect(ggmail.renderer.getByText("5 files", { exact: true })).toBeVisible();
+    await expect(ggmail.renderer.getByText("New invoice.pdf", { exact: true })).toHaveCount(0);
+  } finally {
+    holdListing = false;
+  }
+});
+
+test("resumes an incomplete mailbox after quitting without reading successful threads again", async () => {
+  await identifyProfiles();
+  failThread = true;
+  const open = () =>
+    ggmail.renderer.getByRole("button", { name: "Attachments", exact: true }).click();
+  await open();
+  await expect(ggmail.renderer.getByRole("status")).toContainText("Some messages in Work");
+  await expect(ggmail.renderer.getByText("8 files", { exact: true })).toBeVisible();
+  const before = [...workPrints];
+  await ggmail.relaunch();
+  failThread = false;
+  holdListing = true;
+  await identifyProfiles();
+  await open();
+  try {
+    await expect(ggmail.renderer.getByText("8 files", { exact: true })).toBeVisible();
+    expect(workPrints).toEqual(before);
+  } finally {
+    holdListing = false;
+  }
+  await expect(ggmail.renderer.getByText("10 files", { exact: true })).toBeVisible();
+  expect(workPrints).toEqual([...before, second]);
+});
+
+test("recovers from a transient Gmail failure and waits for older search rows", async () => {
+  await identifyWorkMailbox();
+  failOnce = true;
+  staleOlderPage = true;
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("10 files")).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(10);
+  await expect(page.getByRole("button", { name: "Retry", exact: true })).toHaveCount(0);
+  expect(workPrints.filter((id) => id === second)).toHaveLength(2);
+});
+
+test("checks later pages after one unreadable thread and keeps healthy scans running during retry", async () => {
+  await identifyWorkMailbox();
+  oneBadThreadOnFirstPage = true;
+  failThread = true;
+  const loading = Promise.withResolvers<void>();
+  holdPersonalOlder = loading.promise;
+  const page = ggmail.renderer;
+  try {
+    await page.getByRole("button", { name: "Attachments", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Some messages in Work");
+    await expect(page.getByText("Still checking Personal…")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Project handover.pdf", exact: true }),
+    ).toBeVisible();
+    failThread = false;
+    await page.getByRole("button", { name: "Retry", exact: true }).click();
+    await expect(page.getByRole("listitem")).toHaveCount(6);
+  } finally {
+    loading.resolve();
+  }
+  await expect(page.getByRole("listitem")).toHaveCount(8);
+  await expect(page.getByRole("status")).toHaveCount(0);
+});
+
+test("distinguishes an unavailable account from partial results and clears its warning after retry", async () => {
+  await identifyWorkMailbox();
+  rejectWorkMailbox = true;
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Couldn’t check Work for attachments.");
+  await expect(page.getByRole("listitem")).toHaveCount(5);
+  rejectWorkMailbox = false;
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(10);
+  await expect(page.getByRole("status")).toHaveCount(0);
+});
 test("compact windows keep filters, file actions and keyboard navigation reachable", async () => {
   await identifyWorkMailbox();
   const page = ggmail.renderer;
@@ -361,7 +918,13 @@ test("compact windows keep filters, file actions and keyboard navigation reachab
   const filters = page.getByRole("dialog", { name: "Filters" });
   await filters.getByRole("button", { name: "Work", exact: true }).click();
   await filters.getByRole("button", { name: "PDF", exact: true }).click();
-  await page.keyboard.press("Escape");
+  await filters.getByRole("button", { name: "Contract", exact: true }).click();
+  await expect(filters.getByRole("button", { name: "Contract", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await filters.getByRole("button", { name: "All categories", exact: true }).click();
+  await filters.getByRole("button", { name: "Done", exact: true }).click();
   await expect(filters).toBeHidden();
   await expect(page.getByText("2 files", { exact: true })).toBeVisible();
   await expect(page.getByRole("listitem")).toHaveCount(2);
@@ -391,6 +954,17 @@ test("compact windows keep filters, file actions and keyboard navigation reachab
           ),
       ),
   ).toBe(true);
+  await page.getByRole("button", { name: "Filters", exact: true }).click();
+  await choose(filters.getByRole("combobox", { name: "File extension", exact: true }), /^\.pdf /);
+  await filters.getByLabel("Received through").fill("2026-11-17");
+  await expect(filters.getByText("1 file", { exact: true })).toBeVisible();
+  await expect(filters.getByRole("button", { name: "Done" })).toBeInViewport();
+  expect(await filters.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+    true,
+  );
+  await filters.getByRole("button", { name: "Clear filters" }).click();
+  await expect(filters.getByText("10 files", { exact: true })).toBeVisible();
+  await filters.getByRole("button", { name: "Done" }).click();
   const search = page.getByRole("searchbox");
   await search.fill("missing");
   await expect(page.getByText("No matching files")).toBeVisible();

@@ -1,7 +1,27 @@
+export const attachmentCategories = [
+  "invoice",
+  "receipt",
+  "contract",
+  "ticket",
+  "booking",
+  "statement",
+  "order",
+  "quote",
+  "uncategorized",
+] as const;
+
+export type AttachmentCategory = (typeof attachmentCategories)[number];
+
+export function isAttachmentCategory(value: unknown): value is AttachmentCategory {
+  return attachmentCategories.some((category) => category === value);
+}
+
 export type MailAttachment = {
   id: string;
   name: string;
   subject: string;
+  detectedCategory: AttachmentCategory;
+  categoryOverride?: AttachmentCategory;
   sender: string;
   senderPhotoUrl?: string;
   receivedAt: number;
@@ -9,9 +29,10 @@ export type MailAttachment = {
 };
 
 export type AttachmentBatch = {
+  mailboxKey: string;
   files: MailAttachment[];
-  complete: boolean;
-  partial: boolean;
+  removedIds?: string[];
+  status: "loading" | "ready" | "incomplete";
 };
 
 export type AttachmentAction = "message" | "download";
@@ -21,8 +42,24 @@ export type AttachmentPreview = {
   bytes: ArrayBuffer;
 };
 
+export function foldAttachmentText(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replaceAll("ς", "σ")
+    .replaceAll("ß", "ss");
+}
+
+export function attachmentExtension(filename: string) {
+  const name = filename.trim();
+  const dot = name.lastIndexOf(".");
+  const suffix = dot > 0 ? name.slice(dot + 1) : "";
+  return /^[\p{L}\p{N}][\p{L}\p{N}_+-]*$/u.test(suffix) ? suffix.toLowerCase() : "";
+}
+
 export function fileKind(filename: string) {
-  const ext = /\.([a-z0-9]+)$/i.exec(filename)?.[1]?.toLowerCase() ?? "";
+  const ext = attachmentExtension(filename);
   if (/^(png|jpe?g|gif|webp|avif|heic|heif|tiff?|bmp|svg)$/.test(ext)) {
     return "image";
   }

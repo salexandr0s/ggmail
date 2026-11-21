@@ -48,19 +48,26 @@ export function FilterButton({
 export function AccountFilters({
   accounts,
   chosen,
+  counts,
+  label,
   onAccount,
 }: {
   accounts: AccountConfig[];
-  chosen: string;
+  chosen: string | readonly string[];
+  label?: string;
+  counts?: { total: number; values: Map<string, number> };
   onAccount: (id: string) => void;
 }) {
   const { t } = useLingui();
   return (
-    <div role="group" aria-label={t`Account`}>
-      <h2 className="mb-1.5 px-2 text-xs font-medium text-muted-foreground">{t`Account`}</h2>
+    <div role="group" aria-label={label ?? t`Account`}>
+      <h2 className="mb-1.5 px-2 text-xs font-medium text-muted-foreground">
+        {label ?? t`Account`}
+      </h2>
       <FilterButton
         label={t`All accounts`}
-        active={!chosen}
+        active={!chosen.length}
+        count={counts?.total}
         icon={<LayersIcon />}
         onClick={() => onAccount("")}
       />
@@ -68,7 +75,8 @@ export function AccountFilters({
         <FilterButton
           key={a.id}
           label={getAccountLabel(a.label)}
-          active={chosen === a.id}
+          active={typeof chosen === "string" ? chosen === a.id : chosen.includes(a.id)}
+          count={counts && (counts.values.get(a.id) ?? 0)}
           icon={
             a.color ? (
               <span className="grid size-3.5 shrink-0 place-items-center">

@@ -21,6 +21,10 @@ mock.module("electron", () => ({ net: {}, powerMonitor: { on: () => {} }, sessio
 
 mock.module("./account", () => ({ Account: class {} }));
 
+mock.module("./attachments/disk-index", () => ({ clearAttachmentIndexes: () => {} }));
+
+mock.module("./attachments/categories", () => ({ clearAttachmentCategories: () => {} }));
+
 mock.module("./config", () => ({
   config: { get: () => accountConfigs, onDidChange: () => {} },
 }));

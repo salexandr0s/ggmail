@@ -1,5 +1,5 @@
 import { getAccountLabel } from "@ggmail/shared/accounts";
-import { fileKind } from "@ggmail/shared/attachments";
+import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import {
   Empty,
@@ -15,12 +15,6 @@ import {
   InputGroupInput,
 } from "@ggmail/ui/components/input-group";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@ggmail/ui/components/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -35,45 +29,61 @@ import {
   CircleAlertIcon,
   LayoutGridIcon,
   ListIcon,
+  MailIcon,
+  FileIcon,
   Loader2Icon,
   PaperclipIcon,
   RefreshCwIcon,
   SearchIcon,
-  SlidersHorizontalIcon,
+  CalendarDaysIcon,
+  HardDriveIcon,
+  UserRoundIcon,
   XIcon,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { navigate } from "wouter/use-hash-location";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { create } from "zustand";
-import { FileItem, ListHeadings, type LibraryFile } from "@/components/attachments/files";
-import { LibraryFilters, type KindFilter, type KindOption } from "@/components/attachments/filters";
+import { categoryIcons, useCategoryLabels } from "@/components/attachments/categories";
+import { DetailFilters, useSizeLabels } from "@/components/attachments/detail-filters";
+import { FileItem, ListHeadings } from "@/components/attachments/files";
+import {
+  FormatFilters,
+  LibraryFilters,
+  FilterMenu,
+  type KindOption,
+} from "@/components/attachments/filters";
+import {
+  dateBoundary,
+  emptyAttachmentFilters,
+  filterAttachments,
+  indexAttachment,
+  toggleValue,
+  type AttachmentFilters,
+} from "@/lib/attachment-filters";
 import { createDateTimeFormatter } from "@/lib/date";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
 import { useAccountsStore } from "@/lib/stores";
 import { useAttachmentFiles } from "@/lib/use-attachment-files";
+import "@/components/attachments/library.css";
 
 // Keep the reader's place when a file opens in Gmail. Only the layout persists across app launches.
 const useBrowseState = create(() => ({
-  account: "",
-  kind: "all" as KindFilter,
-  query: "",
+  ...emptyAttachmentFilters,
   sort: "recent",
   page: 0,
 }));
-const setBrowse = useBrowseState.setState;
+type LibraryPosition = { top: number; key?: string; offset?: number };
+let position: LibraryPosition = { top: 0 };
+const setBrowse = (changes: Partial<ReturnType<typeof useBrowseState.getState>>) => {
+  position = { top: 0 };
+  useBrowseState.setState(changes);
+};
 const pageSize = 36;
-const matchText = (value: string) => value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-
-function closeLibrary() {
-  navigate("/");
-  document.getElementById("attachments-toggle")?.focus();
-}
+const changeFilters = (change: Partial<AttachmentFilters>) => setBrowse({ ...change, page: 0 });
 
 export function Attachments() {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const accounts = useAccountsStore((state) => state.accounts);
   const [refresh, setRefresh] = useState(0);
-  const [retry, setRetry] = useState(0);
   const scope = JSON.stringify(
     accounts.map(({ config, gmail }) => ({
       id: config.id,
@@ -81,63 +91,106 @@ export function Attachments() {
       delegated: config.gmail.delegatedAccountId,
     })),
   );
-  const mailboxes = useAttachmentFiles(scope, refresh, retry);
-  const { account, kind, query, sort, page } = useBrowseState();
+  const { mailboxes, setCategory, retry } = useAttachmentFiles(scope, refresh);
+  const browse = useBrowseState();
+  const {
+    accountIds,
+    kinds,
+    categories,
+    query,
+    sender,
+    extension,
+    from,
+    through,
+    size,
+    sort,
+    page,
+  } = browse;
   const { config } = useConfig();
   const configMutation = useConfigMutation();
   const grid = config?.["attachments.layout"] === "grid";
   const searchInput = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
+  const restore = useRef<LibraryPosition | null>(position);
+  const previousBrowse = useRef(browse);
+  const previousGrid = useRef(grid);
   const date = useMemo(
     () => createDateTimeFormatter({ year: "numeric", month: "short", day: "numeric" }),
     [],
   );
-  const chosenAccount = accounts.find((a) => a.config.id === account);
-  const chosen = chosenAccount?.config.id ?? "";
-  const scoped = accounts.filter((a) => !chosen || a.config.id === chosen);
-  const loading = scoped.some(
+  const chosen = useMemo(
+    () => accountIds.filter((id) => accounts.some((a) => a.config.id === id)),
+    [accountIds, accounts],
+  );
+  const scoped = accounts.filter((a) => !chosen.length || chosen.includes(a.config.id));
+  const scanning = scoped.filter(
     (a) =>
       !a.gmail.attentionRequired && (mailboxes[a.config.id]?.status ?? "loading") === "loading",
   );
-  const unavailable = scoped.filter(
-    (a) => a.gmail.attentionRequired || mailboxes[a.config.id]?.status === "error",
+  const loading = scanning.length > 0;
+  const incomplete = scoped.filter(
+    (a) => !a.gmail.attentionRequired && mailboxes[a.config.id]?.status === "incomplete",
   );
-  const unavailableAccounts = unavailable.map((a) => getAccountLabel(a.config.label)).join(", ");
+  const accountNames = (subset: typeof scoped) =>
+    new Intl.ListFormat(i18n.locale).format(subset.map((a) => getAccountLabel(a.config.label)));
+  const partialAccounts = accountNames(
+    incomplete.filter((a) => mailboxes[a.config.id]?.files.length),
+  );
+  const unavailableAccounts = accountNames(
+    incomplete.filter((a) => !mailboxes[a.config.id]?.files.length),
+  );
+  const signedOutAccounts = accountNames(scoped.filter((a) => a.gmail.attentionRequired));
+  const hasIssue = !!(incomplete.length || signedOutAccounts);
+  const loadingAccounts = accountNames(scanning);
 
-  const { results, counts } = useMemo(() => {
-    const text = matchText(query.trim());
-    const counts = { all: 0, pdf: 0, sheet: 0, document: 0, image: 0, other: 0 };
-    const results: LibraryFile[] = [];
-    for (const { config: accountConfig, gmail } of accounts) {
-      if (gmail.attentionRequired || (chosen && chosen !== accountConfig.id)) {
-        continue;
-      }
-      for (const file of mailboxes[accountConfig.id]?.files ?? []) {
-        if (text && !matchText([file.name, file.subject, file.sender].join(" ")).includes(text)) {
-          continue;
+  const categoryLabels = useCategoryLabels();
+  const byName = useMemo(
+    () => new Intl.Collator(i18n.locale, { numeric: true, sensitivity: "base" }),
+    [i18n.locale],
+  );
+  const index = useMemo(
+    () =>
+      accounts.flatMap(({ config: account, gmail }) => {
+        const mailbox = mailboxes[account.id];
+        if (!mailbox || gmail.attentionRequired) {
+          return [];
         }
-        const type = fileKind(file.name);
-        counts.all++;
-        counts[type]++;
-        if (kind === "all" || kind === type) {
-          results.push({ ...file, account: accountConfig });
-        }
-      }
-    }
-    results.sort(
-      (a, b) =>
-        (sort === "name" ? a.name.localeCompare(b.name) : 0) ||
-        b.receivedAt - a.receivedAt ||
-        a.account.id.localeCompare(b.account.id) ||
-        a.id.localeCompare(b.id),
-    );
-    return { results, counts };
-  }, [accounts, mailboxes, chosen, kind, query, sort]);
+        return mailbox.files.map((file) =>
+          indexAttachment({ ...file, account, mailboxKey: mailbox.mailboxKey }),
+        );
+      }),
+    [accounts, mailboxes],
+  );
+  const matches = useMemo(
+    () =>
+      filterAttachments(index, {
+        accountIds: chosen,
+        kinds,
+        categories,
+        query,
+        sender,
+        extension,
+        from,
+        through,
+        size,
+      }),
+    [index, chosen, kinds, categories, query, sender, extension, from, through, size],
+  );
+  const results = useMemo(
+    () =>
+      [...matches.results].sort(
+        (a, b) =>
+          (sort === "name" ? byName.compare(a.name, b.name) : 0) ||
+          b.receivedAt - a.receivedAt ||
+          a.account.id.localeCompare(b.account.id) ||
+          a.id.localeCompare(b.id),
+      ),
+    [matches, sort, byName],
+  );
   const count = results.length;
   const pages = Math.ceil(count / pageSize);
   const currentPage = Math.min(page, Math.max(0, pages - 1));
-  const filtered = !!(chosen || query || kind !== "all");
-  const kinds: KindOption[] = [
+  const kindOptions: KindOption[] = [
     { value: "all", label: t`All files` },
     { value: "pdf", label: "PDF" },
     { value: "document", label: t`Documents` },
@@ -149,30 +202,153 @@ export function Attachments() {
     { value: "recent", label: t`Newest first` },
     { value: "name", label: t`File name` },
   ];
-  const title = kinds.find((option) => option.value === kind)?.label;
-  const clear = () => setBrowse({ account: "", kind: "all", query: "", page: 0 });
-  const filters = (
-    <>
-      <LibraryFilters
-        kinds={kinds}
-        counts={counts}
-        kind={kind}
-        onKind={(kind) => setBrowse({ kind, page: 0 })}
-        accounts={accounts.map((a) => a.config)}
-        chosen={chosen}
-        onAccount={(account) => setBrowse({ account, page: 0 })}
-      />
-      {filtered && count > 0 && (
-        <Button variant="ghost" size="sm" className="mt-4 text-muted-foreground" onClick={clear}>
-          <XIcon />
-          <Trans>Clear filters</Trans>
-        </Button>
-      )}
-    </>
+  const clear = () => {
+    changeFilters(emptyAttachmentFilters);
+    searchInput.current?.focus();
+  };
+  const sizeLabels = useSizeLabels();
+  const dateLabels = useMemo(
+    () => new Intl.DateTimeFormat(i18n.locale, { dateStyle: "medium" }),
+    [i18n.locale],
   );
-  useEffect(() => {
-    viewport.current?.scrollTo(0, 0);
-  }, [query, chosen, kind, currentPage, sort, grid]);
+  const formatDay = (day: string) => {
+    const date = dateBoundary(day);
+    return Number.isFinite(+date) ? dateLabels.format(date) : day;
+  };
+  const startDate = from && formatDay(from);
+  const endDate = through && formatDay(through);
+  const details = [
+    {
+      key: "sender",
+      label: sender.trim() && t`From ${sender}`,
+      Icon: UserRoundIcon,
+      remove: () => changeFilters({ sender: "" }),
+    },
+    {
+      key: "extension",
+      label: extension === null ? "" : extension ? "." + extension : t`No extension`,
+      Icon: FileIcon,
+      remove: () => changeFilters({ extension: null }),
+    },
+    {
+      key: "from",
+      label: from && t`Since ${startDate}`,
+      Icon: CalendarDaysIcon,
+      remove: () => changeFilters({ from: "" }),
+    },
+    {
+      key: "through",
+      label: through && t`Through ${endDate}`,
+      Icon: CalendarDaysIcon,
+      remove: () => changeFilters({ through: "" }),
+    },
+    {
+      key: "size",
+      label: size ? sizeLabels[size] : "",
+      Icon: HardDriveIcon,
+      remove: () => changeFilters({ size: null }),
+    },
+  ].filter(({ label }) => label);
+  const activeFilters = [
+    ...accounts
+      .filter((a) => chosen.includes(a.config.id))
+      .map(({ config }) => ({
+        key: "account-" + config.id,
+        label: getAccountLabel(config.label),
+        Icon: MailIcon,
+        remove: () => changeFilters({ accountIds: toggleValue(chosen, config.id) }),
+      })),
+    ...kindOptions
+      .filter((option) => option.value !== "all" && kinds.includes(option.value))
+      .map(({ value, label }) => ({
+        key: "format-" + value,
+        label,
+        Icon: FileIcon,
+        remove: () => changeFilters({ kinds: kinds.filter((kind) => kind !== value) }),
+      })),
+    ...categories.map((category) => ({
+      key: category,
+      label: categoryLabels[category],
+      Icon: categoryIcons[category],
+      remove: () => changeFilters({ categories: toggleValue(categories, category) }),
+    })),
+    ...details,
+  ];
+  const filtered = activeFilters.length > 0 || !!query.trim();
+  const formats = (
+    <FormatFilters
+      kinds={kindOptions}
+      selected={kinds}
+      counts={matches.kinds}
+      onKind={(kind) => changeFilters({ kinds: kind === "all" ? [] : toggleValue(kinds, kind) })}
+    />
+  );
+  const filters = (
+    <LibraryFilters
+      categories={categories}
+      categoryLabels={categoryLabels}
+      categoryCounts={matches.categories}
+      onCategory={(category) =>
+        changeFilters({ categories: category === "all" ? [] : toggleValue(categories, category) })
+      }
+      accounts={accounts.map((a) => a.config)}
+      chosen={chosen}
+      accountCounts={matches.accounts}
+      onAccount={(id) => changeFilters({ accountIds: id ? toggleValue(chosen, id) : [] })}
+    />
+  );
+  const detailFilters = (
+    <DetailFilters
+      filters={browse}
+      onChange={changeFilters}
+      sizeLabels={sizeLabels}
+      extensionCounts={matches.extensions}
+      sizeCounts={matches.sizes}
+    />
+  );
+  useLayoutEffect(() => {
+    const el = viewport.current;
+    if (!el) {
+      return;
+    }
+    if (
+      previousBrowse.current !== browse ||
+      (config && previousGrid.current !== grid && !restore.current)
+    ) {
+      previousBrowse.current = browse;
+      restore.current = null;
+      position = { top: 0 };
+      el.scrollTop = 0;
+    }
+    previousGrid.current = grid;
+    const saved = restore.current;
+    if (!saved || !config) {
+      return;
+    }
+    const fileIndex = saved.key
+      ? results.findIndex((file) => JSON.stringify([file.mailboxKey, file.id]) === saved.key)
+      : -1;
+    if (fileIndex >= 0 && Math.floor(fileIndex / pageSize) !== currentPage) {
+      if (!loading) {
+        useBrowseState.setState({ page: Math.floor(fileIndex / pageSize) });
+        previousBrowse.current = useBrowseState.getState();
+      }
+      return;
+    }
+    const file = saved.key
+      ? el.querySelector<HTMLButtonElement>(`[data-file-key="${CSS.escape(saved.key)}"]`)
+      : null;
+    if (file && saved.offset !== undefined) {
+      el.scrollTop +=
+        file.getBoundingClientRect().top - el.getBoundingClientRect().top - saved.offset;
+      file.focus({ preventScroll: true });
+    } else {
+      el.scrollTop = saved.top;
+    }
+    if (!loading) {
+      restore.current = null;
+    }
+  }, [browse, config, currentPage, grid, loading, results]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (
@@ -180,35 +356,49 @@ export function Attachments() {
         event.defaultPrevented ||
         event.isComposing ||
         document.querySelector(
-          '[data-slot="popover-content"], [data-slot="select-content"], [data-slot="dialog-content"]',
+          ':is([data-slot="popover-content"], [data-slot="select-content"], [data-slot="dialog-content"], [data-slot="dropdown-menu-content"])[data-open]',
         )
       ) {
         return;
       }
-      event.preventDefault();
       if (event.target === searchInput.current && useBrowseState.getState().query) {
+        event.preventDefault();
         setBrowse({ query: "", page: 0 });
       } else {
-        closeLibrary();
+        event.preventDefault();
+        ipc.main.send("workspaceApp.goBack");
       }
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    // Inspect the open layer before it handles Escape. Closing animations leave portals mounted.
+    document.addEventListener("keydown", onKey, true);
+    return () => document.removeEventListener("keydown", onKey, true);
   }, []);
 
   return (
     <main
       aria-label={t`Attachments`}
-      className="@container/library flex min-h-0 min-w-0 flex-1 flex-col bg-sidebar"
+      className="attachment-library @container/library flex min-h-0 min-w-0 flex-1 flex-col bg-background"
     >
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-2.5 px-3 py-3 @min-[38rem]/library:flex-nowrap @min-[38rem]/library:px-5 @min-[38rem]/library:py-4">
-        <div className="mr-auto flex min-w-0 items-center gap-2.5">
-          <PaperclipIcon aria-hidden="true" className="size-5 text-muted-foreground" />
-          <h1 className="text-xl font-semibold tracking-tight">
-            <Trans>Attachments</Trans>
-          </h1>
+      <header className="attachment-header">
+        <div className="attachment-heading">
+          <span className="attachment-library-icon">
+            <PaperclipIcon aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <h1>
+              <Trans>Attachments</Trans>
+            </h1>
+            <span
+              aria-live="polite"
+              aria-atomic="true"
+              aria-busy={loading}
+              className="block min-h-4 text-xs text-muted-foreground tabular-nums"
+            >
+              {(!loading || count > 0) && <Plural value={count} one="# file" other="# files" />}
+            </span>
+          </div>
         </div>
-        <InputGroup className="order-last h-9 w-full bg-background @min-[38rem]/library:order-0 @min-[38rem]/library:max-w-80">
+        <InputGroup className="attachment-search">
           <InputGroupAddon>
             <SearchIcon />
           </InputGroupAddon>
@@ -248,59 +438,44 @@ export function Attachments() {
           >
             <RefreshCwIcon />
           </Button>
-          <Button variant="ghost" size="icon" title={t`Close attachments`} onClick={closeLibrary}>
-            <XIcon />
-          </Button>
         </div>
       </header>
-      <div className="flex min-h-0 flex-1 gap-4 px-2 pb-2 @min-[38rem]/library:px-4 @min-[38rem]/library:pb-4">
+      <div className="flex min-h-0 flex-1">
         <aside
           aria-label={t`Filters`}
-          className="hidden w-44 shrink-0 overflow-y-auto pt-3 @min-[54rem]/library:block"
+          className="attachment-rail hidden @min-[54rem]/library:block"
         >
           {filters}
         </aside>
         <section
-          aria-label={title}
-          className="@container/results flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background"
+          aria-label={t`All files`}
+          className="@container/results flex min-h-0 min-w-0 flex-1 flex-col"
         >
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b px-3 py-3 @min-[36rem]/results:px-4">
-            <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-              <h2 className="text-base font-semibold tracking-tight">{title}</h2>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                <Plural value={count} one="# file" other="# files" />
-              </span>
-              {chosenAccount && (
-                <span
-                  className="max-w-32 truncate text-xs text-muted-foreground"
-                  title={getAccountLabel(chosenAccount.config.label)}
-                >
-                  · {getAccountLabel(chosenAccount.config.label)}
-                </span>
-              )}
+          <div className="attachment-toolbar">
+            <div className="hidden min-w-0 flex-1 @min-[54rem]/library:block">{formats}</div>
+            <div className="@min-[54rem]/library:hidden">
+              <FilterMenu
+                title={t`Filters`}
+                applied={activeFilters.length}
+                count={count}
+                onClear={filtered ? () => changeFilters(emptyAttachmentFilters) : undefined}
+              >
+                <h2>{t`File type`}</h2>
+                {formats}
+                {filters}
+                {detailFilters}
+              </FilterMenu>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <div className="@min-[54rem]/library:hidden">
-                <Popover>
-                  <PopoverTrigger
-                    render={
-                      <Button
-                        variant={chosen || kind !== "all" ? "secondary" : "outline"}
-                        size="icon"
-                        title={t`Filters`}
-                      />
-                    }
-                  >
-                    <SlidersHorizontalIcon />
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="start"
-                    className="max-h-[min(70vh,var(--available-height))] w-56 overflow-y-auto"
-                  >
-                    <PopoverTitle className="sr-only">{t`Filters`}</PopoverTitle>
-                    {filters}
-                  </PopoverContent>
-                </Popover>
+            <div className="attachment-view-tools">
+              <div className="hidden @min-[54rem]/library:block">
+                <FilterMenu
+                  title={t`More filters`}
+                  applied={details.length}
+                  count={count}
+                  onClear={filtered ? () => changeFilters(emptyAttachmentFilters) : undefined}
+                >
+                  {detailFilters}
+                </FilterMenu>
               </div>
               <Select
                 value={sort}
@@ -311,7 +486,10 @@ export function Attachments() {
                   }
                 }}
               >
-                <SelectTrigger aria-label={t`Sort by`} className="max-w-40 gap-1.5 text-xs">
+                <SelectTrigger
+                  aria-label={t`Sort by`}
+                  className="attachment-sort max-w-40 gap-1.5 text-xs"
+                >
                   <ArrowDownWideNarrowIcon className="size-3.5 text-muted-foreground" />
                   <SelectValue className="truncate" />
                 </SelectTrigger>
@@ -326,7 +504,7 @@ export function Attachments() {
               <div
                 role="group"
                 aria-label={t`Layout`}
-                className="flex gap-0.5 rounded-lg border bg-muted/60 p-0.5"
+                className="attachment-layout-toggle flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5"
               >
                 <Button
                   variant="ghost"
@@ -351,20 +529,71 @@ export function Attachments() {
               </div>
             </div>
           </div>
-          {unavailable.length > 0 && (
+          {activeFilters.length > 0 && (
+            <div className="attachment-applied">
+              <div className="attachment-filter-chips">
+                {activeFilters.map(({ key, label, Icon, remove }) => (
+                  <button
+                    type="button"
+                    key={key}
+                    className="attachment-filter-chip"
+                    aria-label={t`Remove filter “${label}”`}
+                    onClick={(event) => {
+                      if (event.detail === 0) {
+                        const next =
+                          event.currentTarget.nextElementSibling ??
+                          event.currentTarget.previousElementSibling;
+                        (next instanceof HTMLButtonElement ? next : searchInput.current)?.focus();
+                      }
+                      remove();
+                    }}
+                  >
+                    <Icon aria-hidden="true" />
+                    <span className="truncate">{label}</span>
+                    <XIcon aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="shrink-0 text-xs"
+                onClick={clear}
+              >{t`Clear filters`}</Button>
+            </div>
+          )}
+          {hasIssue && (
             <div
               role="status"
               className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b bg-muted/50 px-4 py-2 text-xs text-muted-foreground"
             >
               <CircleAlertIcon className="size-4 shrink-0" />
-              <span className="min-w-40 flex-1">
-                <Trans>
-                  Couldn’t load attachments for {unavailableAccounts}. Check your Gmail connection
-                  and refresh.
-                </Trans>
-              </span>
-              {unavailable.some((a) => !a.gmail.attentionRequired) && (
-                <Button variant="outline" size="sm" onClick={() => setRetry((n) => n + 1)}>
+              <div className="min-w-40 flex-1 space-y-1">
+                {partialAccounts && (
+                  <p>
+                    <Trans>
+                      Some messages in {partialAccounts} couldn’t be checked. Previously loaded
+                      files are still available.
+                    </Trans>
+                  </p>
+                )}
+                {unavailableAccounts && (
+                  <p>
+                    <Trans>Couldn’t check {unavailableAccounts} for attachments.</Trans>
+                  </p>
+                )}
+                {signedOutAccounts && (
+                  <p>
+                    <Trans>Sign in to {signedOutAccounts} to load attachments.</Trans>
+                  </p>
+                )}
+              </div>
+              {incomplete.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => retry(incomplete.map((a) => a.config.id))}
+                >
                   <Trans>Retry</Trans>
                 </Button>
               )}
@@ -373,29 +602,53 @@ export function Attachments() {
           {count > 0 && loading && (
             <div className="flex items-center gap-2 border-b px-4 py-1.5 text-xs text-muted-foreground">
               <Loader2Icon className="size-3 motion-safe:animate-spin" />
-              <Trans>Loading older mail…</Trans>
+              {hasIssue ? (
+                <Trans>Still checking {loadingAccounts}…</Trans>
+              ) : (
+                <Trans>Loading older mail…</Trans>
+              )}
             </div>
           )}
-          <div ref={viewport} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div
+            ref={viewport}
+            className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+            onScroll={(event) => {
+              if (!restore.current) {
+                position.top = event.currentTarget.scrollTop;
+              }
+            }}
+            onWheel={() => {
+              restore.current = null;
+              position.key = undefined;
+            }}
+          >
             {count > 0 ? (
               <>
                 {!grid && <ListHeadings />}
-                <ul
-                  className={
-                    grid
-                      ? "grid grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] gap-3 p-3 text-sm @min-[36rem]/results:p-4"
-                      : "text-sm"
-                  }
-                >
+                <ul className={grid ? "attachment-grid" : "text-sm"}>
                   {results
                     .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
                     .map((item) => (
                       <FileItem
-                        key={JSON.stringify([item.account.id, item.id])}
+                        key={JSON.stringify([item.mailboxKey, item.id])}
                         item={item}
+                        onOpenSource={(button) => {
+                          const el = viewport.current;
+                          if (el) {
+                            position = {
+                              top: el.scrollTop,
+                              key: button.dataset.fileKey,
+                              offset:
+                                button.getBoundingClientRect().top - el.getBoundingClientRect().top,
+                            };
+                          }
+                        }}
+                        onCategory={(category) =>
+                          setCategory(item.account.id, item.mailboxKey, item.id, category)
+                        }
                         grid={grid}
                         date={date}
-                        showAccount={!chosen && accounts.length > 1}
+                        showAccount={scoped.length > 1}
                         showSenderIcons={config?.["gmail.showSenderIcons"] === true}
                       />
                     ))}
@@ -416,18 +669,18 @@ export function Attachments() {
                   <EmptyTitle>
                     {loading
                       ? t`Looking for attachments…`
-                      : kind !== "all" || query
+                      : activeFilters.length > chosen.length || query.trim()
                         ? t`No matching files`
-                        : unavailable.length
+                        : hasIssue
                           ? t`No files available`
                           : t`No attachments`}
                   </EmptyTitle>
-                  {!loading && !filtered && !unavailable.length && (
+                  {!loading && !filtered && !hasIssue && (
                     <EmptyDescription>
                       <Trans>Files attached to your Gmail messages appear here.</Trans>
                     </EmptyDescription>
                   )}
-                  {filtered && (
+                  {filtered && !activeFilters.length && (
                     <Button variant="outline" size="sm" onClick={clear}>
                       <Trans>Clear filters</Trans>
                     </Button>

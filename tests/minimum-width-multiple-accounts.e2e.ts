@@ -15,12 +15,15 @@ const FIRST_ACCOUNT_ID = "first";
 
 const SECOND_ACCOUNT_ID = "second";
 
-const ggmail = useApp({
-  accounts: [
-    seedAccount({ id: FIRST_ACCOUNT_ID, label: "First" }),
-    seedAccount({ id: SECOND_ACCOUNT_ID, label: "Second", selected: false }),
-  ],
-});
+const ggmail = useApp(
+  {
+    accounts: [
+      seedAccount({ id: FIRST_ACCOUNT_ID, label: "First" }),
+      seedAccount({ id: SECOND_ACCOUNT_ID, label: "Second", selected: false }),
+    ],
+  },
+  { args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
+);
 
 function seedMessages(accountId: string): GmailInboxMessage[] {
   return Array.from({ length: 5 }, (_, index) => ({
@@ -34,15 +37,16 @@ function seedMessages(accountId: string): GmailInboxMessage[] {
 }
 
 test("the unified inbox fits the window at its minimum width", async () => {
-  const windowWidth = await setMinimumWindowWidth(ggmail);
+  await setMinimumWindowWidth(ggmail);
 
-  expect(await ggmail.runMenuCommand("Unified Inbox")).toBe(true);
+  expect(await ggmail.runMenuCommand("All Mail")).toBe(true);
 
-  await expect(ggmail.renderer.getByTestId("settings-title")).toHaveText("Unified inbox");
+  await expect(ggmail.renderer.getByTestId("settings-title")).toHaveText("All Mail");
 
   const findings: string[] = [];
 
   const check = async (where: string) => {
+    const windowWidth = await ggmail.renderer.evaluate(() => innerWidth);
     for (const misfit of await readPageMisfits(ggmail.renderer)) {
       findings.push(`${windowWidth}px ${where}: ${misfit}`);
     }
@@ -50,6 +54,19 @@ test("the unified inbox fits the window at its minimum width", async () => {
 
   await check("empty");
 
+  const reset = ggmail.gmailStandIn.serveGmailPages(() => "<main>Inbox</main>");
+  await ggmail.app.evaluate(
+    async ({ webContents, session }, { ids, url }) => {
+      for (const id of ids) {
+        const view = webContents
+          .getAllWebContents()
+          .find((w) => w.session === session.fromPartition("persist:" + id));
+        await view?.loadURL(url);
+      }
+    },
+    { ids: [FIRST_ACCOUNT_ID, SECOND_ACCOUNT_ID], url: ggmail.gmailStandIn.gmailUrl },
+  );
+  reset();
   await ggmail.app.evaluate(
     ({ BrowserWindow }, pushes) => {
       const window = BrowserWindow.getAllWindows().find((candidate) =>
@@ -57,7 +74,7 @@ test("the unified inbox fits the window at its minimum width", async () => {
       );
 
       for (const [accountId, messages] of pushes) {
-        window?.webContents.send("gmail.inboxChanged", accountId, messages);
+        window?.webContents.send("gmail.inboxChanged", accountId, { status: "ready", messages });
       }
     },
     [FIRST_ACCOUNT_ID, SECOND_ACCOUNT_ID].map((id) => [id, seedMessages(id)] as const),
@@ -66,6 +83,17 @@ test("the unified inbox fits the window at its minimum width", async () => {
   await expect(ggmail.renderer.getByRole("row")).toHaveCount(10);
 
   await check("with messages");
+
+  // The optional unrestricted window supports 320px. The two-line header must
+  // leave both the close button and its keyboard hint clear of the search field.
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows().find((win) =>
+      win.webContents.getURL().includes("main.html"),
+    );
+    window?.setMinimumSize(320, 320);
+  });
+  await setMinimumWindowWidth(ggmail);
+  await check("unrestricted with messages");
 
   expect(findings).toEqual([]);
 });

@@ -25,8 +25,9 @@ export const GMAIL_FEED_LABELS = {
   important: "^iim",
 } as const;
 
-export function gmailFeedUrl(label?: keyof typeof GMAIL_FEED_LABELS) {
-  return label ? `${GMAIL_INBOX_FEED_URL}/${GMAIL_FEED_LABELS[label]}` : GMAIL_INBOX_FEED_URL;
+export function gmailFeedUrl(label?: keyof typeof GMAIL_FEED_LABELS, mailbox = GMAIL_URL) {
+  const feed = mailbox.replace(/\/$/, "") + "/feed/atom";
+  return label ? `${feed}/${GMAIL_FEED_LABELS[label]}` : feed;
 }
 
 /**
@@ -79,6 +80,11 @@ export function createGmailDelegatedAccountUrl(delegatedAccountId: string) {
 export function isGmailComposeWindowUrl(url: string) {
   return url.startsWith(GMAIL_URL) && url.includes("/popout");
 }
+
+export type InboxUpdate =
+  | { status: "ready"; messages: GmailInboxMessage[] }
+  | { status: "syncing" | "retrying"; messages?: GmailInboxMessage[] }
+  | { status: "signIn" };
 
 export interface GmailInboxMessage {
   id: string;

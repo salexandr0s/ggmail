@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import assert from "node:assert/strict";
-import { readThreadText } from "./thread-text";
+import { extractMessages, readThreadText, readThreadPreview } from "./thread-text";
 
 const message = (sender: string, date: string, body: string) =>
   `<table class="message"><tbody><tr><td>${sender}</td><td>${date}</td></tr>
@@ -47,4 +47,27 @@ test("rejects a sign-in page or incomplete print markup", () => {
   expect(() =>
     readThreadText('<table class="message"><tr><td>Loading</td></tr></table>', 0),
   ).toThrow();
+});
+
+test("source preview continues the same message across pages and keeps quoted headers in the body", () => {
+  const long = "Words ".repeat(3000);
+  const html =
+    message("Mira", "Nov 1", `${long}<br>From: Sam<br>Date: Nov 3`) +
+    message("Sam", "Nov 4", "Approved");
+  const all = readThreadText(html, 0);
+  const messages = extractMessages(html);
+  const first = readThreadPreview(messages, 0);
+  expect(first.messages.map(({ sender }) => sender)).toEqual(["Mira"]);
+  assert(first.nextOffset !== null);
+  const last = readThreadPreview(messages, first.nextOffset);
+  expect(last.nextOffset).toBeNull();
+  expect(last.messages.map(({ index, sender }) => [index, sender])).toEqual([
+    [0, "Mira"],
+    [1, "Sam"],
+  ]);
+  assert(first.messages[0] && last.messages[0]);
+  expect(first.messages[0].body + last.messages[0].body).toContain(
+    long.trimEnd() + "\nFrom: Sam\nDate: Nov 3",
+  );
+  expect(all.messageCount).toBe(2);
 });

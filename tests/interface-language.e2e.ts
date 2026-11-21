@@ -67,7 +67,7 @@ test("every renderer page carries the active language", async () => {
     window.url().includes("recent-download-history.html"),
   );
 
-  await ggmail.renderer.getByTitle("Show recent download history").click();
+  expect(await ggmail.runMenuCommand("Show recent download history")).toBe(true);
 
   const popup = await openingPopup;
 

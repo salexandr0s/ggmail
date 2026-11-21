@@ -22,15 +22,15 @@ export function UnifiedInboxSettings() {
       <SettingsContent>
         <FieldGroup>
           <ConfigSwitchField
-            label={t`Enable unified inbox`}
-            description={t`Show all unread messages from every account in a single unified inbox.`}
+            label={t`Enable All Mail`}
+            description={t`Show unread messages from your accounts in one place.`}
             configKey="unifiedInbox.enabled"
             restartRequired
           />
           {config["unifiedInbox.enabled"] && (
             <ConfigSwitchField
               label={t`Show sender icons`}
-              description={t`Show sender icons next to the senders in the unified inbox.`}
+              description={t`Show sender icons in All Mail.`}
               configKey="unifiedInbox.showSenderIcons"
             />
           )}

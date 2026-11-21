@@ -54,5 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initCss();
   initUrlPreview();
 
+  setUserEmail();
   observeBodyMutations(runFeatures);
 });

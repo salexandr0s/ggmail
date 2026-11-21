@@ -1,5 +1,3 @@
-import { plural } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import {
@@ -11,6 +9,8 @@ import {
 } from "@ggmail/ui/components/dropdown-menu";
 import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from "@ggmail/ui/components/field";
 import { cn } from "@ggmail/ui/lib/utils";
+import { plural } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDownIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -117,7 +117,7 @@ export function LanguagesSettings() {
                     // clipping, the way a settings sidebar item does; min-h-8
                     // and py-1 keep a one-line trigger at the Button's h-8.
                     className={cn(
-                      "h-auto min-h-8 w-full justify-between py-1 text-left font-normal whitespace-normal",
+                      "h-auto min-h-8 w-full justify-start gap-1.5 py-1 text-left font-normal whitespace-normal",
                       selected.length === 0 && "text-muted-foreground",
                     )}
                   >

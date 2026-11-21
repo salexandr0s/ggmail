@@ -19,6 +19,7 @@ const available = [primary, secondary].map(({ accountId, ownerEmail }) => ({
 }));
 const search = mock<typeof import("./mail-context").searchAllMail>();
 const read = mock<typeof import("./mail-context").readMailSource>();
+const preview = mock<typeof import("./mail-context").readMailPreview>();
 
 let key = "account/inbox";
 let sources: MailSource[] = [];
@@ -45,6 +46,7 @@ mock.module("./mail-context", () => ({
   getAssistantMailboxes: () => available,
   openMailSource: (_scope: unknown, source: MailSource) => navigate(source),
   readMailSource: read,
+  readMailPreview: preview,
   ensureCurrentScope: (_scope: unknown, signal: AbortSignal) => signal.throwIfAborted(),
   readCurrentMail: () => Promise.resolve({ kind: "mailView", sources }),
   searchAllMail: search,
@@ -88,7 +90,12 @@ test("a revision receives the actual subject and body even when ChatGPT also ret
 
 test("citations keep their numbers when rows reorder and can only open in their own conversation", async () => {
   const chat = new AssistantChat();
-  const first = { ...primary, hash: "#all/aa", subject: "Agenda" };
+  const first = {
+    ...primary,
+    hash: "#all/aa",
+    subject: "Agenda",
+    excerpt: "The deadline is Friday.",
+  };
   const second = { ...primary, hash: "#all/bb", subject: "Budget" };
   sources = [first];
   respondMock.mockResolvedValueOnce({ text: "Read [1]", items: [], calls: [] });
@@ -112,9 +119,17 @@ test("citations keep their numbers when rows reorder and can only open in their 
     throw new Error("Missing citation");
   }
   expect(followUp.reply.citations[0]?.id).toBe(citation.id);
+  preview.mockResolvedValueOnce({ error: "Thread unavailable" });
+  expect(await chat.previewSource(citation.id, 0)).toMatchObject({
+    accountId: primary.accountId,
+    excerpt: first.excerpt,
+    nextOffset: null,
+  });
+  expect(navigate).not.toHaveBeenCalled();
   chat.openSource(citation.id);
   expect(navigate).toHaveBeenLastCalledWith(expect.objectContaining(first));
   key = "other/inbox";
+  await expect(chat.previewSource(citation.id, 0)).rejects.toThrow();
   expect(() => chat.openSource(citation.id)).toThrow();
   chat.context();
   key = "account/inbox";

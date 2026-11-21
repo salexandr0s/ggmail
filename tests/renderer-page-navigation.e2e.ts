@@ -24,7 +24,7 @@ test.beforeEach(async () => {
 
 const surfaces = {
   popup: async () => {
-    await ggmail.renderer.getByTitle("Show recent download history").click();
+    expect(await ggmail.runMenuCommand("Show recent download history")).toBe(true);
 
     return findRendererPage(ggmail, "recent-download-history");
   },

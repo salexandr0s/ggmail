@@ -81,8 +81,8 @@ const accountOptionLabels = {
     comment: "Switch for showing the account's unread badge",
   }),
   unifiedInbox: msg({
-    message: "Unified inbox",
-    comment: "Switch, and a badge on the account, for including the account in the unified inbox",
+    message: "All Mail",
+    comment: "Switch, and a badge on the account, for including the account in All Mail",
   }),
   notifications: msg({
     message: "Notifications",

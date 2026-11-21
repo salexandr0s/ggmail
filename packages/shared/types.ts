@@ -7,9 +7,16 @@ import type {
   AssistantProvider,
   AssistantRequest,
   AssistantResult,
+  SourcePreviewPage,
 } from "./assistant";
-import type { AttachmentAction, AttachmentBatch, AttachmentPreview } from "./attachments";
-import type { GmailAction, GmailInboxMessage, GmailSearchPage } from "./gmail";
+import type {
+  AttachmentAction,
+  AttachmentBatch,
+  AttachmentCategory,
+  AttachmentPreview,
+} from "./attachments";
+import type { FollowUpRow } from "./follow-ups";
+import type { GmailAction, InboxUpdate, GmailSearchPage } from "./gmail";
 import type { CatalogTag } from "./i18n";
 import type {
   AccountConfig,
@@ -215,7 +222,7 @@ export type Config = {
 
 export type IpcMainEvents =
   | {
-      "accounts.selectAccount": [accountId: AccountConfig["id"]];
+      "accounts.selectAccount": [accountId: AccountConfig["id"], showMailbox?: boolean];
       "accounts.selectNextAccount": [];
       "accounts.selectPreviousAccount": [];
       "accounts.addAccount": [account: AccountConfigInput];
@@ -228,11 +235,12 @@ export type IpcMainEvents =
       "workspaceApp.stop": [workspaceAppId?: string];
       "gmail.unreadCountChanged": [unreadCountString: string];
       "gmail.setOutOfOffice": [outOfOffice: boolean];
-      "unifiedSearch.cancel": [accountId: string, requestId: string];
+      "unifiedSearch.clear": [];
       "gmail.search": [searchQuery: string];
       "assistant.setMounted": [mounted: boolean];
       "assistant.setInset": [inset: number];
       "assistant.clear": [];
+      "assistant.closePreview": [id: string];
       "assistant.cancelSignIn": [];
       "assistant.stop": [requestId: string];
       "gmail.openUserStyles": [openIn: "editor" | "folder"];
@@ -243,8 +251,10 @@ export type IpcMainEvents =
       "gmail.closeComposeWindow": [];
       "gmail.undoMessageSent": [browserWindowId: number];
       "gmail.setUserEmail": [email: string];
-      "gmail.openMessage": [messageId: string];
+      "gmail.openInboxSignIn": [accountId: string];
+      "gmail.openMessage": [messageId: string, accountId?: string];
       "gmail.messageHandled": [requestId: string, success: boolean];
+      "titleBar.showMailViews": [anchor: { x: number; y: number }];
       "titleBar.toggleAppMenu": [anchor?: { x: number; y: number }];
       "window.focusActiveView": [];
       "desktopSources.select": [desktopSource: SelectedDesktopSource];
@@ -292,6 +302,10 @@ export type IpcMainEvents =
       "swipeNavigation.setPageScrollEdge": [pageScrollEdge: PageScrollEdge];
     }
   | {
+      "followUps.current": () => { accountId: string; threadId: string; subject: string } | null;
+      "followUps.schedule": (accountId: string, threadId: string, due: string) => boolean;
+      "followUps.list": (accountId: string) => { rows: FollowUpRow[]; unavailable: boolean };
+      "followUps.act": (accountId: string, id: string, action: "remove" | "open") => void;
       "unifiedSearch.read": (
         accountId: string,
         requestId: string,
@@ -303,9 +317,21 @@ export type IpcMainEvents =
         accountId: string,
         mode: "snapshot" | "refresh" | "retry" | "next",
       ) => AttachmentBatch;
-      "attachments.act": (accountId: string, fileId: string, action: AttachmentAction) => void;
+      "attachments.setCategory": (
+        accountId: string,
+        mailboxKey: string,
+        fileId: string,
+        category: AttachmentCategory | null,
+      ) => void;
+      "attachments.act": (
+        accountId: string,
+        mailboxKey: string,
+        fileId: string,
+        action: AttachmentAction,
+      ) => void;
       "attachments.preview": (
         accountId: string,
+        mailboxKey: string,
         fileId: string,
         size: "thumbnail" | "full",
       ) => AttachmentPreview | null;
@@ -316,6 +342,7 @@ export type IpcMainEvents =
       "assistant.disconnect": (provider: AssistantProvider) => AssistantConnection;
       "assistant.context": () => AssistantContext;
       "assistant.send": (request: AssistantRequest) => AssistantResult;
+      "assistant.previewSource": (id: string, offset: number) => SourcePreviewPage;
       "assistant.openSource": (id: string) => void;
       "assistant.openDraft": (draft: AssistantDraft, key: string) => void;
       "assistant.insertReply": (
@@ -336,6 +363,8 @@ export type IpcMainEvents =
       "config.setConfig": (config: Partial<Config>) => void;
       "spellchecker.getAvailableLanguages": () => string[];
       "spellchecker.getOsLocale": () => string;
+      "shell.getHistory": () => { canGoBack: boolean; canGoForward: boolean };
+      "downloads.isActive": () => boolean;
       "downloads.setLocation": () => { canceled: boolean };
       "app.getLoginItemSettings": () => LoginItemSettings;
       "app.setLoginItemSettings": (settings: Partial<LoginItemSettings>) => void;
@@ -356,8 +385,9 @@ export type IpcMainEvents =
 
 export type IpcRendererEvent = {
   navigate: [to: string];
-  "unifiedSearch.invalidated": [accountId: string];
-  "attachments.invalidated": [];
+  "shell.historyChanged": [state: { canGoBack: boolean; canGoForward: boolean }];
+  "downloads.activityChanged": [active: boolean];
+  "gmail.mailboxChanged": [accountId: string];
   "assistant.progress": [id: string, text: string, activity?: AssistantActivity];
   "assistant.connectionChanged": [connection: AssistantConnection];
   "window.blurFocusedElement": [];
@@ -365,7 +395,7 @@ export type IpcRendererEvent = {
   "gmail.navigateTo": [hashLocation: GmailHashLocation];
   "gmail.handleMessage": [messageId: string, action: GmailAction, requestId: string];
   "gmail.refreshInbox": [];
-  "gmail.inboxChanged": [accountId: AccountConfig["id"], messages: GmailInboxMessage[]];
+  "gmail.inboxChanged": [accountId: AccountConfig["id"], update: InboxUpdate];
   "gmail.openMessage": [messageId: string];
   "gmail.showMessageSentNotification": [browserWindowId: number];
   "gmail.dismissMessageSentNotification": [browserWindowId: number];

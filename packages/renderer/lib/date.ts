@@ -5,6 +5,7 @@ import dayjsPrimitive from "dayjs";
 // English is dayjs's built-in locale, so this import only states the rule the
 // rest follow.
 import "dayjs/locale/de";
+import "dayjs/locale/el";
 import "dayjs/locale/en";
 import "dayjs/locale/es";
 import "dayjs/locale/es-mx";

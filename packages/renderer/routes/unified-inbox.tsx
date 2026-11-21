@@ -1,16 +1,10 @@
+import "./unified-inbox.css";
 import type { GmailAction } from "@ggmail/shared/gmail";
-import { getGoogleDomainFaviconUrl } from "@ggmail/shared/google";
 import { ms } from "@ggmail/shared/ms";
 import { ipc } from "@ggmail/shared/renderer/ipc";
-import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from "@ggmail/ui/components/avatar";
+import { AvatarGroup } from "@ggmail/ui/components/avatar";
 import { Button } from "@ggmail/ui/components/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@ggmail/ui/components/empty";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@ggmail/ui/components/empty";
 import {
   Select,
   SelectContent,
@@ -33,6 +27,9 @@ import {
 } from "@tanstack/react-table";
 import {
   ArchiveIcon,
+  CheckIcon,
+  KeyRoundIcon,
+  RefreshCwIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
@@ -45,9 +42,9 @@ import {
 } from "lucide-react";
 import { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { navigate } from "wouter/use-hash-location";
 import { AccountBadge } from "@/components/account-badge";
-import { SettingsHeader, SettingsTitle } from "@/components/settings";
+import { SenderAvatar } from "@/components/assistant/sender-avatar";
+import { InboxFollowUps } from "@/components/follow-ups";
 import { UnifiedInboxSearch } from "@/components/unified-search";
 import { createDateTimeFormatter, dayjs } from "@/lib/date";
 import { useUnifiedInbox, type UnifiedInboxMessage } from "@/lib/hooks";
@@ -55,7 +52,7 @@ import { useConfig, useConfigMutation } from "@/lib/react-query";
 
 const columnHelper = createColumnHelper<UnifiedInboxMessage>();
 
-// lingui-set comment="Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it"
+// lingui-set comment="Button on a message in All Mail. A Gmail action, so it follows Gmail's word for it"
 const MESSAGE_ACTIONS = [
   { action: "archive", label: msg`Archive`, icon: ArchiveIcon },
   { action: "markAsRead", label: msg`Mark as read`, icon: MailOpenIcon },
@@ -81,7 +78,7 @@ function MessageActionButton({
   return <Button title={t(label)} {...props} />;
 }
 
-type PendingMessageAction = { messageId: string; action: GmailAction };
+type PendingMessageAction = { accountId: string; messageId: string; action: GmailAction };
 
 const createColumns = ({
   showSenderIcons,
@@ -99,33 +96,21 @@ const createColumns = ({
   }),
   columnHelper.accessor("author.name", {
     cell: (props) => {
-      const domain = props.row.original.author.email.split("@")[1];
-
+      const senders = [props.row.original.author, ...props.row.original.contributors];
       return (
         <div
-          className="flex max-w-36 items-center gap-2"
-          title={[props.row.original.author, ...props.row.original.contributors]
-            .map(({ name, email }) => `${name} <${email}>`)
-            .join(", ")}
+          className="flex max-w-40 items-center gap-2"
+          title={senders.map(({ name, email }) => `${name} <${email}>`).join(", ")}
         >
           {showSenderIcons && (
             <AvatarGroup>
-              <Avatar className="size-4">
-                {domain && <AvatarImage src={getGoogleDomainFaviconUrl(domain, 32)} />}
-                <AvatarFallback />
-              </Avatar>
-              {props.row.original.contributors.slice(0, 2).map((contributor) => {
-                const contributorDomain = contributor.email.split("@")[1];
-
-                return (
-                  <Avatar key={contributor.email} className="size-4">
-                    {contributorDomain && (
-                      <AvatarImage src={getGoogleDomainFaviconUrl(contributorDomain, 32)} />
-                    )}
-                    <AvatarFallback />
-                  </Avatar>
-                );
-              })}
+              {senders.slice(0, 3).map(({ name, email }, index) => (
+                <SenderAvatar
+                  key={index}
+                  sender={{ name: name || email, domain: email.split("@")[1] }}
+                  className="size-6 text-base"
+                />
+              ))}
             </AvatarGroup>
           )}
           <div className="truncate">
@@ -149,11 +134,14 @@ const createColumns = ({
       // darker than the row. This is the cell the row actions overlap, the
       // date cell being narrower than they are, so the fade has to finish
       // short of this cell's edge rather than at it.
-      <div className="flex flex-1 gap-2 overflow-hidden group-hover:mask-r-from-[calc(100%-8.75rem)] group-hover:mask-r-to-[calc(100%-4.25rem)] group-data-[pending]:mask-r-from-[calc(100%-8.75rem)] group-data-[pending]:mask-r-to-[calc(100%-4.25rem)] group-data-[state=selected]:mask-r-from-[calc(100%-8.75rem)] group-data-[state=selected]:mask-r-to-[calc(100%-4.25rem)]">
-        <div className="max-w-sm shrink-0 truncate" title={props.getValue()}>
+      <div className="inbox-message-text flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden group-hover:mask-r-from-[calc(100%-8.75rem)] group-hover:mask-r-to-[calc(100%-4.25rem)] group-data-[pending]:mask-r-from-[calc(100%-8.75rem)] group-data-[pending]:mask-r-to-[calc(100%-4.25rem)] group-data-[state=selected]:mask-r-from-[calc(100%-8.75rem)] group-data-[state=selected]:mask-r-to-[calc(100%-4.25rem)]">
+        <div className="min-w-0 truncate font-semibold" title={props.getValue()}>
           {props.getValue()}
         </div>
-        <div className="min-w-0 truncate text-muted-foreground" title={props.row.original.summary}>
+        <div
+          className="min-w-0 truncate text-xs leading-4 text-muted-foreground empty:hidden"
+          title={props.row.original.summary}
+        >
           {props.row.original.summary}
         </div>
       </div>
@@ -164,13 +152,16 @@ const createColumns = ({
       const date = dayjs(props.getValue());
 
       const pendingAction =
-        pending && pending.messageId === props.row.original.id ? pending.action : null;
+        pending?.accountId === props.row.original.account.id &&
+        pending.messageId === props.row.original.id
+          ? pending.action
+          : null;
 
       return (
         <>
           {/* Hidden rather than faded, because the actions cover it whole. */}
           <div
-            className="whitespace-nowrap text-muted-foreground group-hover:invisible group-data-[pending]:invisible group-data-[state=selected]:invisible"
+            className="text-xs whitespace-nowrap text-muted-foreground tabular-nums group-hover:invisible group-data-[pending]:invisible group-data-[state=selected]:invisible"
             title={createDateTimeFormatter({
               hour: "2-digit",
               minute: "2-digit",
@@ -191,7 +182,7 @@ const createColumns = ({
                   }).format(date.toDate())
                 : createDateTimeFormatter().format(date.toDate())}
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-3 opacity-0 transition-opacity group-hover:opacity-100 group-data-[pending]:opacity-100 group-data-[state=selected]:opacity-100">
+          <div className="inbox-row-actions absolute inset-y-0 right-0 flex items-center gap-2 pr-3 opacity-0 transition-opacity group-hover:opacity-100 group-data-[pending]:opacity-100 group-data-[state=selected]:opacity-100">
             {MESSAGE_ACTIONS.map(({ action, label, icon: Icon }) => (
               <MessageActionButton
                 key={action}
@@ -237,7 +228,7 @@ function UnifiedInboxTable({
     pageSize: rowsPerPage,
   });
 
-  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [focus, setFocus] = useState<{ id: string; position: number } | null>(null);
 
   const [pending, setPending] = useState<PendingMessageAction | null>(null);
 
@@ -255,7 +246,7 @@ function UnifiedInboxTable({
       return;
     }
 
-    pendingRef.current = { messageId: message.id, action };
+    pendingRef.current = { accountId: message.account.id, messageId: message.id, action };
 
     setPending(pendingRef.current);
 
@@ -277,7 +268,7 @@ function UnifiedInboxTable({
     data: messages,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.id,
+    getRowId: (row) => JSON.stringify([row.account.id, row.id]),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       pagination,
@@ -292,6 +283,19 @@ function UnifiedInboxTable({
 
   const rows = table.getRowModel().rows;
 
+  const allRows = table.getPrePaginationRowModel().rows;
+  const found = focus ? allRows.findIndex((row) => row.id === focus.id) : -1;
+  const position = !focus ? -1 : found >= 0 ? found : Math.min(focus.position, allRows.length - 1);
+  const focusedRow = allRows[position];
+  const pageStart = pagination.pageIndex * pagination.pageSize;
+
+  const focusPosition = (next: number) => {
+    const row = allRows[next];
+    if (row) {
+      setFocus({ id: row.id, position: next });
+    }
+  };
+
   const currentPage = table.getState().pagination.pageIndex + 1;
 
   const pageCount = table.getPageCount();
@@ -303,11 +307,7 @@ function UnifiedInboxTable({
   const gPrefixTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const openMessage = (message: UnifiedInboxMessage) => {
-    navigate("/");
-
-    ipc.main.send("accounts.selectAccount", message.account.id);
-
-    ipc.main.send("gmail.openMessage", message.id);
+    ipc.main.send("gmail.openMessage", message.id, message.account.id);
   };
 
   useHotkeys(
@@ -315,61 +315,42 @@ function UnifiedInboxTable({
     (event) => {
       event.preventDefault();
 
-      if (focusedIndex === -1) {
-        setFocusedIndex(0);
-
-        return;
-      }
-
-      if (focusedIndex < rows.length - 1) {
-        setFocusedIndex(focusedIndex + 1);
-      } else if (table.getCanNextPage()) {
-        table.nextPage();
-
-        setFocusedIndex(0);
-      }
+      focusPosition(position < 0 ? pageStart : position + 1);
     },
-    [focusedIndex, rows],
+    [position, pageStart, allRows],
   );
 
   useHotkeys(
     ["k", "up"],
     (event) => {
       event.preventDefault();
-
-      if (focusedIndex === -1) {
-        setFocusedIndex(0);
-
-        return;
-      }
-
-      if (focusedIndex > 0) {
-        setFocusedIndex(focusedIndex - 1);
-      } else if (table.getCanPreviousPage()) {
-        table.previousPage();
-
-        setFocusedIndex(table.getState().pagination.pageSize - 1);
-      }
+      focusPosition(position < 0 ? pageStart : position - 1);
     },
-    [focusedIndex],
+    [position, pageStart, allRows],
   );
 
   useHotkeys(
     ["enter", "o"],
     (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest("button, a, input, [role=combobox]")
+      ) {
+        return;
+      }
       event.preventDefault();
 
-      const focusedMessage = rows[focusedIndex]?.original;
+      const focusedMessage = focusedRow?.original;
 
       if (focusedMessage) {
         openMessage(focusedMessage);
       }
     },
-    [focusedIndex, rows],
+    [focusedRow],
   );
 
   const handleFocusedMessage = (action: GmailAction) => {
-    const focusedMessage = rows[focusedIndex]?.original;
+    const focusedMessage = focusedRow?.original;
 
     if (focusedMessage) {
       runAction(focusedMessage, action);
@@ -383,7 +364,7 @@ function UnifiedInboxTable({
 
       handleFocusedMessage("archive");
     },
-    [focusedIndex, rows],
+    [focusedRow],
   );
 
   useHotkeys(
@@ -394,7 +375,7 @@ function UnifiedInboxTable({
 
       handleFocusedMessage("markAsRead");
     },
-    [focusedIndex, rows],
+    [focusedRow],
   );
 
   // Matched on the character rather than the key, because the default matches
@@ -407,7 +388,7 @@ function UnifiedInboxTable({
       handleFocusedMessage("delete");
     },
     { useKey: true },
-    [focusedIndex, rows],
+    [focusedRow],
   );
 
   useHotkeys(
@@ -418,7 +399,7 @@ function UnifiedInboxTable({
       handleFocusedMessage("markAsSpam");
     },
     { useKey: true },
-    [focusedIndex, rows],
+    [focusedRow],
   );
 
   useHotkeys("g", () => {
@@ -441,9 +422,7 @@ function UnifiedInboxTable({
     clearTimeout(gPrefixTimeoutRef.current);
 
     if (table.getCanNextPage()) {
-      table.nextPage();
-
-      setFocusedIndex(0);
+      focusPosition(pageStart + pagination.pageSize);
     }
   });
 
@@ -457,9 +436,7 @@ function UnifiedInboxTable({
     clearTimeout(gPrefixTimeoutRef.current);
 
     if (table.getCanPreviousPage()) {
-      table.previousPage();
-
-      setFocusedIndex(0);
+      focusPosition(pageStart - pagination.pageSize);
     }
   });
 
@@ -471,8 +448,17 @@ function UnifiedInboxTable({
   }, [messages.length, table]);
 
   useEffect(() => {
-    setFocusedIndex((current) => Math.min(current, Math.max(rows.length - 1, 0)));
-  }, [rows.length]);
+    if (!focusedRow || !focus) {
+      return;
+    }
+    if (focus.id !== focusedRow.id || focus.position !== position) {
+      setFocus({ id: focusedRow.id, position });
+    }
+    const targetPage = Math.floor(position / pagination.pageSize);
+    if (pagination.pageIndex !== targetPage) {
+      table.setPageIndex(targetPage);
+    }
+  }, [focus, focusedRow, position, pagination, table]);
 
   // Also on `rows`, because acting on the focused row unmounts it and the row
   // that takes its index inherits the ref without inheriting the focus.
@@ -480,7 +466,7 @@ function UnifiedInboxTable({
     focusedRowRef.current?.focus({ preventScroll: true });
 
     focusedRowRef.current?.scrollIntoView({ block: "nearest" });
-  }, [focusedIndex, rows]);
+  }, [focusedRow, rows]);
 
   useEffect(() => {
     return () => {
@@ -490,19 +476,35 @@ function UnifiedInboxTable({
 
   return (
     <>
+      <h2 id="unread-heading" className="mb-2.5 text-sm font-semibold">
+        <Trans>Unread messages</Trans>
+      </h2>
       <div className="overflow-hidden rounded-lg border">
-        <Table>
+        <Table className="unified-inbox-table" aria-labelledby="unread-heading">
           <TableBody>
-            {rows.map((row, index) => (
+            {rows.map((row) => (
               <TableRow
                 key={row.id}
-                ref={index === focusedIndex ? focusedRowRef : undefined}
-                tabIndex={index === focusedIndex ? -1 : undefined}
-                data-state={index === focusedIndex ? "selected" : undefined}
+                ref={row.id === focusedRow?.id ? focusedRowRef : undefined}
+                tabIndex={row.id === focusedRow?.id ? -1 : undefined}
+                data-state={row.id === focusedRow?.id ? "selected" : undefined}
                 // `relative` anchors the row actions rendered from the
                 // receivedAt cell, which are wider than that cell is.
-                className="group relative cursor-default outline-none"
-                data-pending={pending?.messageId === row.original.id || undefined}
+                className="group relative cursor-default outline-none focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                onBlur={(event) => {
+                  if (
+                    event.relatedTarget instanceof Element &&
+                    !event.relatedTarget.hasAttribute("data-inbox-row")
+                  ) {
+                    setFocus(null);
+                  }
+                }}
+                data-inbox-row=""
+                data-pending={
+                  (pending?.accountId === row.original.account.id &&
+                    pending.messageId === row.original.id) ||
+                  undefined
+                }
                 onClick={() => {
                   openMessage(row.original);
                 }}
@@ -511,7 +513,7 @@ function UnifiedInboxTable({
                   <TableCell
                     key={cell.id}
                     className={cn(
-                      "px-3 py-3",
+                      "px-3 py-2",
                       cell.column.id === "subject" && "w-full max-w-0",
                       cell.column.id === "receivedAt" && "text-right",
                     )}
@@ -524,79 +526,94 @@ function UnifiedInboxTable({
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4 flex justify-between">
-        <div className="flex items-center gap-2">
-          <div className="text-sm">
-            <Trans comment="Label of the unified inbox's picker for how many messages a page lists">
-              Rows per page
-            </Trans>
-          </div>
-          <Select
-            value={rowsPerPage}
-            onValueChange={(value) => {
-              if (value) {
-                table.setPageSize(value);
+      {messages.length > 10 && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <div className="text-sm">
+              <Trans comment="Label of All Mail's picker for how many messages a page lists">
+                Rows per page
+              </Trans>
+            </div>
+            <Select
+              value={rowsPerPage}
+              onValueChange={(value) => {
+                if (value) {
+                  setFocus(null);
+                  table.setPageSize(value);
 
-                configMutation.mutate({ "unifiedInbox.rowsPerPage": value });
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[10, 15, 20, 25, 30].map((value) => (
-                <SelectItem key={value} value={value}>
-                  {value}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="text-sm">
-            <Trans comment="The unified inbox's current page and how many pages it has">
-              Page {currentPage} of {pageCount}
-            </Trans>
+                  configMutation.mutate({ "unifiedInbox.rowsPerPage": value });
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 15, 20, 25, 30].map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => table.firstPage()}
-            title={t`First page`}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeftIcon />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => table.previousPage()}
-            title={t`Previous page`}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeftIcon />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => table.nextPage()}
-            title={t`Next page`}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRightIcon />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => table.lastPage()}
-            title={t`Last page`}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRightIcon />
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="text-sm">
+              <Trans comment="All Mail's current page and how many pages it has">
+                Page {currentPage} of {pageCount}
+              </Trans>
+            </div>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setFocus(null);
+                table.firstPage();
+              }}
+              title={t`First page`}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronsLeftIcon />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setFocus(null);
+                table.previousPage();
+              }}
+              title={t`Previous page`}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeftIcon />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setFocus(null);
+                table.nextPage();
+              }}
+              title={t`Next page`}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRightIcon />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setFocus(null);
+                table.lastPage();
+              }}
+              title={t`Last page`}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronsRightIcon />
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
@@ -604,6 +621,7 @@ function UnifiedInboxTable({
 export function UnifiedInbox() {
   const { config } = useConfig();
 
+  const { t } = useLingui();
   const unifiedInbox = useUnifiedInbox();
 
   const renderContent = () => {
@@ -612,25 +630,34 @@ export function UnifiedInbox() {
     }
 
     if (unifiedInbox.messages.length === 0) {
-      return (
-        <div className="py-20">
+      if (!unifiedInbox.inboxes.length) {
+        return (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <InboxIcon />
               </EmptyMedia>
               <EmptyTitle>
-                <Trans>No unread messages</Trans>
+                <Trans>No accounts are included in All Mail.</Trans>
               </EmptyTitle>
-              <EmptyDescription>
-                <Trans>
-                  The unified inbox shows every unread message from your accounts in one place. A
-                  message leaves the list after you read it.
-                </Trans>
-              </EmptyDescription>
             </EmptyHeader>
           </Empty>
-        </div>
+        );
+      }
+      if (!unifiedInbox.inboxes.every(({ status }) => status === "ready")) {
+        return null;
+      }
+      return (
+        <Empty className="py-12">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <InboxIcon />
+            </EmptyMedia>
+            <EmptyTitle role="heading" aria-level={2}>
+              <Trans>No unread messages</Trans>
+            </EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       );
     }
 
@@ -645,12 +672,59 @@ export function UnifiedInbox() {
 
   return (
     <>
-      <SettingsHeader className="flex-col">
-        <SettingsTitle>
-          <Trans comment="Title of the unified inbox page">Unified inbox</Trans>
-        </SettingsTitle>
-      </SettingsHeader>
-      <UnifiedInboxSearch>{renderContent()}</UnifiedInboxSearch>
+      <UnifiedInboxSearch>
+        <div
+          role="status"
+          className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-lg border bg-muted/35 px-3 py-1.5 text-xs text-muted-foreground empty:hidden"
+        >
+          {unifiedInbox.inboxes.map(({ account: { id, label }, status }) => {
+            if (status === "signIn") {
+              return (
+                <Button
+                  key={id}
+                  variant="outline"
+                  size="xs"
+                  className="h-auto min-h-6 max-w-full border-amber-300 bg-amber-50 py-0.5 text-left whitespace-normal text-amber-900 dark:border-amber-500/45 dark:bg-amber-400/10 dark:text-amber-200"
+                  onClick={() => ipc.main.send("gmail.openInboxSignIn", id)}
+                >
+                  <KeyRoundIcon aria-hidden="true" />
+                  <span className="wrap-anywhere">{t`Sign in to ${label}`}</span>
+                </Button>
+              );
+            }
+            const Icon =
+              status === "ready" ? CheckIcon : status === "retrying" ? RefreshCwIcon : Loader2Icon;
+            return (
+              <span
+                key={id}
+                className={cn(
+                  "inline-flex min-h-6 min-w-0 items-center gap-1.5",
+                  status !== "ready" && "font-medium text-foreground",
+                )}
+              >
+                <Icon
+                  aria-hidden="true"
+                  className={cn(
+                    "size-3.5 shrink-0",
+                    status === "ready" && "text-emerald-700 dark:text-emerald-400",
+                    status === "retrying" && "text-amber-700 dark:text-amber-400",
+                    status === "syncing" && "motion-safe:animate-spin",
+                  )}
+                />
+                <span className="wrap-anywhere">
+                  {status === "ready"
+                    ? t`${label} is up to date`
+                    : status === "retrying"
+                      ? t`${label} will retry syncing`
+                      : t`${label} is still syncing`}
+                </span>
+              </span>
+            );
+          })}
+        </div>
+        <InboxFollowUps />
+        {renderContent()}
+      </UnifiedInboxSearch>
     </>
   );
 }

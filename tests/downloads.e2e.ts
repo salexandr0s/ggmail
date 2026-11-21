@@ -156,10 +156,12 @@ test("two same-named downloads at once both survive with their own content", asy
   });
 
   await expect.poll(() => readMain("startedCount")).toBe(2);
-
+  const indicator = ggmail.renderer.getByTitle("Show recent download history");
+  await expect(indicator).toBeVisible();
   ggmail.gmailStandIn.releaseHeld();
 
   await expect.poll(() => readMain("doneStates")).toEqual(["completed", "completed"]);
+  await expect(indicator).toBeHidden();
 
   await expect.poll(savedFiles, { timeout: ms("10s") }).toEqual(["same (1).txt", "same.txt"]);
 

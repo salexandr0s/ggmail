@@ -15,6 +15,7 @@ import { memo, type ReactNode, useState } from "react";
 import { CopyButton } from "@/components/copy-button";
 import { useConfig } from "@/lib/react-query";
 import { Answer } from "./answer";
+import { AssistantMailCard, CitationNumber } from "./mail-card";
 import { SenderAvatar } from "./sender-avatar";
 
 export function DraftCard({
@@ -28,31 +29,20 @@ export function DraftCard({
 }) {
   const { t } = useLingui();
   return (
-    <section
-      aria-label={t`Draft email`}
-      className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow-xs"
+    <AssistantMailCard
+      label={t`Draft email`}
+      icon={FilePenLineIcon}
+      title={<Trans comment="Label for a suggested email draft">Draft email</Trans>}
+      tools={copyButton}
+      actions={children}
     >
-      <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2 text-foreground">
-        <FilePenLineIcon className="size-3.5" />
-        <h3 className="flex-1 text-xs font-semibold">
-          <Trans comment="Label for a suggested email draft">Draft email</Trans>
-        </h3>
-        {copyButton}
-      </div>
-      <div className="space-y-2.5 px-4 pt-3.5 pb-4 select-text">
-        {draft.subject && (
-          <p className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
-            {draft.subject}
-          </p>
-        )}
-        <p className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">{draft.body}</p>
-      </div>
-      {children && (
-        <div className="flex flex-wrap items-center gap-1.5 border-t bg-muted/25 px-3 py-2.5">
-          {children}
-        </div>
+      {draft.subject && (
+        <p className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
+          {draft.subject}
+        </p>
       )}
-    </section>
+      <p className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">{draft.body}</p>
+    </AssistantMailCard>
   );
 }
 
@@ -60,11 +50,17 @@ export const AssistantReply = memo(function AssistantReply({
   reply,
   contextKey,
   inThread,
+  onSource,
   onInserted,
 }: {
   reply: Reply;
   contextKey: string;
   inThread: boolean;
+  onSource: (
+    source: Reply["citations"][number],
+    citations: Reply["citations"],
+    trigger: HTMLButtonElement,
+  ) => void;
   onInserted: () => void;
 }) {
   const { t } = useLingui();
@@ -79,11 +75,11 @@ export const AssistantReply = memo(function AssistantReply({
   ).slice(0, 3);
   const copyError = () => setError(t`Couldn't copy to the clipboard.`);
 
-  function openSource(id: string) {
-    setError("");
-    void ipc.main
-      .invoke("assistant.openSource", id)
-      .catch(() => setError(t`Couldn't open the email source.`));
+  function openSource(id: string, trigger: HTMLButtonElement) {
+    const source = reply.citations.find((item) => item.id === id);
+    if (source) {
+      onSource(source, reply.citations, trigger);
+    }
   }
 
   async function insert(body: string) {
@@ -192,7 +188,8 @@ export const AssistantReply = memo(function AssistantReply({
                     <li key={source.id}>
                       <button
                         type="button"
-                        onClick={() => openSource(source.id)}
+                        data-source-id={source.id}
+                        onClick={(event) => openSource(source.id, event.currentTarget)}
                         aria-label={`${source.number}. ${subject}${names ? " · " + names : ""}`}
                         title={source.subject || t`Open email source`}
                         className="my-0.5 flex w-full items-center gap-2 rounded-md px-1.5 py-1.5 text-left hover:bg-muted focus-visible:outline-2"
@@ -210,9 +207,7 @@ export const AssistantReply = memo(function AssistantReply({
                             </span>
                           )}
                         </span>
-                        <span className="self-start rounded bg-muted px-1.5 text-[11px] font-semibold text-foreground tabular-nums">
-                          {source.number}
-                        </span>
+                        <CitationNumber number={source.number} />
                       </button>
                     </li>
                   );

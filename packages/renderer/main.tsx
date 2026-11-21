@@ -41,6 +41,9 @@ function Main() {
               <AppMain />
             </Route>
             <Route path="/attachments" component={Attachments} />
+            <Route path="/waiting">
+              <AppMain />
+            </Route>
             <Route path="/download-history">
               <AppMain />
             </Route>

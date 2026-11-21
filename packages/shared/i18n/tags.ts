@@ -8,6 +8,7 @@
 export const CATALOG_TAGS = [
   "en",
   "de",
+  "el",
   "fr",
   "it",
   "es",
@@ -28,6 +29,7 @@ export type CatalogTag = (typeof CATALOG_TAGS)[number];
 export const SHIPPED_CATALOG_TAGS: readonly CatalogTag[] = [
   "en",
   "de",
+  "el",
   "fr",
   "it",
   "es",

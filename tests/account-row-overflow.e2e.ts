@@ -79,12 +79,7 @@ function readAccountButtonPlacement(app: GgmailApp, accountId: string) {
 
     // The controls are pinned over the row by being positioned, so the nearest
     // positioned ancestor of one of them is the box the row has to stay clear of.
-    let rightControls =
-      document.querySelector('[title="Show recent download history"]')?.parentElement ?? null;
-
-    while (rightControls && getComputedStyle(rightControls).position !== "absolute") {
-      rightControls = rightControls.parentElement;
-    }
+    const rightControls = document.querySelector('[data-slot="titlebar-utilities"]');
 
     if (!rightControls) {
       throw new Error("The titlebar is not showing its right-hand controls");
@@ -206,12 +201,7 @@ function readRightArrowSeam(app: GgmailApp) {
       throw new Error("The titlebar is not offering to scroll the accounts right");
     }
 
-    let rightControls =
-      document.querySelector('[title="Show recent download history"]')?.parentElement ?? null;
-
-    while (rightControls && getComputedStyle(rightControls).position !== "absolute") {
-      rightControls = rightControls.parentElement;
-    }
+    const rightControls = document.querySelector('[data-slot="titlebar-utilities"]');
 
     if (!rightControls) {
       throw new Error("The titlebar is not showing its right-hand controls");
@@ -276,7 +266,7 @@ test.describe("coming up on the first account", () => {
 
     // The other route the titlebar draws the account row on, and the one whose
     // page is renderer HTML all the way down rather than a view painted over it.
-    expect(await ggmail.runMenuCommand("Unified Inbox")).toBe(true);
+    expect(await ggmail.runMenuCommand("All Mail")).toBe(true);
 
     await expect.poll(() => new URL(ggmail.renderer.url()).hash).toBe("#/unified-inbox");
 
@@ -284,9 +274,10 @@ test.describe("coming up on the first account", () => {
   });
 
   test("the controls at the right edge stay in the window", async () => {
-    await expect.poll(() => readControlIsOnScreen(ggmail, "Show recent download history")).toBe(true);
+    expect(await ggmail.runMenuCommand("Turn Do Not Disturb on")).toBe(true);
+    await expect.poll(() => readControlIsOnScreen(ggmail, "Turn Do Not Disturb off")).toBe(true);
 
-    expect(await readControlIsOnScreen(ggmail, "Turn Do Not Disturb on")).toBe(true);
+    await expect(ggmail.renderer.getByTitle("Show recent download history")).toBeHidden();
   });
 
   test("selecting an account out of reach scrolls it into view", async () => {

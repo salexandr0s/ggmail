@@ -1,0 +1,51 @@
+.unified-inbox-table td:first-child [data-slot="badge"] {
+  max-inline-size: clamp(5rem, 16cqi, 12rem);
+}
+
+/* Give the subject the full second line when a narrow window or sidebar leaves
+   too little room for four table columns. Keep every action on its original row. */
+@container (width < 42rem) {
+  .unified-inbox-table,
+  .unified-inbox-table tbody {
+    display: block;
+  }
+
+  .unified-inbox-table tr {
+    display: grid;
+    grid-template-columns: fit-content(30%) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.375rem 0.625rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .unified-inbox-table td {
+    min-width: 0;
+    padding: 0;
+  }
+
+  .unified-inbox-table td:nth-child(3) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: auto;
+    max-width: none;
+  }
+
+  .unified-inbox-table td:last-child {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 0.75rem;
+  }
+
+  .unified-inbox-table tr:is(:hover, [data-pending], [data-state="selected"]) td:last-child {
+    min-width: 8rem;
+  }
+
+  .unified-inbox-table .inbox-message-text {
+    mask-image: none;
+  }
+
+  .unified-inbox-table .inbox-row-actions {
+    inset-block: 0.375rem auto;
+    gap: 0.25rem;
+  }
+}

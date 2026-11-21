@@ -14,6 +14,7 @@ import {
   filterNewMailIdsByImportance,
   generateGmailLabelColorsCss,
   gmailFeedUrl,
+  type InboxUpdate,
   gmailSearchHash,
   inboxFeedPollDelay,
   parseGmailMessageId,
@@ -248,6 +249,45 @@ export class Gmail {
 
   // Overlapping calls would both find no key and insert the sheet twice.
   private labelColorsApplied: Promise<void> = Promise.resolve();
+
+  private inboxStatus: InboxUpdate["status"] = "syncing";
+  private inboxMessages: GmailInboxMessage[] = [];
+  private inboxReadNumber = 0;
+  private lastSettledInboxRead = 0;
+
+  inboxWentOffline() {
+    // A request made before the disconnect must not mark the inbox current again.
+    this.lastSettledInboxRead = ++this.inboxReadNumber;
+    if (this.inboxStatus !== "signIn") {
+      void this.sendInboxChanged({ status: "retrying" });
+    }
+  }
+
+  resumeInboxSignIn() {
+    // The feed can lose its session while the view still displays old mail.
+    // Leave an in-progress Google sign-in on its current page.
+    if (this._view && this.inboxStatus === "signIn" && !this.store.getState().attentionRequired) {
+      void loadUrl(this._view.webContents, this.url);
+    }
+  }
+
+  // After the renderer reloads its list is empty even if the feed is unchanged.
+  refreshUnifiedInbox() {
+    if (this.inboxStatus === "signIn") {
+      void this.sendInboxChanged({ status: "signIn" }, true);
+    } else {
+      void this.sendInboxChanged(
+        {
+          status: net.isOnline() ? "syncing" : "retrying",
+          messages: this.inboxMessages,
+        },
+        true,
+      );
+    }
+    if (this._view && this.unifiedInboxEnabled && config.get("unifiedInbox.enabled")) {
+      void this.fetchInboxFeed({ retryWhileUnchanged: false });
+    }
+  }
 
   private inboxFeedBaseline: { url: string; ids: Set<string>; readAt: number } | null = null;
 
@@ -498,6 +538,7 @@ export class Gmail {
       WorkspaceApp.handleNavigate(url, this.session);
 
       if (window === this.view) {
+        this.userEmail = null;
         this.invalidateMailboxReads();
         this.store.setState({
           attentionRequired: !url.startsWith(this.baseUrl),
@@ -588,12 +629,13 @@ export class Gmail {
 
   invalidateMailboxReads() {
     this.mailboxGeneration++;
-    if (cancelUnifiedSearch(this.accountId) && main.location === "/unified-inbox") {
-      ipc.renderer.send(main.window.webContents, "unifiedSearch.invalidated", this.accountId);
+    this.inboxStatus = "syncing";
+    this.inboxMessages = [];
+    cancelUnifiedSearch(this.accountId);
+    if (main.windowIfCreated && !main.window.isDestroyed()) {
+      ipc.renderer.send(main.window.webContents, "gmail.mailboxChanged", this.accountId);
     }
-    if (forgetAttachments(this) && main.location === "/attachments") {
-      ipc.renderer.send(main.window.webContents, "attachments.invalidated");
-    }
+    forgetAttachments(this);
   }
 
   destroy() {
@@ -703,20 +745,27 @@ export class Gmail {
    * Only the send waits. The baseline, the view refresh and the notifications
    * stay with the fetch that called this, which is why this is not awaited
    * there.
-   *
-   * A second load is not covered: the promise is already settled, so a
-   * renderer that reloads shows an empty unified inbox until each account's
-   * feed next changes. Nothing in production reloads the main window, so that
-   * is a development-only gap.
    */
-  private async sendInboxChanged(messages: GmailInboxMessage[]) {
-    await main.rendererReady;
-
-    if (main.window.isDestroyed()) {
+  private async sendInboxChanged(update: InboxUpdate, replay = false) {
+    if (!this.unifiedInboxEnabled || !config.get("unifiedInbox.enabled")) {
       return;
     }
+    if (!replay && this.inboxStatus === update.status && update.status !== "ready") {
+      return;
+    }
+    if (update.status === "ready") {
+      this.inboxMessages = update.messages;
+    } else if (update.status === "signIn") {
+      this.inboxMessages = [];
+    }
+    this.inboxStatus = update.status;
+    const generation = this.mailboxGeneration;
+    await main.rendererReady;
 
-    ipc.renderer.send(main.window.webContents, "gmail.inboxChanged", this.accountId, messages);
+    if (main.window.isDestroyed() || this.isDestroyed || this.mailboxGeneration !== generation) {
+      return;
+    }
+    ipc.renderer.send(main.window.webContents, "gmail.inboxChanged", this.accountId, update);
   }
 
   /*
@@ -793,7 +842,7 @@ export class Gmail {
   private async fetchImportantFeedEntryIds() {
     try {
       const body = await this.session
-        .fetch(`${gmailFeedUrl("important")}?t=${Date.now()}`, {
+        .fetch(`${gmailFeedUrl("important", this.url)}?t=${Date.now()}`, {
           signal: AbortSignal.timeout(INBOX_FEED_FETCH_TIMEOUT),
         })
         .then((res) => res.text());
@@ -818,9 +867,19 @@ export class Gmail {
     { retryWhileUnchanged = true }: { retryWhileUnchanged?: boolean },
     fetchAttempt = 1,
   ): Promise<InboxFeedOutcome> {
+    if (!net.isOnline()) {
+      return "notReady";
+    }
     // Set once the feed has parsed, so that a later throw, such as from a
     // malformed entry or a notification, is not held against the feed.
     let isFeedRead = false;
+    const generation = this.mailboxGeneration;
+    const readNumber = ++this.inboxReadNumber;
+    const superseded = () =>
+      generation !== this.mailboxGeneration ||
+      this.isDestroyed ||
+      readNumber < this.lastSettledInboxRead;
+    let listParsed = false;
 
     try {
       if (!this.view.webContents.getURL().startsWith(gmailUrl)) {
@@ -855,17 +914,31 @@ export class Gmail {
         inboxType === "SECTIONED" && config.get("gmail.inboxCategoriesToMonitor") === "primary"
           ? "primary"
           : undefined,
+        this.url,
       );
 
       // Taken before the fetch so the anchor is never later than the feed state
       // it describes.
       const readAt = Date.now();
 
-      const body = await this.session
-        .fetch(`${feedUrl}?t=${Date.now()}`, {
-          signal: AbortSignal.timeout(INBOX_FEED_FETCH_TIMEOUT),
-        })
-        .then((res) => res.text());
+      const response = await this.session.fetch(`${feedUrl}?t=${Date.now()}`, {
+        signal: AbortSignal.timeout(INBOX_FEED_FETCH_TIMEOUT),
+      });
+      const body = await response.text();
+      if (superseded()) {
+        return "notReady";
+      }
+      this.lastSettledInboxRead = readNumber;
+      if (
+        response.status === 401 ||
+        (response.redirected && URL.parse(response.url)?.origin === "https://accounts.google.com")
+      ) {
+        void this.sendInboxChanged({ status: "signIn" });
+        return "failed";
+      }
+      if (!response.ok) {
+        throw new Error("Inbox feed unavailable");
+      }
 
       const { feed } = inboxFeedSchema.parse(xmlParser.parse(body));
 
@@ -901,7 +974,12 @@ export class Gmail {
 
       // Nothing signalled a change ahead of the idle poll, so there is nothing
       // for it to wait for.
-      if (!changed) {
+      if (
+        !changed &&
+        (this.inboxStatus === "ready" ||
+          !this.unifiedInboxEnabled ||
+          !config.get("unifiedInbox.enabled"))
+      ) {
         if (retryWhileUnchanged) {
           // A retry that finds the page gone leaves this read's success
           // standing.
@@ -913,12 +991,6 @@ export class Gmail {
         return "ok";
       }
 
-      this.inboxFeedBaseline = {
-        url: feedUrl,
-        ids: new Set(feedEntries.map(({ id }) => id)),
-        readAt,
-      };
-
       const newIdSet = new Set(newIds);
 
       const messages: GmailInboxMessage[] = [];
@@ -928,7 +1000,7 @@ export class Gmail {
         index,
         { id, link, title, summary, author, contributor, issued },
       ] of feedEntries.entries()) {
-        const messageId = new URLSearchParams(link["@_href"]).get("message_id");
+        const messageId = URL.parse(link["@_href"], this.url)?.searchParams.get("message_id");
         const receivedAt = new Date(issued).getTime();
 
         if (!messageId) {
@@ -952,15 +1024,16 @@ export class Gmail {
         }
       }
 
-      // The renderer's query cache is the only copy of this list, so the send
-      // is the whole of it: main builds it, hands it over and keeps nothing.
-      // Reached only on a changed feed, which is also every account's first
-      // fetch, since a missing baseline counts as a change.
-      if (config.get("unifiedInbox.enabled") && this.unifiedInboxEnabled) {
-        this.sendInboxChanged(messages);
-      }
+      this.inboxFeedBaseline = {
+        url: feedUrl,
+        ids: new Set(feedEntries.map(({ id }) => id)),
+        readAt,
+      };
 
-      if (!baseline) {
+      listParsed = true;
+      void this.sendInboxChanged({ status: "ready", messages });
+
+      if (!changed || !baseline) {
         return "ok";
       }
 
@@ -1131,6 +1204,13 @@ export class Gmail {
         });
       }
     } catch (error) {
+      if (superseded()) {
+        return "notReady";
+      }
+      this.lastSettledInboxRead = readNumber;
+      if (!listParsed) {
+        void this.sendInboxChanged({ status: "retrying" });
+      }
       log.error("Failed to fetch inbox feed", { error });
 
       return isFeedRead ? "ok" : "failed";

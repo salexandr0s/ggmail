@@ -165,6 +165,14 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
       })
       .finally(flush);
   });
+  listener.on("assistant.closePreview", (event, id) => {
+    authorize(event);
+    assistantChat.closePreview(z.uuid().parse(id));
+  });
+  listener.handle("assistant.previewSource", (event, id, offset) => {
+    authorize(event);
+    return assistantChat.previewSource(z.uuid().parse(id), z.int().nonnegative().parse(offset));
+  });
   listener.handle("assistant.openSource", (event, id) => {
     authorize(event);
     return assistantChat.openSource(z.uuid().parse(id));

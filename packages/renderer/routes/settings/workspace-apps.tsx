@@ -276,7 +276,7 @@ export function WorkspaceAppsSettings() {
                   <DropdownMenuTrigger
                     id={excludedAppsFieldId}
                     render={
-                      <Button variant="outline" className="justify-between font-normal">
+                      <Button variant="outline" className="justify-start gap-1.5 font-normal">
                         {excludedAppsSummary}
                         <ChevronDownIcon className="opacity-50" />
                       </Button>

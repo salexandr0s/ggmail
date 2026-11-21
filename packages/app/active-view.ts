@@ -3,6 +3,7 @@ import { serializeError } from "serialize-error";
 import { accounts } from "@/accounts";
 import { log } from "@/lib/log";
 import { main } from "@/main";
+import { shellHistory } from "@/shell-history";
 import { WorkspaceApp } from "@/workspace-app";
 
 /**
@@ -31,12 +32,16 @@ export function getActiveView(window: BrowserWindow | null) {
  */
 export function navigateOnSwipe(window: BrowserWindow) {
   window.on("swipe", (_event, direction) => {
-    // Every view is hidden away from `/`, so a renderer page is showing.
-    if (window === main.window && main.location !== "/") {
-      return;
-    }
-
     try {
+      if (window === main.window) {
+        if (direction === "left") {
+          shellHistory.move(-1);
+        }
+        if (direction === "right") {
+          shellHistory.move(1);
+        }
+        return;
+      }
       const { navigationHistory } = getActiveView(window).webContents;
 
       // Electron names the direction after the sign of AppKit's deltaX, where

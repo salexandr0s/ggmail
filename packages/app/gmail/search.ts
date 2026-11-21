@@ -30,6 +30,7 @@ const resultPage = z.object({
     .array(
       z.object({
         id: z.string().regex(/^[\da-f]{15,16}$/i),
+        lastMessageId: z.string().optional(),
         subject: z.string(),
         sender: z.string(),
         photos: z.array(z.object({ address: z.string(), url: z.string() })).optional(),
@@ -50,6 +51,7 @@ const readSearchPage = `(includePhotos => {
   if (!rows.length) return Array.from(main.querySelectorAll('.TC, .TD')).some(visible) ? {threads: [], more: false} : null;
   const threads = rows.map(row => ({
     id: (row.matches('[data-legacy-thread-id]') ? row : row.querySelector('[data-legacy-thread-id]'))?.getAttribute('data-legacy-thread-id')?.replace(/^#/, ''),
+    lastMessageId: includePhotos ? (row.querySelector('[data-legacy-last-message-id]') ?? row).getAttribute('data-legacy-last-message-id') ?? undefined : undefined,
     subject: row.querySelector('.bog')?.textContent?.trim() ?? '',
     sender: row.querySelector('.yW')?.textContent?.trim() ?? '',
     photos: includePhotos ? Array.from(row.querySelectorAll('.yW [email]')).slice(0, 8).flatMap((author, _, authors) => {
@@ -73,6 +75,7 @@ export async function listSearchThreads(
   page: number,
   signal: AbortSignal,
   includePhotos = false,
+  seenThreads?: ReadonlySet<string>,
 ) {
   const url = new URL(mailbox);
   url.hash = gmailSearchHash(query) + (page > 1 ? "/p" + page : "");
@@ -128,7 +131,17 @@ export async function listSearchThreads(
           { code: readSearchPage + "(" + includePhotos + ")" },
         ]);
         if (raw) {
-          return resultPage.parse(raw);
+          const result = resultPage.safeParse(raw);
+          // Gmail can change its hash before replacing the previous rows, or render
+          // placeholders before their thread IDs. Wait for the requested page to settle.
+          if (
+            result.success &&
+            (!seenThreads ||
+              !result.data.threads.length ||
+              result.data.threads.some(({ id }) => !seenThreads.has(id)))
+          ) {
+            return result.data;
+          }
         }
       }
       await delay(ms("250ms"), undefined, { signal: stop });

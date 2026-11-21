@@ -125,8 +125,7 @@ export function GmailSettings() {
               description={t({
                 message:
                   "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design.",
-                comment:
-                  "Original colors is the label of the toggle on an individual email",
+                comment: "Original colors is the label of the toggle on an individual email",
               })}
               configKey="gmail.extendDarkTheme"
             />
@@ -245,7 +244,7 @@ export function GmailSettings() {
               label={t`Categories to monitor`}
               description={t({
                 message:
-                  "With a categorized inbox, choose which categories are watched for new email notifications and included in the unified inbox.",
+                  "With a categorized inbox, choose which categories are watched for new email notifications and included in All Mail.",
                 comment:
                   "A categorized inbox is Gmail's own inbox type of that name, with categories such as Primary and Promotions, so it follows Gmail's words for them",
               })}

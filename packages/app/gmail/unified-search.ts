@@ -23,9 +23,10 @@ export function cancelUnifiedSearch(accountId: string) {
   return searches.delete(accountId);
 }
 
-export function clearUnifiedSearches() {
-  for (const id of searches.keys()) {
-    cancelUnifiedSearch(id);
+export function pauseUnifiedSearches() {
+  for (const search of searches.values()) {
+    search.controller.abort();
+    search.controller = new AbortController();
   }
 }
 
@@ -53,9 +54,11 @@ function getMailbox(event: IpcMainInvokeEvent, id: string) {
 }
 
 export function registerUnifiedSearchIpc({ main: listener }: typeof ipc) {
-  listener.on("unifiedSearch.cancel", (event, id, requestId) => {
-    if (isInboxPage(event) && searches.get(id)?.requestId === requestId) {
-      cancelUnifiedSearch(id);
+  listener.on("unifiedSearch.clear", (event) => {
+    if (isInboxPage(event)) {
+      for (const id of searches.keys()) {
+        cancelUnifiedSearch(id);
+      }
     }
   });
 
@@ -89,6 +92,7 @@ export function registerUnifiedSearchIpc({ main: listener }: typeof ipc) {
 
     // Reserve the page while reading. On failure it can be retried without losing earlier matches.
     search.nextPage = null;
+    const { signal } = search.controller;
     try {
       const result = await listSearchThreads(
         gmail.session,
@@ -96,9 +100,9 @@ export function registerUnifiedSearchIpc({ main: listener }: typeof ipc) {
         mailbox,
         query,
         page,
-        search.controller.signal,
+        signal,
       );
-      search.controller.signal.throwIfAborted();
+      signal.throwIfAborted();
       if (getMailbox(event, id).mailbox !== mailbox) {
         throw new Error("Mailbox changed");
       }
@@ -120,6 +124,7 @@ export function registerUnifiedSearchIpc({ main: listener }: typeof ipc) {
     }
   });
 
+  let latestOpen = 0;
   listener.handle("unifiedSearch.open", async (event, id, requestId, threadId) => {
     const { account, gmail, mailbox } = getMailbox(event, id);
     const search = searches.get(id);
@@ -130,9 +135,21 @@ export function registerUnifiedSearchIpc({ main: listener }: typeof ipc) {
     ) {
       throw new Error("Conversation unavailable");
     }
+    const opening = ++latestOpen;
+    const generation = gmail.mailboxGeneration;
     account.instance.tabs.activateTab(GMAIL_TAB_ID);
     accounts.selectAccount(id);
-    main.navigate("/");
     await gmail.navigateToHash("#all/" + threadId);
+    if (
+      opening !== latestOpen ||
+      !isInboxPage(event) ||
+      searches.get(id) !== search ||
+      gmail.mailboxGeneration !== generation ||
+      accounts.getSelectedAccount().config.id !== id
+    ) {
+      return;
+    }
+    main.navigate("/");
+    accounts.sendTabsChangedToRenderer();
   });
 }

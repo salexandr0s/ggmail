@@ -53,8 +53,12 @@ registerUnifiedInboxCacheDefaults(queryClient);
 
 export const unifiedInboxOptions = queryOptions(unifiedInboxCacheOptions);
 
-ipc.renderer.on("gmail.inboxChanged", (_event, accountId, messages) => {
-  mergeUnifiedInboxPush(queryClient, accountId, messages);
+ipc.renderer.on("gmail.mailboxChanged", (_event, accountId) => {
+  mergeUnifiedInboxPush(queryClient, accountId, { status: "syncing" });
+});
+
+ipc.renderer.on("gmail.inboxChanged", (_event, accountId, update) => {
+  mergeUnifiedInboxPush(queryClient, accountId, update);
 });
 
 export function useIsBelowMinimumMacOSVersion() {

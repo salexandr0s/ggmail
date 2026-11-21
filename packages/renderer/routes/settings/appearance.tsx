@@ -263,7 +263,7 @@ export function AppearanceSettings() {
             </FieldLegend>
             <ConfigSwitchField
               label={t`Show Do Not Disturb button`}
-              description={t`Show the button that turns Do Not Disturb on and off. Turning this off also turns Do Not Disturb off.`}
+              description={t`Show a moon in the title bar while Do Not Disturb is on.`}
               configKey="doNotDisturb.showTitlebarButton"
             />
           </FieldSet>

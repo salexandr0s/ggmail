@@ -8,6 +8,7 @@ export default defineConfig({
     "mail-assistant.e2e.ts",
     "attachments.e2e.ts",
     "unified-search.e2e.ts",
+    "waiting-for-reply.e2e.ts",
   ],
   workers: 1,
   timeout: 60000,

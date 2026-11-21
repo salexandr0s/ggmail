@@ -16,6 +16,12 @@ const requests: { label: string; query: string; page: string }[] = [];
 const server = createServer((request, response) => {
   const url = new URL(request.url ?? "/", "http://localhost");
   const label = request.headers.cookie?.includes("search=work") ? "Work" : "Personal";
+  if (url.pathname.includes("/feed/atom")) {
+    response.end(
+      "<feed><title>Inbox</title><tagline>Unread</tagline><fullcount>0</fullcount><modified>2026-11-20T12:00:00Z</modified></feed>",
+    );
+    return;
+  }
   if (url.pathname === "/results") {
     const query = url.searchParams.get("q") ?? "";
     const page = url.searchParams.get("page") ?? "";
@@ -28,7 +34,7 @@ const server = createServer((request, response) => {
     }
     const id = label === "Work" && failWork ? "unavailable" : page === "p2" ? olderId : sharedId;
     const subject =
-      query === invoice
+      query === invoice || query === "invoice"
         ? page === "p2"
           ? "Older invoice"
           : "Invoice"
@@ -40,6 +46,7 @@ const server = createServer((request, response) => {
   }
   response.setHeader("Content-Type", "text/html; charset=utf-8");
   response.end(`<main role="main"></main><script>
+    window.GM_INBOX_TYPE = "CLASSIC";
     async function showResults() {
       const [route, encodedQuery, page = ""] = location.hash.split("/");
       if (route !== "#search") return;
@@ -54,6 +61,14 @@ const server = createServer((request, response) => {
       main.innerHTML = '<table><tr class="zA"><td class="yW">${label} sender</td><td><span class="bog"></span><span class="y2">Receipt enclosed</span></td><td class="xW"><span title="Nov 20">Nov 20</span></td></tr></table><button><span class="amJ">Older</span></button>';
       main.querySelector("tr").dataset.legacyThreadId = "#" + result.id;
       main.querySelector(".bog").textContent = result.subject;
+      if (page === "p2") {
+        for (let i = 0; i < 18; i++) {
+          const copy = main.querySelector("tr").cloneNode(true);
+          copy.dataset.legacyThreadId = (BigInt("0x" + result.id) + BigInt(i + 1)).toString(16);
+          copy.querySelector(".bog").textContent = "October receipt " + (i + 1);
+          main.querySelector("tbody").append(copy);
+        }
+      }
       main.querySelector("button").disabled = !result.more;
     }
     showResults();
@@ -91,7 +106,7 @@ async function openSearch() {
       .fromPartition("persist:Work")
       .cookies.set({ url, path: "/", name: "search", value: "work" });
   }, env.GGMAIL_TEST_GMAIL_URL ?? "");
-  await ggmail.renderer.getByRole("button", { name: "Open unified inbox" }).click();
+  await ggmail.renderer.getByRole("button", { name: "All Mail" }).click();
   return ggmail.renderer.getByRole("searchbox", { name: "Search all accounts" });
 }
 
@@ -104,6 +119,8 @@ test("shows independent mailbox results, filters and pages them, and opens the o
   await search.fill(invoice);
   await search.press("Enter");
   await expect(personal.getByRole("button", { name: /Invoice/ })).toBeVisible();
+  await search.press("ArrowDown");
+  await expect(personal.getByRole("button", { name: /Invoice/ })).toBeFocused();
   await expect(work.getByRole("status")).toHaveText("Searching…");
   await expect
     .poll(() => requests.some((r) => r.label === "Work" && r.query === invoice))
@@ -121,20 +138,109 @@ test("shows independent mailbox results, filters and pages them, and opens the o
     .click();
   await page.keyboard.press("Escape");
   await expect(personal).toBeHidden();
-  await work.getByRole("button", { name: /Work sender Nov 20 Invoice/ }).click();
+  const selected = work.getByRole("button", { name: /October receipt 15 / });
+  await selected.scrollIntoViewIfNeeded();
+  const viewport = page.locator('[data-slot="scroll-area-viewport"]');
+  const scrollTop = await viewport.evaluate((el) => el.scrollTop);
+  expect(scrollTop).toBeGreaterThan(0);
+  const reads = requests.length;
+  await selected.click();
   await expect
     .poll(async () => (await ggmail.readConfig()).accounts?.find((a) => a.selected)?.id)
     .toBe("Work");
   await expect
     .poll(() =>
-      ggmail.app.evaluate(({ webContents, session }, id) => {
-        return webContents
-          .getAllWebContents()
-          .filter((w) => w.getURL().endsWith("#all/" + id))
-          .map((w) => w.session === session.fromPartition("persist:Work"));
-      }, sharedId),
+      ggmail.app.evaluate(
+        ({ webContents, session }, id) => {
+          return webContents
+            .getAllWebContents()
+            .filter((w) => w.getURL().endsWith("#all/" + id))
+            .map((w) => w.session === session.fromPartition("persist:Work"));
+        },
+        (BigInt("0x" + olderId) + 15n).toString(16),
+      ),
     )
     .toEqual([true]);
+  // Gmail may canonicalize a thread with replaceState. A subsequent mail
+  // navigation should still go back to that entry before returning to search.
+  const mail = ggmail.app
+    .windows()
+    .find((tab) => tab.url().endsWith((BigInt("0x" + olderId) + 15n).toString(16)));
+  if (!mail) {
+    throw new Error("Missing opened result");
+  }
+  await mail.evaluate(() => {
+    history.replaceState(null, "", "#all/canonical-thread");
+    history.pushState(null, "", "#inbox");
+  });
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(mail).toHaveURL(/#all\/canonical-thread$/);
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(personal).toBeHidden();
+  await expect(selected).toBeFocused();
+  await expect(selected).toHaveAttribute("aria-current", "true");
+  expect(await viewport.evaluate((el) => el.scrollTop)).toBe(scrollTop);
+  await page.keyboard.press("ArrowDown");
+  await expect(work.getByRole("button", { name: /October receipt 16 / })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(
+        ({ webContents }, id) =>
+          webContents.getAllWebContents().some((view) => view.getURL().endsWith("#all/" + id)),
+        (BigInt("0x" + olderId) + 16n).toString(16),
+      ),
+    )
+    .toBe(true);
+  expect(requests).toHaveLength(reads);
+});
+
+test("marks literal matches in search results and keeps filter syntax out of the highlights", async () => {
+  const search = await openSearch();
+  await search.fill("invoice");
+  await search.press("Enter");
+  const result = ggmail.renderer.getByRole("region", { name: "Work" });
+  await expect(result.locator("mark")).toHaveText("Invoice");
+  await search.fill(invoice);
+  await search.press("Enter");
+  await expect(result.getByText("Invoice", { exact: true })).toBeVisible();
+  await expect(result.locator("mark")).toHaveCount(0);
+});
+
+test("clearing a search while a conversation opens keeps the unified inbox visible", async () => {
+  const search = await openSearch();
+  const personal = ggmail.renderer.getByRole("region", { name: "Personal" });
+  await search.fill(invoice);
+  await search.press("Enter");
+  const row = personal.getByRole("button", { name: /Invoice/ });
+  await expect(row).toBeVisible();
+  await ggmail.app.evaluate(({ webContents, session, ipcMain }, id) => {
+    const view = webContents
+      .getAllWebContents()
+      .find((tab) => tab.session === session.fromPartition("persist:Personal"));
+    if (!view) {
+      throw new Error("Personal mailbox missing");
+    }
+    const execute = view.executeJavaScript.bind(view);
+    view.executeJavaScript = async (...args) => {
+      const result = await execute(...args);
+      if (args[0].includes("#all/" + id)) {
+        await new Promise<void>((resolve) => ipcMain.once("fixture.resumeOpen", () => resolve()));
+        view.executeJavaScript = execute;
+      }
+      return result;
+    };
+  }, sharedId);
+  await row.click();
+  await expect
+    .poll(() => ggmail.app.evaluate(({ ipcMain }) => ipcMain.listenerCount("fixture.resumeOpen")))
+    .toBe(1);
+  await search.press("Escape");
+  await expect(search).toHaveValue("");
+  await ggmail.app.evaluate(({ ipcMain }) => ipcMain.emit("fixture.resumeOpen"));
+  await search.fill(paid);
+  await search.press("Enter");
+  await expect(personal.getByText("Paid", { exact: true })).toBeVisible();
 });
 
 test("retries a single mailbox and discards old responses when a saved search or clear supersedes them", async () => {
@@ -212,7 +318,7 @@ test("clears signed-out results, searches again after sign-in, and stops pending
   await expect
     .poll(() => requests.some((r) => r.label === "Work" && r.query === invoice))
     .toBe(true);
-  await page.getByRole("button", { name: "Close unified inbox" }).click();
+  await page.getByRole("button", { name: "Go back" }).click();
   await expect
     .poll(() =>
       ggmail.app.evaluate(({ webContents }) =>
