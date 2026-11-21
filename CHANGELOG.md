@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.65.6 — 2026-11-21
+
+- Account tabs and Settings now load Google profile photos served through an account-specific redirect.
+
 ## 3.65.5 — 2026-11-21
 
 - Mac updates installed with `bun run install:mac:local` use the same Developer ID as the release, so Keychain can recognize ggmail across updates.

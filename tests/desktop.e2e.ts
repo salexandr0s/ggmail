@@ -388,12 +388,15 @@ test("Gmail profile photos follow their own accounts into the toolbar and Accoun
       const png = nativeImage.createFromBitmap(bitmap, { width: 1, height: 1 }).toPNG();
       partition.protocol.handle("https", (request) => {
         const url = new URL(request.url);
+        if (url.hostname === "lh3.google.com") {
+          return Response.redirect(photoURL, 302);
+        }
         if (url.hostname === "lh3.googleusercontent.com") {
           return new Response(new Uint8Array(png), { headers: { "Content-Type": "image/png" } });
         }
         const accountHeader =
           index === 0
-            ? `<meta name="og-profile-acct" content="${id}@example.test"><header id="gb"><a href="https://accounts.google.com/SignOutOptions"><img src="${photoURL}"></a></header>`
+            ? `<meta name="og-profile-acct" content="${id}@example.test"><header id="gb"><a href="https://accounts.google.com/SignOutOptions"><img src="https://lh3.google.com/u/0/fixture-avatar"></a></header>`
             : `<header role="banner"><button role="button" aria-label="Account (${id}@example.test)"><svg><image href="${photoURL}"/></svg></button></header>`;
         const sender =
           '<main><img src="https://lh3.googleusercontent.com/a/unrelated-sender"></main>';
