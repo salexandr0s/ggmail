@@ -127,6 +127,7 @@ test("Back and Forward retrace libraries and account switches at both toolbar wi
   const info = test.info();
   const page = ggmail.renderer;
   const navigation = page.getByRole("navigation", { name: "Mail views" });
+  await expect(navigation.getByRole("button", { name: "Mail views", exact: true })).toHaveCount(0);
   await navigation.getByRole("button", { name: "Attachments" }).click();
   await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
   await expect(navigation.getByRole("button", { name: "Attachments" })).toHaveAttribute(
@@ -153,6 +154,7 @@ test("Back and Forward retrace libraries and account switches at both toolbar wi
   });
   const selector = navigation.getByRole("button", { name: "Mail views" });
   await expect(selector).toHaveText("Waiting for reply");
+  await expect(navigation.getByRole("button", { name: "All Mail" })).toHaveCount(0);
   await selector.click();
   await page.getByRole("menuitem", { name: "Attachments" }).click();
   await expect(selector).toHaveText("Attachments");

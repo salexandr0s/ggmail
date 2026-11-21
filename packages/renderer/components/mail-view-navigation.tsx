@@ -73,7 +73,7 @@ export function MailViewNavigation({ location, unified }: { location: string; un
             <Button
               size="sm"
               variant="secondary"
-              className="hidden max-w-40 gap-1.5 px-2 text-xs min-[1040px]:hidden sm:inline-flex"
+              className="hidden max-w-40 gap-1.5 px-2 text-xs sm:max-[1040px]:inline-flex"
             />
           }
         >

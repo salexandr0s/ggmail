@@ -61,6 +61,7 @@ const readSearchPage = `(includePhotos => {
     snippet: row.querySelector('.y2')?.textContent?.trim() ?? '',
     date: row.querySelector('.xW [title]')?.getAttribute('title') ?? row.querySelector('.xW')?.textContent?.trim() ?? ''
   }));
+  if (threads.some(thread => !thread.id)) return null;
   const arrow = Array.from(document.querySelectorAll('.amJ, [aria-label="Older"]')).find(visible);
   const older = arrow?.closest('button, [role="button"]') ?? arrow;
   const more = older ? !older.disabled && older.getAttribute('aria-disabled') !== 'true' && !older.classList.contains('T-I-JE') : rows.length >= 10;
@@ -131,16 +132,15 @@ export async function listSearchThreads(
           { code: readSearchPage + "(" + includePhotos + ")" },
         ]);
         if (raw) {
-          const result = resultPage.safeParse(raw);
+          const result = resultPage.parse(raw);
           // Gmail can change its hash before replacing the previous rows, or render
           // placeholders before their thread IDs. Wait for the requested page to settle.
           if (
-            result.success &&
-            (!seenThreads ||
-              !result.data.threads.length ||
-              result.data.threads.some(({ id }) => !seenThreads.has(id)))
+            !seenThreads ||
+            !result.threads.length ||
+            result.threads.some(({ id }) => !seenThreads.has(id))
           ) {
-            return result.data;
+            return result;
           }
         }
       }
