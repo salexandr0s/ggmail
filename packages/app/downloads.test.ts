@@ -20,6 +20,8 @@ const fakeWindow = {
 
 let mainWindow: typeof fakeWindow | undefined = fakeWindow;
 
+mock.module("@/ipc", () => ({ ipc: { renderer: { send: () => {} } } }));
+
 mock.module("@/main", () => ({
   main: {
     get windowIfCreated() {

@@ -3,14 +3,15 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { platform } from "@electron-toolkit/utils";
-import { msg, ph, t } from "@lingui/core/macro";
 import { BASE_SPACING } from "@ggmail/shared/constants";
 import { i18n } from "@ggmail/shared/i18n";
 import { ms } from "@ggmail/shared/ms";
 import type { DownloadItem } from "@ggmail/shared/types";
+import { msg, ph, t } from "@lingui/core/macro";
 import { app, type BrowserWindow, dialog, type Session, shell, type WebContents } from "electron";
 import { serializeError } from "serialize-error";
 import { config } from "@/config";
+import { ipc } from "@/ipc";
 import { main } from "@/main";
 import { createNotification } from "@/notifications";
 import { findUnusedPath, pathKey, withPreferredExtension } from "./lib/download-path";
@@ -171,6 +172,12 @@ class Downloads {
     return receivedBytes / totalBytes;
   }
 
+  get isActive() {
+    return this.activeDownloads.size > 0;
+  }
+
+  private lastActive = false;
+
   private updateProgressBar() {
     const progress = this.measureProgress();
 
@@ -178,6 +185,10 @@ class Downloads {
 
     if (window && !window.isDestroyed()) {
       window.setProgressBar(progress);
+      if (this.lastActive !== this.isActive) {
+        this.lastActive = this.isActive;
+        ipc.renderer.send(window.webContents, "downloads.activityChanged", this.isActive);
+      }
     }
   }
 
@@ -320,6 +331,8 @@ class Downloads {
       } else {
         item.setSavePath(unusedPath);
       }
+
+      this.updateProgressBar();
 
       item.on("updated", (_updatedEvent, state) => {
         if (state === "interrupted") {

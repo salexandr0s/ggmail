@@ -44,6 +44,7 @@ function resolveAppLocale(): LocaleTag {
  */
 export const gmailCatalogLoaders: CatalogLoaders = {
   de: () => import("@ggmail/preload-gmail/locales/de"),
+  el: () => import("@ggmail/preload-gmail/locales/el"),
   fr: () => import("@ggmail/preload-gmail/locales/fr"),
   it: () => import("@ggmail/preload-gmail/locales/it"),
   es: () => import("@ggmail/preload-gmail/locales/es"),

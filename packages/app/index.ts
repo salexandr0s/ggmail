@@ -43,6 +43,8 @@ import { registerWindowsMailClient } from "@/protocol/windows-mail-client";
 import { theme } from "@/theme";
 import { appTray } from "@/tray";
 import { appUpdater } from "@/updater";
+import { clearAttachmentCategories } from "./attachments/categories";
+import { clearAttachmentIndexes } from "./attachments/disk-index";
 import { doNotDisturb } from "./do-not-disturb";
 import { isGgmailUrl, isWebUrl } from "./lib/deep-link";
 import { spellchecker } from "./spellchecker";
@@ -72,6 +74,10 @@ async function resetApp() {
   // reach far past the extensions
   await extensions.clearSessionData(session.defaultSession);
 
+  clearAttachmentCategories();
+  clearAttachmentIndexes();
+  const { removeReminders } = await import("./follow-ups/store");
+  removeReminders(() => true);
   config.clear();
 
   relaunchApp();

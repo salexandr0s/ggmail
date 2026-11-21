@@ -7,6 +7,8 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: fr\n"
 
+#: packages/renderer/components/assistant/source-preview.tsx
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "(no subject)"
 msgstr "(sans objet)"
@@ -24,6 +26,7 @@ msgstr "{conflictName} est toujours activé et {extensionName} n’a pas été i
 msgid "{conflictName} was turned off, and you're signed out of it in ggmail."
 msgstr "{conflictName} a été désactivé et vous en êtes déconnecté dans ggmail."
 
+#: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# fichier} many {# fichiers} other {# fichiers}}"
@@ -52,6 +55,22 @@ msgstr "{extensionName} ne s’exécute que sur les pages de connexion de Google
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
 msgstr "{failedCount, plural, one {Impossible de mettre à jour # extension} many {Impossible de mettre à jour # extensions} other {Impossible de mettre à jour # extensions}}"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "{label} is still syncing"
+msgstr "{label} est en cours de synchronisation"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "{label} is up to date"
+msgstr "{label} est à jour"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "{label} will retry syncing"
+msgstr "Une nouvelle synchronisation de {label} sera tentée"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "{large} or more"
+msgstr "{large} ou plus"
 
 #. name is the name of a browser extension, such as Bitwarden
 #: packages/app/lib/extension-window.ts
@@ -97,6 +116,10 @@ msgstr "{remainingExcludedAppCount, plural, one {{visibleExcludedApps} +# exclue
 #: packages/renderer/routes/settings/languages.tsx
 msgid "{selectedCount, plural, one {# additional language} other {# additional languages}}"
 msgstr "{selectedCount, plural, one {# langue supplémentaire} many {# langues supplémentaires} other {# langues supplémentaires}}"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "{small} to under {large}"
+msgstr "De {small} à moins de {large}"
 
 #. Tooltip of the tab every link to a Google Workspace app opens in. tabTitle is the page's title; appName is the app's English name, such as Calendar
 #: packages/renderer/components/vertical-tabs.tsx
@@ -394,6 +417,7 @@ msgid "All accounts"
 msgstr "Tous les comptes"
 
 #. Option of the Categories to monitor setting: every category of Gmail's inbox
+#: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "All categories"
 msgstr "Toutes les catégories"
@@ -405,6 +429,19 @@ msgstr "Tous les fichiers"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "All mail"
+msgstr "Tous les messages"
+
+#. A menu or a menu item in ggmail's menu bar
+#. A page of Settings, named in the settings sidebar and as the page's title
+#. Switch, and a badge on the account, for including the account in All Mail
+#. Title of All Mail page
+#: packages/app/ipc.ts
+#: packages/app/menu.ts
+#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/components/unified-search.tsx
+#: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "All Mail"
 msgstr "Tous les messages"
 
 #. Option of the Notify for setting: a notification for every new email
@@ -444,6 +481,14 @@ msgstr "Toujours afficher le contenu tronqué"
 msgid "Amber"
 msgstr "Ambre"
 
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Any extension"
+msgstr "Toutes les extensions"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Any size"
+msgstr "Toutes les tailles"
+
 #: packages/renderer/routes/settings/ai.tsx
 msgid "API key"
 msgstr "Clé API"
@@ -464,7 +509,7 @@ msgstr "Apparence"
 msgid "Application version"
 msgstr "Version de l’application"
 
-#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#. Button on a message in All Mail. A Gmail action, so it follows Gmail's word for it
 #. Button on a new email notification. A Gmail action, so it follows Gmail's word for it, under Gmail's words in the glossary
 #: packages/app/gmail/index.ts
 #: packages/renderer/routes/unified-inbox.tsx
@@ -490,8 +535,9 @@ msgid "Assistant model"
 msgstr "Modèle de l’assistant"
 
 #. A menu or a menu item in ggmail's menu bar
+#: packages/app/ipc.ts
 #: packages/app/menu.ts
-#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/components/mail-view-navigation.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Attachments"
 msgstr "Pièces jointes"
@@ -525,6 +571,10 @@ msgstr "Auto"
 msgid "Automatic"
 msgstr "Automatique"
 
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Automatic ({detected})"
+msgstr "Automatique ({detected})"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Automatically select the first account with unread emails when clicking the menu bar icon."
 msgstr "Sélectionner automatiquement le premier compte avec des e-mails non lus lors d’un clic sur l’icône de la barre des menus."
@@ -548,6 +598,14 @@ msgstr "Disponibles"
 #: packages/app/menu.ts
 msgid "Back"
 msgstr "Retour"
+
+#: packages/renderer/components/assistant/source-preview.tsx
+msgid "Back to answer"
+msgstr "Revenir à la réponse"
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Bank statement"
+msgstr "Relevé bancaire"
 
 #. Badge beside a setting whose feature isn't stable yet
 #: packages/renderer/components/maturity-field-badge.tsx
@@ -688,6 +746,15 @@ msgstr "Fais le point sur les e-mails récents de cette vue. Lesquels demandent 
 msgid "Categories to monitor"
 msgstr "Catégories à surveiller"
 
+#: packages/renderer/components/attachments/files.tsx
+#: packages/renderer/components/attachments/filters.tsx
+msgid "Category"
+msgstr "Catégorie"
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Category for {name}"
+msgstr "Catégorie de {name}"
+
 #. Button that picks another folder for downloads
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Change…"
@@ -746,6 +813,10 @@ msgstr "Vérifiez votre solde ou les limites d’utilisation de votre fournisseu
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Checking connection…"
 msgstr "Vérification de la connexion…"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Checking for replies…"
+msgstr "Recherche de réponses…"
 
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Checking visible messages"
@@ -826,6 +897,7 @@ msgstr "Vider le cache"
 msgid "Clear color"
 msgstr "Effacer la couleur"
 
+#: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Clear filters"
 msgstr "Effacer les filtres"
@@ -871,17 +943,9 @@ msgctxt "Windows"
 msgid "Close"
 msgstr "Fermer"
 
-#: packages/renderer/routes/attachments.tsx
-msgid "Close attachments"
-msgstr "Fermer les pièces jointes"
-
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Close compose window after send"
 msgstr "Fermer la fenêtre de rédaction après l’envoi"
-
-#: packages/renderer/components/app-main.tsx
-msgid "Close download history"
-msgstr "Fermer l’historique des téléchargements"
 
 #: packages/renderer/components/find-in-page.tsx
 msgid "Close find in page"
@@ -909,10 +973,6 @@ msgstr "Fermer les onglets en dessous"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Close the compose window after you send."
 msgstr "Fermer la fenêtre de rédaction après l’envoi d’un message."
-
-#: packages/renderer/components/app-main.tsx
-msgid "Close unified inbox"
-msgstr "Fermer Toutes les boîtes"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -989,6 +1049,10 @@ msgstr "Connecté avec {email}"
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Continue with ChatGPT"
 msgstr "Continuer avec ChatGPT"
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Contract"
+msgstr "Contrat"
 
 #. Heading of the Gmail page's section about reading an email conversation
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -1088,6 +1152,14 @@ msgstr "Copier la réponse"
 msgid "Copy URL"
 msgstr "Copier l’URL"
 
+#: packages/renderer/routes/attachments.tsx
+msgid "Couldn’t check {unavailableAccounts} for attachments."
+msgstr "Impossible de rechercher des pièces jointes dans {unavailableAccounts}."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Couldn’t check this mailbox."
+msgstr "Impossible de vérifier cette boîte mail."
+
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
 msgstr "Impossible de se connecter à ChatGPT. Réessayez."
@@ -1117,10 +1189,6 @@ msgstr "Impossible d’installer {extensionName}"
 msgid "Couldn't install the extension: {errorMessage}"
 msgstr "Impossible d’installer l’extension : {errorMessage}"
 
-#: packages/renderer/routes/attachments.tsx
-msgid "Couldn’t load attachments for {unavailableAccounts}. Check your Gmail connection and refresh."
-msgstr "Impossible de charger les pièces jointes pour {unavailableAccounts}. Vérifiez la connexion à Gmail et actualisez la vue."
-
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't open {extensionName}"
 msgstr "Impossible d’ouvrir {extensionName}"
@@ -1129,7 +1197,8 @@ msgstr "Impossible d’ouvrir {extensionName}"
 msgid "Couldn't open the draft in Gmail."
 msgstr "Impossible d’ouvrir le brouillon dans Gmail."
 
-#: packages/renderer/components/assistant/assistant-reply.tsx
+#: packages/app/assistant/chat.ts
+#: packages/renderer/components/assistant/source-preview.tsx
 msgid "Couldn't open the email source."
 msgstr "Impossible d’ouvrir l’e-mail cité."
 
@@ -1156,6 +1225,14 @@ msgstr "Impossible de lire la connexion ChatGPT enregistrée. Déconnectez ChatG
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Couldn’t read this image. Try another file."
 msgstr "Impossible de lire cette image. Essayez un autre fichier."
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Couldn’t save the category. Try again."
+msgstr "Impossible d’enregistrer la catégorie. Réessayez."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Couldn’t schedule this follow-up. Check the conversation and try again."
+msgstr "Impossible de programmer la relance. Vérifiez la conversation et réessayez."
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Couldn’t search this account."
@@ -1188,6 +1265,14 @@ msgstr "Impossible de mettre à jour les extensions"
 msgid "Couldn't update the AI connection. Try again."
 msgstr "Impossible de mettre à jour la connexion à l’IA. Réessayez."
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "Couldn’t update this follow-up."
+msgstr "Impossible de mettre à jour cette relance."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Couldn’t verify replies"
+msgstr "Impossible de vérifier les réponses"
+
 #. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Ctrl"
@@ -1212,6 +1297,7 @@ msgid "Cu&t"
 msgstr "Co&uper"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/components/follow-ups.tsx
 msgid "Current mail view"
 msgstr "Vue de messagerie actuelle"
 
@@ -1263,7 +1349,7 @@ msgstr "Emplacement de téléchargement par défaut"
 msgid "Default mail client"
 msgstr "Client de messagerie par défaut"
 
-#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#. Button on a message in All Mail. A Gmail action, so it follows Gmail's word for it
 #. Button on a new email notification. A Gmail action, so it follows Gmail's word for it, under Gmail's words in the glossary
 #: packages/app/gmail/index.ts
 #: packages/renderer/routes/unified-inbox.tsx
@@ -1364,6 +1450,7 @@ msgid "Don't show again"
 msgstr "Ne plus afficher"
 
 #. Button that closes the dialog of an extension's sites
+#: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Done"
 msgstr "OK"
@@ -1420,6 +1507,10 @@ msgstr "Brouillon d’e-mail"
 msgid "Drag {label} to reorder"
 msgstr "Faire glisser {label} pour réorganiser"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "Due for follow-up"
+msgstr "À relancer"
+
 #. Name of a notification sound, picked in Settings
 #: packages/renderer/lib/notifications/index.ts
 msgid "Duet"
@@ -1470,12 +1561,18 @@ msgstr "Modifier la couleur de libellé"
 msgid "Edit saved search"
 msgstr "Modifier la recherche enregistrée"
 
+#: packages/renderer/components/assistant/source-preview.tsx
+msgid "Email excerpt"
+msgstr "Extrait du message"
+
 #: packages/renderer/components/assistant/answer.tsx
 #: packages/renderer/components/assistant/assistant-reply.tsx
+#: packages/renderer/components/assistant/source-preview.tsx
 msgid "Email source"
 msgstr "E-mail cité"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+#: packages/renderer/components/assistant/source-preview.tsx
 msgid "Email sources"
 msgstr "E-mails cités"
 
@@ -1488,6 +1585,10 @@ msgstr "E-mails"
 #: packages/shared/accounts.ts
 msgid "Emerald"
 msgstr "Émeraude"
+
+#: packages/renderer/routes/settings/unified-inbox.tsx
+msgid "Enable All Mail"
+msgstr "Activer Tous les messages"
 
 #: packages/renderer/routes/settings/blocker.tsx
 msgid "Enable blocker"
@@ -1514,10 +1615,6 @@ msgstr "Activer l’icône de la zone de notification"
 msgctxt "Windows"
 msgid "Enable system tray icon"
 msgstr "Activer l’icône de la zone de notification"
-
-#: packages/renderer/routes/settings/unified-inbox.tsx
-msgid "Enable unified inbox"
-msgstr "Activer Toutes les boîtes"
 
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a color"
@@ -1642,6 +1739,10 @@ msgctxt "Windows"
 msgid "File"
 msgstr "Fichier"
 
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "File extension"
+msgstr "Extension du fichier"
+
 #. In the download history, in place of when a file was downloaded, once the file is no longer where it was saved
 #: packages/renderer/components/download-history.tsx
 msgid "File moved or deleted"
@@ -1653,6 +1754,7 @@ msgid "File name"
 msgstr "Nom du fichier"
 
 #: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/routes/attachments.tsx
 msgid "File type"
 msgstr "Type de fichier"
 
@@ -1677,6 +1779,10 @@ msgstr "Remplit et génère des mots de passe et des clés d’accès pour votre
 #: packages/renderer/lib/extension-descriptions.ts
 msgid "Fills and generates passwords and passkeys for your Google Account. Unlocking with biometrics needs the Bitwarden desktop app."
 msgstr "Remplit et génère des mots de passe et des clés d’accès pour votre compte Google. Le déverrouillage biométrique nécessite l’application de bureau Bitwarden."
+
+#: packages/renderer/components/attachments/filters.tsx
+msgid "Filter by account"
+msgstr "Filtrer par compte"
 
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -1729,6 +1835,18 @@ msgstr "Première page"
 msgid "First section only"
 msgstr "Première section uniquement"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "Follow up Friday"
+msgstr "Relancer vendredi"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Follow-up date"
+msgstr "Date de relance"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Follow-up scheduled"
+msgstr "Relance programmée"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Forward"
@@ -1738,6 +1856,10 @@ msgstr "Avancer"
 #: packages/renderer/routes/settings/saved-searches.tsx
 msgid "Friends"
 msgstr "Amis"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "From {sender}"
+msgstr "De {sender}"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
@@ -2067,6 +2189,10 @@ msgstr "Installer {extensionName}"
 msgid "Install Claude Code on this computer, then try again."
 msgstr "Installez Claude Code sur cet ordinateur, puis réessayez."
 
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Invoice"
+msgstr "Facture"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Jump to latest reply"
 msgstr "Aller à la dernière réponse"
@@ -2106,6 +2232,10 @@ msgstr "Langues"
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Last page"
 msgstr "Dernière page"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Last sent {lastSent}"
+msgstr "Dernier envoi le {lastSent}"
 
 #. Button on the toast after a setting changes, which dismisses it and leaves the restart for later
 #. Dialog button that puts off restarting ggmail
@@ -2181,6 +2311,7 @@ msgstr "Lister les applis Workspace ouvertes dans leur propre fenêtre à côté
 msgid "Load clipped messages in full"
 msgstr "Charger les messages tronqués en entier"
 
+#: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "Load more"
 msgstr "Afficher plus"
@@ -2195,6 +2326,11 @@ msgstr "Charger au démarrage"
 #: packages/renderer/components/loading-spinner.tsx
 msgid "Loading"
 msgstr "Chargement"
+
+#: packages/renderer/components/assistant/source-preview.tsx
+#: packages/renderer/components/follow-ups.tsx
+msgid "Loading email…"
+msgstr "Chargement du message…"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Loading older mail…"
@@ -2232,12 +2368,17 @@ msgstr "Conversation avec l’assistant de messagerie"
 msgid "Mail assistant provider"
 msgstr "Fournisseur de l’assistant de messagerie"
 
+#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/mail-views.tsx
+msgid "Mail views"
+msgstr "Vues de messagerie"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Manage Accounts"
 msgstr "Gérer les comptes"
 
-#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#. Button on a message in All Mail. A Gmail action, so it follows Gmail's word for it
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Mark as read"
 msgstr "Marquer comme lu"
@@ -2247,7 +2388,7 @@ msgstr "Marquer comme lu"
 msgid "Mark as Read"
 msgstr "Marquer comme lu"
 
-#. Button on a message in the unified inbox. A Gmail action, so it follows Gmail's word for it
+#. Button on a message in All Mail. A Gmail action, so it follows Gmail's word for it
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Mark as spam"
 msgstr "Signaler comme spam"
@@ -2298,6 +2439,10 @@ msgstr "Divers"
 msgid "Mode"
 msgstr "Mode"
 
+#: packages/renderer/routes/attachments.tsx
+msgid "More filters"
+msgstr "Plus de filtres"
+
 #. Button in a Google Workspace app window's titlebar that opens its menu
 #: packages/renderer/workspace-app.tsx
 msgid "More options"
@@ -2330,6 +2475,10 @@ msgstr "Déplacer vers une nouvelle fenêtre"
 #: packages/app/ipc.ts
 msgid "Move to Tab"
 msgstr "Déplacer vers un onglet"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Name or email address"
+msgstr "Nom ou adresse e-mail"
 
 #. Option of the Width setting for the vertical tabs sidebar
 #: packages/shared/tabs.ts
@@ -2373,6 +2522,14 @@ msgstr "Plus récents en premier"
 msgid "Next page"
 msgstr "Page suivante"
 
+#: packages/renderer/components/assistant/source-preview.tsx
+msgid "Next source"
+msgstr "Source suivante"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "No accounts are included in All Mail."
+msgstr "Aucun compte dans Tous les messages."
+
 #: packages/renderer/routes/settings/languages.tsx
 msgid "No additional languages selected"
 msgstr "Aucune langue supplémentaire sélectionnée"
@@ -2402,9 +2559,18 @@ msgstr "Aucun téléchargement pour l’instant"
 msgid "No emoji found."
 msgstr "Aucun emoji trouvé."
 
+#: packages/renderer/components/attachments/detail-filters.tsx
+#: packages/renderer/routes/attachments.tsx
+msgid "No extension"
+msgstr "Sans extension"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "No files available"
 msgstr "Aucun fichier disponible"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "No follow-ups"
+msgstr "Aucune relance"
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "No free time slot left for another window. Remove or shorten one first."
@@ -2559,6 +2725,7 @@ msgstr "Ouvrir une appli"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/attachments/files.tsx
+#: packages/renderer/components/attachments/preview.tsx
 msgid "Open email"
 msgstr "E-mail ouvert"
 
@@ -2601,6 +2768,7 @@ msgstr "Ouvrir dans le dossier"
 
 #. Open a suggested email in the Gmail composer
 #: packages/renderer/components/assistant/assistant-reply.tsx
+#: packages/renderer/components/assistant/source-preview.tsx
 msgid "Open in Gmail"
 msgstr "Ouvrir dans Gmail"
 
@@ -2630,10 +2798,6 @@ msgstr "Ouvrir le dossier contenant le fichier à la fin d’un téléchargement
 msgid "Open this link in your default browser?"
 msgstr "Ouvrir ce lien dans votre navigateur par défaut ?"
 
-#: packages/renderer/components/app-titlebar.tsx
-msgid "Open unified inbox"
-msgstr "Ouvrir Toutes les boîtes"
-
 #. Button that opens the Settings app of Windows at its default apps, named as Microsoft names it
 #: packages/renderer/routes/settings/general.tsx
 msgid "Open Windows Settings"
@@ -2662,11 +2826,15 @@ msgstr "Options"
 msgid "Orange"
 msgstr "Orange"
 
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Order"
+msgstr "Commande"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "Other files"
 msgstr "Autres fichiers"
 
-#. The unified inbox's current page and how many pages it has
+#. All Mail's current page and how many pages it has
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Page {currentPage} of {pageCount}"
 msgstr "Page {currentPage} sur {pageCount}"
@@ -2788,6 +2956,14 @@ msgstr "Afficher un aperçu de la pièce jointe"
 msgid "Previous page"
 msgstr "Page précédente"
 
+#: packages/renderer/components/assistant/source-preview.tsx
+msgid "Previous source"
+msgstr "Source précédente"
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Price quote"
+msgstr "Devis"
+
 #. Option of the Categories to monitor setting. Primary is Gmail's inbox category of that name, so it follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Primary only"
@@ -2858,9 +3034,21 @@ msgstr "Lecture de « {subject} »"
 msgid "Reading this conversation"
 msgstr "Lecture de cette conversation"
 
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Receipt"
+msgstr "Reçu"
+
 #: packages/renderer/components/attachments/files.tsx
 msgid "Received"
 msgstr "Date de réception"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Received from"
+msgstr "Reçu à partir du"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Received through"
+msgstr "Reçu jusqu’au"
 
 #: packages/renderer/recent-download-history.tsx
 msgid "Recent download history"
@@ -2917,6 +3105,7 @@ msgstr "Mémoriser le niveau de zoom des applis Workspace entre les redémarrage
 
 #. Button that removes a host from the trusted hosts
 #. Button that removes a site from the extension's sites
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/routes/settings/extensions.tsx
 #: packages/renderer/routes/settings/phishing-protection.tsx
 msgid "Remove"
@@ -2958,6 +3147,10 @@ msgstr "Supprimer le favori"
 #: packages/app/ipc.ts
 msgid "Remove Bookmark"
 msgstr "Supprimer le favori"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Remove filter “{label}”"
+msgstr "Retirer le filtre « {label} »"
 
 #. Button that removes a download from the download history
 #: packages/renderer/components/download-history.tsx
@@ -3005,6 +3198,10 @@ msgstr "Réponse interrompue"
 msgid "Report Issue…"
 msgstr "Signaler un problème…"
 
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Reservation"
+msgstr "Réservation"
+
 #. Button in the Reset App dialog that erases ggmail's data
 #: packages/app/menu.ts
 msgid "Reset"
@@ -3051,6 +3248,8 @@ msgstr "Redémarrer maintenant"
 msgid "Restrict minimum window size"
 msgstr "Limiter la taille minimale de la fenêtre"
 
+#: packages/renderer/components/assistant/source-preview.tsx
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Retry"
@@ -3068,7 +3267,7 @@ msgstr "Inverser la conversation"
 msgid "Reviewing the mail results"
 msgstr "Examen des résultats de la recherche"
 
-#. Label of the unified inbox's picker for how many messages a page lists
+#. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Rows per page"
 msgstr "Lignes par page"
@@ -3108,6 +3307,14 @@ msgstr "Enregistrer"
 #: packages/renderer/lib/settings-pages.ts
 msgid "Saved searches"
 msgstr "Recherches enregistrées"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Schedule follow-up"
+msgstr "Programmer une relance"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Scheduled"
+msgstr "Programmée"
 
 #: packages/renderer/routes/settings/advanced.tsx
 msgid "Screen sharing"
@@ -3254,6 +3461,7 @@ msgstr "Onglets sélectionnés"
 msgid "Send chat message"
 msgstr "Envoyer le message"
 
+#: packages/renderer/components/attachments/detail-filters.tsx
 #: packages/renderer/components/attachments/files.tsx
 msgid "Sender"
 msgstr "Expéditeur"
@@ -3339,6 +3547,10 @@ msgstr "Maj"
 msgid "Show"
 msgstr "Afficher"
 
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show a moon in the title bar while Do Not Disturb is on."
+msgstr "Afficher une lune dans la barre de titre lorsque le mode Ne pas déranger est activé."
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Show a notification when a download finishes."
 msgstr "Afficher une notification à la fin d’un téléchargement."
@@ -3352,10 +3564,6 @@ msgstr "Afficher une notification de test pour voir comment les notifications s�
 msgctxt "macOS"
 msgid "Show All"
 msgstr "Tout afficher"
-
-#: packages/renderer/routes/settings/unified-inbox.tsx
-msgid "Show all unread messages from every account in a single unified inbox."
-msgstr "Afficher tous les messages non lus de tous les comptes réunis dans Toutes les boîtes."
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show an unread badge on the dock icon when there are unread emails."
@@ -3453,6 +3661,8 @@ msgstr "Afficher des notifications pour les nouveaux e-mails."
 msgid "Show notifications from Workspace apps such as Calendar, Meet, and Chat."
 msgstr "Afficher les notifications des applis Workspace comme Calendar, Meet et Chat."
 
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "Show recent download history"
@@ -3490,8 +3700,8 @@ msgid "Show sender icons"
 msgstr "Afficher les icônes des expéditeurs"
 
 #: packages/renderer/routes/settings/unified-inbox.tsx
-msgid "Show sender icons next to the senders in the unified inbox."
-msgstr "Afficher les icônes des expéditeurs à côté de leur nom dans Toutes les boîtes."
+msgid "Show sender icons in All Mail."
+msgstr "Afficher les icônes des expéditeurs dans Tous les messages."
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Show sender icons next to the senders in your inbox."
@@ -3536,10 +3746,6 @@ msgstr "Afficher le bouton en bas de la barre latérale qui bascule entre étroi
 msgid "Show the button that opens bookmarks."
 msgstr "Afficher le bouton qui ouvre les favoris."
 
-#: packages/renderer/routes/settings/appearance.tsx
-msgid "Show the button that turns Do Not Disturb on and off. Turning this off also turns Do Not Disturb off."
-msgstr "Afficher le bouton qui active et désactive Ne pas déranger. Désactiver cette option désactive aussi Ne pas déranger."
-
 #. Automatic is this setting's first option; dwm, i3 and sway are window managers
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show the close, minimize and maximize buttons in the titlebar. Automatic hides them on window managers without decorations, such as dwm, i3 and sway."
@@ -3576,6 +3782,10 @@ msgstr "Afficher les pastilles des e-mails non lus, selon le paramètre de chaqu
 msgid "Show unread count"
 msgstr "Afficher le nombre de non lus"
 
+#: packages/renderer/routes/settings/unified-inbox.tsx
+msgid "Show unread messages from your accounts in one place."
+msgstr "Afficher les messages non lus de vos comptes au même endroit."
+
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Show width button"
 msgstr "Afficher le bouton de largeur"
@@ -3588,6 +3798,14 @@ msgstr "Afficher les fenêtres"
 #: packages/shared/workspace-apps.ts
 msgid "Sidebar"
 msgstr "Barre latérale"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Sign in to {label}"
+msgstr "Se connecter à {label}"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Sign in to {signedOutAccounts} to load attachments."
+msgstr "Connectez-vous à {signedOutAccounts} pour charger les pièces jointes."
 
 #: packages/app/assistant/connection.ts
 msgid "Sign in to ChatGPT again to continue."
@@ -3621,6 +3839,10 @@ msgstr "Vous êtes déconnecté sur cet appareil. Ouvrez les paramètres de Chat
 msgid "Signs you out of this account."
 msgstr "Vous déconnecte de ce compte."
 
+#: packages/renderer/routes/attachments.tsx
+msgid "Since {startDate}"
+msgstr "Depuis le {startDate}"
+
 #. Screen reader label of the field for the address of a site to add
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Site to add"
@@ -3631,6 +3853,7 @@ msgstr "Site à ajouter"
 msgid "Sites for {extensionName}"
 msgstr "Sites pour {extensionName}"
 
+#: packages/renderer/components/attachments/detail-filters.tsx
 #: packages/renderer/components/attachments/files.tsx
 msgid "Size"
 msgstr "Taille"
@@ -3639,6 +3862,10 @@ msgstr "Taille"
 #: packages/shared/accounts.ts
 msgid "Sky"
 msgstr "Ciel"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Some messages in {partialAccounts} couldn’t be checked. Previously loaded files are still available."
+msgstr "Certains messages de {partialAccounts} n’ont pas pu être vérifiés. Les fichiers déjà chargés restent disponibles."
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Some pages may load more slowly the next time."
@@ -3692,6 +3919,10 @@ msgstr "Démarrer l’application en mode réduit."
 #: packages/renderer/routes/settings/general.tsx
 msgid "Startup"
 msgstr "Démarrage"
+
+#: packages/renderer/routes/attachments.tsx
+msgid "Still checking {loadingAccounts}…"
+msgstr "Vérification en cours pour {loadingAccounts}…"
 
 #: packages/renderer/components/titlebar.tsx
 msgid "Stop loading"
@@ -3824,10 +4055,18 @@ msgstr "Le compte Claude Code a changé. Reconnectez-vous dans les paramètres d
 msgid "The connection ended before the reply finished."
 msgstr "La connexion a été interrompue avant la fin de la réponse."
 
+#: packages/app/assistant/chat.ts
+msgid "The conversation changed."
+msgstr "La conversation a changé."
+
 #. Message of the error box shown when a download fails; fileName is the file's name
 #: packages/app/downloads.ts
 msgid "The download of {fileName} was interrupted"
 msgstr "Le téléchargement du fichier {fileName} a été interrompu"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "The end date must be on or after the start date."
+msgstr "La date de fin doit être égale ou postérieure à la date de début."
 
 #: packages/app/lib/extension-window.ts
 msgid "The extension is running, but ggmail can't open a window for it."
@@ -3836,6 +4075,10 @@ msgstr "L’extension est en cours d’exécution, mais ggmail ne peut pas lui o
 #: packages/app/lib/extension-window.ts
 msgid "The extension starts after ggmail restarts. Restart ggmail, then try again."
 msgstr "L’extension démarre après le redémarrage de ggmail. Redémarrez ggmail, puis réessayez."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "The latest message must be one you sent."
+msgstr "Vous devez être l’auteur du dernier message."
 
 #: packages/app/assistant/chat.ts
 #: packages/app/assistant/insert-reply.ts
@@ -3847,10 +4090,6 @@ msgstr "La vue de messagerie a changé. Reposez votre question pour utiliser la 
 #: packages/app/assistant/responses.ts
 msgid "The reply was incomplete. Try again with a shorter request."
 msgstr "La réponse est incomplète. Réessayez avec une demande plus courte."
-
-#: packages/renderer/routes/unified-inbox.tsx
-msgid "The unified inbox shows every unread message from your accounts in one place. A message leaves the list after you read it."
-msgstr "Dans Toutes les boîtes, tous les messages non lus de vos comptes sont regroupés. Un message disparaît de la liste une fois lu."
 
 #. Setting that picks a light or dark appearance
 #: packages/renderer/routes/settings/appearance.tsx
@@ -3881,6 +4120,14 @@ msgstr "Vous vous êtes connecté avec un autre compte ChatGPT. Utilisez le comp
 msgid "This signs out of every account and clears all settings and data on this device. It can't be undone."
 msgstr "Cette action déconnecte tous les comptes et efface tous les paramètres et données de cet appareil. Elle est irréversible."
 
+#: packages/renderer/routes/attachments.tsx
+msgid "Through {endDate}"
+msgstr "Jusqu’au {endDate}"
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Ticket"
+msgstr "Billet"
+
 #. Heading of the Appearance section for the bar along the top of ggmail's window
 #. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
 #: packages/renderer/routes/settings/appearance.tsx
@@ -3892,6 +4139,10 @@ msgstr "Barre de titre"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "à"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."
+msgstr "Pour programmer une relance, ouvrez une conversation envoyée dans Gmail et revenez ici."
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -3919,17 +4170,28 @@ msgstr "Réessayez plus tard."
 msgid "Try updating again."
 msgstr "Réessayez la mise à jour."
 
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
 #: packages/renderer/components/app-titlebar.tsx
 msgid "Turn Do Not Disturb off"
 msgstr "Désactiver Ne pas déranger"
 
-#: packages/renderer/components/app-titlebar.tsx
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/menu.ts
 msgid "Turn Do Not Disturb on"
 msgstr "Activer Ne pas déranger"
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Turn off Do Not Disturb to show a test notification."
 msgstr "Désactivez Ne pas déranger pour afficher une notification de test."
+
+#: packages/renderer/components/attachments/categories.tsx
+msgid "Uncategorized"
+msgstr "Sans catégorie"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Under {small}"
+msgstr "Moins de {small}"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -3949,19 +4211,9 @@ msgctxt "Windows"
 msgid "Undo"
 msgstr "Annuler"
 
-#. A page of Settings, named in the settings sidebar and as the page's title
-#. Switch, and a badge on the account, for including the account in the unified inbox
-#. Title of the unified inbox page
-#: packages/renderer/lib/settings-pages.ts
-#: packages/renderer/routes/settings/accounts.tsx
-#: packages/renderer/routes/unified-inbox.tsx
-msgid "Unified inbox"
-msgstr "Toutes les boîtes"
-
-#. A menu or a menu item in ggmail's menu bar
-#: packages/app/menu.ts
-msgid "Unified Inbox"
-msgstr "Toutes les boîtes"
+#: packages/renderer/components/assistant/source-preview.tsx
+msgid "Unknown sender"
+msgstr "Expéditeur inconnu"
 
 #. Unpinned tabs and Selected tabs quote this setting's options and Hibernate When Idle the tab's context menu item, so they match those messages' wording
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -3996,6 +4248,10 @@ msgstr "Non lus"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Unread count preference"
 msgstr "Calcul du nombre de non lus"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Unread messages"
+msgstr "Messages non lus"
 
 #. How long Do Not Disturb keeps notifications silenced, in its menu
 #: packages/app/do-not-disturb.ts
@@ -4104,6 +4360,14 @@ msgstr "Volume {percent}"
 msgid "Waiting for {modelName}"
 msgstr "En attente de la réponse de {modelName}"
 
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/ipc.ts
+#: packages/app/menu.ts
+#: packages/renderer/components/follow-ups.tsx
+#: packages/renderer/components/mail-view-navigation.tsx
+msgid "Waiting for reply"
+msgstr "En attente de réponse"
+
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
 msgstr "En attente de la vue de messagerie…"
@@ -4191,8 +4455,8 @@ msgstr "Fenêtres"
 
 #. A categorized inbox is Gmail's own inbox type of that name, with categories such as Primary and Promotions, so it follows Gmail's words for them
 #: packages/renderer/routes/settings/gmail/index.tsx
-msgid "With a categorized inbox, choose which categories are watched for new email notifications and included in the unified inbox."
-msgstr "Avec une boîte de réception classée par catégories, choisir les catégories surveillées pour les notifications de nouveaux e-mails et incluses dans Toutes les boîtes."
+msgid "With a categorized inbox, choose which categories are watched for new email notifications and included in All Mail."
+msgstr "Avec une boîte de réception classée par catégories, choisir les catégories surveillées pour les notifications de nouveaux e-mails et incluses dans Tous les messages."
 
 #. Multiple inboxes is Gmail's own inbox type of that name, so it follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx

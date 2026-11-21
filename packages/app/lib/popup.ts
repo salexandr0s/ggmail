@@ -15,6 +15,7 @@ export type PopupAnchor = { x: number; y: number; align: "start" | "end" };
 
 export type PopupOptions = {
   page: RendererPage;
+  searchParams?: URLSearchParams;
   /** The size of the popup itself, without the gaps the view spans. */
   width: number;
   /** `fill` reaches the bottom of the window, leaving the gap it hangs by. */
@@ -197,7 +198,7 @@ export class Popup {
 
     this.options = options;
 
-    loadRenderer(this.view, { page: options.page });
+    loadRenderer(this.view, { page: options.page, searchParams: options.searchParams });
 
     parentWindow.contentView.addChildView(this.view);
 

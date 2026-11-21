@@ -2,6 +2,7 @@
 import type { MailAttachment } from "@ggmail/shared/attachments";
 import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { load } from "cheerio/slim";
+import { classifyMessageAttachments } from "./classify";
 
 export type AttachmentEntry = {
   file: MailAttachment;
@@ -100,6 +101,7 @@ export function readPrintAttachments(
     const tiles = $(message)
       .find("table.att")
       .filter((_i, node) => !$(node).parentsUntil(message, "div").length);
+    const messageFiles = new Map<string, AttachmentEntry>();
     for (const table of tiles) {
       for (const link of $(table).find("a[href]")) {
         const locator = readLocator($(link).attr("href") ?? "", mailbox);
@@ -121,7 +123,7 @@ export function readPrintAttachments(
           : Number(
               BigInt(`0x${legacyId.test(locator.messageId) ? locator.messageId : threadId}`) >> 20n,
             );
-        files.set(id, {
+        messageFiles.set(id, {
           ...locator,
           thumbnailUrl:
             thumbnail &&
@@ -133,6 +135,7 @@ export function readPrintAttachments(
           file: {
             id,
             name,
+            detectedCategory: "uncategorized",
             subject,
             sender,
             senderPhotoUrl,
@@ -142,6 +145,38 @@ export function readPrintAttachments(
         });
       }
     }
+    const readMessageText = () => {
+      const body = rows.slice(1).clone();
+      body.find("#divRplyFwdMsg, .moz-cite-prefix").replaceWith("\n-----Original Message-----\n");
+      body
+        .find("[style]")
+        .filter((_i, node) =>
+          /(?:^|;)\s*(?:display\s*:\s*none|visibility\s*:\s*hidden)\b/i.test(
+            $(node).attr("style") ?? "",
+          ),
+        )
+        .remove();
+      body
+        .find(
+          "blockquote, .gmail_quote, .gmail_attr, .gmail_signature, [data-smartmail=gmail_signature], script, style, [hidden], [aria-hidden=true], table.att",
+        )
+        .remove();
+      body.find("br").replaceWith("\n");
+      body.find("td, th").append(" ");
+      body.find("p, div, li, tr").append("\n");
+      return body.text().slice(0, 4000);
+    };
+    const entries = [...messageFiles.values()];
+    const detected = classifyMessageAttachments(
+      entries.map(({ file }) => file.name),
+      // Gmail supplies one subject for the entire thread. In a reply chain it may describe a different message.
+      messages.length === 1 ? subject : "",
+      readMessageText,
+    );
+    entries.forEach((entry, index) => {
+      entry.file.detectedCategory = detected[index] ?? "uncategorized";
+      files.set(entry.file.id, entry);
+    });
   }
   return [...files.values()];
 }

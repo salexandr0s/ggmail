@@ -5,6 +5,7 @@ import {
   type AssistantDraft,
   type AssistantRequest,
   type AssistantResult,
+  type SourceMessage,
 } from "@ggmail/shared/assistant";
 import { t } from "@lingui/core/macro";
 import { z } from "zod";
@@ -15,19 +16,21 @@ import {
   getAssistantMailboxes,
   openMailSource,
   readMailSource,
+  readMailPreview,
   type MailSource,
   readCurrentMail,
   searchAllMail,
 } from "./mail-context";
 import { AssistantProviders } from "./providers";
 import { AssistantError, type AssistantTool, type ResponseInput } from "./responses";
+import { readThreadPreview } from "./thread-text";
 
 // oxlint-disable-next-line lingui/no-unlocalized-strings -- Internal model instruction, tool result or mailto URL.
 const instructions = `
 You are ggmail's mail assistant. Answer the user's question in their language.
 You can search signed-in Gmail accounts and read conversations from any view.
 Use the selected account by default. When the user names an account, use that account.
-For a mailbox-wide question in the unified inbox, or when asked about all accounts,
+For a mailbox-wide question in All Mail, or when asked about all accounts,
 search each relevant available account. Report any relevant unavailable accounts.
 For questions about a mailbox or folder, run search_mail even if the visible rows show no matches.
 Respect any folder, sender or date limits the user gives.
@@ -142,6 +145,7 @@ export class AssistantChat {
   private conversation: Conversation | undefined;
   private active: { id: string; controller: AbortController } | undefined;
   private inserting: AbortController | undefined;
+  private preview?: { id: string; controller: AbortController; messages?: SourceMessage[] };
 
   context() {
     const { kind, key, accountLabel } = getMailScope();
@@ -152,6 +156,7 @@ export class AssistantChat {
   }
 
   clear() {
+    this.closePreview();
     this.inserting?.abort();
     this.active?.controller.abort();
     this.active = undefined;
@@ -164,7 +169,7 @@ export class AssistantChat {
     }
   }
 
-  openSource(id: string) {
+  private citedSource(id: string) {
     const scope = getMailScope();
     const source =
       this.conversation?.key === scope.key &&
@@ -172,7 +177,49 @@ export class AssistantChat {
     if (!source) {
       throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
     }
+    return { scope, source };
+  }
+
+  openSource(id: string) {
+    const { scope, source } = this.citedSource(id);
     return openMailSource(scope, source);
+  }
+
+  closePreview(id?: string) {
+    if (this.preview && (!id || this.preview.id === id)) {
+      this.preview.controller.abort();
+      this.preview = undefined;
+    }
+  }
+
+  async previewSource(id: string, offset: number) {
+    const { scope, source } = this.citedSource(id);
+    if (offset === 0) {
+      this.closePreview();
+      const controller = new AbortController();
+      this.preview = { id, controller };
+      const result = await readMailPreview(scope, source, controller.signal);
+      ensureCurrentScope(scope, controller.signal);
+      if (this.preview?.controller !== controller) {
+        throw new AssistantError(t`The conversation changed.`);
+      }
+      if ("error" in result) {
+        this.closePreview(id);
+        if (source.excerpt) {
+          return { accountId: source.accountId, excerpt: source.excerpt, nextOffset: null };
+        }
+        throw new AssistantError(t`Couldn't open the email source.`);
+      }
+      this.preview.messages = result;
+    }
+    if (this.preview?.id !== id || !this.preview.messages) {
+      throw new AssistantError(t`Couldn't open the email source.`);
+    }
+    const page = readThreadPreview(this.preview.messages, offset);
+    if (page.nextOffset === null) {
+      this.closePreview(id);
+    }
+    return { accountId: source.accountId, ...page };
   }
 
   openDraft(draft: AssistantDraft, key: string) {

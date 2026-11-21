@@ -94,25 +94,29 @@ export function useUnifiedInbox() {
 
   const accounts = useAccountsStore((state) => state.accounts);
 
-  const messages = useMemo<UnifiedInboxMessage[]>(
+  const inboxes = useMemo(
     () =>
       accounts
-        .map((account) =>
-          (data[account.config.id] ?? []).map((mail) => ({
-            account: {
-              id: account.config.id,
-              label: getAccountLabel(account.config.label),
-              color: account.config.color,
-            },
-            ...mail,
-          })),
-        )
-        .flat()
-        .sort((a, b) => (b.receivedAt > a.receivedAt ? 1 : -1)),
-    [data, accounts],
+        .filter(({ config }) => config.gmail.unifiedInbox)
+        .map(({ config, gmail }) => ({
+          account: { id: config.id, label: getAccountLabel(config.label), color: config.color },
+          status: gmail.attentionRequired
+            ? ("signIn" as const)
+            : (data[config.id]?.status ?? "syncing"),
+          messages: gmail.attentionRequired ? [] : (data[config.id]?.messages ?? []),
+        })),
+    [accounts, data],
   );
 
-  return { messages };
+  const messages = useMemo<UnifiedInboxMessage[]>(
+    () =>
+      inboxes
+        .flatMap(({ account, messages }) => messages.map((mail) => ({ ...mail, account })))
+        .sort((a, b) => (b.receivedAt > a.receivedAt ? 1 : -1)),
+    [inboxes],
+  );
+
+  return { messages, inboxes };
 }
 
 export function useCopied() {

@@ -7,6 +7,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@ggmail/ui/components/input-group";
+import { Item } from "@ggmail/ui/components/item";
 import {
   Popover,
   PopoverContent,
@@ -15,22 +16,69 @@ import {
 } from "@ggmail/ui/components/popover";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2Icon, SearchIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import {
+  ChevronDownIcon,
+  KeyRoundIcon,
+  Loader2Icon,
+  SearchIcon,
+  SearchXIcon,
+  SlidersHorizontalIcon,
+  XIcon,
+} from "lucide-react";
+import { type ReactNode, useLayoutEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
-import { useAccountsStore } from "@/lib/stores";
+import { useAccountsStore, useMailboxRevisions } from "@/lib/stores";
 import { submitUnifiedSearch, useUnifiedSearch } from "@/lib/unified-search";
-import { AccountBadge } from "./account-badge";
 import { AccountFilters } from "./account-filters";
+import { MailboxSection, MailPageHeader } from "./mail-page";
 
-function MailboxResults({ accountId, query }: { accountId: string; query: string }) {
+// Only literal search terms describe text the reader can find in a result.
+// Gmail operators such as filename: and newer_than: affect the result set instead.
+function searchPattern(query: string) {
+  const terms = new Set<string>();
+  for (const token of query.match(/(?:[^\s"]+|"[^"]*")+/gu) ?? []) {
+    if (token.startsWith("-") || token === "OR" || /^[\w-]+:/u.test(token)) {
+      continue;
+    }
+    const text = token.replace(/^"|"$/gu, "").trim();
+    if (text) {
+      terms.add(text);
+    }
+  }
+  const parts = [...terms]
+    .sort((a, b) => b.length - a.length)
+    .map((term) => term.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&"));
+  return parts.length ? new RegExp(`(${parts.join("|")})`, "iu") : null;
+}
+
+function highlight(text: string, pattern: RegExp | null) {
+  return pattern
+    ? text.split(pattern).map((part, index) =>
+        index % 2 ? (
+          <mark key={index} className="rounded-xs bg-amber-100 text-inherit dark:bg-amber-400/25">
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )
+    : text;
+}
+
+function MailboxResults({
+  accountId,
+  query,
+  requestId,
+}: {
+  accountId: string;
+  query: string;
+  requestId: string;
+}) {
   const { t } = useLingui();
-  const [requestId] = useState(() => crypto.randomUUID());
-  useEffect(
-    () => () => ipc.main.send("unifiedSearch.cancel", accountId, requestId),
-    [accountId, requestId],
+  const pattern = useMemo(() => searchPattern(query), [query]);
+  const selectedThread = useUnifiedSearch((state) =>
+    state.selection?.accountId === accountId ? state.selection.threadId : null,
   );
-
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
     queryKey: ["unifiedSearch", accountId, requestId],
     initialPageParam: 1,
@@ -38,7 +86,7 @@ function MailboxResults({ accountId, query }: { accountId: string; query: string
       ipc.main.invoke("unifiedSearch.read", accountId, requestId, query, pageParam),
     getNextPageParam: (lastPage, _pages, page) => (lastPage.more ? page + 1 : undefined),
     retry: false,
-    gcTime: 0,
+    gcTime: Infinity,
     staleTime: Infinity,
     networkMode: "always",
   });
@@ -46,13 +94,23 @@ function MailboxResults({ accountId, query }: { accountId: string; query: string
   return (
     <>
       {!!threads?.length && (
-        <ul className="divide-y">
+        <ul className="divide-y border-t">
           {threads.map((thread) => (
             <li key={thread.id}>
-              <button
-                type="button"
-                className="block w-full min-w-0 px-3 py-2.5 text-left hover:bg-muted/60 focus-visible:bg-muted focus-visible:-outline-offset-2 focus-visible:outline-ring"
-                onClick={async () => {
+              <Item
+                render={<button type="button" />}
+                size="xs"
+                aria-current={selectedThread === thread.id ? "true" : undefined}
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 px-3.5 py-2.5 text-left hover:bg-muted/50 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset aria-current:bg-sky-50 aria-current:shadow-[inset_3px_0_var(--color-sky-700)] @2xl:grid-cols-[minmax(7rem,20%)_minmax(0,1fr)_auto] dark:aria-current:bg-sky-400/10 dark:aria-current:shadow-[inset_3px_0_var(--color-sky-400)]"
+                data-search-thread={thread.id}
+                data-search-account={accountId}
+                onClick={async (event) => {
+                  const scrollTop =
+                    event.currentTarget.closest('[data-slot="scroll-area-viewport"]')?.scrollTop ??
+                    0;
+                  useUnifiedSearch.setState({
+                    selection: { accountId, threadId: thread.id, scrollTop },
+                  });
                   try {
                     await ipc.main.invoke("unifiedSearch.open", accountId, requestId, thread.id);
                   } catch {
@@ -60,26 +118,36 @@ function MailboxResults({ accountId, query }: { accountId: string; query: string
                   }
                 }}
               >
-                <span className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
-                  <span className="truncate">{thread.sender}</span>
-                  <span className="shrink-0">{thread.date}</span>
+                <span
+                  className="min-w-0 truncate text-xs leading-4 text-muted-foreground @2xl:text-foreground"
+                  title={thread.sender}
+                >
+                  {highlight(thread.sender, pattern)}
                 </span>
-                <span className="block truncate text-sm font-medium">
-                  {thread.subject || t`(no subject)`}
-                </span>
-                {thread.snippet && (
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {thread.snippet}
+                <span className="col-span-2 row-start-2 flex min-w-0 flex-col gap-0.5 @2xl:col-span-1 @2xl:col-start-2 @2xl:row-start-1">
+                  <span className="max-w-full truncate font-semibold" title={thread.subject}>
+                    {thread.subject ? highlight(thread.subject, pattern) : t`(no subject)`}
                   </span>
-                )}
-              </button>
+                  {thread.snippet && (
+                    <span className="min-w-0 truncate text-xs leading-4 text-muted-foreground">
+                      {highlight(thread.snippet, pattern)}
+                    </span>
+                  )}
+                </span>
+                <span
+                  className="col-start-2 row-start-1 truncate text-end text-xs text-muted-foreground tabular-nums @2xl:col-start-3"
+                  title={thread.date}
+                >
+                  {thread.date}
+                </span>
+              </Item>
             </li>
           ))}
         </ul>
       )}
       <div
         role="status"
-        className="flex items-center gap-2 px-3 text-sm text-muted-foreground has-[*]:py-2"
+        className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground empty:hidden has-[*]:border-t has-[*]:px-3 has-[*]:py-2"
       >
         {isFetching ? (
           <>
@@ -102,11 +170,13 @@ function MailboxResults({ accountId, query }: { accountId: string; query: string
             </Button>
           </>
         ) : !threads?.length ? (
-          <span>
+          <span className="flex items-center gap-2">
+            <SearchXIcon aria-hidden="true" className="size-4" />
             <Trans>No matching conversations</Trans>
           </span>
         ) : hasNextPage ? (
           <Button size="sm" variant="ghost" onClick={() => fetchNextPage()}>
+            <ChevronDownIcon aria-hidden="true" />
             <Trans>Load more</Trans>
           </Button>
         ) : null}
@@ -117,120 +187,169 @@ function MailboxResults({ accountId, query }: { accountId: string; query: string
 
 export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
   const { t } = useLingui();
-  const { search, draft } = useUnifiedSearch();
+  const { search, draft, accountId } = useUnifiedSearch();
+  const revisions = useMailboxRevisions();
   const accounts = useAccountsStore((state) => state.accounts);
-  const [accountId, setAccountId] = useState("");
+  const setAccountId = (id: string) =>
+    useUnifiedSearch.setState({ accountId: id, selection: null });
   const chosen = accounts.find((a) => a.config.id === accountId);
-  const [revisions, setRevisions] = useState<Record<string, number>>({});
   const input = useRef<HTMLInputElement>(null);
-  useEffect(
-    () =>
-      ipc.renderer.on("unifiedSearch.invalidated", (_event, id) => {
-        setRevisions((previous) => ({ ...previous, [id]: (previous[id] ?? 0) + 1 }));
-      }),
-    [],
-  );
+  const results = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const selection = useUnifiedSearch.getState().selection;
+    if (!selection || !results.current) {
+      return;
+    }
+    const row = results.current.querySelector<HTMLButtonElement>(
+      `[data-search-account="${CSS.escape(selection.accountId)}"][data-search-thread="${CSS.escape(selection.threadId)}"]`,
+    );
+    const viewport = results.current.closest('[data-slot="scroll-area-viewport"]');
+    if (viewport && row) {
+      viewport.scrollTop = selection.scrollTop;
+      row.focus({ preventScroll: true });
+    }
+  }, [search?.id]);
 
   const clear = () => {
     submitUnifiedSearch("");
-    setAccountId("");
     input.current?.focus();
   };
 
   return (
     <>
-      <form
-        className="mb-5 flex flex-wrap items-center gap-2"
-        role="search"
-        onSubmit={(event) => {
-          event.preventDefault();
-          submitUnifiedSearch(draft);
-        }}
-      >
-        <InputGroup className="h-9 min-w-32 flex-1">
-          <InputGroupAddon>
-            <InputGroupButton type="submit" size="icon-xs" title={t`Search all accounts`}>
-              <SearchIcon />
-            </InputGroupButton>
-          </InputGroupAddon>
-          <InputGroupInput
-            ref={input}
-            type="search"
-            aria-label={t`Search all accounts`}
-            placeholder={t`Search all accounts`}
-            className="[&::-webkit-search-cancel-button]:hidden"
-            value={draft}
-            onChange={(event) => {
-              if (!event.target.value) {
-                clear();
-              } else {
-                useUnifiedSearch.setState({ draft: event.target.value });
-              }
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" && !event.nativeEvent.isComposing && draft) {
-                event.preventDefault();
-                event.stopPropagation();
-                clear();
-              }
-            }}
-          />
-          {draft && (
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton size="icon-xs" title={t`Clear search`} onClick={clear}>
-                <XIcon />
+      <MailPageHeader title={<Trans comment="Title of All Mail page">All Mail</Trans>}>
+        <form
+          className="flex min-w-0 flex-wrap items-center gap-2 @2xl:w-[min(52%,30rem)]"
+          role="search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            submitUnifiedSearch(draft);
+          }}
+        >
+          <InputGroup className="min-w-32 flex-1">
+            <InputGroupAddon>
+              <InputGroupButton type="submit" size="icon-xs" title={t`Search all accounts`}>
+                <SearchIcon />
               </InputGroupButton>
             </InputGroupAddon>
-          )}
-        </InputGroup>
-        {search && accounts.length > 1 && (
-          <Popover>
-            <PopoverTrigger
-              render={
-                <Button
-                  type="button"
-                  variant={chosen ? "secondary" : "outline"}
-                  className="max-w-full"
+            <InputGroupInput
+              ref={input}
+              type="search"
+              aria-label={t`Search all accounts`}
+              placeholder={t`Search all accounts`}
+              className="[&::-webkit-search-cancel-button]:hidden"
+              value={draft}
+              onChange={(event) => {
+                if (!event.target.value) {
+                  clear();
+                } else {
+                  useUnifiedSearch.setState({ draft: event.target.value });
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowDown" && !event.nativeEvent.isComposing) {
+                  const first = results.current?.querySelector<HTMLButtonElement>(
+                    "section:not([hidden]) [data-search-thread]",
+                  );
+                  if (first) {
+                    event.preventDefault();
+                    first.focus();
+                  }
+                }
+                if (event.key === "Escape" && !event.nativeEvent.isComposing && draft) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  clear();
+                }
+              }}
+            />
+            {draft && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton size="icon-xs" title={t`Clear search`} onClick={clear}>
+                  <XIcon />
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
+          {search && accounts.length > 1 && (
+            <Popover>
+              <PopoverTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant={chosen ? "secondary" : "outline"}
+                    className="max-w-full"
+                  />
+                }
+              >
+                <SlidersHorizontalIcon />
+                <span className="truncate">
+                  {chosen ? getAccountLabel(chosen.config.label) : t`All accounts`}
+                </span>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="max-h-[min(70vh,var(--available-height))] w-56 overflow-y-auto"
+              >
+                <PopoverTitle className="sr-only">{t`Filters`}</PopoverTitle>
+                <AccountFilters
+                  accounts={accounts.map((a) => a.config)}
+                  chosen={chosen?.config.id ?? ""}
+                  onAccount={setAccountId}
                 />
-              }
-            >
-              <SlidersHorizontalIcon />
-              <span className="truncate">
-                {chosen ? getAccountLabel(chosen.config.label) : t`All accounts`}
-              </span>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="max-h-[min(70vh,var(--available-height))] w-56 overflow-y-auto"
-            >
-              <PopoverTitle className="sr-only">{t`Filters`}</PopoverTitle>
-              <AccountFilters
-                accounts={accounts.map((a) => a.config)}
-                chosen={chosen?.config.id ?? ""}
-                onAccount={setAccountId}
-              />
-            </PopoverContent>
-          </Popover>
-        )}
-      </form>
+              </PopoverContent>
+            </Popover>
+          )}
+        </form>
+      </MailPageHeader>
       {search ? (
-        <div className="space-y-4">
+        <div
+          className="space-y-4"
+          ref={results}
+          onKeyDown={(event) => {
+            if (
+              !(event.target instanceof HTMLButtonElement) ||
+              !event.target.dataset.searchThread
+            ) {
+              return;
+            }
+            const direction = ["ArrowDown", "j"].includes(event.key)
+              ? 1
+              : ["ArrowUp", "k"].includes(event.key)
+                ? -1
+                : 0;
+            if (!direction) {
+              return;
+            }
+            event.preventDefault();
+            const rows = Array.from(
+              event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                "section:not([hidden]) [data-search-thread]",
+              ),
+            );
+            rows[rows.indexOf(event.target) + direction]?.focus();
+          }}
+        >
           {accounts.map(({ config, gmail }) => {
             const label = getAccountLabel(config.label);
             return (
-              <section
+              <MailboxSection
                 key={config.id}
-                aria-label={label}
+                label={label}
+                color={config.color}
                 hidden={!!chosen && chosen.config.id !== config.id}
-                className="overflow-hidden rounded-lg border"
               >
-                <h2 className="border-b bg-muted/40 px-3 py-2">
-                  <AccountBadge label={label} color={config.color} />
-                </h2>
                 {gmail.attentionRequired ? (
-                  <p role="status" className="px-3 py-2 text-sm text-muted-foreground">
-                    <Trans>Sign in to search this account.</Trans>
-                  </p>
+                  <div role="status" className="border-t px-3.5 py-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => ipc.main.send("gmail.openInboxSignIn", config.id)}
+                    >
+                      <KeyRoundIcon aria-hidden="true" />
+                      <Trans>Sign in to search this account.</Trans>
+                    </Button>
+                  </div>
                 ) : (
                   <MailboxResults
                     key={JSON.stringify([
@@ -238,11 +357,12 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
                       config.gmail.delegatedAccountId,
                       revisions[config.id],
                     ])}
+                    requestId={search.id + "/" + (revisions[config.id] ?? 0)}
                     accountId={config.id}
                     query={search.query}
                   />
                 )}
-              </section>
+              </MailboxSection>
             );
           })}
         </div>

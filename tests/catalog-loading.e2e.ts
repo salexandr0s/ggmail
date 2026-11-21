@@ -1,3 +1,7 @@
+import { messages as gmailDe } from "@ggmail/preload-gmail/locales/de";
+import { messages as gmailJa } from "@ggmail/preload-gmail/locales/ja";
+import { messages as en } from "@ggmail/shared/i18n/locales/en";
+import { type CatalogTag, SHIPPED_CATALOG_TAGS } from "@ggmail/shared/i18n/tags";
 /*
  * A German start loads the German catalog and no other: in the main process, in
  * the renderer and in the Gmail preload, and in time for the first paint. A
@@ -10,10 +14,6 @@
  */
 import { type Messages, setupI18n } from "@lingui/core";
 import { generateMessageId } from "@lingui/message-utils/generateMessageId";
-import { messages as gmailDe } from "@ggmail/preload-gmail/locales/de";
-import { messages as gmailJa } from "@ggmail/preload-gmail/locales/ja";
-import { messages as en } from "@ggmail/shared/i18n/locales/en";
-import { type CatalogTag, SHIPPED_CATALOG_TAGS } from "@ggmail/shared/i18n/tags";
 import { expect, test } from "@playwright/test";
 import { type GgmailApp, useApp } from "./lib/app";
 
@@ -241,17 +241,17 @@ test.describe("German", () => {
 
     await ggmail.renderer.reload();
 
-    const recentDownloadsTitle = translate(translations.de ?? {}, "Show recent download history");
+    const backTitle = translate(translations.de ?? {}, "Go back");
 
-    await expect(ggmail.renderer.getByTitle(recentDownloadsTitle)).toBeVisible();
+    await expect(ggmail.renderer.getByTitle(backTitle)).toBeVisible();
 
     const shownTitles = await ggmail.renderer.evaluate(
       () => (window as unknown as { shownTitles: string[] }).shownTitles,
     );
 
-    expect(shownTitles).toContain(recentDownloadsTitle);
+    expect(shownTitles).toContain(backTitle);
 
-    expect(shownTitles).not.toContain("Show recent download history");
+    expect(shownTitles).not.toContain("Go back");
 
     // Proves the delay above applied, which a renamed chunk would quietly undo.
     expect(delayedCatalogRequests).toBe(1);

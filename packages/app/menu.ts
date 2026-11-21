@@ -9,6 +9,7 @@ import { accounts } from "@/accounts";
 import { getActiveView } from "@/active-view";
 import { config } from "@/config";
 import { showRestartDialog } from "@/dialogs";
+import { doNotDisturb } from "@/do-not-disturb";
 import { downloads } from "@/downloads";
 import { ipc } from "@/ipc";
 import { copyText } from "@/lib/clipboard";
@@ -17,6 +18,7 @@ import { getNativeCancelLabel } from "@/lib/native-cancel-label";
 import { relaunchApp } from "@/lib/relaunch";
 import { main } from "@/main";
 import { settingsWindow } from "@/settings-window";
+import { shellHistory } from "@/shell-history";
 import { appUpdater } from "@/updater";
 import { openExternalUrl } from "@/url";
 import { WorkspaceApp } from "@/workspace-app";
@@ -51,6 +53,8 @@ export class AppMenu {
 
       this.refresh();
     });
+
+    config.onDidChange("doNotDisturb.enabled", () => this.refresh());
 
     app.on("browser-window-focus", () => {
       this.refresh();
@@ -545,7 +549,7 @@ export class AppMenu {
         }),
         submenu: [
           {
-            label: t`Unified Inbox`,
+            label: t`All Mail`,
             enabled: config.get("unifiedInbox.enabled") && allAccounts.length > 1,
             accelerator: "CommandOrControl+Shift+I",
             click: () => {
@@ -555,6 +559,22 @@ export class AppMenu {
           {
             label: t`Attachments`,
             click: () => main.navigate("/attachments"),
+          },
+          {
+            label: t`Waiting for reply`,
+            click: () => main.navigate("/waiting"),
+          },
+          {
+            label: config.get("doNotDisturb.enabled")
+              ? t`Turn Do Not Disturb off`
+              : t`Turn Do Not Disturb on`,
+            click: () => doNotDisturb.toggle(),
+          },
+          {
+            label: t`Show recent download history`,
+            click: () => {
+              downloads.toggleRecentDownloadHistoryPopup(main.window);
+            },
           },
           {
             label: t`Downloads`,
@@ -686,7 +706,11 @@ export class AppMenu {
                 return;
               }
 
-              getActiveViewWebContents().navigationHistory.goBack();
+              if (!focusedWindow || focusedWindow === main.window) {
+                shellHistory.move(-1);
+              } else {
+                getActiveViewWebContents().navigationHistory.goBack();
+              }
             },
           },
           {
@@ -697,7 +721,11 @@ export class AppMenu {
                 return;
               }
 
-              getActiveViewWebContents().navigationHistory.goForward();
+              if (!focusedWindow || focusedWindow === main.window) {
+                shellHistory.move(1);
+              } else {
+                getActiveViewWebContents().navigationHistory.goForward();
+              }
             },
           },
         ],

@@ -1,6 +1,7 @@
 import { realpath } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { useApp } from "./lib/app";
+import { findRendererPage } from "./lib/renderer-navigation";
 import { readSettingsPageLabels } from "./lib/settings";
 
 /** The shape `accounts` is stored in, with only the two labels differing. */
@@ -60,11 +61,11 @@ test("both accounts survive into the app", async () => {
   expect(accountLabels).toEqual(["Personal", "Work"]);
 });
 
-test("Unified Inbox is enabled with two accounts", async () => {
+test("All Mail is enabled with two accounts", async () => {
   const unifiedInbox = await ggmail.app.evaluate(({ Menu }) => {
     const find = (menuItems: Electron.MenuItem[]): Electron.MenuItem | undefined => {
       for (const menuItem of menuItems) {
-        if (menuItem.label === "Unified Inbox") {
+        if (menuItem.label === "All Mail") {
           return menuItem;
         }
 
@@ -110,9 +111,9 @@ test("both accounts are in the titlebar, and switching writes back", async () =>
     .toBe("Work");
 });
 
-test("the unified inbox opens from the titlebar", async () => {
+test("All Mail opens from the titlebar", async () => {
   const unifiedInbox = ggmail.renderer.getByRole("button", {
-    name: "Open unified inbox",
+    name: "All Mail",
   });
 
   await expect(unifiedInbox).toBeVisible();
@@ -120,6 +121,95 @@ test("the unified inbox opens from the titlebar", async () => {
   await unifiedInbox.click();
 
   await expect.poll(() => new URL(ggmail.renderer.url()).hash).toBe("#/unified-inbox");
+});
+
+test("Back and Forward retrace libraries and account switches at both toolbar widths", async () => {
+  const info = test.info();
+  const page = ggmail.renderer;
+  const navigation = page.getByRole("navigation", { name: "Mail views" });
+  await expect(navigation.getByRole("button", { name: "Mail views", exact: true })).toHaveCount(0);
+  await navigation.getByRole("button", { name: "Attachments" }).click();
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+  await expect(navigation.getByRole("button", { name: "Attachments" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await page.screenshot({ path: info.outputPath("wide-shell.png") });
+  await navigation.getByRole("button", { name: "Waiting for reply" }).click();
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(page.getByRole("heading", { name: "Attachments", exact: true })).toBeVisible();
+  expect(await ggmail.runMenuCommand("Forward")).toBe(true);
+  await expect(page.getByRole("heading", { name: "Waiting for reply" })).toBeVisible();
+  await page.locator('[data-account-id="second-account"]').click();
+  await expect(page.locator('[data-account-id="second-account"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(page.getByRole("heading", { name: "Waiting for reply" })).toBeVisible();
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("main.html"))
+      ?.setSize(920, 640);
+  });
+  const selector = navigation.getByRole("button", { name: "Mail views" });
+  await expect(selector).toHaveText("Waiting for reply");
+  await expect(navigation.getByRole("button", { name: "All Mail" })).toHaveCount(0);
+  await selector.click();
+  await page.getByRole("menuitem", { name: "Attachments" }).click();
+  await expect(selector).toHaveText("Attachments");
+  await expect(page.getByRole("button", { name: "Go forward" })).toBeDisabled();
+  await page.screenshot({ path: info.outputPath("compact-shell.png") });
+});
+
+test("the narrow Mail views menu opens above Gmail and supports keyboard selection", async () => {
+  const page = ggmail.renderer;
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    window?.setMinimumSize(320, 360);
+    window?.setSize(480, 580);
+  });
+  const trigger = page.getByRole("button", { name: "Mail views", exact: true });
+  await trigger.click();
+  const id = await findRendererPage(ggmail, "mail-views");
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  const readOptions = () =>
+    ggmail.app.evaluate(
+      ({ webContents }, id) =>
+        webContents
+          .fromId(id)
+          ?.executeJavaScript(
+            `Array.from(document.querySelectorAll('[role="menuitemradio"]'), el => el.textContent)`,
+          ),
+      id,
+    );
+  await expect
+    .poll(readOptions)
+    .toEqual(["All Mail", "Attachments", "Waiting for reply", "Personal", "Work"]);
+  await ggmail.app.evaluate(({ webContents }, id) => {
+    const popup = webContents.fromId(id);
+    for (const keyCode of ["Home", "Down", "Return"]) {
+      popup?.sendInputEvent({ type: "keyDown", keyCode });
+      popup?.sendInputEvent({ type: "keyUp", keyCode });
+    }
+  }, id);
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.click();
+  const next = await findRendererPage(ggmail, "mail-views");
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(
+        ({ webContents }, id) =>
+          webContents
+            .fromId(id)
+            ?.executeJavaScript(`document.querySelector('[aria-checked="true"]')?.textContent`),
+        next,
+      ),
+    )
+    .toBe("Attachments");
 });
 
 test("settings opens without an activation page and survives restart", async () => {

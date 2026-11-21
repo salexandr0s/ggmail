@@ -178,6 +178,7 @@ export type RendererPage =
   | "settings"
   | "workspace-app"
   | "desktop-sources"
+  | "mail-views"
   | "recent-download-history"
   | "bookmarks";
 

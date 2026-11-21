@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
 import { Button } from "@ggmail/ui/components/button";
 import {
@@ -9,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@ggmail/ui/components/dropdown-menu";
 import { cn } from "@ggmail/ui/lib/utils";
+import { useLingui } from "@lingui/react/macro";
 import { ArrowLeftIcon, ArrowRightIcon, LoaderCircleIcon, RotateCwIcon, XIcon } from "lucide-react";
 import { type ComponentProps, type ReactNode, type Ref, useState } from "react";
 import { useChromeMenu } from "@/lib/chrome-menu";
@@ -67,6 +67,7 @@ export function TitlebarRightOverlay({
   return (
     <div
       ref={ref}
+      data-slot="titlebar-utilities"
       className="absolute top-0 right-0 flex items-center gap-4 bg-background px-1.5"
       style={{ height: APP_TITLEBAR_HEIGHT }}
     >
@@ -195,17 +196,19 @@ export function TitlebarNavigationControls({
 
   return (
     <>
-      <TitlebarIconButton title={t`Go back`} disabled={disabled || !canGoBack} onClick={onGoBack}>
+      <TitlebarIconButton title={t`Go back`} disabled={!canGoBack} onClick={onGoBack}>
         <ArrowLeftIcon />
       </TitlebarIconButton>
       <TitlebarIconButton
         title={t`Go forward`}
-        disabled={disabled || !canGoForward}
+        className="max-sm:disabled:hidden"
+        disabled={!canGoForward}
         onClick={onGoForward}
       >
         <ArrowRightIcon />
       </TitlebarIconButton>
       <TitlebarIconButton
+        className="max-sm:hidden"
         title={isLoading ? t`Stop loading` : t`Reload page`}
         disabled={disabled}
         onMouseEnter={() => setIsReloadHovered(true)}

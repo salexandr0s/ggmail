@@ -16,6 +16,7 @@ import { extensions } from "./extensions";
 import { ipc } from "./ipc";
 import { resolveViewFocusTarget } from "./lib/view-focus";
 import { main } from "./main";
+import { shellHistory } from "./shell-history";
 import { isWindowedTab } from "./tabs";
 import { WorkspaceApp } from "./workspace-app";
 
@@ -102,17 +103,22 @@ class Accounts {
      * channel of its own to get here. `net.isOnline()` reads Chromium's
      * network change notifier, so the tick costs nothing.
      */
-    let wasOnline = net.isOnline();
+    // The first sweep must also mark accounts stale when ggmail started offline.
+    let wasOnline = true;
 
     setInterval(() => {
       const isOnline = net.isOnline();
 
-      const cameBack = isOnline && !wasOnline;
-
+      if (isOnline === wasOnline) {
+        return;
+      }
       wasOnline = isOnline;
-
-      if (cameBack) {
+      if (isOnline) {
         accounts.resyncInboxes();
+      } else {
+        for (const { gmail } of accounts.instances.values()) {
+          gmail.inboxWentOffline();
+        }
       }
     }, NETWORK_RECOVERY_SWEEP_INTERVAL);
   }
@@ -594,6 +600,12 @@ class Accounts {
       dataTypes,
     });
 
+    const { clearAttachmentIndexes } = await import("./attachments/disk-index");
+    if (instance) {
+      instance.gmail.invalidateMailboxReads();
+    }
+    clearAttachmentIndexes(accountId);
+
     if (!instance) {
       return;
     }
@@ -632,6 +644,12 @@ class Accounts {
       await extensions.clearSessionData(accountSession);
     }
 
+    const { clearAttachmentCategories } = await import("./attachments/categories");
+    clearAttachmentCategories(selectedAccountId);
+    const { clearAttachmentIndexes } = await import("./attachments/disk-index");
+    clearAttachmentIndexes(selectedAccountId);
+    const { removeReminders } = await import("./follow-ups/store");
+    removeReminders((row) => row.accountId === selectedAccountId);
     const updatedAccounts = config
       .get("accounts")
       .filter((account) => account.id !== selectedAccountId);
@@ -842,6 +860,7 @@ class Accounts {
       return;
     }
 
+    shellHistory.record();
     ipc.broadcast("tabs.changed", this.serializeTabs());
   }
 
@@ -852,6 +871,7 @@ class Accounts {
       return;
     }
 
+    shellHistory.record();
     ipc.broadcast("accounts.changed", this.serializeAccounts());
   }
 }

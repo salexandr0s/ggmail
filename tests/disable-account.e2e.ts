@@ -152,7 +152,7 @@ test.describe("with the second account disabled", () => {
     // Personal has Unified inbox as its only switch on. The badge row is drawn
     // only when one of its badges is, so a row whose condition missed that
     // switch would hide its badge here and nowhere else.
-    await expect(accountItems.nth(0).getByText("Unified inbox", { exact: true })).toBeVisible();
+    await expect(accountItems.nth(0).getByText("All Mail", { exact: true })).toBeVisible();
   });
 
   test("it can be removed, without an instance to remove it through", async () => {

@@ -1,56 +1,25 @@
 import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
-import { fileKind, type AttachmentAction, type MailAttachment } from "@ggmail/shared/attachments";
+import {
+  fileKind,
+  type AttachmentAction,
+  type AttachmentCategory,
+  type MailAttachment,
+} from "@ggmail/shared/attachments";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { AccountConfig } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
 import { cn } from "@ggmail/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
-import {
-  DownloadIcon,
-  FileIcon,
-  FileTextIcon,
-  ImageIcon,
-  MailIcon,
-  SheetIcon,
-  TextIcon,
-} from "lucide-react";
+import { DownloadIcon, MailIcon } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SenderAvatar } from "@/components/assistant/sender-avatar";
+import { CategoryPicker } from "./categories";
+import { FileMark } from "./file-mark";
 import { FilePreview, FileThumbnail } from "./preview";
 import "./files.css";
 
-export type LibraryFile = MailAttachment & { account: AccountConfig };
-
-export const kindIcons = {
-  pdf: FileTextIcon,
-  document: TextIcon,
-  sheet: SheetIcon,
-  image: ImageIcon,
-  other: FileIcon,
-};
-
-function FileMark({ name, large = false }: { name: string; large?: boolean }) {
-  const kind = fileKind(name);
-  const Icon = kindIcons[kind];
-  const extension = /\.([a-z0-9]{1,6})$/i.exec(name)?.[1]?.toUpperCase();
-  return (
-    <span
-      className={cn("attachment-mark", large && "attachment-mark-large")}
-      data-kind={kind}
-      aria-hidden="true"
-    >
-      <span className="attachment-paper">
-        {(large || !extension) && <Icon strokeWidth={1.6} />}
-        {extension && (
-          <span className="attachment-extension" data-long={extension.length > 4 || undefined}>
-            {extension}
-          </span>
-        )}
-      </span>
-    </span>
-  );
-}
+export type LibraryFile = MailAttachment & { account: AccountConfig; mailboxKey: string };
 
 function AccountName({ account }: { account: AccountConfig }) {
   return (
@@ -104,6 +73,7 @@ export function ListHeadings() {
   return (
     <div className="attachment-columns attachment-headings" aria-hidden="true">
       <span>{t`File name`}</span>
+      <span className="attachment-category">{t`Category`}</span>
       <span className="attachment-from">{t`Sender`}</span>
       <span className="attachment-date">{t`Received`}</span>
       <span className="attachment-size">{t`Size`}</span>
@@ -114,12 +84,16 @@ export function ListHeadings() {
 export function FileItem({
   item,
   grid,
+  onCategory,
+  onOpenSource,
   showAccount,
   showSenderIcons,
   date,
 }: {
   item: LibraryFile;
   grid: boolean;
+  onOpenSource: (button: HTMLButtonElement) => void;
+  onCategory: (category: AttachmentCategory | null) => Promise<void>;
   showAccount: boolean;
   showSenderIcons: boolean;
   date: Intl.DateTimeFormat;
@@ -131,7 +105,10 @@ export function FileItem({
   const received = date.format(item.receivedAt);
   const act = async (action: AttachmentAction) => {
     try {
-      await ipc.main.invoke("attachments.act", item.account.id, item.id, action);
+      if (action === "message" && button.current) {
+        onOpenSource(button.current);
+      }
+      await ipc.main.invoke("attachments.act", item.account.id, item.mailboxKey, item.id, action);
     } catch {
       toast.error(t`This attachment is unavailable. Refresh and try again.`);
     }
@@ -140,6 +117,7 @@ export function FileItem({
     <>
       <button
         ref={button}
+        data-file-key={JSON.stringify([item.mailboxKey, item.id])}
         type="button"
         className="attachment-preview"
         title={item.name + "\n" + t`Preview attachment`}
@@ -156,10 +134,18 @@ export function FileItem({
           item={item}
           onClose={() => setOpen(false)}
           returnFocus={button}
+          received={received}
+          onOpenEmail={() => void act("message")}
           onDownload={() => void act("download")}
         />
       )}
     </>
+  );
+  const category = <CategoryPicker file={item} onChange={onCategory} />;
+  const subject = item.subject && (
+    <div className="attachment-subject" title={item.subject}>
+      {item.subject}
+    </div>
   );
   const actions = (
     <div className="attachment-actions">
@@ -190,12 +176,9 @@ export function FileItem({
           <FileMark name={item.name} large />
         </FileThumbnail>
         <div className="flex flex-1 flex-col px-4 pt-3 pb-2">
+          <div className="mb-2">{category}</div>
           {preview}
-          {item.subject && (
-            <span className="mt-0.5 truncate text-xs text-muted-foreground" title={item.subject}>
-              {item.subject}
-            </span>
-          )}
+          {subject}
           <div className="mt-auto flex min-w-0 items-center gap-1.5 pt-3 text-xs">
             <Sender
               sender={item.sender}
@@ -227,35 +210,21 @@ export function FileItem({
   }
   return (
     <li className="attachment-columns attachment-row">
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="attachment-file flex min-w-0 items-center gap-3">
         <FileThumbnail item={item}>
           <FileMark name={item.name} />
         </FileThumbnail>
         <div className="min-w-0">
           {preview}
-          {item.subject && (
-            <div className="truncate text-xs/5 text-muted-foreground" title={item.subject}>
-              {item.subject}
-            </div>
-          )}
-          <div className="attachment-compact-detail text-xs text-muted-foreground">
-            <Sender
-              sender={item.sender}
-              photoUrl={item.senderPhotoUrl}
-              showIcon={showSenderIcons}
-            />
-            {showAccount && <AccountName account={item.account} />}
-            <span className="inline-flex shrink-0 items-center gap-1.5 tabular-nums">
-              <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>
-              {item.size && (
-                <>
-                  <span aria-hidden="true">·</span>
-                  {item.size}
-                </>
-              )}
-            </span>
-          </div>
+          {subject}
         </div>
+      </div>
+      <div className="attachment-category">{category}</div>
+      <div className="attachment-compact-detail text-xs text-muted-foreground">
+        <Sender sender={item.sender} photoUrl={item.senderPhotoUrl} showIcon={showSenderIcons} />
+        {showAccount && <AccountName account={item.account} />}
+        <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>
+        {item.size && <span>{item.size}</span>}
       </div>
       <div className="attachment-from min-w-0 text-[13px]">
         <Sender

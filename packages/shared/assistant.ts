@@ -85,6 +85,12 @@ export const assistantDraftSchema = z.object({
 
 export type AssistantDraft = z.infer<typeof assistantDraftSchema>;
 
+export type SourceMessage = { index: number; sender: string; date: string; body: string };
+export type SourcePreviewPage = {
+  accountId: string;
+  nextOffset: number | null;
+} & ({ messages: SourceMessage[] } | { excerpt: string });
+
 export type AssistantReply = {
   text: string;
   citations: Array<AssistantCitation & { number: number }>;

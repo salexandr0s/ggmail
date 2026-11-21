@@ -54,6 +54,70 @@ describe("Gmail attachment metadata", () => {
     ).toEqual([]);
   });
 
+  test("keeps an email subject from assigning the same purpose to sibling files", () => {
+    const link = `?view=att&th=${message}&attid=0.1`;
+    const files = readPrintAttachments(
+      printDocument(tile(link, "scan.pdf") + tile(link.replace("0.1", "0.2"), "Contratto.pdf")),
+      mailbox,
+      thread,
+      "Votre facture",
+    );
+    expect(files.map((entry) => entry.file.detectedCategory)).toEqual([
+      "uncategorized",
+      "contract",
+    ]);
+    expect(
+      readPrintAttachments(
+        printDocument(tile(link, "scan.pdf") + tile(link, "scan.pdf")),
+        mailbox,
+        thread,
+        "Votre facture",
+      )[0]?.file.detectedCategory,
+    ).toBe("invoice");
+  });
+
+  test("keeps quoted replies and signatures out of enclosure hints", () => {
+    const parse = (body: string) =>
+      readPrintAttachments(
+        printDocument(tile(`?view=att&th=${message}&attid=0.1`, "scan.pdf"), body),
+        mailbox,
+        thread,
+        "Documents",
+      )[0]?.file.detectedCategory;
+    expect(parse("<p>Ci-joint votre facture.</p><blockquote>Contract attached.</blockquote>")).toBe(
+      "invoice",
+    );
+    expect(
+      parse(
+        '<div class="gmail_quote">Attached is your invoice.</div><div class="gmail_signature">Contract enclosed.</div>',
+      ),
+    ).toBe("uncategorized");
+  });
+
+  test("assigns per-file enclosure labels from the current message and ignores stale thread subjects", () => {
+    const link = `?view=att&th=${message}&attid=0.1`;
+    const first = printDocument(
+      tile(link, "numéro.01.pdf") + tile(link.replace("0.1", "0.2"), "scan(2).pdf"),
+      "<ul><li>Facture : numéro.01.pdf</li><li>Reçu de paiement : scan(2).pdf</li></ul>",
+    );
+    const second = printDocument(tile(link.replace(message, thread), "export.pdf"), "Many thanks.");
+    expect(
+      readPrintAttachments(first + second, mailbox, thread, "Contract").map(
+        (entry) => entry.file.detectedCategory,
+      ),
+    ).toEqual(["invoice", "receipt", "uncategorized"]);
+  });
+
+  test("the current enclosure takes precedence over the thread subject, hidden text and forwarded mail", () => {
+    const attachment = tile(`?view=att&th=${message}&attid=0.1`, "scan.pdf");
+    const body =
+      '<div style="display: none">Attached invoice.</div><p>In allegato la ricevuta di pagamento.</p><div id="divRplyFwdMsg">From earlier mail</div><p>Contract attached.</p>';
+    expect(
+      readPrintAttachments(printDocument(attachment, body), mailbox, thread, "Votre commande")[0]
+        ?.file.detectedCategory,
+    ).toBe("receipt");
+  });
+
   test("recognizes permanent message IDs and rejects sign-in pages", () => {
     const permanent = `msg-f:${BigInt("0x" + message)}`;
     const rows = readPrintAttachments(

@@ -12,7 +12,7 @@ import { fetchPrintThread, legacyThreadId } from "@/gmail/print-thread";
 import { getSearchMailbox, listSearchThreads } from "@/gmail/search";
 import { main } from "@/main";
 import { AssistantError } from "./responses";
-import { readThreadText } from "./thread-text";
+import { extractMessages, readThreadText } from "./thread-text";
 
 function activeMailboxes() {
   return accounts.getAccounts().flatMap(({ config, instance }) => {
@@ -136,6 +136,7 @@ export type MailSource = MailboxIdentity & {
   hash: string;
   senders?: AssistantSender[];
   rowSender?: string;
+  excerpt?: string;
 };
 
 function snippetsToSources(rows: Snippet[], fallback: string, identity: MailboxIdentity) {
@@ -147,6 +148,7 @@ function snippetsToSources(rows: Snippet[], fallback: string, identity: MailboxI
       hash: id ? `#all/${id}` : fallback,
       senders: senders.length || !row.sender ? senders : [{ name: row.sender }],
       rowSender: id ? undefined : row.sender,
+      excerpt: row.snippet,
     };
     return { ...row, source };
   });
@@ -275,6 +277,9 @@ export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
                 threadId,
                 subject: thread?.subject || "",
                 hash: scope.hash,
+                excerpt: messages
+                  ?.map((message) => [message.sender, message.date, message.body].join("\n"))
+                  .join("\n\n"),
                 senders: Array.from(authors.values()),
               },
             ]
@@ -365,11 +370,11 @@ export async function searchAllMail(
   }
 }
 
-export async function readMailSource(
+async function readSource<T>(
   scope: Scope,
   source: MailSource,
-  offset: number,
   signal: AbortSignal,
+  parse: (html: string) => T,
 ) {
   ensureCurrentScope(scope, signal);
   const mailbox = resolveMailbox(source);
@@ -392,7 +397,7 @@ export async function readMailSource(
     if (!resolveMailbox(source)) {
       throw new Error();
     }
-    return readThreadText(html, offset);
+    return parse(html);
   } catch {
     ensureCurrentScope(scope, signal);
     return {
@@ -400,6 +405,19 @@ export async function readMailSource(
       error: "Gmail could not read this conversation at that offset. Its contents are unverified.",
     };
   }
+}
+
+export function readMailSource(
+  scope: Scope,
+  source: MailSource,
+  offset: number,
+  signal: AbortSignal,
+) {
+  return readSource(scope, source, signal, (html) => readThreadText(html, offset));
+}
+
+export function readMailPreview(scope: Scope, source: MailSource, signal: AbortSignal) {
+  return readSource(scope, source, signal, extractMessages);
 }
 
 export function openMailSource(scope: Scope, source: MailSource) {

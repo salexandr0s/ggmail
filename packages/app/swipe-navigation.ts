@@ -1,4 +1,5 @@
 import { platform } from "@electron-toolkit/utils";
+import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
 import { PAGE_AT_BOTH_EDGES, type PageScrollEdge } from "@ggmail/shared/scroll-edge";
 import {
   decideSwipeBegin,
@@ -17,6 +18,7 @@ import { config } from "@/config";
 import { log } from "@/lib/log";
 import { Popup } from "@/lib/popup";
 import { main } from "@/main";
+import { shellHistory } from "@/shell-history";
 import { WorkspaceApp } from "@/workspace-app";
 
 /** `GGMAIL_SWIPE_NAVIGATION_PREVIEW=left:0.5` and the like. */
@@ -29,7 +31,9 @@ class SwipeNavigation {
    */
   private pageScrollEdges = new WeakMap<WebContents, PageScrollEdge>();
 
-  private gesture: { webContents: WebContents; action: SwipeNavigationAction } | undefined;
+  private gesture:
+    | { webContents: WebContents; action: SwipeNavigationAction; mainWindow: boolean }
+    | undefined;
 
   /**
    * `GGMAIL_SWIPE_NAVIGATION_DEBUG=true` raises every gesture line to info and
@@ -72,14 +76,10 @@ class SwipeNavigation {
         return undefined;
       }
 
+      const mainWindow = window === main.window;
+      const library = mainWindow && main.location !== "/";
       const isViewWindow =
-        window === main.window
-          ? // Every view is hidden away from `/`, so a renderer page is showing
-            // and there is nothing under the pointer to navigate.
-            main.location === "/"
-          : // A compose or screen-share window draws its own page and holds no
-            // view, and the selected account's view is not in it to navigate.
-            Boolean(WorkspaceApp.tryFromWebContents(window.webContents));
+        mainWindow || Boolean(WorkspaceApp.tryFromWebContents(window.webContents));
 
       if (!isViewWindow) {
         this.logGesture("refused", { direction, refusedBecause: "noView" });
@@ -87,9 +87,14 @@ class SwipeNavigation {
         return undefined;
       }
 
-      const view = getActiveView(window);
-
-      const bounds = view.getBounds();
+      const view = library ? undefined : getActiveView(window);
+      const { width, height } = window.getContentBounds();
+      const bounds = view?.getBounds() ?? {
+        x: 0,
+        y: APP_TITLEBAR_HEIGHT,
+        width,
+        height: height - APP_TITLEBAR_HEIGHT,
+      };
 
       if (!isPointInBounds({ x, y }, bounds)) {
         this.logGesture("refused", { direction, refusedBecause: "pointerOutsideView" });
@@ -107,12 +112,16 @@ class SwipeNavigation {
         return undefined;
       }
 
-      const { webContents } = view;
+      const webContents = view?.webContents ?? window.webContents;
 
       const decision = decideSwipeBegin({
         direction,
-        canGoBack: webContents.navigationHistory.canGoBack(),
-        canGoForward: webContents.navigationHistory.canGoForward(),
+        canGoBack: mainWindow
+          ? shellHistory.state.canGoBack
+          : webContents.navigationHistory.canGoBack(),
+        canGoForward: mainWindow
+          ? shellHistory.state.canGoForward
+          : webContents.navigationHistory.canGoForward(),
         pageScrollEdge: this.pageScrollEdges.get(webContents) ?? PAGE_AT_BOTH_EDGES,
       });
 
@@ -122,7 +131,7 @@ class SwipeNavigation {
         return undefined;
       }
 
-      this.gesture = { webContents, action: decision.action };
+      this.gesture = { webContents, action: decision.action, mainWindow };
 
       this.logGesture("began", { direction, action: decision.action, url: webContents.getURL() });
 
@@ -171,7 +180,9 @@ class SwipeNavigation {
         return;
       }
 
-      if (gesture.action === "back") {
+      if (gesture.mainWindow) {
+        shellHistory.move(gesture.action === "back" ? -1 : 1);
+      } else if (gesture.action === "back") {
         gesture.webContents.navigationHistory.goBack();
       } else {
         gesture.webContents.navigationHistory.goForward();

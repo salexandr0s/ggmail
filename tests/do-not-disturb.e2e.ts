@@ -25,33 +25,16 @@ async function setShowDoNotDisturbButton(shown: boolean) {
   await ggmail.closeSettings();
 }
 
-test("the Do Not Disturb button follows its setting, and turns Do Not Disturb off when hidden", async () => {
-  // Found by the title it toggles between, which is what a user reads off it
-  // and the only thing distinguishing it from the other icon buttons beside it.
-  const doNotDisturbButton = ggmail.renderer.getByRole("button", {
-    name: /Turn Do Not Disturb (on|off)/,
-  });
-
-  await expect(doNotDisturbButton).toHaveCount(1);
-
-  await doNotDisturbButton.click();
-
-  await expect.poll(async () => (await ggmail.readConfig())["doNotDisturb.enabled"]).toBe(true);
-
+test("Do Not Disturb is available in View and shows an indicator while active", async () => {
+  const indicator = ggmail.renderer.getByTitle("Turn Do Not Disturb off");
+  await expect(indicator).toHaveCount(0);
+  expect(await ggmail.runMenuCommand("Turn Do Not Disturb on")).toBe(true);
+  await expect(indicator).toBeVisible();
   await setShowDoNotDisturbButton(false);
-
-  await expect(doNotDisturbButton).toHaveCount(0);
-
-  await expect.poll(async () => (await ggmail.readConfig())["doNotDisturb.enabled"]).toBe(false);
-
+  await expect(indicator).toHaveCount(0);
+  expect((await ggmail.readConfig())["doNotDisturb.enabled"]).toBe(true);
   await setShowDoNotDisturbButton(true);
-
-  await expect(doNotDisturbButton).toHaveCount(1);
-
-  /*
-   * Bringing the button back is not bringing Do Not Disturb back: what was
-   * turned off stays off, and the button comes back reading Turn Do Not
-   * Disturb on.
-   */
-  expect((await ggmail.readConfig())["doNotDisturb.enabled"]).toBe(false);
+  await indicator.click();
+  await expect(indicator).toHaveCount(0);
+  await expect.poll(async () => (await ggmail.readConfig())["doNotDisturb.enabled"]).toBe(false);
 });

@@ -1,0 +1,282 @@
+.attachment-library,
+.attachment-filter-popover {
+  color-scheme: light;
+  --library-ink: light-dark(#355e61, #a2d0c9);
+  --library-tint: light-dark(#e7f1ee, #243b39);
+  --library-edge: light-dark(#c8dbd7, #3c5955);
+}
+
+.dark :is(.attachment-library, .attachment-filter-popover) {
+  color-scheme: dark;
+}
+
+[data-attachment-category="contract"] {
+  --category-ink: light-dark(#6b467a, #d6bddd);
+  --category-tint: light-dark(#f2eaf6, #392e41);
+}
+:is([data-attachment-category="ticket"], [data-attachment-category="booking"]) {
+  --category-ink: light-dark(#345c84, #b2d1f2);
+  --category-tint: light-dark(#e9f1fa, #263849);
+}
+[data-attachment-category="order"] {
+  --category-ink: light-dark(#795722, #e2c491);
+  --category-tint: light-dark(#f7efdf, #3d3528);
+}
+.attachment-facets
+  button:not([aria-pressed="true"])
+  [data-attachment-category]:not([data-attachment-category="uncategorized"]) {
+  color: var(--category-ink, var(--library-ink));
+}
+
+.attachment-header {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  border-block-end: 1px solid var(--border);
+  padding: 0.85rem 1rem;
+}
+.attachment-heading {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+}
+.attachment-heading h1 {
+  font-size: clamp(1.15rem, 2.2cqw, 1.55rem);
+  line-height: 1.25;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+.attachment-library-icon {
+  display: grid;
+  flex: none;
+  width: 2.65rem;
+  height: 2.65rem;
+  place-items: center;
+  border-radius: 0.85rem;
+  background: var(--library-tint);
+  color: var(--library-ink);
+}
+.attachment-library-icon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+.attachment-search {
+  order: 1;
+  width: 100%;
+  height: 2.35rem;
+  border-radius: 0.7rem;
+  background: var(--sidebar);
+}
+@container library (min-width: 38rem) {
+  .attachment-header {
+    flex-wrap: nowrap;
+    padding: 1.05rem 1.5rem;
+  }
+  .attachment-search {
+    order: 0;
+    width: min(42%, 27rem);
+  }
+}
+
+.attachment-rail {
+  flex: none;
+  width: clamp(11.75rem, 17cqw, 14.5rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-inline-end: 1px solid var(--border);
+  padding: 1.2rem 0.75rem;
+  background: var(--sidebar);
+}
+.attachment-facets {
+  display: grid;
+  gap: 1.1rem;
+}
+.attachment-facets > [role="group"] + [role="group"] {
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 1rem;
+}
+.attachment-facets h2,
+.attachment-filter-scroll > h2 {
+  margin: 0 0 0.45rem;
+  padding-inline: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--foreground);
+}
+.attachment-facets button {
+  min-height: 2.05rem;
+  height: auto;
+  font-weight: 450;
+}
+.attachment-facets button[aria-pressed="true"] {
+  color: var(--library-ink);
+  background: var(--library-tint);
+  font-weight: 630;
+}
+.attachment-facets button[aria-pressed="true"] span:last-child {
+  color: inherit;
+}
+.attachment-facets button svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.65;
+}
+
+.attachment-toolbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.85rem;
+  border-block-end: 1px solid var(--border);
+  padding: 0.65rem clamp(0.6rem, 1.6cqw, 1.4rem);
+}
+.attachment-view-tools {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+.attachment-formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+.attachment-formats button {
+  width: auto;
+  gap: 0.35rem;
+  padding-inline: 0.5rem;
+  font-size: 0.77rem;
+}
+.attachment-formats button svg {
+  display: none;
+}
+.attachment-formats button span:last-child {
+  padding: 0;
+}
+.attachment-formats button[aria-pressed="true"] {
+  color: var(--foreground);
+  background: var(--secondary);
+  font-weight: 620;
+}
+@container results (max-width: 25rem) {
+  .attachment-sort {
+    width: 2.2rem;
+    min-width: 2.2rem;
+    justify-content: center;
+    padding: 0;
+  }
+  .attachment-sort [data-slot="select-value"],
+  .attachment-sort svg:last-child {
+    display: none;
+  }
+}
+.attachment-filter-popover {
+  width: min(20rem, var(--available-width), calc(100vw - 1rem));
+  max-height: min(76vh, var(--available-height));
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.attachment-filter-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem;
+}
+.attachment-filter-scroll .attachment-formats {
+  margin-block-end: 1rem;
+}
+.attachment-filter-scroll .attachment-formats button {
+  border: 1px solid var(--border);
+}
+.attachment-applied {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  border-block-end: 1px solid var(--border);
+  padding: 0.3rem clamp(0.6rem, 1.6cqw, 1.4rem);
+  background: var(--sidebar);
+}
+.attachment-filter-chips {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  overflow-x: auto;
+  padding: 0.2rem;
+  scrollbar-width: thin;
+}
+.attachment-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 0.35rem;
+  max-width: min(13rem, 100%);
+  min-height: 1.6rem;
+  border: 1px solid var(--library-edge);
+  border-radius: 2rem;
+  background: var(--background);
+  color: var(--library-ink);
+  padding-inline: 0.55rem;
+  font-size: 0.73rem;
+  font-weight: 550;
+}
+.attachment-filter-chip svg {
+  flex: none;
+  width: 0.78rem;
+  height: 0.78rem;
+}
+.attachment-filter-chip:hover {
+  background: var(--library-tint);
+}
+.attachment-filter-chip:focus-visible {
+  outline: 2px solid var(--library-ink);
+  outline-offset: 1px;
+}
+
+.attachment-detail-filters {
+  display: grid;
+  gap: 0.8rem;
+}
+.attachment-facets + .attachment-detail-filters {
+  margin-block-start: 1rem;
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 0.9rem;
+}
+.attachment-detail-filters label,
+.attachment-filter-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 550;
+}
+.attachment-detail-filters :is(input, [data-slot="select-trigger"]) {
+  width: 100%;
+  min-width: 0;
+  height: 2.2rem;
+  padding-inline: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 400;
+}
+.attachment-detail-filters :is(input, [data-slot="select-trigger"]):focus-visible {
+  outline: 2px solid var(--library-ink);
+  outline-offset: 1px;
+}
+.attachment-date-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}

@@ -1,14 +1,15 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail markup and model tool output. */
+import type { SourceMessage } from "@ggmail/shared/assistant";
 import { load } from "cheerio/slim";
 
-export function readThreadText(html: string, offset: number) {
+export function extractMessages(html: string) {
   const $ = load(html);
   const tables = $("table.message").filter((_i, node) => !$(node).parents("table.message").length);
   if (!tables.length) {
     throw new Error("Missing Gmail conversation");
   }
 
-  const messages: string[] = [];
+  const messages: SourceMessage[] = [];
   for (const table of tables) {
     const rows = $(table).children("tr").add($(table).children("tbody").children("tr"));
     const headers = rows.first().children("td");
@@ -30,9 +31,16 @@ export function readThreadText(html: string, offset: number) {
       .replace(/[ \t]+\n/g, "\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
-    messages.push(`From: ${sender}\nDate: ${date}\n${text}`);
+    messages.push({ index: messages.length, sender, date, body: text });
   }
-  const fullText = messages.join("\n\n");
+  return messages;
+}
+
+export function readThreadText(html: string, offset: number) {
+  const messages = extractMessages(html);
+  const fullText = messages
+    .map(({ sender, date, body }) => `From: ${sender}\nDate: ${date}\n${body}`)
+    .join("\n\n");
   if (!Number.isSafeInteger(offset) || offset < 0 || offset >= fullText.length) {
     throw new Error("Invalid Gmail conversation offset");
   }
@@ -44,4 +52,38 @@ export function readThreadText(html: string, offset: number) {
     totalCharacters: fullText.length,
     nextOffset: end < fullText.length ? end : null,
   };
+}
+
+/** The cursor counts body characters, allowing one position for an empty message. */
+export function readThreadPreview(messages: SourceMessage[], offset: number) {
+  if (!Number.isSafeInteger(offset) || offset < 0) {
+    throw new Error("Invalid preview offset");
+  }
+  const fragments: SourceMessage[] = [];
+  let position = 0;
+  let remaining = 16_000;
+  for (const message of messages) {
+    const length = Math.max(1, message.body.length);
+    const end = position + length;
+    if (end > offset) {
+      const start = Math.max(0, offset - position);
+      const count = Math.min(remaining, length - start);
+      fragments.push({
+        ...message,
+        sender: message.sender.slice(0, 1024),
+        date: message.date.slice(0, 256),
+        body: message.body.slice(start, start + count),
+      });
+      remaining -= count;
+      if (!remaining || fragments.length === 32) {
+        const more = start + count < length || message.index < messages.length - 1;
+        return { messages: fragments, nextOffset: more ? position + start + count : null };
+      }
+    }
+    position = end;
+  }
+  if (!fragments.length) {
+    throw new Error("Invalid preview offset");
+  }
+  return { messages: fragments, nextOffset: null };
 }

@@ -36,10 +36,12 @@ import { config } from "@/config";
 import { copyText } from "@/lib/clipboard";
 import { getExtensionWindowError } from "@/lib/extension-window";
 import { readFindRequest } from "@/lib/find-in-page";
+import { Popup } from "@/lib/popup";
 import { relaunchApp } from "@/lib/relaunch";
 import { main } from "@/main";
 import { appMenu } from "@/menu";
 import { settingsWindow } from "@/settings-window";
+import { shellHistory } from "@/shell-history";
 import { swipeNavigation } from "@/swipe-navigation";
 import { DormantTab, isWindowedTab } from "@/tabs";
 import {
@@ -57,6 +59,7 @@ import {
   openCuratedExtensionWindow,
   uninstallCuratedExtension,
 } from "./extensions";
+import { registerFollowUpIpc } from "./follow-ups/ipc";
 import { Gmail, GMAIL_USER_STYLES_PATH } from "./gmail";
 import { registerUnifiedSearchIpc } from "./gmail/unified-search";
 import {
@@ -168,6 +171,7 @@ class Ipc {
     registerAssistantIpc(this);
     registerAttachmentIpc(this);
     registerUnifiedSearchIpc(this);
+    registerFollowUpIpc(this);
 
     config.onDidAnyChange(() => {
       ipc.broadcast("config.configChanged", config.store);
@@ -186,8 +190,11 @@ class Ipc {
       WorkspaceApp.broadcastBookmarkStates();
     });
 
-    this.main.on("accounts.selectAccount", (_event, selectedAccountId) => {
+    this.main.on("accounts.selectAccount", (_event, selectedAccountId, showMailbox) => {
       accounts.selectAccount(selectedAccountId);
+      if (showMailbox && main.location !== "/") {
+        main.navigate("/");
+      }
     });
 
     this.main.on("accounts.selectPreviousAccount", () => {
@@ -228,12 +235,23 @@ class Ipc {
       }
     });
 
+    this.main.handle("shell.getHistory", () => shellHistory.state);
+    this.main.handle("downloads.isActive", () => downloads.isActive);
+
     this.main.on("workspaceApp.goBack", (_event, workspaceAppId) => {
-      getNavigationWebContents(workspaceAppId).navigationHistory.goBack();
+      if (workspaceAppId) {
+        getNavigationWebContents(workspaceAppId).navigationHistory.goBack();
+      } else {
+        shellHistory.move(-1);
+      }
     });
 
     this.main.on("workspaceApp.goForward", (_event, workspaceAppId) => {
-      getNavigationWebContents(workspaceAppId).navigationHistory.goForward();
+      if (workspaceAppId) {
+        getNavigationWebContents(workspaceAppId).navigationHistory.goForward();
+      } else {
+        shellHistory.move(1);
+      }
     });
 
     this.main.on("workspaceApp.reload", (_event, workspaceAppId) => {
@@ -261,6 +279,86 @@ class Ipc {
     this.main.on("swipeNavigation.setPageScrollEdge", (event, pageScrollEdge) => {
       swipeNavigation.setPageScrollEdge(event.sender, pageScrollEdge);
     });
+
+    /* oxlint-disable lingui/no-unlocalized-strings -- Internal route and account identifiers for the mail-view popup. */
+    const mailViewsPopup = new Popup();
+    this.main.on("titleBar.showMailViews", (event, anchor) => {
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame
+      ) {
+        return;
+      }
+      const mailboxes = accounts.getAccounts();
+      const views = [
+        ...(config.get("unifiedInbox.enabled") && mailboxes.length > 1
+          ? [{ value: "/unified-inbox", label: t`All Mail` }]
+          : []),
+        { value: "/attachments", label: t`Attachments` },
+        { value: "/waiting", label: t`Waiting for reply` },
+      ];
+      const accountItems = mailboxes.map(({ config: account }) => ({
+        value: "account/" + account.id,
+        label: getAccountLabel(account.label),
+      }));
+      const selectedAccount = mailboxes.find(({ config: account }) => account.selected);
+      const selected =
+        main.location === "/" && selectedAccount
+          ? "account/" + selectedAccount.config.id
+          : main.location;
+      if (
+        mailViewsPopup.toggle(main.window, {
+          page: "mail-views",
+          anchor: { ...anchor, align: "start" },
+          width: 224,
+          height: 16 + 32 * (views.length + accountItems.length),
+          searchParams: new URLSearchParams({
+            choices: JSON.stringify({ views, accountItems, selected }),
+          }),
+        })
+      ) {
+        const owner = event.sender;
+        ipc.renderer.send(owner, "titleBar.mailViewsOpen", true);
+        mailViewsPopup.webContents?.once("destroyed", () => {
+          if (!owner.isDestroyed() && !mailViewsPopup.webContents) {
+            ipc.renderer.send(owner, "titleBar.mailViewsOpen", false);
+          }
+        });
+        mailViewsPopup.closeOnBlurEnabled = true;
+        mailViewsPopup.webContents?.once("did-finish-load", () =>
+          mailViewsPopup.webContents?.focus(),
+        );
+      }
+    });
+
+    this.main.on("titleBar.chooseMailView", (event, value) => {
+      if (
+        event.sender !== mailViewsPopup.webContents ||
+        event.senderFrame !== event.sender.mainFrame
+      ) {
+        return;
+      }
+      mailViewsPopup.close();
+      if (value?.startsWith("account/")) {
+        const id = value.slice("account/".length);
+        if (accounts.getAccounts().some((account) => account.config.id === id)) {
+          accounts.selectAccount(id);
+          main.navigate("/");
+        }
+      } else if (
+        value === "/attachments" ||
+        value === "/waiting" ||
+        (value === "/unified-inbox" &&
+          config.get("unifiedInbox.enabled") &&
+          accounts.getAccounts().length > 1)
+      ) {
+        main.navigate(value);
+      } else if (main.location === "/") {
+        accounts.focusActiveView();
+      }
+    });
+
+    /* oxlint-enable lingui/no-unlocalized-strings */
 
     this.main.on("titleBar.toggleAppMenu", (event, anchor) => {
       appMenu.togglePopup(anchor, settingsWindow.getAppMenuWindow(event.sender));
@@ -1119,6 +1217,7 @@ class Ipc {
       if (accountInstance && accountInstance.gmail.userEmail !== email) {
         accountInstance.gmail.invalidateMailboxReads();
         accountInstance.gmail.userEmail = email;
+        void accountInstance.gmail.fetchInboxFeed({ retryWhileUnchanged: false });
       }
     });
 
@@ -1292,7 +1391,44 @@ class Ipc {
       }
     });
 
-    this.main.on("gmail.openMessage", (_event, messageId) => {
+    this.main.on("gmail.openInboxSignIn", (event, accountId) => {
+      const renderer = main.windowIfCreated?.webContents;
+      if (
+        !renderer ||
+        event.sender !== renderer ||
+        event.senderFrame !== renderer.mainFrame ||
+        main.location !== "/unified-inbox"
+      ) {
+        return;
+      }
+      const account = accounts.getAccount(accountId);
+      account.instance.tabs.activateTab(GMAIL_TAB_ID);
+      accounts.selectAccount(accountId);
+      main.navigate("/");
+      account.instance.gmail.resumeInboxSignIn();
+    });
+
+    this.main.on("gmail.openMessage", async (event, messageId, accountId) => {
+      if (accountId !== undefined) {
+        if (
+          event.sender !== main.window.webContents ||
+          event.senderFrame !== event.sender.mainFrame ||
+          main.location !== "/unified-inbox"
+        ) {
+          return;
+        }
+        const { instance } = accounts.getAccount(accountId);
+        instance.tabs.activateTab(GMAIL_TAB_ID);
+        accounts.selectAccount(accountId);
+        await instance.gmail.navigateToHash("#inbox/" + messageId);
+        if (
+          main.location === "/unified-inbox" &&
+          accounts.getSelectedAccount().config.id === accountId
+        ) {
+          main.navigate("/");
+        }
+        return;
+      }
       accounts.openMessage(accounts.getSelectedAccount().config.id, messageId);
     });
 

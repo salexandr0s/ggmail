@@ -32,11 +32,27 @@ describe("mergeUnifiedInboxPush", () => {
   test("builds the entry from a push that arrives before anything reads it", () => {
     const queryClient = createQueryClient();
 
-    mergeUnifiedInboxPush(queryClient, "account-1", [message("a")]);
+    mergeUnifiedInboxPush(queryClient, "account-1", { status: "ready", messages: [message("a")] });
 
     expect(queryClient.getQueryData<UnifiedInbox>(unifiedInboxQueryKey)).toEqual({
-      "account-1": [message("a")],
+      "account-1": { status: "ready", messages: [message("a")] },
     });
+  });
+
+  test("retains mail through a failed poll and clears it when the mailbox changes", () => {
+    const client = createQueryClient();
+    const cached = () => client.getQueryData<UnifiedInbox>(unifiedInboxQueryKey)?.work;
+
+    mergeUnifiedInboxPush(client, "work", { status: "ready", messages: [message("one")] });
+    mergeUnifiedInboxPush(client, "work", { status: "retrying" });
+    expect(cached()).toEqual({ status: "retrying", messages: [message("one")] });
+
+    mergeUnifiedInboxPush(client, "work", { status: "signIn" });
+    expect(cached()).toEqual({ status: "signIn", messages: [] });
+    mergeUnifiedInboxPush(client, "work", { status: "syncing" });
+    expect(cached()).toEqual({ status: "syncing", messages: [] });
+    mergeUnifiedInboxPush(client, "work", { status: "ready", messages: [] });
+    expect(cached()).toEqual({ status: "ready", messages: [] });
   });
 
   test("keeps an entry it built alive for the window's lifetime", () => {
@@ -56,13 +72,13 @@ describe("mergeUnifiedInboxPush", () => {
   test("replaces one account's list and leaves the others alone", () => {
     const queryClient = createQueryClient();
 
-    mergeUnifiedInboxPush(queryClient, "account-1", [message("a")]);
-    mergeUnifiedInboxPush(queryClient, "account-2", [message("b")]);
-    mergeUnifiedInboxPush(queryClient, "account-1", [message("c")]);
+    mergeUnifiedInboxPush(queryClient, "account-1", { status: "ready", messages: [message("a")] });
+    mergeUnifiedInboxPush(queryClient, "account-2", { status: "ready", messages: [message("b")] });
+    mergeUnifiedInboxPush(queryClient, "account-1", { status: "ready", messages: [message("c")] });
 
     expect(queryClient.getQueryData<UnifiedInbox>(unifiedInboxQueryKey)).toEqual({
-      "account-1": [message("c")],
-      "account-2": [message("b")],
+      "account-1": { status: "ready", messages: [message("c")] },
+      "account-2": { status: "ready", messages: [message("b")] },
     });
   });
 });
@@ -90,9 +106,11 @@ describe("unifiedInboxCacheOptions", () => {
     expect(observer.getCurrentResult().data).toEqual({});
     expect(observer.getCurrentResult().isPending).toBe(false);
 
-    mergeUnifiedInboxPush(queryClient, "account-1", [message("a")]);
+    mergeUnifiedInboxPush(queryClient, "account-1", { status: "ready", messages: [message("a")] });
 
-    expect(observer.getCurrentResult().data).toEqual({ "account-1": [message("a")] });
+    expect(observer.getCurrentResult().data).toEqual({
+      "account-1": { status: "ready", messages: [message("a")] },
+    });
     expect(fetches).toBe(0);
 
     unsubscribe();
