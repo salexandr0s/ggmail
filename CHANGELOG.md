@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.65.2 — 2026-11-21
+
+- Settings groups pages under Application, Mail, and System. Related controls share panels, dropdown arrows sit at the right edge, and long selections wrap in narrow windows.
+- The attachment library remembers indexed files across launches, recognizes more document categories, and preserves manual category choices.
+- Compact mail navigation and dropdown menus work more consistently across window sizes.
+
 ## 3.65.1 — 2026-11-21
 
 - Reopening the mail assistant in the same mail view restores the conversation and unsent text. Replies can finish while the sidebar is closed. Use **New chat** to start over.
