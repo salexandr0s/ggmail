@@ -3,6 +3,7 @@
 ## 3.65.4 — 2026-11-21
 
 - Calendar opens as a tab in the main ggmail window. Choose a mailbox when opening Calendar, or switch accounts from the title bar while viewing it. Each mailbox keeps its own Calendar page.
+- All Mail shows per-account unread counts and sync status. This release also updates Attachments, Waiting for reply, mail navigation, and Settings.
 
 ## 3.65.3 — 2026-11-21
 

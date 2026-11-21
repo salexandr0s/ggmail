@@ -1,3 +1,4 @@
+import { fileKind } from "@ggmail/shared/attachments";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import { Dialog, DialogContent, DialogTitle } from "@ggmail/ui/components/dialog";
@@ -83,6 +84,7 @@ export function FileThumbnail({
       ref={element}
       aria-hidden="true"
       className={large ? "attachment-cover" : "attachment-miniature"}
+      data-file-kind={fileKind(item.name)}
     >
       {preview && !failed ? (
         <img src={preview.url} alt="" onError={() => setFailed(true)} />
@@ -123,9 +125,9 @@ export function FilePreview({
       <DialogContent
         closeLabel={t`Close`}
         finalFocus={returnFocus}
-        className="flex max-h-[90vh] w-[min(64rem,94vw)] flex-col gap-0 overflow-hidden p-0 sm:max-w-none"
+        className="attachment-preview-dialog flex max-h-[90vh] w-[min(64rem,94vw)] flex-col gap-0 overflow-hidden p-0 sm:max-w-none"
       >
-        <header className="flex min-w-0 shrink-0 items-center gap-3 border-b py-3 ps-4 pe-12">
+        <header className="attachment-preview-header">
           <FileMark name={item.name} />
           <div className="min-w-0">
             <DialogTitle className="truncate leading-snug" title={item.name}>
@@ -184,10 +186,15 @@ export function FilePreview({
           )}
         </div>
         <footer className="attachment-preview-footer">
-          <span className="min-w-0 truncate text-xs text-muted-foreground" title={item.sender}>
-            {item.sender} · {received}
-            {item.size && ` · ${item.size}`}
-          </span>
+          <div className="min-w-0 text-xs">
+            <div className="truncate font-medium" title={item.sender}>
+              {item.sender}
+            </div>
+            <div className="mt-1 text-muted-foreground">
+              <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>
+              {item.size && ` · ${item.size}`}
+            </div>
+          </div>
           <div className="flex shrink-0 gap-1.5">
             <Button
               size="sm"

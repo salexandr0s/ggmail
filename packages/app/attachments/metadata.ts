@@ -9,7 +9,8 @@ export type AttachmentEntry = {
   threadId: string;
   messageId: string;
   part: string;
-  downloadUrl: string;
+  downloadUrl?: string;
+  thumbnailView?: "snatt" | "fimg" | "att";
   thumbnailUrl?: string;
 };
 
@@ -88,6 +89,13 @@ export function readPrintAttachments(
   }
   const files = new Map<string, AttachmentEntry>();
   for (const message of messages) {
+    // The message body is in a div before Gmail's own attachment table. Exclude tables inside it.
+    const tiles = $(message)
+      .find("table.att")
+      .filter((_i, node) => !$(node).parentsUntil(message, "div").length);
+    if (!tiles.length) {
+      continue;
+    }
     const rows = $(message).children("tr").add($(message).children("tbody").children("tr"));
     const header = rows.first().children("td");
     const sender = header.first().text().trim();
@@ -97,10 +105,7 @@ export function readPrintAttachments(
       getGoogleProfilePhotoUrl(
         photos.find((photo) => photo.address.toLowerCase() === address)?.url ?? "",
       );
-    // The message body is in a div before Gmail's own attachment table. Exclude tables inside it.
-    const tiles = $(message)
-      .find("table.att")
-      .filter((_i, node) => !$(node).parentsUntil(message, "div").length);
+    const parsedDate = Date.parse(header.last().text().trim().replace(" at ", " "));
     const messageFiles = new Map<string, AttachmentEntry>();
     for (const table of tiles) {
       for (const link of $(table).find("a[href]")) {
@@ -117,7 +122,6 @@ export function readPrintAttachments(
           continue;
         }
         const id = locator.messageId + "/" + locator.part;
-        const parsedDate = Date.parse(header.last().text().trim().replace(" at ", " "));
         const receivedAt = Number.isFinite(parsedDate)
           ? parsedDate
           : Number(

@@ -10,7 +10,7 @@ import {
 import { cn } from "@ggmail/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ArrowLeftIcon, ArrowRightIcon, LoaderCircleIcon, RotateCwIcon, XIcon } from "lucide-react";
-import { type ComponentProps, type ReactNode, type Ref, useState } from "react";
+import { type ComponentProps, type ReactNode, useState } from "react";
 import { useChromeMenu } from "@/lib/chrome-menu";
 import { useCloseOnWindowBlur } from "@/lib/hooks";
 
@@ -22,10 +22,13 @@ import { useCloseOnWindowBlur } from "@/lib/hooks";
  * keyboard's way into the menu on Windows and Linux, and the find field, which
  * a shortcut opens and the keyboard then works inside.
  */
-export function Titlebar({ children }: { children: ReactNode }) {
+export function Titlebar({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className="relative overflow-hidden border-b bg-background select-none draggable"
+      className={cn(
+        "relative shrink-0 overflow-hidden border-b bg-background select-none draggable",
+        className,
+      )}
       style={{ height: APP_TITLEBAR_HEIGHT }}
     >
       <div
@@ -47,33 +50,6 @@ export function TitlebarLeft({ children }: { children: ReactNode }) {
 
 export function TitlebarRight({ children }: { children: ReactNode }) {
   return <div className="flex items-center gap-2">{children}</div>;
-}
-
-/**
- * The right-hand controls, pinned over the right edge of the titlebar instead of
- * sharing a row with what is to their left.
- *
- * Whatever is to their left can then be a scroll container that shrinks to
- * nothing, rather than a row that pushes these controls out of the window. It is
- * opaque so that the content scrolls under it.
- */
-export function TitlebarRightOverlay({
-  ref,
-  children,
-}: {
-  ref?: Ref<HTMLDivElement>;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      ref={ref}
-      data-slot="titlebar-utilities"
-      className="absolute top-0 right-0 flex items-center gap-4 bg-background px-1.5"
-      style={{ height: APP_TITLEBAR_HEIGHT }}
-    >
-      {children}
-    </div>
-  );
 }
 
 export function TitlebarButtonGroup({

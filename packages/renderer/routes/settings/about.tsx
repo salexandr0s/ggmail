@@ -1,14 +1,6 @@
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
-import { Field, FieldDescription, FieldTitle } from "@ggmail/ui/components/field";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemTitle,
-} from "@ggmail/ui/components/item";
+import { Field, FieldContent, FieldDescription, FieldTitle } from "@ggmail/ui/components/field";
 import { Skeleton } from "@ggmail/ui/components/skeleton";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -32,13 +24,7 @@ function DiagnosticInfo() {
   });
 
   if (isPending || !info) {
-    return (
-      <ItemGroup>
-        <Skeleton className="h-14" />
-        <Skeleton className="h-14" />
-        <Skeleton className="h-14" />
-      </ItemGroup>
-    );
+    return <Skeleton className="h-36 rounded-xl" />;
   }
 
   const rows = [
@@ -47,21 +33,17 @@ function DiagnosticInfo() {
   ];
 
   return (
-    <ItemGroup>
+    <SettingsPanel>
       {rows.map(({ label, value }) => (
-        <Item key={label} variant="muted">
-          <ItemContent className="min-w-0">
-            <ItemTitle>{label}</ItemTitle>
-            <ItemDescription className="truncate" data-truncated>
-              {value}
-            </ItemDescription>
-          </ItemContent>
-          <ItemActions>
-            <CopyButton value={value} />
-          </ItemActions>
-        </Item>
+        <Field key={label} orientation="horizontal">
+          <FieldContent>
+            <FieldTitle>{label}</FieldTitle>
+            <FieldDescription className="wrap-anywhere">{value}</FieldDescription>
+          </FieldContent>
+          <CopyButton value={value} />
+        </Field>
       ))}
-    </ItemGroup>
+    </SettingsPanel>
   );
 }
 
@@ -76,28 +58,28 @@ function ExportLogsField() {
   });
 
   return (
-    <Field>
-      <FieldTitle>
-        <Trans comment="Heading of the About ggmail section for exporting the application's logs">
-          Logs
-        </Trans>
-      </FieldTitle>
-      <FieldDescription>
-        <Trans>
-          Export the application logs to a file, to diagnose a problem or to share with support.
-        </Trans>
-      </FieldDescription>
-      <div>
-        <Button
-          variant="outline"
-          onClick={() => {
-            exportLogsMutation.mutate();
-          }}
-          disabled={exportLogsMutation.isPending}
-        >
-          <Trans>Export logs</Trans>
-        </Button>
-      </div>
+    <Field orientation="responsive">
+      <FieldContent>
+        <FieldTitle>
+          <Trans comment="Heading of the About ggmail section for exporting the application's logs">
+            Logs
+          </Trans>
+        </FieldTitle>
+        <FieldDescription>
+          <Trans>
+            Export the application logs to a file, to diagnose a problem or to share with support.
+          </Trans>
+        </FieldDescription>
+      </FieldContent>
+      <Button
+        variant="outline"
+        onClick={() => {
+          exportLogsMutation.mutate();
+        }}
+        disabled={exportLogsMutation.isPending}
+      >
+        <Trans>Export logs</Trans>
+      </Button>
     </Field>
   );
 }

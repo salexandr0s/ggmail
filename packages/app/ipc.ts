@@ -300,17 +300,11 @@ class Ipc {
         return;
       }
       const mailboxes = accounts.getAccounts();
-      const views = [
-        ...(config.get("unifiedInbox.enabled") && mailboxes.length > 1
-          ? [{ value: "/unified-inbox", label: t`All Mail` }]
-          : []),
-        { value: "/attachments", label: t`Attachments` },
-        { value: "/waiting", label: t`Waiting for reply` },
-        { value: "calendar", label: t`Calendar` },
-      ];
+      const unified = config.get("unifiedInbox.enabled") && mailboxes.length > 1;
       const accountItems = mailboxes.map(({ config: account }) => ({
         value: "account/" + account.id,
         label: getAccountLabel(account.label),
+        color: account.color,
       }));
       const selectedAccount = mailboxes.find(({ config: account }) => account.selected);
       const selected =
@@ -323,10 +317,11 @@ class Ipc {
         mailViewsPopup.toggle(main.window, {
           page: "mail-views",
           anchor: { ...anchor, align: "start" },
-          width: 224,
-          height: 16 + 32 * (views.length + accountItems.length),
+          width: 248,
+          // Two section labels, the divider and padding, plus each 36px menu row.
+          height: 80 + 36 * ((unified ? 4 : 3) + accountItems.length),
           searchParams: new URLSearchParams({
-            choices: JSON.stringify({ views, accountItems, selected }),
+            choices: JSON.stringify({ unified, accountItems, selected }),
           }),
         })
       ) {

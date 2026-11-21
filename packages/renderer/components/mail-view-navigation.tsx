@@ -1,77 +1,57 @@
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuBackdrop,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@ggmail/ui/components/dropdown-menu";
 import { useLingui } from "@lingui/react/macro";
-import {
-  CalendarDaysIcon,
-  ChevronDownIcon,
-  ClockIcon,
-  InboxIcon,
-  PaperclipIcon,
-} from "lucide-react";
+import { ChevronDownIcon, PanelsTopLeftIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { navigate } from "wouter/use-hash-location";
-import { useChromeMenu } from "@/lib/chrome-menu";
-import { useCloseOnWindowBlur } from "@/lib/hooks";
+import { getMailViews } from "@/lib/mail-views";
 
 export function MailViewNavigation({
   location,
   unified,
   multipleAccounts,
+  accountLabel,
 }: {
   location: string;
   unified: boolean;
   multipleAccounts: boolean;
+  accountLabel?: string;
 }) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
-  const [compactMenuOpen, setCompactMenuOpen] = useState(false);
-  useEffect(
-    () => ipc.renderer.on("titleBar.mailViewsOpen", (_event, next) => setCompactMenuOpen(next)),
-    [],
-  );
-  const menu = useChromeMenu(open, setOpen);
-  useCloseOnWindowBlur(open, () => setOpen(false));
-  const views = [
-    ...(unified ? [{ id: "/unified-inbox", label: t`All Mail`, Icon: InboxIcon }] : []),
-    { id: "/attachments", label: t`Attachments`, Icon: PaperclipIcon },
-    { id: "/waiting", label: t`Waiting for reply`, Icon: ClockIcon },
-    { id: "calendar", label: t`Calendar`, Icon: CalendarDaysIcon },
-  ];
-  const openView = (id: string, trigger: HTMLElement) => {
-    if (id === "calendar") {
-      const rect = trigger.getBoundingClientRect();
-      ipc.main.send("titleBar.openCalendar", {
-        x: Math.round(rect.left),
-        y: Math.round(rect.bottom),
-      });
-    } else if (location !== id) {
-      navigate(id);
-    }
+  useEffect(() => ipc.renderer.on("titleBar.mailViewsOpen", (_event, next) => setOpen(next)), []);
+
+  const views = getMailViews(unified);
+  const current = views.find((view) => view.value === location);
+  const CurrentIcon = current?.Icon ?? PanelsTopLeftIcon;
+  const anchor = (button: HTMLElement) => {
+    const rect = button.getBoundingClientRect();
+    return { x: Math.round(rect.left), y: Math.round(rect.bottom) };
   };
-  const current = views.find((view) => view.id === location);
+
   return (
-    <nav aria-label={t`Mail views`} className="shrink-0 draggable-none">
-      <div className="hidden items-center gap-0.5 min-[1040px]:flex">
-        {views.map(({ id, label, Icon }) => (
+    <nav aria-label={t`Mail views`} className="mail-view-nav draggable-none">
+      <div className="mail-view-segments">
+        {views.map(({ value, label, Icon }) => (
           <Button
-            key={id}
+            key={value}
             size="sm"
-            variant={location === id ? "secondary" : "ghost"}
-            aria-current={location === id ? "page" : undefined}
-            className="gap-1.5 px-2 text-xs"
-            aria-haspopup={id === "calendar" && multipleAccounts ? "menu" : undefined}
-            onClick={(event) => openView(id, event.currentTarget)}
+            variant="ghost"
+            data-view={value}
+            aria-current={location === value ? "page" : undefined}
+            className="mail-view-segment"
+            aria-haspopup={value === "calendar" && multipleAccounts ? "menu" : undefined}
+            onClick={(event) => {
+              if (value === "calendar") {
+                ipc.main.send("titleBar.openCalendar", anchor(event.currentTarget));
+              } else if (location !== value) {
+                navigate(value);
+              }
+            }}
           >
-            <Icon className="size-3.5" />
+            <Icon aria-hidden="true" />
             {label}
-            {id === "calendar" && multipleAccounts && (
+            {value === "calendar" && multipleAccounts && (
               <ChevronDownIcon aria-hidden="true" className="size-3" />
             )}
           </Button>
@@ -79,62 +59,36 @@ export function MailViewNavigation({
       </div>
       <Button
         size="sm"
-        variant="secondary"
+        variant="ghost"
+        data-view={current?.value}
         aria-haspopup="menu"
-        aria-expanded={compactMenuOpen}
+        aria-expanded={open}
         aria-label={t`Mail views`}
-        aria-description={current?.label}
-        className="max-w-32 gap-1 px-2 text-xs sm:hidden"
-        onClick={(event) => {
-          const rect = event.currentTarget.getBoundingClientRect();
-          ipc.main.send("titleBar.showMailViews", {
-            x: Math.round(rect.left),
-            y: Math.round(rect.bottom),
-          });
+        aria-description={current?.label ?? accountLabel}
+        title={t`Mail views`}
+        className="mail-view-picker"
+        onClick={(event) => ipc.main.send("titleBar.showMailViews", anchor(event.currentTarget))}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            ipc.main.send("titleBar.showMailViews", anchor(event.currentTarget));
+          }
         }}
       >
-        <span className="truncate">{current?.label ?? t`Mail views`}</span>
-        <ChevronDownIcon aria-hidden="true" className="size-3.5 shrink-0" />
+        <CurrentIcon aria-hidden="true" />
+        <span className="truncate">
+          {current?.label ??
+            (accountLabel && multipleAccounts ? (
+              <>
+                <span className="mail-picker-account">{accountLabel}</span>
+                <span className="mail-picker-caption">{t`Mail views`}</span>
+              </>
+            ) : (
+              (accountLabel ?? t`Mail views`)
+            ))}
+        </span>
+        <ChevronDownIcon aria-hidden="true" className="mail-picker-chevron size-3" />
       </Button>
-      {/* Keep the menu in the title bar, above the embedded Gmail or Workspace view. */}
-      <DropdownMenu {...menu.rootProps} orientation="horizontal">
-        <DropdownMenuTrigger
-          aria-label={t`Mail views`}
-          aria-description={current?.label}
-          render={
-            <Button
-              size="sm"
-              variant="secondary"
-              className="hidden max-w-40 gap-1.5 px-2 text-xs sm:max-[1040px]:inline-flex"
-            />
-          }
-        >
-          <span className="truncate">{current?.label ?? t`Mail views`}</span>
-          <ChevronDownIcon aria-hidden="true" className="size-3.5 text-muted-foreground" />
-        </DropdownMenuTrigger>
-        <DropdownMenuBackdrop className="draggable-none" />
-        <DropdownMenuContent
-          {...menu.contentProps}
-          side="right"
-          align="center"
-          collisionPadding={0}
-          className="flex w-auto min-w-0 flex-row gap-0.5 p-0.5 draggable-none"
-        >
-          {views.map(({ id, label, Icon }) => (
-            <DropdownMenuItem
-              key={id}
-              title={label}
-              aria-label={label}
-              aria-current={location === id ? "page" : undefined}
-              className="h-7 justify-center px-1.5 aria-[current=page]:bg-accent"
-              onClick={(event) => openView(id, event.currentTarget)}
-            >
-              <Icon aria-hidden="true" className="size-3.5" />
-              <span className="truncate">{label}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
     </nav>
   );
 }

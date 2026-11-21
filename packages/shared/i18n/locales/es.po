@@ -10,6 +10,7 @@ msgstr ""
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "(no subject)"
 msgstr "(sin asunto)"
 
@@ -56,15 +57,15 @@ msgstr "{extensionName} solo se ejecuta en las páginas de inicio de sesión de 
 msgid "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
 msgstr "{failedCount, plural, one {No se ha podido actualizar # extensión} many {No se han podido actualizar # extensiones} other {No se han podido actualizar # extensiones}}"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is still syncing"
 msgstr "{label} aún se está sincronizando"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is up to date"
 msgstr "{label} está al día"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} will retry syncing"
 msgstr "Se volverá a intentar la sincronización de {label}"
 
@@ -324,6 +325,7 @@ msgstr "Acciones de la cuenta"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Appearance section for how accounts look
 #: packages/app/menu.ts
+#: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Accounts"
@@ -412,6 +414,7 @@ msgstr "Ajustes de IA"
 
 #: packages/renderer/components/account-filters.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "Todas las cuentas"
@@ -425,6 +428,10 @@ msgstr "Todas las categorías"
 #: packages/renderer/routes/attachments.tsx
 msgid "All files"
 msgstr "Todos los archivos"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "All follow-ups"
+msgstr "Todos los seguimientos"
 
 #: packages/renderer/components/assistant/assistant-activity.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
@@ -796,6 +803,10 @@ msgstr "Se agotó el tiempo para iniciar sesión en ChatGPT. Vuelve a intentarlo
 msgid "ChatGPT sign-in was canceled."
 msgstr "Se canceló el inicio de sesión en ChatGPT."
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "Check for replies"
+msgstr "Comprobar si hay respuestas"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -914,6 +925,7 @@ msgstr "Quitar color"
 msgid "Clear filters"
 msgstr "Borrar filtros"
 
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Clear search"
@@ -1070,6 +1082,10 @@ msgstr "Contrato"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Conversation"
 msgstr "Conversación"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Conversations leave this list when a reply arrives."
+msgstr "Las conversaciones desaparecen de esta lista cuando llega una respuesta."
 
 #. Checkbox in the Delete browsing data dialog that deletes the account's cookies and the data sites store, such as local storage
 #: packages/renderer/routes/settings/accounts.tsx
@@ -1520,6 +1536,10 @@ msgid "Drag {label} to reorder"
 msgstr "Arrastra {label} para reordenar"
 
 #: packages/renderer/components/follow-ups.tsx
+msgid "Due"
+msgstr "Pendientes"
+
+#: packages/renderer/components/follow-ups.tsx
 msgid "Due for follow-up"
 msgstr "Seguimiento pendiente"
 
@@ -1797,8 +1817,13 @@ msgid "Fills and generates passwords and passkeys for your Google Account. Unloc
 msgstr "Rellena y genera contraseñas y llaves de acceso para tu Cuenta de Google. Para desbloquear con biometría se necesita la aplicación de escritorio de Bitwarden."
 
 #: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "Filter by account"
 msgstr "Filtrar por cuenta"
+
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Filter pages"
+msgstr "Filtrar páginas"
 
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -1887,10 +1912,8 @@ msgid "Full download history"
 msgstr "Historial de descargas completo"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
-#. Heading of the Appearance section for the settings that apply to the whole app
 #. Heading of the Downloads section for how files are downloaded
 #: packages/renderer/lib/settings-pages.ts
-#: packages/renderer/routes/settings/appearance.tsx
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "General"
 msgstr "General"
@@ -2250,6 +2273,10 @@ msgid "Last page"
 msgstr "Última página"
 
 #: packages/renderer/components/follow-ups.tsx
+msgid "Last sent"
+msgstr "Último envío"
+
+#: packages/renderer/components/follow-ups.tsx
 msgid "Last sent {lastSent}"
 msgstr "Último envío el {lastSent}"
 
@@ -2345,6 +2372,7 @@ msgstr "Cargando"
 
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Loading email…"
 msgstr "Cargando correo…"
 
@@ -2535,6 +2563,7 @@ msgid "New windows"
 msgstr "Ventanas nuevas"
 
 #: packages/renderer/routes/attachments.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Newest first"
 msgstr "Más recientes primero"
 
@@ -2597,6 +2626,10 @@ msgstr "No hay archivos disponibles"
 msgid "No follow-ups"
 msgstr "No hay seguimientos"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "No follow-ups due"
+msgstr "No hay seguimientos pendientes"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "No free time slot left for another window. Remove or shorten one first."
 msgstr "No queda tiempo libre para otro intervalo. Quita o acorta uno primero."
@@ -2614,6 +2647,10 @@ msgstr "No hay conversaciones que coincidan"
 msgid "No matching files"
 msgstr "Ningún archivo coincide"
 
+#: packages/renderer/components/app-sidebar.tsx
+msgid "No matching pages"
+msgstr "No hay páginas que coincidan"
+
 #: packages/app/assistant/connection.ts
 msgid "No models are available for this ChatGPT account."
 msgstr "No hay modelos disponibles para esta cuenta de ChatGPT."
@@ -2626,6 +2663,10 @@ msgstr "Vista previa no disponible"
 #: packages/renderer/routes/settings/saved-searches.tsx
 msgid "No saved searches yet."
 msgstr "Todavía no hay búsquedas guardadas."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "No scheduled follow-ups"
+msgstr "No hay seguimientos programados"
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -2815,6 +2856,10 @@ msgstr "Abrir enlaces aquí"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Open replies and forwards in a pop-out instead of below the message."
 msgstr "Abrir las respuestas y los reenvíos en una ventana nueva en lugar de debajo del mensaje."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Open sent mail"
+msgstr "Abrir correo enviado"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open the browser allowlist in an editor with root permissions."
@@ -3376,6 +3421,10 @@ msgstr "Buscar archivos adjuntos"
 msgid "Search files, senders, or subjects"
 msgstr "Buscar archivos, remitentes o asuntos"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Search results"
+msgstr "Resultados de búsqueda"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3466,10 +3515,6 @@ msgstr "Seleccionar cuenta anterior"
 msgid "Select Previous Tab"
 msgstr "Seleccionar pestaña anterior"
 
-#: packages/renderer/routes/settings/appearance.tsx
-msgid "Select the application theme."
-msgstr "Seleccionar el tema de la aplicación."
-
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Select the sound to play for notifications."
 msgstr "Seleccionar el sonido de las notificaciones."
@@ -3519,6 +3564,7 @@ msgid "Set up the mail assistant"
 msgstr "Configurar el asistente de correo"
 
 #. Title of the Settings window, in its titlebar
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "Configuración"
@@ -3830,7 +3876,11 @@ msgstr "Mostrar ventanas"
 msgid "Sidebar"
 msgstr "Barra lateral"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Sign in"
+msgstr "Iniciar sesión"
+
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "Sign in to {label}"
 msgstr "Iniciar sesión en {label}"
 
@@ -3853,6 +3903,10 @@ msgstr "Iniciar sesión en Google con una llave de acceso y Windows Hello"
 #: packages/renderer/components/unified-search.tsx
 msgid "Sign in to search this account."
 msgstr "Inicia sesión para buscar en esta cuenta."
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Sign in to see unread messages"
+msgstr "Inicia sesión para ver los mensajes sin leer"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
@@ -4003,6 +4057,10 @@ msgstr "Cambiar a Ventanas nuevas"
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Switch to New windows?"
 msgstr "¿Cambiar a Ventanas nuevas?"
+
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Syncing…"
+msgstr "Sincronizando…"
 
 #. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
@@ -4291,6 +4349,10 @@ msgstr "Mensajes no leídos"
 msgid "Until Tomorrow"
 msgstr "Hasta mañana"
 
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Up to date"
+msgstr "Al día"
+
 #. Titlebar button that shows the details of a downloaded update, ready to install
 #: packages/renderer/components/app-titlebar.tsx
 msgid "Update available"
@@ -4374,6 +4436,10 @@ msgctxt "Windows"
 msgid "View"
 msgstr "Vista"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "View all follow-ups"
+msgstr "Ver todos los seguimientos"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "View Logs"
@@ -4404,6 +4470,11 @@ msgstr "En espera de respuesta"
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
 msgstr "Esperando la vista de correo…"
+
+#: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Waiting to sync"
+msgstr "Esperando la sincronización"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "What can I help you with?"
@@ -4541,6 +4612,10 @@ msgstr "Has alcanzado tu límite de uso de ChatGPT. Vuelve a intentarlo más tar
 #: packages/app/ipc.ts
 msgid "Your test notification request"
 msgstr "Tu solicitud de notificación de prueba"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "You can schedule a follow-up when you sent the last message."
+msgstr "Puedes programar un seguimiento si enviaste el último mensaje."
 
 #. Window menu item that toggles the window between its size and filling the screen
 #: packages/app/menu.ts

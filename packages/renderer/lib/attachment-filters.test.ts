@@ -13,7 +13,7 @@ function file(name: string, account: string, properties: Partial<MailAttachment>
   return indexAttachment({
     id: name,
     name,
-    account: { id: account },
+    accountId: account,
     receivedAt: +new Date(2026, 2, 29, 12),
     sender: "Inès Weiß <πληροφορίες@example.test>",
     subject: "March studio work",

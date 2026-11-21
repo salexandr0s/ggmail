@@ -5,6 +5,7 @@ import { useHashLocation } from "wouter/use-hash-location";
 import { AppMenuButton } from "@/components/app-menu-button";
 import { AppSidebar, settingsPages } from "@/components/app-sidebar";
 import { AppToaster } from "@/components/app-toaster";
+import { SettingsHeadingContext } from "@/components/settings";
 import { Titlebar, TitlebarTitle } from "@/components/titlebar";
 import { renderApp } from "@/lib/react";
 import "@/lib/ipc";
@@ -12,13 +13,18 @@ import "./settings.css";
 
 function SettingsPage() {
   const [location] = useLocation();
+  const { t } = useLingui();
 
   return (
     <main className="settings-main">
       <ScrollArea key={location} className="h-full">
         <div className="settings-page">
-          {settingsPages.map(({ path, component }) => (
-            <Route key={path} path={path} component={component} />
+          {settingsPages.map(({ path, component: Page, icon, group }) => (
+            <Route key={path} path={path}>
+              <SettingsHeadingContext value={{ icon, group: t(group) }}>
+                <Page />
+              </SettingsHeadingContext>
+            </Route>
           ))}
         </div>
       </ScrollArea>

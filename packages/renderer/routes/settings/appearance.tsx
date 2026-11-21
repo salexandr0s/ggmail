@@ -1,23 +1,8 @@
 import { byPlatform } from "@ggmail/shared/platform";
 import { ipc } from "@ggmail/shared/renderer/ipc";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@ggmail/ui/components/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ggmail/ui/components/select";
+import { FieldLegend, FieldSet } from "@ggmail/ui/components/field";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useId } from "react";
 import { ConfigSelectField } from "@/components/config-select-field";
 import { ConfigSwitchField } from "@/components/config-switch-field";
 import {
@@ -31,13 +16,14 @@ import { useConfig } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { restartRequiredToast } from "@/lib/toast";
 import { platform } from "@/lib/utils";
+import "./appearance.css";
 
 // lingui-set comment="Option of the Theme setting"
 const themeItems = [
   { value: "light", label: msg`Light` },
   { value: "dark", label: msg`Dark` },
   { value: "system", label: msg`System` },
-];
+] as const;
 // lingui-reset
 
 // lingui-set comment="Option of the system tray icon's Color setting"
@@ -72,18 +58,28 @@ const linuxWindowControlsItems = [
 ];
 // lingui-reset
 
+function ThemeWindow({ dark = false }: { dark?: boolean }) {
+  return (
+    <span className="theme-window" data-dark={dark}>
+      <span className="theme-window-bar" />
+      <span className="theme-window-sidebar" />
+      <span className="theme-window-messages">
+        <i />
+        <i />
+        <i />
+      </span>
+    </span>
+  );
+}
+
 export function AppearanceSettings() {
   const { config } = useConfig();
-
-  const themeFieldId = useId();
 
   const { t } = useLingui();
 
   if (!config) {
     return;
   }
-
-  const translatedThemeItems = themeItems.map(({ value, label }) => ({ value, label: t(label) }));
 
   const renderPlatformIconSettings = () => {
     const selectAccountWithUnreadField = (
@@ -209,46 +205,35 @@ export function AppearanceSettings() {
       <SettingsContent>
         <FieldSet>
           <FieldLegend>
-            <Trans comment="Heading of the Appearance section for the settings that apply to the whole app">
-              General
-            </Trans>
+            <Trans comment="Setting that picks a light or dark appearance">Theme</Trans>
           </FieldLegend>
-          <SettingsPanel>
-            <Field className="settings-choice-row">
-              <FieldContent>
-                <FieldLabel htmlFor={themeFieldId}>
-                  <Trans comment="Setting that picks a light or dark appearance">Theme</Trans>
-                </FieldLabel>
-                <FieldDescription>
-                  <Trans>Select the application theme.</Trans>
-                </FieldDescription>
-              </FieldContent>
-              <Select
-                items={translatedThemeItems}
-                value={config.theme}
-                onValueChange={(value) => {
-                  if (value) {
-                    ipc.main.send("theme.setTheme", value);
-
-                    if (!platform.isMacOS) {
-                      restartRequiredToast();
-                    }
-                  }
-                }}
-              >
-                <SelectTrigger id={themeFieldId}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {translatedThemeItems.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-          </SettingsPanel>
+          <div className="settings-themes">
+            {themeItems.map(({ value, label }) => (
+              <label key={value} className="settings-theme">
+                <span aria-hidden="true" className="settings-theme-preview" data-theme={value}>
+                  <span className="theme-window-frame">
+                    <ThemeWindow dark={value === "dark"} />
+                    {value === "system" && <ThemeWindow dark />}
+                  </span>
+                </span>
+                <span className="settings-theme-caption">
+                  {t(label)}
+                  <input
+                    type="radio"
+                    name="theme"
+                    value={value}
+                    checked={config.theme === value}
+                    onChange={() => {
+                      ipc.main.send("theme.setTheme", value);
+                      if (!platform.isMacOS) {
+                        restartRequiredToast();
+                      }
+                    }}
+                  />
+                </span>
+              </label>
+            ))}
+          </div>
         </FieldSet>
 
         <FieldSet>

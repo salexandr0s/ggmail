@@ -56,12 +56,13 @@ const readableFile = z.preprocess((raw) => {
   }
   return raw;
 }, storedFile);
+const readableFiles = readableFile.array();
 const storedThread = z.object({
   id: z.string().regex(/^[\da-f]{15,16}$/i),
   signature: z.string(),
   files: z.string().transform((json, ctx) => {
     try {
-      return readableFile.array().parse(JSON.parse(json));
+      return readableFiles.parse(JSON.parse(json));
     } catch {
       ctx.addIssue({ code: "custom", message: "Invalid attachment metadata" });
       return z.NEVER;
@@ -142,10 +143,10 @@ export class AttachmentDiskIndex {
     log.warn("Attachment index unavailable; continuing in memory");
   }
 
-  read(mailbox: string) {
-    const threads = [];
+  *read() {
     try {
-      for (const row of this.db?.prepare("SELECT id, signature, files FROM threads").all() ?? []) {
+      for (const row of this.db?.prepare("SELECT id, signature, files FROM threads").iterate() ??
+        []) {
         const stored = storedThread.safeParse(row);
         if (!stored.success) {
           continue;
@@ -153,65 +154,53 @@ export class AttachmentDiskIndex {
         const { id, signature, files } = stored.data;
         const entries: AttachmentEntry[] = files.map(({ thumbnailView, ...file }) => {
           const [messageId, part] = file.id.split("/") as [string, string];
-          const url = new URL(mailbox);
-          url.search = new URLSearchParams({
-            ui: "2",
-            view: "att",
-            [messageId.startsWith("msg-a:") ? "permmsgid" : "th"]: messageId,
-            attid: part,
-            disp: "attd",
-            safe: "1",
-            zw: "",
-          }).toString();
-          const thumb = new URL(url);
-          if (thumbnailView) {
-            thumb.searchParams.set("view", thumbnailView);
-            thumb.searchParams.set("disp", "thd");
-          }
           return {
-            thumbnailUrl: thumbnailView ? thumb.href : undefined,
+            thumbnailView,
             file: { ...file, senderPhotoUrl: getGoogleProfilePhotoUrl(file.senderPhotoUrl ?? "") },
             threadId: id,
             messageId,
             part,
-            downloadUrl: url.href,
           };
         });
-        threads.push({ id, signature, entries });
+        yield { id, signature, entries };
       }
-    } catch {
-      this.disable();
-    }
-    return threads;
-  }
-
-  save(id: string, signature: string, entries: AttachmentEntry[]) {
-    try {
-      // Select fields explicitly. Gmail request URLs, session tokens, message bodies
-      // and manual category overrides are never part of this cache.
-      if (!this.db) {
-        return;
-      }
-      const files = entries.map(({ file, thumbnailUrl }) =>
-        storedFile.parse({
-          ...file,
-          thumbnailView: thumbnailUrl
-            ? (new URL(thumbnailUrl).searchParams.get("view") ?? undefined)
-            : undefined,
-        }),
-      );
-      this.db
-        ?.prepare("INSERT OR REPLACE INTO threads VALUES (?, ?, ?)")
-        .run(id, signature, JSON.stringify(files));
     } catch {
       this.disable();
     }
   }
 
-  remove(id: string) {
+  update(
+    saved: { id: string; signature: string; entries: AttachmentEntry[] }[],
+    removed: string[],
+  ) {
+    const db = this.db;
+    if (!db || (!saved.length && !removed.length)) {
+      return;
+    }
     try {
-      this.db?.prepare("DELETE FROM threads WHERE id = ?").run(id);
+      db.exec("BEGIN IMMEDIATE");
+      const save = db.prepare("INSERT OR REPLACE INTO threads VALUES (?, ?, ?)");
+      for (const { id, signature, entries } of saved) {
+        // Only persist metadata. Live URLs can contain short-lived Gmail credentials.
+        const files = entries.map(({ file, thumbnailUrl }) =>
+          storedFile.parse({
+            ...file,
+            thumbnailView: thumbnailUrl
+              ? (new URL(thumbnailUrl).searchParams.get("view") ?? undefined)
+              : undefined,
+          }),
+        );
+        save.run(id, signature, JSON.stringify(files));
+      }
+      if (removed.length) {
+        const remove = db.prepare("DELETE FROM threads WHERE id = ?");
+        for (const id of removed) {
+          remove.run(id);
+        }
+      }
+      db.exec("COMMIT");
     } catch {
+      // Closing the connection rolls back the entire unfinished batch.
       this.disable();
     }
   }

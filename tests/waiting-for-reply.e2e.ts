@@ -108,8 +108,8 @@ test("partial feeds show mail and the owning sign-in action before an empty all-
   const page = ggmail.renderer;
   await openMailbox("Personal");
   await page.getByRole("button", { name: "All Mail" }).click();
-  await expect(page.getByText("Personal is up to date")).toBeVisible();
-  await expect(page.getByText("Work is still syncing", { exact: false })).toBeVisible();
+  await expect(page.getByTitle("Personal is up to date")).toBeVisible();
+  await expect(page.getByTitle("Work is still syncing")).toBeVisible();
   await expect(page.getByText("Ready message")).toBeVisible();
   await expect(page.getByText("No unread messages")).toHaveCount(0);
   await openMailbox("Work", true);
@@ -122,8 +122,8 @@ test("partial feeds show mail and the owning sign-in action before an empty all-
   await openMailbox("Personal");
   await page.getByRole("button", { name: "All Mail" }).click();
   await expect(page.getByText("No unread messages")).toBeVisible();
-  await expect(page.getByText("Work is up to date", { exact: false })).toBeVisible();
-  await expect(page.getByText("Off is still syncing")).toHaveCount(0);
+  await expect(page.getByTitle("Work is up to date")).toBeVisible();
+  await expect(page.getByTitle("Off is still syncing")).toHaveCount(0);
   await page.reload();
   await expect(page.getByText("No unread messages")).toBeVisible();
 });
@@ -140,7 +140,7 @@ test("a late mailbox with the same message ID keeps the keyboard on the selected
   await openMailbox("Work");
   await expect(page.getByRole("row").first()).toContainText("Work");
   await expect(personal).toBeFocused();
-  const rowAction = personal.getByRole("button").first();
+  const rowAction = personal.getByRole("button", { name: "Archive" });
   await rowAction.focus();
   await openMailbox("Work", true);
   await expect(page.getByRole("button", { name: "Sign in to Work" })).toBeVisible();
@@ -175,28 +175,28 @@ test("an expired feed offers a fresh sign-in even while Gmail still displays the
     )
     .toBe(env.GGMAIL_TEST_GMAIL_URL);
   await page.getByRole("button", { name: "All Mail" }).click();
-  await expect(page.getByText("Work is up to date", { exact: false })).toBeVisible();
+  await expect(page.getByTitle("Work is up to date")).toBeVisible();
 });
 
 test("losing connectivity keeps unread mail visible and withdraws the up-to-date status", async () => {
   await openMailbox("Personal");
   const page = ggmail.renderer;
   await page.getByRole("button", { name: "All Mail" }).click();
-  await expect(page.getByText("Personal is up to date")).toBeVisible();
+  await expect(page.getByTitle("Personal is up to date")).toBeVisible();
   // Change the test process's network signal without disconnecting the host Mac.
   await ggmail.app.evaluate(({ net }) => {
     net.isOnline = () => false;
   });
-  await expect(page.getByText("Personal will retry syncing")).toBeVisible({ timeout: 12_000 });
+  await expect(page.getByTitle("Personal will retry syncing")).toBeVisible({ timeout: 12_000 });
   await expect(page.getByText("Ready message")).toBeVisible();
   await page.reload();
-  await expect(page.getByText("Personal will retry syncing")).toBeVisible();
+  await expect(page.getByTitle("Personal will retry syncing")).toBeVisible();
   await expect(page.getByText("Ready message")).toBeVisible();
   await expect(page.getByText("No unread messages")).toHaveCount(0);
   await ggmail.app.evaluate(({ net }) => {
     net.isOnline = () => true;
   });
-  await expect(page.getByText("Personal is up to date")).toBeVisible({ timeout: 12_000 });
+  await expect(page.getByTitle("Personal is up to date")).toBeVisible({ timeout: 12_000 });
 });
 
 test("a thread change during scheduling leaves the waiting list empty", async () => {
@@ -224,7 +224,7 @@ test("a thread change during scheduling leaves the waiting list empty", async ()
     response.resolve();
   }
   await expect(page.getByText(/Couldn’t schedule this follow-up/)).toBeVisible();
-  await expect(page.getByRole("region", { name: "Personal" })).toContainText("No follow-ups");
+  await expect(page.getByRole("heading", { name: "No follow-ups", exact: true })).toBeVisible();
 });
 
 test("an early reply clears a future follow-up from the waiting list", async () => {
@@ -239,7 +239,7 @@ test("an early reply clears a future follow-up from the waiting list", async () 
   await page.getByRole("button", { name: "Go back" }).click();
   replied = true;
   await waiting.click();
-  await expect(work).toContainText("No follow-ups");
+  await expect(page.getByRole("heading", { name: "No follow-ups", exact: true })).toBeVisible();
 });
 
 test("scheduled follow-ups survive restart and only due threads without replies return", async () => {
@@ -277,10 +277,82 @@ test("scheduled follow-ups survive restart and only due threads without replies 
   );
   await expect(ggmail.renderer.getByText("Work invoice")).toHaveCount(0);
   await waiting().click();
-  await expect(ggmail.renderer.getByRole("region", { name: "Work" })).toContainText(
-    "No follow-ups",
-  );
+  await expect(ggmail.renderer.getByRole("region", { name: "Work" })).toHaveCount(0);
   const personal = ggmail.renderer.getByRole("region", { name: "Personal" });
   await personal.getByRole("button", { name: "Remove" }).click();
-  await expect(personal).toContainText("No follow-ups");
+  await expect(
+    ggmail.renderer.getByRole("heading", { name: "No follow-ups", exact: true }),
+  ).toBeVisible();
+});
+
+test("filtering by status keeps the mailbox and conversation together", async () => {
+  const page = ggmail.renderer;
+  const waiting = page.getByRole("button", { name: "Waiting for reply", exact: true }).first();
+  for (const account of ["Personal", "Work"]) {
+    await openMailbox(account);
+    await page.locator(`[data-account-id="${account}"]`).click();
+    await waiting.click();
+    if (account === "Work") {
+      await page.getByLabel("Follow-up date").fill(localDay());
+    }
+    await page
+      .getByRole("button", {
+        name: account === "Work" ? "Schedule follow-up" : "Follow up Friday",
+        exact: true,
+      })
+      .click();
+    await expect(page.getByRole("region", { name: account, exact: true })).toContainText(
+      `${account} invoice`,
+    );
+    if (account === "Personal") {
+      await page.getByRole("button", { name: "Go back" }).click();
+    }
+  }
+
+  const filters = page.getByRole("group", { name: "All follow-ups" });
+  const work = page.getByRole("region", { name: "Work", exact: true });
+  const personal = page.getByRole("region", { name: "Personal", exact: true });
+  await filters.getByRole("button", { name: /Due.*1/ }).click();
+  await expect(work).toContainText("Work invoice");
+  await expect(personal).toHaveCount(0);
+
+  replied = true;
+  await page.getByRole("button", { name: "Check for replies" }).click();
+  await expect(page.getByRole("heading", { name: "No follow-ups due" })).toBeVisible();
+  await page.getByRole("button", { name: "View all follow-ups" }).click();
+  await expect(filters.getByRole("button", { name: /All follow-ups.*1/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await filters.getByRole("button", { name: /Scheduled.*1/ }).click();
+  await personal.getByRole("button", { name: /Personal invoice/ }).click();
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(({ session, webContents }) =>
+        webContents
+          .getAllWebContents()
+          .find((view) => view.session === session.fromPartition("persist:Personal"))
+          ?.getURL(),
+      ),
+    )
+    .toContain("#all/" + id);
+});
+
+test("the scheduling prompt opens sent mail in the selected account", async () => {
+  await openMailbox("Work");
+  const page = ggmail.renderer;
+  await page.locator('[data-account-id="Work"]').click();
+  const gmail = ggmail.app.windows().find((tab) => tab.url().endsWith("#sent/" + id));
+  if (!gmail) {
+    throw new Error("Work thread missing");
+  }
+  await gmail.evaluate(() => {
+    window.location.hash = "#inbox";
+  });
+  await expect(gmail).toHaveURL(/#inbox$/);
+  await page.getByRole("button", { name: "Waiting for reply", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: "No follow-ups", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Open sent mail" }).click();
+  await expect(gmail).toHaveURL(/#sent$/);
+  await expect(page.getByRole("heading", { name: "Waiting for reply" })).toHaveCount(0);
 });

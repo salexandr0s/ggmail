@@ -16,6 +16,7 @@ import {
   Mail,
   PanelsTopLeft,
   Puzzle,
+  Search,
   Settings2,
   ShieldBan,
   ShieldCheck,
@@ -23,10 +24,12 @@ import {
   Sparkles,
   SunMoon,
   UsersRound,
+  X,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { type RouteProps, useLocation } from "wouter";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useLocation } from "wouter";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { platform } from "@/lib/utils";
 import { AboutSettings } from "@/routes/settings/about";
@@ -53,7 +56,7 @@ type SettingsPage = {
   label: MessageDescriptor | string;
   path: string;
   icon: LucideIcon;
-  component: RouteProps["component"];
+  component: ComponentType;
   hidden?: boolean;
 };
 
@@ -181,45 +184,133 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
   },
 ];
 
-export const settingsPages = groups.flatMap((group) => group.pages);
+export const settingsPages = groups.flatMap((group) =>
+  group.pages.map((page) => ({ ...page, group: group.label })),
+);
 
 export function AppSidebar() {
   const [location, navigate] = useLocation();
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const activeButton = useRef<HTMLButtonElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const nav = useRef<HTMLElement>(null);
+  const [query, setQuery] = useState("");
+  const normalize = (label: string) =>
+    label.trim().toLocaleLowerCase(i18n.locale).normalize("NFD").replace(/\p{M}/gu, "");
+  const term = normalize(query);
+  const matches = groups
+    .map((group) => ({
+      ...group,
+      pages: group.pages.filter(
+        ({ hidden, label }) =>
+          !hidden && normalize(typeof label === "string" ? label : t(label)).includes(term),
+      ),
+    }))
+    .filter((group) => group.pages.length > 0);
+
+  useHotkeys(
+    "/",
+    (event) => {
+      if (
+        !document.querySelector(
+          '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]',
+        )
+      ) {
+        event.preventDefault();
+        input.current?.focus();
+      }
+    },
+    { useKey: true },
+  );
 
   useEffect(() => {
-    activeButton.current?.scrollIntoView({ block: "nearest" });
+    setQuery("");
   }, [location]);
 
+  useEffect(() => {
+    if (term) {
+      return;
+    }
+    activeButton.current?.scrollIntoView({ block: "nearest" });
+  }, [location, term]);
+
   return (
-    <nav className="settings-nav" data-testid="settings-nav">
-      <ScrollArea className="h-full">
-        <div className="settings-nav-groups">
-          {groups.map((group) => (
-            <div key={group.label.id} role="group" aria-label={t(group.label)}>
-              <div className="settings-nav-label" aria-hidden="true">
-                {t(group.label)}
-              </div>
-              {group.pages
-                .filter((page) => !page.hidden)
-                .map(({ path, label, icon: Icon }) => (
+    <aside className="settings-nav">
+      <div className="settings-nav-search">
+        <Search aria-hidden="true" />
+        <input
+          ref={input}
+          type="search"
+          aria-label={t`Filter pages`}
+          placeholder={t`Filter pages`}
+          aria-controls="settings-pages"
+          aria-keyshortcuts="/"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.nativeEvent.isComposing) {
+              return;
+            }
+            if (event.key === "Escape") {
+              event.preventDefault();
+              setQuery("");
+            } else if (event.key === "ArrowDown" || (event.key === "Enter" && term)) {
+              event.preventDefault();
+              const first = nav.current?.querySelector("button");
+              first?.focus();
+              if (event.key === "Enter") {
+                first?.click();
+              }
+            }
+          }}
+        />
+        {query ? (
+          <button
+            type="button"
+            aria-label={t`Clear search`}
+            onClick={() => {
+              setQuery("");
+              input.current?.focus();
+            }}
+          >
+            <X aria-hidden="true" />
+          </button>
+        ) : (
+          <kbd aria-hidden="true">/</kbd>
+        )}
+      </div>
+      <nav ref={nav} id="settings-pages" data-testid="settings-nav" aria-label={t`Settings`}>
+        <ScrollArea className="h-full">
+          <div className="settings-nav-groups">
+            {matches.length === 0 && (
+              <p className="settings-nav-empty" role="status">{t`No matching pages`}</p>
+            )}
+            {matches.map((group) => (
+              <div key={group.label.id} role="group" aria-label={t(group.label)}>
+                <div className="settings-nav-label" aria-hidden="true">
+                  {t(group.label)}
+                </div>
+                {group.pages.map(({ path, label, icon: Icon }) => (
                   <Button
                     key={path}
                     ref={location === path ? activeButton : undefined}
                     aria-current={location === path ? "page" : undefined}
                     variant="ghost"
                     className="settings-nav-item"
-                    onClick={() => navigate(path)}
+                    onClick={() => {
+                      setQuery("");
+                      navigate(path);
+                    }}
                   >
                     <Icon aria-hidden="true" />
                     <span>{typeof label === "string" ? label : t(label)}</span>
                   </Button>
                 ))}
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-    </nav>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </nav>
+    </aside>
   );
 }

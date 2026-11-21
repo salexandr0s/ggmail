@@ -69,7 +69,7 @@ function searchTerms(query: string) {
   ).filter(Boolean);
 }
 
-export function indexAttachment<T extends MailAttachment & { account: { id: string } }>(file: T) {
+export function indexAttachment<T extends MailAttachment & { accountId: string }>(file: T) {
   const sender = fold(file.sender);
   return {
     file,
@@ -102,7 +102,7 @@ function count<T>(facet: FacetCounts<T>, ...values: T[]) {
   }
 }
 
-export function filterAttachments<T extends MailAttachment & { account: { id: string } }>(
+export function filterAttachments<T extends MailAttachment & { accountId: string }>(
   index: ReturnType<typeof indexAttachment<T>>[],
   filters: AttachmentFilters,
 ) {
@@ -126,7 +126,7 @@ export function filterAttachments<T extends MailAttachment & { account: { id: st
     ) {
       continue;
     }
-    const account = !filters.accountIds.length || filters.accountIds.includes(item.file.account.id);
+    const account = !filters.accountIds.length || filters.accountIds.includes(item.file.accountId);
     const kind = !filters.kinds.length || filters.kinds.includes(item.kind);
     const category =
       !filters.categories.length ||
@@ -143,7 +143,7 @@ export function filterAttachments<T extends MailAttachment & { account: { id: st
       continue;
     }
     if (!misses || !account) {
-      count(accounts, item.file.account.id);
+      count(accounts, item.file.accountId);
     }
     if (!misses || !kind) {
       count(kinds, item.kind);

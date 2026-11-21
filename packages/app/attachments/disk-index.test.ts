@@ -35,17 +35,17 @@ test("commits per-thread metadata, isolates mailboxes and clears removed account
     thumbnailUrl: mailbox + "?attbid=private-thumbnail-token",
   };
   const original = new AttachmentDiskIndex("A", "primary");
-  original.save(id, "first", [entry]);
+  original.update([{ id, signature: "first", entries: [entry] }], []);
   original.close();
   const db = new AttachmentDiskIndex("A", "primary");
-  expect(db.read(mailbox)).toMatchObject([
+  expect(Array.from(db.read())).toMatchObject([
     {
       id,
       signature: "first",
       entries: [{ threadId: id, file: { id: file.id, detectedCategories: ["receipt"] } }],
     },
   ]);
-  expect(db.read(mailbox)[0]?.entries[0]?.file.categoryOverride).toBeUndefined();
+  expect(Array.from(db.read())[0]?.entries[0]?.file.categoryOverride).toBeUndefined();
   const directory = path.join(profile, "attachment-index");
   const bytes = readFileSync(
     path.join(directory, ...readdirSync(directory), "primary-v1.sqlite"),
@@ -54,20 +54,20 @@ test("commits per-thread metadata, isolates mailboxes and clears removed account
   expect(bytes).not.toContain("private-thumbnail-token");
   const delegated = new AttachmentDiskIndex("A", "delegated");
   const other = new AttachmentDiskIndex("B", "primary");
-  expect(delegated.read(mailbox)).toEqual([]);
-  expect(other.read(mailbox)).toEqual([]);
-  other.save(id, "other", [entry]);
-  db.save(id, "changed", []);
-  expect(db.read(mailbox)).toEqual([{ id, signature: "changed", entries: [] }]);
-  db.remove(id);
-  expect(db.read(mailbox)).toEqual([]);
+  expect(Array.from(delegated.read())).toEqual([]);
+  expect(Array.from(other.read())).toEqual([]);
+  other.update([{ id, signature: "other", entries: [entry] }], []);
+  db.update([{ id, signature: "changed", entries: [] }], []);
+  expect(Array.from(db.read())).toEqual([{ id, signature: "changed", entries: [] }]);
+  db.update([], [id]);
+  expect(Array.from(db.read())).toEqual([]);
   db.close();
   delegated.close();
   other.close();
   clearAttachmentIndexes("A");
   expect(readdirSync(directory)).toHaveLength(1);
   const surviving = new AttachmentDiskIndex("B", "primary");
-  expect(surviving.read(mailbox)).toHaveLength(1);
+  expect(Array.from(surviving.read())).toHaveLength(1);
   surviving.close();
   clearAttachmentIndexes();
   expect(readdirSync(profile)).toEqual([]);
@@ -82,7 +82,6 @@ test("upgrades legacy filenames in place across restarts and preserves context-o
   );
   mkdirSync(directory, { recursive: true });
   const filename = path.join(directory, "primary-v1.sqlite");
-  const mailbox = "https://mail.google.com/mail/u/0/";
   const id = "194a92f8c0000002";
   const db = new DatabaseSync(filename);
   db.exec(
@@ -114,7 +113,7 @@ test("upgrades legacy filenames in place across restarts and preserves context-o
   locked.exec("BEGIN IMMEDIATE");
   try {
     const previous = new AttachmentDiskIndex(account, "primary");
-    const entries = previous.read(mailbox)[0]?.entries;
+    const entries = Array.from(previous.read())[0]?.entries;
     expect(entries).toHaveLength(fixtures.length);
     expect(entries?.[0]?.file.detectedCategories).toEqual(["ticket", "booking"]);
     previous.close();
@@ -130,7 +129,7 @@ test("upgrades legacy filenames in place across restarts and preserves context-o
   }));
   for (let launch = 0; launch < 2; launch++) {
     const index = new AttachmentDiskIndex(account, "primary");
-    const restored = index.read(mailbox);
+    const restored = Array.from(index.read());
     expect(restored[0]?.signature).toBe("unchanged");
     expect(restored[0]?.entries.map((entry) => entry.file.detectedCategories)).toEqual(
       fixtures.map(([, , category]) => category),

@@ -97,6 +97,8 @@ let emptyMailbox = false;
 let holdListing = false;
 let changedWork = false;
 let workListings = 0;
+let workSearchStarts = 0;
+let handoverThumbnails = 0;
 let fileRequests = 0;
 
 test.beforeEach(() => {
@@ -113,6 +115,8 @@ test.beforeEach(() => {
   holdListing = false;
   changedWork = false;
   workListings = 0;
+  workSearchStarts = 0;
+  handoverThumbnails = 0;
   fileRequests = 0;
 });
 
@@ -127,6 +131,9 @@ const server = createServer(async (request, response) => {
       url.searchParams.get("view") === "snatt" &&
       url.searchParams.get("attid") === "0.1"
     ) {
+      if (url.searchParams.get("th") === older) {
+        handoverThumbnails++;
+      }
       response.setHeader("Content-Type", "image/png");
       response.end(await readFile(picture));
     } else {
@@ -200,6 +207,9 @@ const server = createServer(async (request, response) => {
   if (url.pathname === "/mail/u/0/listing") {
     if (work) {
       workListings++;
+      if (url.searchParams.has("start")) {
+        workSearchStarts++;
+      }
     }
     response.setHeader("Content-Type", "application/json");
     response.end(JSON.stringify({ hold: holdListing }));
@@ -209,9 +219,13 @@ const server = createServer(async (request, response) => {
     response.end('<main role="main"><div class="TC">No conversations</div></main>');
     return;
   }
-  response.end(`<main role="main"><table><tbody></tbody></table></main><script>(async () => {
-    if(location.hash.startsWith('#search/')) {
-      while ((await (await fetch('/mail/u/0/listing')).json()).hold) await new Promise(resolve => setTimeout(resolve, 100));
+  response.end(`<main role="main"><table><tbody></tbody></table></main><script>
+    let started = false;
+    async function render() {
+      if (!location.hash.startsWith('#search/')) return;
+      const path = started ? '/mail/u/0/listing' : '/mail/u/0/listing?start';
+      started = true;
+      while ((await (await fetch(path)).json()).hold) await new Promise(resolve => setTimeout(resolve, 100));
       const older = location.hash.endsWith('/p2');
       const subjects = ${JSON.stringify(Object.fromEntries(Object.entries(threads).map(([id, thread]) => [id, thread.subject])))};
       const firstPage = ${JSON.stringify(work && oneBadThreadOnFirstPage ? [second] : [first, second])};
@@ -228,9 +242,12 @@ const server = createServer(async (request, response) => {
       } else {
         rows(older ? ['${older}'] : firstPage);
       }
+      document.querySelector('main button')?.remove();
       document.querySelector('main').insertAdjacentHTML('beforeend','<button aria-disabled="'+older+'"><span class="amJ">Older</span></button>');
     }
-  })();</script>`);
+    addEventListener('hashchange', render);
+    render();
+  </script>`);
 });
 
 test.beforeAll(async () => {
@@ -808,6 +825,42 @@ test("a file without a Gmail preview keeps its download action", async () => {
       ),
     )
     .toBe(true);
+});
+
+test("shows available files while a sibling thread is slow and resumes after leaving", async () => {
+  await identifyWorkMailbox();
+  const slow = Promise.withResolvers<void>();
+  holdWorkRecovery = slow.promise;
+  const page = ggmail.renderer;
+  const open = () => page.getByRole("button", { name: "Attachments", exact: true }).click();
+  try {
+    await open();
+    await expect(page.getByRole("button", { name: "Studio budget.xlsx" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Identity overview.pdf" })).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("heading", { name: "Attachments" })).toHaveCount(0);
+    await open();
+    await expect(page.getByRole("button", { name: "Studio budget.xlsx" })).toBeVisible();
+  } finally {
+    slow.resolve();
+  }
+  await expect(page.getByText("10 files", { exact: true })).toBeVisible();
+  expect(workPrints.filter((id) => id === first)).toHaveLength(1);
+});
+
+test("reuses the Gmail search document and loaded thumbnails across layouts", async () => {
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("10 files", { exact: true })).toBeVisible();
+  expect(workSearchStarts).toBe(1);
+  await page.getByRole("searchbox").fill("Project handover.pdf");
+  await expect(page.locator(".attachment-miniature img")).toBeVisible();
+  expect(handoverThumbnails).toBe(1);
+  await page.getByRole("button", { name: "Grid view" }).click();
+  await expect(page.locator(".attachment-cover img")).toBeVisible();
+  expect(handoverThumbnails).toBe(1);
+  expect(fileRequests).toBe(0);
 });
 
 test("retains partial results, retries only unreadable mail, and refreshes to an empty mailbox", async () => {

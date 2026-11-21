@@ -12,11 +12,20 @@ export function AppMain() {
 
   return (
     <div className="relative flex flex-1 bg-sidebar">
-      <ScrollArea className="@container relative flex-1 overflow-hidden border bg-background dark:border-none">
+      <ScrollArea
+        className={cn(
+          "@container relative flex-1 overflow-hidden border bg-background dark:border-none",
+          matchUnifiedInboxRoute && "all-mail-surface",
+        )}
+      >
         <div
           className={cn(
             "mx-auto py-8",
-            matchUnifiedInboxRoute || waiting ? "w-full max-w-6xl px-4 @md:px-8" : "max-w-2xl px-8",
+            matchUnifiedInboxRoute
+              ? "all-mail-page"
+              : waiting
+                ? "w-full max-w-6xl px-4 @md:px-8"
+                : "max-w-2xl px-8",
           )}
         >
           <Route path="/unified-inbox" component={UnifiedInbox} />

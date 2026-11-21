@@ -10,6 +10,7 @@ msgstr ""
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "(no subject)"
 msgstr "(χωρίς θέμα)"
 
@@ -56,15 +57,15 @@ msgstr "Η επέκταση {extensionName} λειτουργεί μόνο στι
 msgid "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
 msgstr "{failedCount, plural, one {Αποτυχία ενημέρωσης # επέκτασης} other {Αποτυχία ενημέρωσης # επεκτάσεων}}"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is still syncing"
 msgstr "Ο λογαριασμός {label} συγχρονίζεται ακόμη"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is up to date"
 msgstr "Ο λογαριασμός {label} είναι ενημερωμένος"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} will retry syncing"
 msgstr "Θα γίνει νέα προσπάθεια συγχρονισμού του λογαριασμού {label}"
 
@@ -324,6 +325,7 @@ msgstr "Ενέργειες λογαριασμού"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Appearance section for how accounts look
 #: packages/app/menu.ts
+#: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Accounts"
@@ -412,6 +414,7 @@ msgstr "Ρυθμίσεις τεχνητής νοημοσύνης"
 
 #: packages/renderer/components/account-filters.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "Όλοι οι λογαριασμοί"
@@ -425,6 +428,10 @@ msgstr "Όλες οι κατηγορίες"
 #: packages/renderer/routes/attachments.tsx
 msgid "All files"
 msgstr "Όλα τα αρχεία"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "All follow-ups"
+msgstr "Όλες οι υπενθυμίσεις"
 
 #: packages/renderer/components/assistant/assistant-activity.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
@@ -796,6 +803,10 @@ msgstr "Έληξε ο χρόνος σύνδεσης στο ChatGPT. Δοκιμά
 msgid "ChatGPT sign-in was canceled."
 msgstr "Η σύνδεση στο ChatGPT ακυρώθηκε."
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "Check for replies"
+msgstr "Έλεγχος για απαντήσεις"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -914,6 +925,7 @@ msgstr "Κατάργηση χρώματος"
 msgid "Clear filters"
 msgstr "Εκκαθάριση φίλτρων"
 
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Clear search"
@@ -1070,6 +1082,10 @@ msgstr "Σύμβαση"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Conversation"
 msgstr "Συνομιλία"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Conversations leave this list when a reply arrives."
+msgstr "Όταν έρθει απάντηση, η συνομιλία αφαιρείται από τη λίστα."
 
 #. Checkbox in the Delete browsing data dialog that deletes the account's cookies and the data sites store, such as local storage
 #: packages/renderer/routes/settings/accounts.tsx
@@ -1520,6 +1536,10 @@ msgid "Drag {label} to reorder"
 msgstr "Σύρετε το {label} για αλλαγή σειράς"
 
 #: packages/renderer/components/follow-ups.tsx
+msgid "Due"
+msgstr "Σε εκκρεμότητα"
+
+#: packages/renderer/components/follow-ups.tsx
 msgid "Due for follow-up"
 msgstr "Ώρα για υπενθύμιση"
 
@@ -1797,8 +1817,13 @@ msgid "Fills and generates passwords and passkeys for your Google Account. Unloc
 msgstr "Συμπληρώνει και δημιουργεί κωδικούς και κλειδιά πρόσβασης για τον λογαριασμό σας Google. Για βιομετρικό ξεκλείδωμα απαιτείται η εφαρμογή Bitwarden για υπολογιστή."
 
 #: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "Filter by account"
 msgstr "Φιλτράρισμα ανά λογαριασμό"
+
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Filter pages"
+msgstr "Φίλτρο σελίδων"
 
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -1887,10 +1912,8 @@ msgid "Full download history"
 msgstr "Πλήρες ιστορικό λήψεων"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
-#. Heading of the Appearance section for the settings that apply to the whole app
 #. Heading of the Downloads section for how files are downloaded
 #: packages/renderer/lib/settings-pages.ts
-#: packages/renderer/routes/settings/appearance.tsx
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "General"
 msgstr "Γενικά"
@@ -2250,6 +2273,10 @@ msgid "Last page"
 msgstr "Τελευταία σελίδα"
 
 #: packages/renderer/components/follow-ups.tsx
+msgid "Last sent"
+msgstr "Τελευταία αποστολή"
+
+#: packages/renderer/components/follow-ups.tsx
 msgid "Last sent {lastSent}"
 msgstr "Τελευταία αποστολή: {lastSent}"
 
@@ -2345,6 +2372,7 @@ msgstr "Φόρτωση"
 
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Loading email…"
 msgstr "Φόρτωση μηνύματος…"
 
@@ -2535,6 +2563,7 @@ msgid "New windows"
 msgstr "Νέα παράθυρα"
 
 #: packages/renderer/routes/attachments.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Newest first"
 msgstr "Νεότερα πρώτα"
 
@@ -2597,6 +2626,10 @@ msgstr "Δεν υπάρχουν διαθέσιμα αρχεία"
 msgid "No follow-ups"
 msgstr "Δεν υπάρχουν υπενθυμίσεις"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "No follow-ups due"
+msgstr "Καμία υπενθύμιση σε εκκρεμότητα"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "No free time slot left for another window. Remove or shorten one first."
 msgstr "Δεν υπάρχει διαθέσιμος χρόνος για άλλο διάστημα. Αφαιρέστε ή συντομεύστε ένα υπάρχον διάστημα."
@@ -2614,6 +2647,10 @@ msgstr "Δεν βρέθηκαν συνομιλίες"
 msgid "No matching files"
 msgstr "Δεν βρέθηκαν αρχεία που να ταιριάζουν"
 
+#: packages/renderer/components/app-sidebar.tsx
+msgid "No matching pages"
+msgstr "Δεν βρέθηκαν σελίδες"
+
 #: packages/app/assistant/connection.ts
 msgid "No models are available for this ChatGPT account."
 msgstr "Δεν υπάρχουν διαθέσιμα μοντέλα για αυτόν τον λογαριασμό ChatGPT."
@@ -2626,6 +2663,10 @@ msgstr "Δεν υπάρχει διαθέσιμη προεπισκόπηση"
 #: packages/renderer/routes/settings/saved-searches.tsx
 msgid "No saved searches yet."
 msgstr "Δεν υπάρχουν ακόμη αποθηκευμένες αναζητήσεις."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "No scheduled follow-ups"
+msgstr "Δεν υπάρχουν προγραμματισμένες υπενθυμίσεις"
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -2815,6 +2856,10 @@ msgstr "Άνοιγμα συνδέσμων εδώ"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Open replies and forwards in a pop-out instead of below the message."
 msgstr "Άνοιγμα απαντήσεων και προωθήσεων σε ξεχωριστό παράθυρο αντί κάτω από το μήνυμα."
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Open sent mail"
+msgstr "Άνοιγμα απεσταλμένων"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open the browser allowlist in an editor with root permissions."
@@ -3376,6 +3421,10 @@ msgstr "Αναζήτηση συνημμένων"
 msgid "Search files, senders, or subjects"
 msgstr "Αναζήτηση αρχείων, αποστολέων ή θεμάτων"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Search results"
+msgstr "Αποτελέσματα αναζήτησης"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3466,10 +3515,6 @@ msgstr "Επιλογή προηγούμενου λογαριασμού"
 msgid "Select Previous Tab"
 msgstr "Επιλογή προηγούμενης καρτέλας"
 
-#: packages/renderer/routes/settings/appearance.tsx
-msgid "Select the application theme."
-msgstr "Επιλέξτε το θέμα της εφαρμογής."
-
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Select the sound to play for notifications."
 msgstr "Επιλέξτε τον ήχο ειδοποιήσεων."
@@ -3519,6 +3564,7 @@ msgid "Set up the mail assistant"
 msgstr "Ρύθμιση βοηθού αλληλογραφίας"
 
 #. Title of the Settings window, in its titlebar
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "Ρυθμίσεις"
@@ -3830,7 +3876,11 @@ msgstr "Εμφάνιση παραθύρων"
 msgid "Sidebar"
 msgstr "Πλαϊνή γραμμή"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Sign in"
+msgstr "Σύνδεση"
+
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "Sign in to {label}"
 msgstr "Σύνδεση στον λογαριασμό {label}"
 
@@ -3853,6 +3903,10 @@ msgstr "Σύνδεση στο Google με κλειδί πρόσβασης και
 #: packages/renderer/components/unified-search.tsx
 msgid "Sign in to search this account."
 msgstr "Συνδεθείτε για αναζήτηση σε αυτόν τον λογαριασμό."
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Sign in to see unread messages"
+msgstr "Συνδεθείτε για να δείτε τα μη αναγνωσμένα μηνύματα"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
@@ -4003,6 +4057,10 @@ msgstr "Μετάβαση σε νέα παράθυρα"
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Switch to New windows?"
 msgstr "Μετάβαση σε νέα παράθυρα;"
+
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Syncing…"
+msgstr "Συγχρονισμός…"
 
 #. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
@@ -4291,6 +4349,10 @@ msgstr "Μη αναγνωσμένα μηνύματα"
 msgid "Until Tomorrow"
 msgstr "Μέχρι αύριο"
 
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Up to date"
+msgstr "Ενημερωμένο"
+
 #. Titlebar button that shows the details of a downloaded update, ready to install
 #: packages/renderer/components/app-titlebar.tsx
 msgid "Update available"
@@ -4374,6 +4436,10 @@ msgctxt "Windows"
 msgid "View"
 msgstr "Προβολή"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "View all follow-ups"
+msgstr "Προβολή όλων των υπενθυμίσεων"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "View Logs"
@@ -4404,6 +4470,11 @@ msgstr "Σε αναμονή απάντησης"
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
 msgstr "Αναμονή για την προβολή αλληλογραφίας…"
+
+#: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Waiting to sync"
+msgstr "Αναμονή για συγχρονισμό"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "What can I help you with?"
@@ -4541,6 +4612,10 @@ msgstr "Εξαντλήθηκε το όριο χρήσης του ChatGPT. Δοκ
 #: packages/app/ipc.ts
 msgid "Your test notification request"
 msgstr "Το αίτημά σας για δοκιμαστική ειδοποίηση"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "You can schedule a follow-up when you sent the last message."
+msgstr "Μπορείτε να προγραμματίσετε υπενθύμιση αν στείλατε εσείς το τελευταίο μήνυμα."
 
 #. Window menu item that toggles the window between its size and filling the screen
 #: packages/app/menu.ts

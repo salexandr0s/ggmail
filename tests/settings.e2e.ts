@@ -47,6 +47,45 @@ test("every settings page renders", async () => {
   expect(rendererErrors.map((error) => error.stack ?? error.message)).toEqual([]);
 });
 
+test("the page filter narrows navigation and opens a result from the keyboard", async () => {
+  const settings = await ggmail.openSettings();
+  const filter = settings.getByRole("searchbox", { name: "Filter pages" });
+  const pages = settings.getByTestId("settings-nav").getByRole("button");
+  const pageCount = await pages.count();
+
+  await settings.keyboard.press("/");
+  await expect(filter).toBeFocused();
+  await filter.fill("xyzzy");
+  await expect(pages).toHaveCount(0);
+  await expect(settings.getByRole("status")).toContainText("No matching pages");
+  await filter.press("Escape");
+  await expect(pages).toHaveCount(pageCount);
+
+  await filter.fill("APPear");
+  await expect(pages).toHaveCount(1);
+  await filter.press("Enter");
+  await expect(settings.getByTestId("settings-title")).toHaveText("Appearance");
+  await expect(filter).toHaveValue("");
+  await expect(pages).toHaveCount(pageCount);
+});
+
+test("theme previews apply and persist the keyboard selection", async () => {
+  const settings = await ggmail.openSettings();
+  await openSettingsPage(settings, "Appearance");
+  const light = settings.getByRole("radio", { name: "Light", exact: true });
+  const dark = settings.getByRole("radio", { name: "Dark", exact: true });
+
+  await light.check();
+  await expect.poll(async () => (await ggmail.readConfig()).theme).toBe("light");
+  await light.press("ArrowRight");
+  await expect(dark).toBeChecked();
+  await expect.poll(async () => (await ggmail.readConfig()).theme).toBe("dark");
+  await expect(settings.locator("html")).toHaveClass(/\bdark\b/);
+  await openSettingsPage(settings, "General");
+  await openSettingsPage(settings, "Appearance");
+  await expect(dark).toBeChecked();
+});
+
 test("a switch writes its key back to the config", async () => {
   const settings = await ggmail.openSettings();
 

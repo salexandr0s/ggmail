@@ -26,7 +26,7 @@ const ggmail = useApp(
 );
 
 function seedMessages(accountId: string): GmailInboxMessage[] {
-  return Array.from({ length: 5 }, (_, index) => ({
+  return Array.from({ length: 6 }, (_, index) => ({
     id: `${accountId}-${index}`,
     subject: `Quarterly planning notes and the follow-ups everyone agreed to take on ${index}`,
     summary: "A summary long enough to fill the row it is shown in, and then some more of it.",
@@ -94,6 +94,35 @@ test("the unified inbox fits the window at its minimum width", async () => {
   });
   await setMinimumWindowWidth(ggmail);
   await check("unrestricted with messages");
+
+  const accounts = ggmail.renderer.getByRole("group", { name: "Filter by account" });
+  await ggmail.renderer.getByRole("button", { name: "Next page" }).click();
+  await expect(ggmail.renderer.getByRole("row")).toHaveCount(2);
+  const first = accounts.getByRole("button", { name: "First", exact: true });
+  await first.click();
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect(ggmail.renderer.getByRole("row")).toHaveCount(6);
+  await expect(ggmail.renderer.getByRole("row", { name: /Second/ })).toHaveCount(0);
+  expect(await ggmail.runMenuCommand("Waiting for reply")).toBe(true);
+  await expect(
+    ggmail.renderer.getByRole("heading", { name: "Waiting for reply", exact: true }),
+  ).toBeVisible();
+  expect(await ggmail.runMenuCommand("All Mail")).toBe(true);
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect(ggmail.renderer.getByRole("row")).toHaveCount(6);
+  await accounts.getByRole("button", { name: "All accounts" }).click();
+  await expect(ggmail.renderer.getByRole("row")).toHaveCount(10);
+
+  const row = ggmail.renderer.getByRole("row").first();
+  const subject = row.getByRole("button", { name: /Quarterly planning notes/ });
+  const initialBox = await subject.boundingBox();
+  await subject.focus();
+  await ggmail.renderer.keyboard.press("Tab");
+  await expect(row.getByRole("button", { name: "Archive" })).toBeFocused();
+  expect((await subject.boundingBox())?.width).toBe(initialBox?.width);
+
+  await ggmail.renderer.keyboard.press("/");
+  await expect(ggmail.renderer.getByRole("searchbox")).toBeFocused();
 
   expect(findings).toEqual([]);
 });

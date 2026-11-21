@@ -27,11 +27,72 @@ const previewTypes: Record<string, string> = {
   webm: "video/webm",
 };
 
+// One cache per mailbox. A replacement entry from discovery gets its own thumbnail.
+export class AttachmentThumbnails {
+  private images = new Map<AttachmentEntry, AttachmentPreview>();
+  private bytes = 0;
+  private pending = new Map<AttachmentEntry, { visit: AbortSignal; request: Promise<AttachmentPreview | null> }>();
+
+  get(entry: AttachmentEntry, visit: AbortSignal, read: () => Promise<AttachmentPreview | null>) {
+    const cached = this.images.get(entry);
+    if (cached) {
+      this.images.delete(entry);
+      this.images.set(entry, cached);
+      return cached;
+    }
+    const pending = this.pending.get(entry);
+    if (pending?.visit === visit) {
+      return pending.request;
+    }
+    const request = read().then((preview) => {
+      if (preview && !visit.aborted) {
+        this.images.set(entry, preview);
+        this.bytes += preview.bytes.byteLength;
+        for (const [oldest, image] of this.images) {
+          if (this.bytes <= 8 * 1024 * 1024 && this.images.size <= 128) {
+            break;
+          }
+          this.images.delete(oldest);
+          this.bytes -= image.bytes.byteLength;
+        }
+      }
+      return preview;
+    }).finally(() => {
+      if (this.pending.get(entry)?.request === request) {
+        this.pending.delete(entry);
+      }
+    });
+    this.pending.set(entry, { visit, request });
+    return request;
+  }
+}
+
+function downloadUrl(entry: AttachmentEntry, mailbox: string) {
+  if (entry.downloadUrl) {
+    return new URL(entry.downloadUrl);
+  }
+  // Saved metadata omits Gmail locators. Construct one only when a file is opened.
+  const url = new URL(mailbox);
+  url.search = new URLSearchParams({
+    ui: "2",
+    view: "att",
+    [entry.messageId.startsWith("msg-a:") ? "permmsgid" : "th"]: entry.messageId,
+    attid: entry.part,
+    disp: "attd",
+    safe: "1",
+    zw: "",
+  }).toString();
+  return url;
+}
+
 /** Gmail sends document snapshots separately from the attachment download. */
-export function snapshotUrl(entry: AttachmentEntry, large: boolean) {
-  const url = new URL(entry.thumbnailUrl ?? entry.downloadUrl);
+export function snapshotUrl(entry: AttachmentEntry, large: boolean, mailbox: string) {
+  const url = entry.thumbnailUrl ? new URL(entry.thumbnailUrl) : downloadUrl(entry, mailbox);
   if (!entry.thumbnailUrl) {
-    url.searchParams.set("view", fileKind(entry.file.name) === "image" ? "fimg" : "snatt");
+    url.searchParams.set(
+      "view",
+      entry.thumbnailView ?? (fileKind(entry.file.name) === "image" ? "fimg" : "snatt"),
+    );
   }
   url.searchParams.set("disp", "thd");
   url.searchParams.set("sz", large ? "w1600-h2000" : "w480-h300-p-nu");
@@ -40,6 +101,7 @@ export function snapshotUrl(entry: AttachmentEntry, large: boolean) {
 
 export async function readAttachmentPreview(
   session: Session,
+  mailbox: string,
   entry: AttachmentEntry,
   size: "thumbnail" | "full",
   signal: AbortSignal,
@@ -47,7 +109,7 @@ export async function readAttachmentPreview(
   const extension = /\.([a-z0-9]+)$/i.exec(entry.file.name)?.[1]?.toLowerCase() ?? "";
   const nativeMime = Object.hasOwn(previewTypes, extension) ? previewTypes[extension] : undefined;
   const snapshot = size === "thumbnail" || !nativeMime;
-  const url = snapshot ? snapshotUrl(entry, size === "full") : new URL(entry.downloadUrl);
+  const url = snapshot ? snapshotUrl(entry, size === "full", mailbox) : downloadUrl(entry, mailbox);
   const response = await session.fetch(url.href, { credentials: "include", signal });
   const mime = response.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
   const limit = (size === "thumbnail" ? 1 : snapshot ? 8 : 32) * 1024 * 1024;
@@ -80,12 +142,21 @@ export async function readAttachmentPreview(
   if (!length) {
     return null;
   }
-  const bytes = Buffer.concat(chunks, length);
-  if (!snapshot && nativeMime === "application/pdf" && !bytes.subarray(0, 1024).includes("%PDF-")) {
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  if (
+    !snapshot &&
+    nativeMime === "application/pdf" &&
+    !Buffer.from(bytes.buffer, 0, Math.min(length, 1024)).includes("%PDF-")
+  ) {
     return null;
   }
   return {
     mime: snapshot ? mime : nativeMime,
-    bytes: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + length),
+    bytes: bytes.buffer,
   };
 }

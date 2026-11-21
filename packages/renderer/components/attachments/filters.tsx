@@ -13,7 +13,7 @@ import {
 } from "@ggmail/ui/components/popover";
 import { Plural, useLingui } from "@lingui/react/macro";
 import { CheckIcon, FilesIcon, LayersIcon, SlidersHorizontalIcon } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { AccountFilters, FilterButton } from "@/components/account-filters";
 import type { FacetCounts } from "@/lib/attachment-filters";
 import { categoryIcons } from "./categories";
@@ -34,19 +34,30 @@ export function FormatFilters({
   onKind: (value: KindFilter) => void;
 }) {
   const { t } = useLingui();
+  const groupId = useId();
   return (
     <div role="group" aria-label={t`File type`} className="attachment-formats">
       {kinds.map(({ value, label }) => {
         const Icon = value === "all" ? FilesIcon : kindIcons[value];
+        const countId = groupId + value;
         return (
-          <FilterButton
+          <button
+            type="button"
             key={value}
-            label={label}
-            active={value === "all" ? !selected.length : selected.includes(value)}
-            icon={<Icon />}
-            count={value === "all" ? counts.total : (counts.values.get(value) ?? 0)}
+            className="attachment-format"
+            data-file-kind={value}
+            aria-label={label}
+            aria-describedby={countId}
+            aria-pressed={value === "all" ? !selected.length : selected.includes(value)}
+            title={label}
             onClick={() => onKind(value)}
-          />
+          >
+            <Icon aria-hidden="true" />
+            <span className="attachment-format-count" id={countId}>
+              {value === "all" ? counts.total : (counts.values.get(value) ?? 0)}
+            </span>
+            <span className="attachment-format-name">{label}</span>
+          </button>
         );
       })}
     </div>

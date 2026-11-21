@@ -20,17 +20,20 @@ import {
   ChevronDownIcon,
   KeyRoundIcon,
   Loader2Icon,
+  MailsIcon,
   SearchIcon,
   SearchXIcon,
   SlidersHorizontalIcon,
   XIcon,
 } from "lucide-react";
 import { type ReactNode, useLayoutEffect, useMemo, useRef } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useAccountsStore, useMailboxRevisions } from "@/lib/stores";
 import { submitUnifiedSearch, useUnifiedSearch } from "@/lib/unified-search";
 import { AccountFilters } from "./account-filters";
-import { MailboxSection, MailPageHeader } from "./mail-page";
+import { MailboxSection } from "./mail-page";
+import { SettingsTitle } from "./settings";
 
 // Only literal search terms describe text the reader can find in a result.
 // Gmail operators such as filename: and newer_than: affect the result set instead.
@@ -101,7 +104,7 @@ function MailboxResults({
                 render={<button type="button" />}
                 size="xs"
                 aria-current={selectedThread === thread.id ? "true" : undefined}
-                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 px-3.5 py-2.5 text-left hover:bg-muted/50 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset aria-current:bg-sky-50 aria-current:shadow-[inset_3px_0_var(--color-sky-700)] @2xl:grid-cols-[minmax(7rem,20%)_minmax(0,1fr)_auto] dark:aria-current:bg-sky-400/10 dark:aria-current:shadow-[inset_3px_0_var(--color-sky-400)]"
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 px-3.5 py-2.5 text-left hover:bg-muted/50 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset @2xl:grid-cols-[minmax(7rem,20%)_minmax(0,1fr)_auto]"
                 data-search-thread={thread.id}
                 data-search-account={accountId}
                 onClick={async (event) => {
@@ -195,6 +198,16 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
   const chosen = accounts.find((a) => a.config.id === accountId);
   const input = useRef<HTMLInputElement>(null);
   const results = useRef<HTMLDivElement>(null);
+  useHotkeys(
+    "/",
+    (event) => {
+      if (!document.querySelector('[role="dialog"], [role="menu"], [role="listbox"]')) {
+        event.preventDefault();
+        input.current?.focus();
+      }
+    },
+    { useKey: true },
+  );
   useLayoutEffect(() => {
     const selection = useUnifiedSearch.getState().selection;
     if (!selection || !results.current) {
@@ -217,24 +230,33 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <MailPageHeader title={<Trans comment="Title of All Mail page">All Mail</Trans>}>
+      <header className="all-mail-header">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="all-mail-mark" aria-hidden="true">
+            <MailsIcon />
+          </span>
+          <SettingsTitle className="all-mail-title">
+            <Trans comment="Title of All Mail page">All Mail</Trans>
+          </SettingsTitle>
+        </div>
         <form
-          className="flex min-w-0 flex-wrap items-center gap-2 @2xl:w-[min(52%,30rem)]"
+          className="all-mail-search"
           role="search"
           onSubmit={(event) => {
             event.preventDefault();
             submitUnifiedSearch(draft);
           }}
         >
-          <InputGroup className="min-w-32 flex-1">
+          <InputGroup className="all-mail-search-field">
             <InputGroupAddon>
-              <InputGroupButton type="submit" size="icon-xs" title={t`Search all accounts`}>
+              <InputGroupButton type="submit" size="icon-sm" title={t`Search all accounts`}>
                 <SearchIcon />
               </InputGroupButton>
             </InputGroupAddon>
             <InputGroupInput
               ref={input}
               type="search"
+              aria-keyshortcuts="/"
               aria-label={t`Search all accounts`}
               placeholder={t`Search all accounts`}
               className="[&::-webkit-search-cancel-button]:hidden"
@@ -263,12 +285,16 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
                 }
               }}
             />
-            {draft && (
+            {draft ? (
               <InputGroupAddon align="inline-end">
                 <InputGroupButton size="icon-xs" title={t`Clear search`} onClick={clear}>
                   <XIcon />
                 </InputGroupButton>
               </InputGroupAddon>
+            ) : (
+              <kbd aria-hidden="true" className="all-mail-search-key">
+                /
+              </kbd>
             )}
           </InputGroup>
           {search && accounts.length > 1 && (
@@ -278,7 +304,7 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
                   <Button
                     type="button"
                     variant={chosen ? "secondary" : "outline"}
-                    className="max-w-full"
+                    className="max-w-full min-w-0 shrink"
                   />
                 }
               >
@@ -301,10 +327,10 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
             </Popover>
           )}
         </form>
-      </MailPageHeader>
+      </header>
       {search ? (
         <div
-          className="space-y-4"
+          className="all-mail-results space-y-4"
           ref={results}
           onKeyDown={(event) => {
             if (
@@ -330,6 +356,9 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
             rows[rows.indexOf(event.target) + direction]?.focus();
           }}
         >
+          <h2 className="all-mail-section-heading">
+            <Trans>Search results</Trans>
+          </h2>
           {accounts.map(({ config, gmail }) => {
             const label = getAccountLabel(config.label);
             return (

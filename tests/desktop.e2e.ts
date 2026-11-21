@@ -178,15 +178,13 @@ test("Calendar lets you pick and switch mailboxes in a tab in the main window", 
         pageId: active?.id,
       };
     });
-  await expect
-    .poll(readPage)
-    .toEqual({
-      windowCount: 1,
-      fullScreen: false,
-      calendars: 1,
-      account: "second-account",
-      pageId: expect.any(Number),
-    });
+  await expect.poll(readPage).toEqual({
+    windowCount: 1,
+    fullScreen: false,
+    calendars: 1,
+    account: "second-account",
+    pageId: expect.any(Number),
+  });
   await expect(button).toHaveAttribute("aria-current", "page");
   const work = await readPage();
   await page.locator('[data-account-id="first-account"]').click();
@@ -232,7 +230,16 @@ test("Back and Forward retrace libraries and account switches at both toolbar wi
   await expect(selector).toHaveText("Waiting for reply");
   await expect(navigation.getByRole("button", { name: "All Mail" })).toHaveCount(0);
   await selector.click();
-  await page.getByRole("menuitem", { name: "Attachments" }).click();
+  await findRendererPage(ggmail, "mail-views");
+  const picker = ggmail.app
+    .context()
+    .pages()
+    .find((popup) => popup.url().includes("mail-views.html"));
+  if (!picker) {
+    throw new Error("The mail views picker did not open");
+  }
+  await expect(picker.getByRole("menuitemradio", { name: "Waiting for reply" })).toBeChecked();
+  await picker.getByRole("menuitemradio", { name: "Attachments" }).click();
   await expect(selector).toHaveText("Attachments");
   await expect(page.getByRole("button", { name: "Go forward" })).toBeDisabled();
   await page.screenshot({ path: info.outputPath("compact-shell.png") });

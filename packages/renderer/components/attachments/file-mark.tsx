@@ -18,7 +18,7 @@ export function FileMark({ name, large = false }: { name: string; large?: boolea
   return (
     <span
       className={cn("attachment-mark", large && "attachment-mark-large")}
-      data-kind={kind}
+      data-file-kind={kind}
       aria-hidden="true"
     >
       <span className="attachment-paper">

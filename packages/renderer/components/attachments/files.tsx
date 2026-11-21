@@ -174,26 +174,21 @@ export function FileItem({
         <FileThumbnail item={item} large>
           <FileMark name={item.name} large />
         </FileThumbnail>
-        <div className="flex flex-1 flex-col px-4 pt-3 pb-2">
-          <div className="mb-2">{category}</div>
+        <div className="attachment-card-body">
           {preview}
           {subject}
-          <div className="mt-auto flex min-w-0 items-center gap-1.5 pt-3 text-xs">
+          <div className="attachment-card-category">{category}</div>
+          <div className="attachment-card-sender">
             <Sender
               sender={item.sender}
               photoUrl={item.senderPhotoUrl}
               showIcon={showSenderIcons}
+              account={showAccount ? item.account : undefined}
             />
-            {showAccount && (
-              <span className="inline-flex min-w-0 items-center gap-1.5 truncate text-muted-foreground">
-                <span aria-hidden="true">·</span>
-                <AccountName account={item.account} />
-              </span>
-            )}
           </div>
         </div>
-        <div className="mx-4 flex min-w-0 items-center justify-between gap-1 border-t py-1.5">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 text-[11px] text-muted-foreground tabular-nums">
+        <div className="attachment-card-footer">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground tabular-nums">
             <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>
             {item.size && (
               <>

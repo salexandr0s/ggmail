@@ -154,8 +154,8 @@ describe("Gmail attachment metadata", () => {
     };
     const entry = parse(thumbnail);
     expect(entry.file.senderPhotoUrl).toBe(photo);
-    expect(snapshotUrl(entry, false).searchParams.get("attbid")).toBe("tile");
-    expect(snapshotUrl(entry, true).searchParams.get("attid")).toBe("0.2.3");
+    expect(snapshotUrl(entry, false, mailbox).searchParams.get("attbid")).toBe("tile");
+    expect(snapshotUrl(entry, true, mailbox).searchParams.get("attid")).toBe("0.2.3");
     expect(parse(thumbnail.replace("0.2.3", "0.1")).thumbnailUrl).toBeUndefined();
     expect(parse("https://example.test/" + thumbnail).thumbnailUrl).toBeUndefined();
   });

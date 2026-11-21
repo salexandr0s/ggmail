@@ -55,7 +55,6 @@ import {
   dateBoundary,
   emptyAttachmentFilters,
   filterAttachments,
-  indexAttachment,
   toggleValue,
   type AttachmentFilters,
 } from "@/lib/attachment-filters";
@@ -148,19 +147,18 @@ export function Attachments() {
     () => new Intl.Collator(i18n.locale, { numeric: true, sensitivity: "base" }),
     [i18n.locale],
   );
-  const index = useMemo(
-    () =>
-      accounts.flatMap(({ config: account, gmail }) => {
-        const mailbox = mailboxes[account.id];
-        if (!mailbox || gmail.attentionRequired) {
-          return [];
-        }
-        return mailbox.files.map((file) =>
-          indexAttachment({ ...file, account, mailboxKey: mailbox.mailboxKey }),
-        );
-      }),
-    [accounts, mailboxes],
-  );
+  const index = useMemo(() => {
+    const files = accounts.flatMap(({ config, gmail }) =>
+      gmail.attentionRequired ? [] : (mailboxes[config.id]?.files ?? []),
+    );
+    return files.sort(
+      ({ file: a }, { file: b }) =>
+        (sort === "name" ? byName.compare(a.name, b.name) : 0) ||
+        b.receivedAt - a.receivedAt ||
+        a.accountId.localeCompare(b.accountId) ||
+        a.id.localeCompare(b.id),
+    );
+  }, [accounts, mailboxes, sort, byName]);
   const matches = useMemo(
     () =>
       filterAttachments(index, {
@@ -176,20 +174,16 @@ export function Attachments() {
       }),
     [index, chosen, kinds, categories, query, sender, extension, from, through, size],
   );
-  const results = useMemo(
-    () =>
-      [...matches.results].sort(
-        (a, b) =>
-          (sort === "name" ? byName.compare(a.name, b.name) : 0) ||
-          b.receivedAt - a.receivedAt ||
-          a.account.id.localeCompare(b.account.id) ||
-          a.id.localeCompare(b.id),
-      ),
-    [matches, sort, byName],
-  );
+  const { results } = matches;
   const count = results.length;
   const pages = Math.ceil(count / pageSize);
   const currentPage = Math.min(page, Math.max(0, pages - 1));
+  const visibleFiles = results
+    .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+    .flatMap((file) => {
+      const account = accounts.find(({ config }) => config.id === file.accountId)?.config;
+      return account ? [{ ...file, account }] : [];
+    });
   const kindOptions: KindOption[] = [
     { value: "all", label: t`All files` },
     { value: "pdf", label: "PDF" },
@@ -384,19 +378,9 @@ export function Attachments() {
           <span className="attachment-library-icon">
             <PaperclipIcon aria-hidden="true" />
           </span>
-          <div className="min-w-0">
-            <h1>
-              <Trans>Attachments</Trans>
-            </h1>
-            <span
-              aria-live="polite"
-              aria-atomic="true"
-              aria-busy={loading}
-              className="block min-h-4 text-xs text-muted-foreground tabular-nums"
-            >
-              {(!loading || count > 0) && <Plural value={count} one="# file" other="# files" />}
-            </span>
-          </div>
+          <h1>
+            <Trans>Attachments</Trans>
+          </h1>
         </div>
         <InputGroup className="attachment-search">
           <InputGroupAddon>
@@ -426,209 +410,203 @@ export function Attachments() {
             </InputGroupAddon>
           )}
         </InputGroup>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t`Refresh attachments`}
-            onClick={() => {
-              setBrowse({ page: 0 });
-              setRefresh((n) => n + 1);
-            }}
-          >
-            <RefreshCwIcon />
-          </Button>
-        </div>
+        <Button
+          className="attachment-refresh"
+          variant="outline"
+          size="icon"
+          title={t`Refresh attachments`}
+          onClick={() => {
+            setBrowse({ page: 0 });
+            setRefresh((n) => n + 1);
+          }}
+        >
+          <RefreshCwIcon />
+        </Button>
       </header>
-      <div className="flex min-h-0 flex-1">
+      <div className="attachment-body">
         <aside
           aria-label={t`Filters`}
           className="attachment-rail hidden @min-[54rem]/library:block"
         >
           {filters}
         </aside>
-        <section
-          aria-label={t`All files`}
-          className="@container/results flex min-h-0 min-w-0 flex-1 flex-col"
-        >
-          <div className="attachment-toolbar">
-            <div className="hidden min-w-0 flex-1 @min-[54rem]/library:block">{formats}</div>
-            <div className="@min-[54rem]/library:hidden">
-              <FilterMenu
-                title={t`Filters`}
-                applied={activeFilters.length}
-                count={count}
-                onClear={filtered ? () => changeFilters(emptyAttachmentFilters) : undefined}
+        <section aria-label={t`All files`} className="attachment-results @container/results">
+          <div className="attachment-type-bar hidden @min-[54rem]/library:block">{formats}</div>
+          <div className="attachment-results-panel">
+            <div className="attachment-toolbar">
+              <h2
+                aria-live="polite"
+                aria-atomic="true"
+                aria-busy={loading}
+                className="attachment-count"
               >
-                <h2>{t`File type`}</h2>
-                {formats}
-                {filters}
-                {detailFilters}
-              </FilterMenu>
-            </div>
-            <div className="attachment-view-tools">
-              <div className="hidden @min-[54rem]/library:block">
-                <FilterMenu
-                  title={t`More filters`}
-                  applied={details.length}
-                  count={count}
-                  onClear={filtered ? () => changeFilters(emptyAttachmentFilters) : undefined}
-                >
-                  {detailFilters}
-                </FilterMenu>
-              </div>
-              <Select
-                value={sort}
-                items={sortOptions}
-                onValueChange={(value) => {
-                  if (value) {
-                    setBrowse({ sort: value, page: 0 });
-                  }
-                }}
-              >
-                <SelectTrigger
-                  aria-label={t`Sort by`}
-                  className="attachment-sort max-w-40 gap-1.5 text-xs"
-                >
-                  <ArrowDownWideNarrowIcon className="size-3.5 text-muted-foreground" />
-                  <SelectValue className="truncate" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sortOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div
-                role="group"
-                aria-label={t`Layout`}
-                className="attachment-layout-toggle flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5"
-              >
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-pressed={!grid}
-                  title={t`List view`}
-                  className="h-6 rounded-md text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm"
-                  onClick={() => configMutation.mutate({ "attachments.layout": "list" })}
-                >
-                  <ListIcon />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-pressed={grid}
-                  title={t`Grid view`}
-                  className="h-6 rounded-md text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm"
-                  onClick={() => configMutation.mutate({ "attachments.layout": "grid" })}
-                >
-                  <LayoutGridIcon />
-                </Button>
-              </div>
-            </div>
-          </div>
-          {activeFilters.length > 0 && (
-            <div className="attachment-applied">
-              <div className="attachment-filter-chips">
-                {activeFilters.map(({ key, label, Icon, remove }) => (
-                  <button
-                    type="button"
-                    key={key}
-                    className="attachment-filter-chip"
-                    aria-label={t`Remove filter “${label}”`}
-                    onClick={(event) => {
-                      if (event.detail === 0) {
-                        const next =
-                          event.currentTarget.nextElementSibling ??
-                          event.currentTarget.previousElementSibling;
-                        (next instanceof HTMLButtonElement ? next : searchInput.current)?.focus();
-                      }
-                      remove();
-                    }}
+                {(!loading || count > 0) && <Plural value={count} one="# file" other="# files" />}
+              </h2>
+              <div className="attachment-view-tools">
+                <div className="@min-[54rem]/library:hidden">
+                  <FilterMenu
+                    title={t`Filters`}
+                    applied={activeFilters.length}
+                    count={count}
+                    onClear={filtered ? () => changeFilters(emptyAttachmentFilters) : undefined}
                   >
-                    <Icon aria-hidden="true" />
-                    <span className="truncate">{label}</span>
-                    <XIcon aria-hidden="true" />
-                  </button>
-                ))}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="shrink-0 text-xs"
-                onClick={clear}
-              >{t`Clear filters`}</Button>
-            </div>
-          )}
-          {hasIssue && (
-            <div
-              role="status"
-              className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b bg-muted/50 px-4 py-2 text-xs text-muted-foreground"
-            >
-              <CircleAlertIcon className="size-4 shrink-0" />
-              <div className="min-w-40 flex-1 space-y-1">
-                {partialAccounts && (
-                  <p>
-                    <Trans>
-                      Some messages in {partialAccounts} couldn’t be checked. Previously loaded
-                      files are still available.
-                    </Trans>
-                  </p>
-                )}
-                {unavailableAccounts && (
-                  <p>
-                    <Trans>Couldn’t check {unavailableAccounts} for attachments.</Trans>
-                  </p>
-                )}
-                {signedOutAccounts && (
-                  <p>
-                    <Trans>Sign in to {signedOutAccounts} to load attachments.</Trans>
-                  </p>
-                )}
-              </div>
-              {incomplete.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => retry(incomplete.map((a) => a.config.id))}
+                    <h2>{t`File type`}</h2>
+                    {formats}
+                    {filters}
+                    {detailFilters}
+                  </FilterMenu>
+                </div>
+                <div className="hidden @min-[54rem]/library:block">
+                  <FilterMenu
+                    title={t`More filters`}
+                    applied={details.length}
+                    count={count}
+                    onClear={filtered ? () => changeFilters(emptyAttachmentFilters) : undefined}
+                  >
+                    {detailFilters}
+                  </FilterMenu>
+                </div>
+                <Select
+                  value={sort}
+                  items={sortOptions}
+                  onValueChange={(value) => {
+                    if (value) {
+                      setBrowse({ sort: value, page: 0 });
+                    }
+                  }}
                 >
-                  <Trans>Retry</Trans>
-                </Button>
-              )}
+                  <SelectTrigger
+                    aria-label={t`Sort by`}
+                    className="attachment-sort max-w-40 gap-1.5 text-xs"
+                  >
+                    <ArrowDownWideNarrowIcon className="size-3.5 text-muted-foreground" />
+                    <SelectValue className="truncate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sortOptions.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div role="group" aria-label={t`Layout`} className="attachment-layout-toggle">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-pressed={!grid}
+                    title={t`List view`}
+                    onClick={() => configMutation.mutate({ "attachments.layout": "list" })}
+                  >
+                    <ListIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-pressed={grid}
+                    title={t`Grid view`}
+                    onClick={() => configMutation.mutate({ "attachments.layout": "grid" })}
+                  >
+                    <LayoutGridIcon />
+                  </Button>
+                </div>
+              </div>
             </div>
-          )}
-          {count > 0 && loading && (
-            <div className="flex items-center gap-2 border-b px-4 py-1.5 text-xs text-muted-foreground">
-              <Loader2Icon className="size-3 motion-safe:animate-spin" />
-              {hasIssue ? (
-                <Trans>Still checking {loadingAccounts}…</Trans>
-              ) : (
-                <Trans>Loading older mail…</Trans>
-              )}
-            </div>
-          )}
-          <div
-            ref={viewport}
-            className="flex min-h-0 flex-1 flex-col overflow-y-auto"
-            onScroll={(event) => {
-              if (!restore.current) {
-                position.top = event.currentTarget.scrollTop;
-              }
-            }}
-            onWheel={() => {
-              restore.current = null;
-              position.key = undefined;
-            }}
-          >
-            {count > 0 ? (
-              <>
-                {!grid && <ListHeadings />}
-                <ul className={grid ? "attachment-grid" : "text-sm"}>
-                  {results
-                    .slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                    .map((item) => (
+            {activeFilters.length > 0 && (
+              <div className="attachment-applied">
+                <div className="attachment-filter-chips">
+                  {activeFilters.map(({ key, label, Icon, remove }) => (
+                    <button
+                      type="button"
+                      key={key}
+                      className="attachment-filter-chip"
+                      aria-label={t`Remove filter “${label}”`}
+                      onClick={(event) => {
+                        if (event.detail === 0) {
+                          const next =
+                            event.currentTarget.nextElementSibling ??
+                            event.currentTarget.previousElementSibling;
+                          (next instanceof HTMLButtonElement ? next : searchInput.current)?.focus();
+                        }
+                        remove();
+                      }}
+                    >
+                      <Icon aria-hidden="true" />
+                      <span className="truncate">{label}</span>
+                      <XIcon aria-hidden="true" />
+                    </button>
+                  ))}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="shrink-0 text-xs"
+                  onClick={clear}
+                >{t`Clear filters`}</Button>
+              </div>
+            )}
+            {hasIssue && (
+              <div role="status" className="attachment-warning">
+                <CircleAlertIcon className="size-4 shrink-0" />
+                <div className="min-w-40 flex-1 space-y-1">
+                  {partialAccounts && (
+                    <p>
+                      <Trans>
+                        Some messages in {partialAccounts} couldn’t be checked. Previously loaded
+                        files are still available.
+                      </Trans>
+                    </p>
+                  )}
+                  {unavailableAccounts && (
+                    <p>
+                      <Trans>Couldn’t check {unavailableAccounts} for attachments.</Trans>
+                    </p>
+                  )}
+                  {signedOutAccounts && (
+                    <p>
+                      <Trans>Sign in to {signedOutAccounts} to load attachments.</Trans>
+                    </p>
+                  )}
+                </div>
+                {incomplete.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => retry(incomplete.map((a) => a.config.id))}
+                  >
+                    <Trans>Retry</Trans>
+                  </Button>
+                )}
+              </div>
+            )}
+            {count > 0 && loading && (
+              <div className="attachment-loading">
+                <Loader2Icon className="size-3 motion-safe:animate-spin" />
+                {hasIssue ? (
+                  <Trans>Still checking {loadingAccounts}…</Trans>
+                ) : (
+                  <Trans>Loading older mail…</Trans>
+                )}
+              </div>
+            )}
+            <div
+              ref={viewport}
+              className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+              onScroll={(event) => {
+                if (!restore.current) {
+                  position.top = event.currentTarget.scrollTop;
+                }
+              }}
+              onWheel={() => {
+                restore.current = null;
+                position.key = undefined;
+              }}
+            >
+              {count > 0 ? (
+                <>
+                  {!grid && <ListHeadings />}
+                  <ul className={grid ? "attachment-grid" : "attachment-list"}>
+                    {visibleFiles.map((item) => (
                       <FileItem
                         key={JSON.stringify([item.mailboxKey, item.id])}
                         item={item}
@@ -652,66 +630,67 @@ export function Attachments() {
                         showSenderIcons={config?.["gmail.showSenderIcons"] === true}
                       />
                     ))}
-                </ul>
-              </>
-            ) : (
-              <Empty>
-                <EmptyHeader>
-                  <EmptyMedia variant="icon" className="size-11 rounded-xl">
-                    {loading ? (
-                      <Loader2Icon className="motion-safe:animate-spin" />
-                    ) : filtered ? (
-                      <SearchIcon />
-                    ) : (
-                      <PaperclipIcon />
+                  </ul>
+                </>
+              ) : (
+                <Empty className="attachment-empty">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      {loading ? (
+                        <Loader2Icon className="motion-safe:animate-spin" />
+                      ) : filtered ? (
+                        <SearchIcon />
+                      ) : (
+                        <PaperclipIcon />
+                      )}
+                    </EmptyMedia>
+                    <EmptyTitle>
+                      {loading
+                        ? t`Looking for attachments…`
+                        : activeFilters.length > chosen.length || query.trim()
+                          ? t`No matching files`
+                          : hasIssue
+                            ? t`No files available`
+                            : t`No attachments`}
+                    </EmptyTitle>
+                    {!loading && !filtered && !hasIssue && (
+                      <EmptyDescription>
+                        <Trans>Files attached to your Gmail messages appear here.</Trans>
+                      </EmptyDescription>
                     )}
-                  </EmptyMedia>
-                  <EmptyTitle>
-                    {loading
-                      ? t`Looking for attachments…`
-                      : activeFilters.length > chosen.length || query.trim()
-                        ? t`No matching files`
-                        : hasIssue
-                          ? t`No files available`
-                          : t`No attachments`}
-                  </EmptyTitle>
-                  {!loading && !filtered && !hasIssue && (
-                    <EmptyDescription>
-                      <Trans>Files attached to your Gmail messages appear here.</Trans>
-                    </EmptyDescription>
-                  )}
-                  {filtered && !activeFilters.length && (
-                    <Button variant="outline" size="sm" onClick={clear}>
-                      <Trans>Clear filters</Trans>
-                    </Button>
-                  )}
-                </EmptyHeader>
-              </Empty>
+                    {filtered && !activeFilters.length && (
+                      <Button variant="outline" size="sm" onClick={clear}>
+                        <Trans>Clear filters</Trans>
+                      </Button>
+                    )}
+                  </EmptyHeader>
+                </Empty>
+              )}
+            </div>
+            {pages > 1 && (
+              <div className="attachment-pagination">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  title={t`Previous page`}
+                  disabled={!currentPage}
+                  onClick={() => setBrowse({ page: currentPage - 1 })}
+                >
+                  <ChevronLeftIcon />
+                </Button>
+                {currentPage + 1} / {pages}
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  title={t`Next page`}
+                  disabled={currentPage + 1 === pages}
+                  onClick={() => setBrowse({ page: currentPage + 1 })}
+                >
+                  <ChevronRightIcon />
+                </Button>
+              </div>
             )}
           </div>
-          {pages > 1 && (
-            <div className="flex items-center justify-end gap-2 border-t px-4 py-2 text-xs text-muted-foreground tabular-nums">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                title={t`Previous page`}
-                disabled={!currentPage}
-                onClick={() => setBrowse({ page: currentPage - 1 })}
-              >
-                <ChevronLeftIcon />
-              </Button>
-              {currentPage + 1} / {pages}
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                title={t`Next page`}
-                disabled={currentPage + 1 === pages}
-                onClick={() => setBrowse({ page: currentPage + 1 })}
-              >
-                <ChevronRightIcon />
-              </Button>
-            </div>
-          )}
         </section>
       </div>
     </main>

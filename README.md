@@ -2,13 +2,13 @@
 
 [Download ggmail for Mac with Apple silicon](https://github.com/salexandr0s/ggmail/releases/latest/download/ggmail-mac-arm64.dmg). Open the disk image and drag ggmail into Applications. Requires macOS 13 or later.
 
-ggmail is a desktop app for Gmail. All Mail brings unread mail from all your accounts into one list. The status line shows which accounts have checked in and where you need to sign in. Select a message to open the conversation in its own account, or use `J` and `K` to move through the list and `Enter` to open it.
+ggmail is a desktop app for Gmail. All Mail brings unread mail from all your accounts into one list. The Accounts list shows sync status and unread counts. Select an account to see its unread mail and due follow-ups, or choose **All accounts** to see them together. Select a message to open the conversation in its own account, or use `J` and `K` to move through the list and `Enter` to open it.
 
-To find mail across accounts, enter a Gmail query such as `filename:pdf newer_than:30d` in **Search all accounts** and press **Enter**. You can also choose a saved search in All Mail. Results appear as each mailbox responds. Use **All accounts** to narrow the list, or clear the search to return to unread mail. After opening a result, use **Back** to return to that row. Press **↓** and **Enter** to open the next conversation.
+To find mail across accounts, press `/` to focus **Search all accounts**, enter a Gmail query such as `filename:pdf newer_than:30d` and press **Enter**. You can also choose a saved search in All Mail. Results appear as each mailbox responds. Use **All accounts** to narrow the list, or clear the search to return to unread mail. After opening a result, use **Back** to return to that row. Press **↓** and **Enter** to open the next conversation.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/unified-inbox-dark.png">
-  <img src="docs/screenshots/unified-inbox-light.png" alt="All Mail with ten unread messages. Teal Personal and amber Work badges identify each message’s account.">
+  <img src="docs/screenshots/unified-inbox-light.png" alt="All Mail shows unread conversations from Studio and Personal, with per-account counts and sync status in the sidebar.">
 </picture>
 
 _The screenshots use fictional mailboxes and files. The assistant conversation is an example._

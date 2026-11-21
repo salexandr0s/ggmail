@@ -66,18 +66,8 @@ const readSearchPage = `(includeDetails => {
   return {threads, more};
 })`;
 
-export async function listSearchThreads(
-  session: Session,
-  userAgent: string,
-  mailbox: string,
-  query: string,
-  page: number,
-  signal: AbortSignal,
-  includeDetails = false,
-  seenThreads?: ReadonlySet<string>,
-) {
-  const url = new URL(mailbox);
-  url.hash = gmailSearchHash(query) + (page > 1 ? "/p" + page : "");
+export function createSearchView(session: Session, userAgent: string, mailbox: string) {
+  const base = new URL(mailbox);
   const view = new WebContentsView({
     webPreferences: {
       session,
@@ -94,15 +84,13 @@ export async function listSearchThreads(
       view.webContents.close();
     }
   };
-  const stop = AbortSignal.any([signal, AbortSignal.timeout(ms("30s"))]);
-  stop.addEventListener("abort", close, { once: true });
   webContents.setUserAgent(userAgent);
   webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   const isMailbox = (href: string) => {
     const target = URL.parse(href);
     return (
-      target?.origin === url.origin &&
-      target.pathname.replace(/\/$/, "") === url.pathname.replace(/\/$/, "")
+      target?.origin === base.origin &&
+      target.pathname.replace(/\/$/, "") === base.pathname.replace(/\/$/, "")
     );
   };
   webContents.on("will-navigate", (event, href) => {
@@ -115,37 +103,75 @@ export async function listSearchThreads(
       event.preventDefault();
     }
   });
-  try {
-    stop.throwIfAborted();
-    await webContents.loadURL(url.href);
-    while (true) {
+  async function read(
+    query: string,
+    page: number,
+    signal: AbortSignal,
+    includeDetails = false,
+    seenThreads?: ReadonlySet<string>,
+  ) {
+    const url = new URL(base);
+    url.hash = gmailSearchHash(query) + (page > 1 ? "/p" + page : "");
+    const stop = AbortSignal.any([signal, AbortSignal.timeout(ms("30s"))]);
+    stop.addEventListener("abort", close, { once: true });
+    try {
       stop.throwIfAborted();
-      const current = URL.parse(webContents.getURL());
-      if (
-        current &&
-        isMailbox(current.href) &&
-        decodeURIComponent(current.hash.replace(/\+/g, " ")) === decodeURIComponent(url.hash)
-      ) {
-        const raw: unknown = await webContents.executeJavaScriptInIsolatedWorld(1244, [
-          { code: readSearchPage + "(" + includeDetails + ")" },
+      if (isMailbox(webContents.getURL())) {
+        // Gmail routes older pages in the current document. Keep the authenticated
+        // app loaded and wait below for its previous rows to be replaced.
+        await webContents.executeJavaScriptInIsolatedWorld(1244, [
+          { code: "location.hash = " + JSON.stringify(url.hash) },
         ]);
-        if (raw) {
-          const result = resultPage.parse(raw);
-          // Gmail can change its hash before replacing the previous rows, or render
-          // placeholders before their thread IDs. Wait for the requested page to settle.
-          if (
-            !seenThreads ||
-            !result.threads.length ||
-            result.threads.some(({ id }) => !seenThreads.has(id))
-          ) {
-            return result;
+      } else {
+        await webContents.loadURL(url.href);
+      }
+      while (true) {
+        stop.throwIfAborted();
+        const current = URL.parse(webContents.getURL());
+        if (
+          current &&
+          isMailbox(current.href) &&
+          decodeURIComponent(current.hash.replace(/\+/g, " ")) === decodeURIComponent(url.hash)
+        ) {
+          const raw: unknown = await webContents.executeJavaScriptInIsolatedWorld(1244, [
+            { code: readSearchPage + "(" + includeDetails + ")" },
+          ]);
+          if (raw) {
+            const result = resultPage.parse(raw);
+            // Gmail can change its hash before replacing the previous rows, or render
+            // placeholders before their thread IDs. Wait for the requested page to settle.
+            if (
+              !seenThreads ||
+              !result.threads.length ||
+              result.threads.some(({ id }) => !seenThreads.has(id))
+            ) {
+              return result;
+            }
           }
         }
+        await delay(ms("250ms"), undefined, { signal: stop });
       }
-      await delay(ms("250ms"), undefined, { signal: stop });
+    } finally {
+      stop.removeEventListener("abort", close);
     }
+  }
+  return { read, close };
+}
+
+export async function listSearchThreads(
+  session: Session,
+  userAgent: string,
+  mailbox: string,
+  query: string,
+  page: number,
+  signal: AbortSignal,
+  includeDetails = false,
+  seenThreads?: ReadonlySet<string>,
+) {
+  const view = createSearchView(session, userAgent, mailbox);
+  try {
+    return await view.read(query, page, signal, includeDetails, seenThreads);
   } finally {
-    stop.removeEventListener("abort", close);
-    close();
+    view.close();
   }
 }

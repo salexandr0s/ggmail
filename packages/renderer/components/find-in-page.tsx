@@ -1,6 +1,6 @@
-import { useLingui } from "@lingui/react/macro";
 import { Button } from "@ggmail/ui/components/button";
 import { Input } from "@ggmail/ui/components/input";
+import { useLingui } from "@lingui/react/macro";
 import { ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -46,11 +46,13 @@ export function FindInPage({
   }
 
   return (
-    <div className="flex items-center gap-4 draggable-none">
-      <div className="relative">
+    <div className="titlebar-find flex min-w-0 items-center gap-1 draggable-none">
+      <div className="flex min-w-0 items-center rounded-lg border border-input bg-background focus-within:border-ring">
         <Input
           ref={inputRef}
-          className="h-7"
+          aria-label={t`Find…`}
+          placeholder={t`Find…`}
+          className="h-6 border-0 px-2 text-xs focus-visible:ring-0 md:text-xs dark:bg-transparent"
           autoFocus
           value={text}
           onChange={(event) => {
@@ -73,11 +75,11 @@ export function FindInPage({
             }
           }}
         />
-        <div className="absolute top-0 right-0 bottom-0 flex items-center p-2.5 text-xs text-muted-foreground">
+        <div className="shrink-0 pe-2 text-xs text-muted-foreground tabular-nums">
           {activeMatch}/{totalMatches}
         </div>
       </div>
-      <div className="flex gap-2">
+      <div className="flex shrink-0 gap-0.5">
         <Button
           variant="ghost"
           size="icon-sm"

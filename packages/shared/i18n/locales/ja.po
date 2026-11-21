@@ -10,6 +10,7 @@ msgstr ""
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "(no subject)"
 msgstr "（件名なし）"
 
@@ -56,15 +57,15 @@ msgstr "{extensionName}はGoogleのログインページでのみ動作します
 msgid "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
 msgstr "{failedCount, plural, other {#個の拡張機能をアップデートできませんでした}}"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is still syncing"
 msgstr "{label} は同期中です"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is up to date"
 msgstr "{label} は最新です"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} will retry syncing"
 msgstr "{label} の同期を再試行します"
 
@@ -324,6 +325,7 @@ msgstr "アカウントの操作"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Appearance section for how accounts look
 #: packages/app/menu.ts
+#: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Accounts"
@@ -412,6 +414,7 @@ msgstr "AI 設定"
 
 #: packages/renderer/components/account-filters.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "すべてのアカウント"
@@ -425,6 +428,10 @@ msgstr "すべてのカテゴリ"
 #: packages/renderer/routes/attachments.tsx
 msgid "All files"
 msgstr "すべてのファイル"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "All follow-ups"
+msgstr "すべてのフォローアップ"
 
 #: packages/renderer/components/assistant/assistant-activity.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
@@ -796,6 +803,10 @@ msgstr "ChatGPT へのログインがタイムアウトしました。もう一�
 msgid "ChatGPT sign-in was canceled."
 msgstr "ChatGPT へのログインをキャンセルしました。"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "Check for replies"
+msgstr "返信を確認"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -914,6 +925,7 @@ msgstr "色をクリア"
 msgid "Clear filters"
 msgstr "フィルタをクリア"
 
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "Clear search"
@@ -1070,6 +1082,10 @@ msgstr "契約書"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Conversation"
 msgstr "スレッド"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Conversations leave this list when a reply arrives."
+msgstr "返信が届くと、そのスレッドはこの一覧から消えます。"
 
 #. Checkbox in the Delete browsing data dialog that deletes the account's cookies and the data sites store, such as local storage
 #: packages/renderer/routes/settings/accounts.tsx
@@ -1520,6 +1536,10 @@ msgid "Drag {label} to reorder"
 msgstr "{label}をドラッグして並べ替え"
 
 #: packages/renderer/components/follow-ups.tsx
+msgid "Due"
+msgstr "期限到来"
+
+#: packages/renderer/components/follow-ups.tsx
 msgid "Due for follow-up"
 msgstr "フォローアップの期限"
 
@@ -1797,8 +1817,13 @@ msgid "Fills and generates passwords and passkeys for your Google Account. Unloc
 msgstr "Googleアカウントのパスワードとパスキーを入力・生成します。生体認証でロックを解除するにはBitwardenデスクトップアプリが必要です。"
 
 #: packages/renderer/components/attachments/filters.tsx
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "Filter by account"
 msgstr "アカウントで絞り込む"
+
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Filter pages"
+msgstr "ページを絞り込む"
 
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -1887,10 +1912,8 @@ msgid "Full download history"
 msgstr "すべてのダウンロード履歴"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
-#. Heading of the Appearance section for the settings that apply to the whole app
 #. Heading of the Downloads section for how files are downloaded
 #: packages/renderer/lib/settings-pages.ts
-#: packages/renderer/routes/settings/appearance.tsx
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "General"
 msgstr "一般"
@@ -2250,6 +2273,10 @@ msgid "Last page"
 msgstr "最後のページ"
 
 #: packages/renderer/components/follow-ups.tsx
+msgid "Last sent"
+msgstr "最終送信"
+
+#: packages/renderer/components/follow-ups.tsx
 msgid "Last sent {lastSent}"
 msgstr "最終送信日：{lastSent}"
 
@@ -2345,6 +2372,7 @@ msgstr "読み込み中"
 
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Loading email…"
 msgstr "メールを読み込み中…"
 
@@ -2535,6 +2563,7 @@ msgid "New windows"
 msgstr "新しいウィンドウ"
 
 #: packages/renderer/routes/attachments.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Newest first"
 msgstr "新しい順"
 
@@ -2597,6 +2626,10 @@ msgstr "利用できるファイルはありません"
 msgid "No follow-ups"
 msgstr "フォローアップはありません"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "No follow-ups due"
+msgstr "期限を迎えたフォローアップはありません"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "No free time slot left for another window. Remove or shorten one first."
 msgstr "時間帯を追加する空き時間がありません。先にいずれかの時間帯を削除するか、短くしてください。"
@@ -2614,6 +2647,10 @@ msgstr "一致するスレッドはありません"
 msgid "No matching files"
 msgstr "一致するファイルはありません"
 
+#: packages/renderer/components/app-sidebar.tsx
+msgid "No matching pages"
+msgstr "一致するページはありません"
+
 #: packages/app/assistant/connection.ts
 msgid "No models are available for this ChatGPT account."
 msgstr "この ChatGPT アカウントで利用できるモデルはありません。"
@@ -2626,6 +2663,10 @@ msgstr "プレビューできません"
 #: packages/renderer/routes/settings/saved-searches.tsx
 msgid "No saved searches yet."
 msgstr "保存した検索はまだありません。"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "No scheduled follow-ups"
+msgstr "予定されているフォローアップはありません"
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -2815,6 +2856,10 @@ msgstr "ここでリンクを開く"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Open replies and forwards in a pop-out instead of below the message."
 msgstr "返信と転送をメッセージの下ではなく、新しいウィンドウで開きます。"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "Open sent mail"
+msgstr "送信済みメールを開く"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open the browser allowlist in an editor with root permissions."
@@ -3376,6 +3421,10 @@ msgstr "添付ファイルを検索"
 msgid "Search files, senders, or subjects"
 msgstr "ファイル、差出人、件名で検索"
 
+#: packages/renderer/components/unified-search.tsx
+msgid "Search results"
+msgstr "検索結果"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3466,10 +3515,6 @@ msgstr "前のアカウントを選択"
 msgid "Select Previous Tab"
 msgstr "前のタブを選択"
 
-#: packages/renderer/routes/settings/appearance.tsx
-msgid "Select the application theme."
-msgstr "アプリケーションのテーマを選択します。"
-
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Select the sound to play for notifications."
 msgstr "通知で再生するサウンドを選択します。"
@@ -3519,6 +3564,7 @@ msgid "Set up the mail assistant"
 msgstr "メールアシスタントを設定"
 
 #. Title of the Settings window, in its titlebar
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "設定"
@@ -3830,7 +3876,11 @@ msgstr "ウィンドウを表示"
 msgid "Sidebar"
 msgstr "サイドバー"
 
-#: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Sign in"
+msgstr "ログイン"
+
+#: packages/renderer/components/inbox-accounts.tsx
 msgid "Sign in to {label}"
 msgstr "{label} にログイン"
 
@@ -3853,6 +3903,10 @@ msgstr "パスキーとWindows HelloでGoogleにログイン"
 #: packages/renderer/components/unified-search.tsx
 msgid "Sign in to search this account."
 msgstr "このアカウントを検索するにはログインしてください。"
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Sign in to see unread messages"
+msgstr "ログインして未読メールを表示"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
@@ -4003,6 +4057,10 @@ msgstr "“新しいウィンドウ”に切り替える"
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Switch to New windows?"
 msgstr "“新しいウィンドウ”に切り替えますか?"
+
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Syncing…"
+msgstr "同期中…"
 
 #. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
@@ -4291,6 +4349,10 @@ msgstr "未読メール"
 msgid "Until Tomorrow"
 msgstr "明日まで"
 
+#: packages/renderer/components/inbox-accounts.tsx
+msgid "Up to date"
+msgstr "同期済み"
+
 #. Titlebar button that shows the details of a downloaded update, ready to install
 #: packages/renderer/components/app-titlebar.tsx
 msgid "Update available"
@@ -4374,6 +4436,10 @@ msgctxt "Windows"
 msgid "View"
 msgstr "表示"
 
+#: packages/renderer/components/follow-ups.tsx
+msgid "View all follow-ups"
+msgstr "すべてのフォローアップを表示"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "View Logs"
@@ -4404,6 +4470,11 @@ msgstr "返信待ち"
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
 msgstr "メール画面を待機中…"
+
+#: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Waiting to sync"
+msgstr "同期待ち"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "What can I help you with?"
@@ -4541,6 +4612,10 @@ msgstr "ChatGPT の利用上限に達しました。後でもう一度お試し�
 #: packages/app/ipc.ts
 msgid "Your test notification request"
 msgstr "テスト通知のリクエスト"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "You can schedule a follow-up when you sent the last message."
+msgstr "最後のメッセージを自分が送信したスレッドにフォローアップを設定できます。"
 
 #. Window menu item that toggles the window between its size and filling the screen
 #: packages/app/menu.ts

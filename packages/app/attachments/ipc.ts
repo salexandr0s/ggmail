@@ -83,7 +83,7 @@ export function registerAttachmentIpc({ main: listener }: typeof ipc) {
       const live = await library.liveEntry(fileId);
       const current = accountFor(event, id);
       if (
-        !live ||
+        !live?.downloadUrl ||
         library !==
           getAttachmentLibrary(current.instance.gmail, current.config.gmail.delegatedAccountId)
       ) {

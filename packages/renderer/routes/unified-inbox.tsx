@@ -1,4 +1,5 @@
 import "./unified-inbox.css";
+import { accountColorsMap } from "@ggmail/shared/accounts";
 import type { GmailAction } from "@ggmail/shared/gmail";
 import { ms } from "@ggmail/shared/ms";
 import { ipc } from "@ggmail/shared/renderer/ipc";
@@ -27,7 +28,8 @@ import {
 } from "@tanstack/react-table";
 import {
   ArchiveIcon,
-  CheckIcon,
+  ArrowDownWideNarrowIcon,
+  MailCheckIcon,
   KeyRoundIcon,
   RefreshCwIcon,
   ChevronLeftIcon,
@@ -42,15 +44,21 @@ import {
 } from "lucide-react";
 import { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { AccountBadge } from "@/components/account-badge";
+import { create } from "zustand";
 import { SenderAvatar } from "@/components/assistant/sender-avatar";
 import { InboxFollowUps } from "@/components/follow-ups";
+import { InboxAccounts } from "@/components/inbox-accounts";
 import { UnifiedInboxSearch } from "@/components/unified-search";
 import { createDateTimeFormatter, dayjs } from "@/lib/date";
 import { useUnifiedInbox, type UnifiedInboxMessage } from "@/lib/hooks";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
 
 const columnHelper = createColumnHelper<UnifiedInboxMessage>();
+
+// Opening a conversation unmounts All Mail. Keep its mailbox selection for the return trip.
+const useInboxScope = create<{ accountId?: string; select: (id?: string) => void }>((set) => ({
+  select: (accountId) => set({ accountId }),
+}));
 
 // lingui-set comment="Button on a message in All Mail. A Gmail action, so it follows Gmail's word for it"
 const MESSAGE_ACTIONS = [
@@ -89,61 +97,69 @@ const createColumns = ({
   pending: PendingMessageAction | null;
   onAction: (message: UnifiedInboxMessage, action: GmailAction) => void;
 }) => [
-  columnHelper.accessor("account.label", {
-    cell: (props) => (
-      <AccountBadge label={props.getValue()} color={props.row.original.account.color} />
-    ),
-  }),
   columnHelper.accessor("author.name", {
-    cell: (props) => {
-      const senders = [props.row.original.author, ...props.row.original.contributors];
+    cell: ({ row: { original: message } }) => {
+      const { author, contributors, account } = message;
+      const senders = [author, ...contributors];
+      const names = contributors.length
+        ? senders.map(({ name, email }) => name.trim().split(/\s+/u)[0] || email).join(", ")
+        : author.name || author.email;
       return (
-        <div
-          className="flex max-w-40 items-center gap-2"
-          title={senders.map(({ name, email }) => `${name} <${email}>`).join(", ")}
-        >
+        <div className="flex min-w-0 items-center gap-2.5">
           {showSenderIcons && (
-            <AvatarGroup>
+            <AvatarGroup className="shrink-0">
               {senders.slice(0, 3).map(({ name, email }, index) => (
                 <SenderAvatar
                   key={index}
                   sender={{ name: name || email, domain: email.split("@")[1] }}
-                  className="size-6 text-base"
+                  className="size-7 text-base"
                 />
               ))}
             </AvatarGroup>
           )}
-          <div className="truncate">
-            {props.row.original.contributors.length === 0
-              ? props.row.original.author.name
-              : [
-                  props.row.original.author.name.split(" ")[0],
-                  ...props.row.original.contributors.map(
-                    (contributor) => contributor.name.split(" ")[0],
-                  ),
-                ].join(", ")}
+          <div className="grid min-w-0 gap-0.5">
+            <span
+              className="truncate text-[13px] font-medium"
+              title={senders
+                .map(({ name, email }) => (name ? `${name} <${email}>` : email))
+                .join(", ")}
+            >
+              {names}
+            </span>
+            <span
+              className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground"
+              title={account.label}
+            >
+              {account.color && (
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "size-1.5 shrink-0 rounded-full",
+                    accountColorsMap[account.color].className,
+                  )}
+                />
+              )}
+              <span className="truncate">{account.label}</span>
+            </span>
           </div>
         </div>
       );
     },
   }),
   columnHelper.accessor("subject", {
-    cell: (props) => (
-      // Faded rather than covered by a background, because the row's own hover
-      // colour is semi-transparent and a band painted over it would come out
-      // darker than the row. This is the cell the row actions overlap, the
-      // date cell being narrower than they are, so the fade has to finish
-      // short of this cell's edge rather than at it.
-      <div className="inbox-message-text flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden group-hover:mask-r-from-[calc(100%-8.75rem)] group-hover:mask-r-to-[calc(100%-4.25rem)] group-data-[pending]:mask-r-from-[calc(100%-8.75rem)] group-data-[pending]:mask-r-to-[calc(100%-4.25rem)] group-data-[state=selected]:mask-r-from-[calc(100%-8.75rem)] group-data-[state=selected]:mask-r-to-[calc(100%-4.25rem)]">
-        <div className="min-w-0 truncate font-semibold" title={props.getValue()}>
-          {props.getValue()}
-        </div>
-        <div
-          className="min-w-0 truncate text-xs leading-4 text-muted-foreground empty:hidden"
-          title={props.row.original.summary}
-        >
-          {props.row.original.summary}
-        </div>
+    cell: ({ getValue, row: { original: message } }) => (
+      <div className="grid min-w-0 gap-0.5">
+        <button type="button" className="inbox-subject" title={getValue()}>
+          {getValue() || <Trans>(no subject)</Trans>}
+        </button>
+        {message.summary && (
+          <span
+            className="truncate text-xs leading-4 text-muted-foreground"
+            title={message.summary}
+          >
+            {message.summary}
+          </span>
+        )}
       </div>
     ),
   }),
@@ -159,9 +175,9 @@ const createColumns = ({
 
       return (
         <>
-          {/* Hidden rather than faded, because the actions cover it whole. */}
-          <div
-            className="text-xs whitespace-nowrap text-muted-foreground tabular-nums group-hover:invisible group-data-[pending]:invisible group-data-[state=selected]:invisible"
+          <time
+            dateTime={date.toISOString()}
+            className="inbox-time"
             title={createDateTimeFormatter({
               hour: "2-digit",
               minute: "2-digit",
@@ -181,28 +197,30 @@ const createColumns = ({
                     day: "numeric",
                   }).format(date.toDate())
                 : createDateTimeFormatter().format(date.toDate())}
-          </div>
-          <div className="inbox-row-actions absolute inset-y-0 right-0 flex items-center gap-2 pr-3 opacity-0 transition-opacity group-hover:opacity-100 group-data-[pending]:opacity-100 group-data-[state=selected]:opacity-100">
+          </time>
+          <div className="inbox-row-actions">
             {MESSAGE_ACTIONS.map(({ action, label, icon: Icon }) => (
               <MessageActionButton
                 key={action}
                 variant="ghost"
                 size="icon-sm"
-                // Out of the tab order because the document-level hotkeys are
-                // the keyboard path, and Enter on a focused one would reach
-                // the `enter` hotkey, which cancels the press and opens the
-                // message.
-                tabIndex={-1}
                 label={label}
                 disabled={pendingAction !== null}
-                className={cn(pendingAction === action && "disabled:opacity-100")}
+                className={cn(
+                  "transition-colors",
+                  pendingAction === action && "disabled:opacity-100",
+                )}
                 onClick={(event) => {
                   event.stopPropagation();
 
                   onAction(props.row.original, action);
                 }}
               >
-                {pendingAction === action ? <Loader2Icon className="animate-spin" /> : <Icon />}
+                {pendingAction === action ? (
+                  <Loader2Icon className="motion-safe:animate-spin" />
+                ) : (
+                  <Icon />
+                )}
               </MessageActionButton>
             ))}
           </div>
@@ -476,58 +494,44 @@ function UnifiedInboxTable({
 
   return (
     <>
-      <h2 id="unread-heading" className="mb-2.5 text-sm font-semibold">
-        <Trans>Unread messages</Trans>
-      </h2>
-      <div className="overflow-hidden rounded-lg border">
-        <Table className="unified-inbox-table" aria-labelledby="unread-heading">
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                key={row.id}
-                ref={row.id === focusedRow?.id ? focusedRowRef : undefined}
-                tabIndex={row.id === focusedRow?.id ? -1 : undefined}
-                data-state={row.id === focusedRow?.id ? "selected" : undefined}
-                // `relative` anchors the row actions rendered from the
-                // receivedAt cell, which are wider than that cell is.
-                className="group relative cursor-default outline-none focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-                onBlur={(event) => {
-                  if (
-                    event.relatedTarget instanceof Element &&
-                    !event.relatedTarget.hasAttribute("data-inbox-row")
-                  ) {
-                    setFocus(null);
-                  }
-                }}
-                data-inbox-row=""
-                data-pending={
-                  (pending?.accountId === row.original.account.id &&
-                    pending.messageId === row.original.id) ||
-                  undefined
+      <Table className="unified-inbox-table" aria-labelledby="unread-heading">
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.id}
+              ref={row.id === focusedRow?.id ? focusedRowRef : undefined}
+              tabIndex={row.id === focusedRow?.id ? -1 : undefined}
+              data-state={row.id === focusedRow?.id ? "selected" : undefined}
+              className="inbox-row outline-none"
+              onBlur={(event) => {
+                if (
+                  event.relatedTarget instanceof Element &&
+                  !event.relatedTarget.hasAttribute("data-inbox-row")
+                ) {
+                  setFocus(null);
                 }
-                onClick={() => {
-                  openMessage(row.original);
-                }}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(
-                      "px-3 py-2",
-                      cell.column.id === "subject" && "w-full max-w-0",
-                      cell.column.id === "receivedAt" && "text-right",
-                    )}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+              }}
+              data-inbox-row=""
+              data-pending={
+                (pending?.accountId === row.original.account.id &&
+                  pending.messageId === row.original.id) ||
+                undefined
+              }
+              onClick={() => {
+                openMessage(row.original);
+              }}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
       {messages.length > 10 && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-muted-foreground">
+        <div className="inbox-pagination">
           <div className="flex items-center gap-2">
             <div className="text-sm">
               <Trans comment="Label of All Mail's picker for how many messages a page lists">
@@ -545,7 +549,7 @@ function UnifiedInboxTable({
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger aria-label={t`Rows per page`}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -564,8 +568,8 @@ function UnifiedInboxTable({
               </Trans>
             </div>
             <Button
-              size="icon"
-              variant="outline"
+              size="icon-sm"
+              variant="ghost"
               onClick={() => {
                 setFocus(null);
                 table.firstPage();
@@ -576,8 +580,8 @@ function UnifiedInboxTable({
               <ChevronsLeftIcon />
             </Button>
             <Button
-              size="icon"
-              variant="outline"
+              size="icon-sm"
+              variant="ghost"
               onClick={() => {
                 setFocus(null);
                 table.previousPage();
@@ -588,8 +592,8 @@ function UnifiedInboxTable({
               <ChevronLeftIcon />
             </Button>
             <Button
-              size="icon"
-              variant="outline"
+              size="icon-sm"
+              variant="ghost"
               onClick={() => {
                 setFocus(null);
                 table.nextPage();
@@ -600,8 +604,8 @@ function UnifiedInboxTable({
               <ChevronRightIcon />
             </Button>
             <Button
-              size="icon"
-              variant="outline"
+              size="icon-sm"
+              variant="ghost"
               onClick={() => {
                 setFocus(null);
                 table.lastPage();
@@ -620,111 +624,87 @@ function UnifiedInboxTable({
 
 export function UnifiedInbox() {
   const { config } = useConfig();
-
-  const { t } = useLingui();
-  const unifiedInbox = useUnifiedInbox();
+  const { t, i18n } = useLingui();
+  const { inboxes, messages } = useUnifiedInbox();
+  const { accountId, select } = useInboxScope();
+  const selected = inboxes.find(({ account }) => account.id === accountId);
+  const visibleMessages = useMemo(
+    () =>
+      selected ? messages.filter(({ account }) => account.id === selected.account.id) : messages,
+    [messages, selected],
+  );
+  const visibleInboxes = selected ? [selected] : inboxes;
+  const ready =
+    visibleInboxes.length > 0 && visibleInboxes.every(({ status }) => status === "ready");
 
   const renderContent = () => {
-    if (!config) {
-      return;
-    }
-
-    if (unifiedInbox.messages.length === 0) {
-      if (!unifiedInbox.inboxes.length) {
-        return (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <InboxIcon />
-              </EmptyMedia>
-              <EmptyTitle>
-                <Trans>No accounts are included in All Mail.</Trans>
-              </EmptyTitle>
-            </EmptyHeader>
-          </Empty>
-        );
-      }
-      if (!unifiedInbox.inboxes.every(({ status }) => status === "ready")) {
-        return null;
-      }
+    if (config && visibleMessages.length) {
       return (
-        <Empty className="py-12">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <InboxIcon />
-            </EmptyMedia>
-            <EmptyTitle role="heading" aria-level={2}>
-              <Trans>No unread messages</Trans>
-            </EmptyTitle>
-          </EmptyHeader>
-        </Empty>
+        <UnifiedInboxTable
+          key={selected?.account.id}
+          messages={visibleMessages}
+          rowsPerPage={config["unifiedInbox.rowsPerPage"]}
+          showSenderIcons={config["unifiedInbox.showSenderIcons"]}
+        />
       );
     }
 
+    let Icon = Loader2Icon;
+    let title = t`Loading email…`;
+    if (config) {
+      if (!inboxes.length) {
+        Icon = InboxIcon;
+        title = t`No accounts are included in All Mail.`;
+      } else if (ready) {
+        Icon = MailCheckIcon;
+        title = t`No unread messages`;
+      } else if (!visibleInboxes.some(({ status }) => status === "syncing")) {
+        const needsSignIn = visibleInboxes.some(({ status }) => status === "signIn");
+        Icon = needsSignIn ? KeyRoundIcon : RefreshCwIcon;
+        title = needsSignIn ? t`Sign in to see unread messages` : t`Waiting to sync`;
+      }
+    }
     return (
-      <UnifiedInboxTable
-        messages={unifiedInbox.messages}
-        rowsPerPage={config["unifiedInbox.rowsPerPage"]}
-        showSenderIcons={config["unifiedInbox.showSenderIcons"]}
-      />
+      <Empty className="inbox-empty" role="status">
+        <EmptyHeader>
+          <EmptyMedia variant="icon" className="inbox-empty-icon">
+            <Icon className={cn("size-7", Icon === Loader2Icon && "motion-safe:animate-spin")} />
+          </EmptyMedia>
+          <EmptyTitle className="text-base">{title}</EmptyTitle>
+        </EmptyHeader>
+      </Empty>
     );
   };
 
   return (
-    <>
+    <main>
       <UnifiedInboxSearch>
-        <div
-          role="status"
-          className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-lg border bg-muted/35 px-3 py-1.5 text-xs text-muted-foreground empty:hidden"
-        >
-          {unifiedInbox.inboxes.map(({ account: { id, label }, status }) => {
-            if (status === "signIn") {
-              return (
-                <Button
-                  key={id}
-                  variant="outline"
-                  size="xs"
-                  className="h-auto min-h-6 max-w-full border-amber-300 bg-amber-50 py-0.5 text-left whitespace-normal text-amber-900 dark:border-amber-500/45 dark:bg-amber-400/10 dark:text-amber-200"
-                  onClick={() => ipc.main.send("gmail.openInboxSignIn", id)}
-                >
-                  <KeyRoundIcon aria-hidden="true" />
-                  <span className="wrap-anywhere">{t`Sign in to ${label}`}</span>
-                </Button>
-              );
-            }
-            const Icon =
-              status === "ready" ? CheckIcon : status === "retrying" ? RefreshCwIcon : Loader2Icon;
-            return (
-              <span
-                key={id}
-                className={cn(
-                  "inline-flex min-h-6 min-w-0 items-center gap-1.5",
-                  status !== "ready" && "font-medium text-foreground",
-                )}
-              >
-                <Icon
-                  aria-hidden="true"
-                  className={cn(
-                    "size-3.5 shrink-0",
-                    status === "ready" && "text-emerald-700 dark:text-emerald-400",
-                    status === "retrying" && "text-amber-700 dark:text-amber-400",
-                    status === "syncing" && "motion-safe:animate-spin",
+        <div className="inbox-layout">
+          {inboxes.length > 0 && (
+            <InboxAccounts inboxes={inboxes} selected={selected?.account.id} onSelect={select} />
+          )}
+          <div className="inbox-feed">
+            <InboxFollowUps accountId={selected?.account.id} />
+            <section className="inbox-panel" aria-labelledby="unread-heading">
+              <div className="inbox-panel-heading">
+                <h2 id="unread-heading" className="all-mail-section-heading">
+                  <Trans>Unread messages</Trans>
+                  {(visibleMessages.length > 0 || ready) && (
+                    <span className="inbox-count">{i18n.number(visibleMessages.length)}</span>
                   )}
-                />
-                <span className="wrap-anywhere">
-                  {status === "ready"
-                    ? t`${label} is up to date`
-                    : status === "retrying"
-                      ? t`${label} will retry syncing`
-                      : t`${label} is still syncing`}
-                </span>
-              </span>
-            );
-          })}
+                </h2>
+                {visibleMessages.length > 1 && (
+                  <span className="inbox-sort">
+                    <ArrowDownWideNarrowIcon aria-hidden="true" />
+                    <Trans>Newest first</Trans>
+                  </span>
+                )}
+              </div>
+              {renderContent()}
+            </section>
+          </div>
         </div>
-        <InboxFollowUps />
-        {renderContent()}
       </UnifiedInboxSearch>
-    </>
+    </main>
   );
 }

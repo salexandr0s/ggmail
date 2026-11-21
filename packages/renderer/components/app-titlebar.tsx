@@ -12,6 +12,7 @@ import {
   ChevronRightIcon,
   CircleAlertIcon,
   DownloadIcon,
+  MailIcon,
   MailSearchIcon,
   MoonIcon,
   SparklesIcon,
@@ -26,9 +27,7 @@ import {
   TitlebarDropdownMenu,
   TitlebarDropdownMenuItem,
   TitlebarIconButton,
-  TitlebarLeft,
   TitlebarNavigationControls,
-  TitlebarRightOverlay,
 } from "@/components/titlebar";
 import { UnreadCountBadge } from "@/components/unread-count-badge";
 import { WorkspaceAppsLauncher } from "@/components/workspace-apps-launcher";
@@ -43,6 +42,7 @@ import {
   useAppUpdaterStore,
   useFindInPageStore,
 } from "../lib/stores";
+import "./mail-titlebar.css";
 import { MailViewNavigation } from "./mail-view-navigation";
 
 function BookmarksButton() {
@@ -186,84 +186,13 @@ function useMeasuredWidth(element: HTMLElement | null) {
   return [width, widthRef] as const;
 }
 
-/**
- * How much of the row's right end the pinned controls cover, which is not how
- * wide they are. They are pinned to the titlebar's padding box while the row
- * ends at its content box, and on Windows the row stops at the edge of the
- * window's titlebar area while the controls still reach the window's own edge.
- *
- * Measured rather than worked out from the padding: that padding belongs to
- * `Titlebar`, and the titlebar area insets make the difference platform
- * dependent. Nothing is covered rather than a negative amount when the controls
- * clear the row altogether.
- */
-function useCoveredRowWidth(rowElement: HTMLElement | null, overlayElement: HTMLElement | null) {
-  const [covered, setCovered] = useState(0);
-
-  const coveredRef = useRef(0);
-
-  useEffect(() => {
-    const record = (measured: number) => {
-      coveredRef.current = measured;
-
-      setCovered(measured);
-    };
-
-    if (!rowElement || !overlayElement) {
-      record(0);
-
-      return;
-    }
-
-    const measure = () => {
-      record(
-        Math.max(
-          0,
-          rowElement.getBoundingClientRect().right - overlayElement.getBoundingClientRect().left,
-        ),
-      );
-    };
-
-    measure();
-
-    const resizeObserver = new ResizeObserver(measure);
-
-    resizeObserver.observe(rowElement);
-
-    resizeObserver.observe(overlayElement);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [rowElement, overlayElement]);
-
-  return [covered, coveredRef] as const;
-}
-
-/**
- * The account row's scroll state: which way it can still go, how far an arrow
- * takes it, and how much of its ends the three overlays over them cover.
- *
- * No overlay takes room from the row, so neither scrolling the row nor an arrow
- * coming or going changes the row's width, and the browser never has to clamp a
- * scroll it has already started. The row reserves their widths instead: as
- * scroll padding at both ends, so selecting an account never parks it underneath
- * one of them, and as the least the spacer after the last button can be, so that
- * button can be scrolled clear of the controls on the right.
- */
+/** Keep selected accounts clear of the arrows at the ends of the scrollable row. */
 function useAccountRow(accounts: AccountInstances) {
   const [rowElement, setRowElement] = useState<HTMLDivElement | null>(null);
-
-  const [rightControlsElement, setRightControlsElement] = useState<HTMLDivElement | null>(null);
 
   const [leftArrowElement, setLeftArrowElement] = useState<HTMLDivElement | null>(null);
 
   const [rightArrowElement, setRightArrowElement] = useState<HTMLDivElement | null>(null);
-
-  const [coveredRowWidth, coveredRowWidthRef] = useCoveredRowWidth(
-    rowElement,
-    rightControlsElement,
-  );
 
   const [leftArrowWidth, leftArrowWidthRef] = useMeasuredWidth(leftArrowElement);
 
@@ -330,9 +259,8 @@ function useAccountRow(accounts: AccountInstances) {
 
     leftInsetRef.current = isScrolledFromStart ? leftArrowWidthRef.current : 0;
 
-    rightInsetRef.current =
-      coveredRowWidthRef.current + (isScrolledFromEnd ? rightArrowWidthRef.current : 0);
-  }, [rowElement, leftArrowWidthRef, rightArrowWidthRef, coveredRowWidthRef]);
+    rightInsetRef.current = isScrolledFromEnd ? rightArrowWidthRef.current : 0;
+  }, [rowElement, leftArrowWidthRef, rightArrowWidthRef]);
 
   /**
    * The button of the account the row owes a scroll to, unless it is already
@@ -511,7 +439,7 @@ function useAccountRow(accounts: AccountInstances) {
     }
 
     alignRow();
-  }, [alignRow, rowElement, accounts, leftArrowWidth, rightArrowWidth, coveredRowWidth]);
+  }, [alignRow, rowElement, accounts, leftArrowWidth, rightArrowWidth]);
 
   const scrollBy = (direction: 1 | -1) => {
     if (!rowElement) {
@@ -523,7 +451,6 @@ function useAccountRow(accounts: AccountInstances) {
     const distance = Math.max(
       ACCOUNT_ROW_MINIMUM_SCROLL,
       rowElement.clientWidth -
-        coveredRowWidth -
         (canScrollLeft ? leftArrowWidth : 0) -
         (canScrollRight ? rightArrowWidth : 0) -
         ACCOUNT_ROW_SCROLL_OVERLAP,
@@ -534,10 +461,8 @@ function useAccountRow(accounts: AccountInstances) {
 
   return {
     setRowElement,
-    setRightControlsElement,
     setLeftArrowElement,
     setRightArrowElement,
-    coveredRowWidth,
     leftArrowWidth,
     rightArrowWidth,
     isOverflowing,
@@ -584,6 +509,7 @@ export function AppTitlebar({
   }
 
   const isAccountLocation = location === "/";
+  const selectedAccount = accounts.find((account) => account.config.selected);
 
   const isUnifiedInboxLocation = location === "/unified-inbox";
   const isAttachmentsLocation = location === "/attachments";
@@ -614,7 +540,7 @@ export function AppTitlebar({
     config["gmail.hideOutOfOfficeBanner"];
 
   const renderAccounts = () => {
-    if (accounts.length === 1) {
+    if (accounts.length < 2) {
       return;
     }
 
@@ -623,30 +549,37 @@ export function AppTitlebar({
         key={account.config.id}
         data-account-id={account.config.id}
         aria-pressed={account.config.selected && isAccountLocation}
-        variant={account.config.selected && isAccountLocation ? "secondary" : "ghost"}
+        variant="ghost"
+        title={getAccountLabel(account.config.label)}
         size="sm"
         tabIndex={-1}
-        className="draggable-none"
+        className="mail-account-button draggable-none"
         onClick={() => {
           ipc.main.send("accounts.selectAccount", account.config.id, true);
         }}
       >
-        {account.config.color && (
-          <div
-            className={cn("size-2 rounded-full", accountColorsMap[account.config.color].className)}
-          />
-        )}
+        <span aria-hidden="true" className="mail-account-mark">
+          {account.config.logo ? (
+            <img
+              src={account.config.logo}
+              alt=""
+              draggable={false}
+              className="size-4 object-contain"
+            />
+          ) : (
+            <MailIcon className="size-3.5" />
+          )}
+          {account.config.color && (
+            <span
+              className={cn("mail-account-color", accountColorsMap[account.config.color].className)}
+            />
+          )}
+        </span>
+        <span className="truncate">{getAccountLabel(account.config.label)}</span>
         {account.gmail.outOfOffice && <BriefcaseIcon />}
-        {getAccountLabel(account.config.label)}
-        {account.config.logo && (
-          <img
-            src={account.config.logo}
-            alt=""
-            draggable={false}
-            className="size-4 shrink-0 object-contain"
-          />
+        {account.gmail.attentionRequired && (
+          <CircleAlertIcon className="size-3.5 text-amber-700 dark:text-amber-400" />
         )}
-        {account.gmail.attentionRequired && <CircleAlertIcon className="text-yellow-400" />}
         {!account.gmail.attentionRequired &&
         config["accounts.unreadBadge"] &&
         account.gmail.unreadCount ? (
@@ -753,8 +686,8 @@ export function AppTitlebar({
 
     return (
       <>
-        <TitlebarLeft>
-          <TitlebarButtonGroup className="shrink-0">
+        <div className="mail-titlebar-main">
+          <TitlebarButtonGroup className="mail-history shrink-0">
             <TitlebarNavigationControls
               canGoBack={history.canGoBack}
               canGoForward={history.canGoForward}
@@ -778,9 +711,14 @@ export function AppTitlebar({
             location={isAccountLocation && activeTab?.app === "calendar" ? "calendar" : location}
             unified={shouldShowUnifiedInboxButton}
             multipleAccounts={accounts.length > 1}
+            accountLabel={
+              isAccountLocation && selectedAccount
+                ? getAccountLabel(selectedAccount.config.label)
+                : undefined
+            }
           />
           {(shouldShowOutOfOfficeButton || accountButtons) && (
-            <TitlebarButtonGroup className="hidden min-w-0 flex-1 before:me-1 before:h-4 before:w-px before:shrink-0 before:bg-border sm:flex">
+            <TitlebarButtonGroup className="mail-account-group">
               {shouldShowOutOfOfficeButton && (
                 <Button
                   variant="ghost"
@@ -811,21 +749,13 @@ export function AppTitlebar({
                     style={{
                       height: APP_TITLEBAR_HEIGHT,
                       scrollPaddingLeft: accountRow.canScrollLeft ? accountRow.leftArrowWidth : 0,
-                      scrollPaddingRight:
-                        accountRow.coveredRowWidth +
-                        (accountRow.canScrollRight ? accountRow.rightArrowWidth : 0),
+                      scrollPaddingRight: accountRow.canScrollRight
+                        ? accountRow.rightArrowWidth
+                        : 0,
                     }}
                   >
                     {accountButtons}
-                    {/*
-                     * The space after the last account: a drag region again, and
-                     * the room the row scrolls the last button clear of the
-                     * controls that sit over its end with.
-                     */}
-                    <div
-                      className="h-full flex-1 draggable"
-                      style={{ minWidth: accountRow.coveredRowWidth }}
-                    />
+                    <div className="h-full flex-1 draggable" />
                   </div>
                   {/*
                    * Over the row rather than beside it, like the controls at the
@@ -857,22 +787,14 @@ export function AppTitlebar({
                       </TitlebarIconButton>
                     </div>
                   )}
-                  {/*
-                   * Held off the right edge by however much of the row the
-                   * controls pinned there cover, so that it ends exactly where
-                   * they begin and the row has no seam to slide through.
-                   */}
                   {accountRow.isOverflowing && (
                     <div
                       ref={accountRow.setRightArrowElement}
                       className={cn(
-                        "absolute top-0 flex items-center bg-background duration-150 before:pointer-events-none before:absolute before:top-0 before:right-full before:bottom-0 before:w-6 before:bg-linear-to-l before:from-background before:to-transparent motion-safe:transition-opacity",
+                        "absolute top-0 right-0 flex items-center bg-background duration-150 before:pointer-events-none before:absolute before:top-0 before:right-full before:bottom-0 before:w-6 before:bg-linear-to-l before:from-background before:to-transparent motion-safe:transition-opacity",
                         !accountRow.canScrollRight && "pointer-events-none opacity-0",
                       )}
-                      style={{
-                        height: APP_TITLEBAR_HEIGHT,
-                        right: accountRow.coveredRowWidth,
-                      }}
+                      style={{ height: APP_TITLEBAR_HEIGHT }}
                     >
                       <TitlebarIconButton
                         className="text-muted-foreground"
@@ -891,9 +813,9 @@ export function AppTitlebar({
               )}
             </TitlebarButtonGroup>
           )}
-        </TitlebarLeft>
-        <TitlebarRightOverlay ref={accountRow.setRightControlsElement}>
-          <div className="flex items-center gap-2">
+        </div>
+        <div data-slot="titlebar-utilities" className="mail-titlebar-utilities">
+          <div className="mail-utility-actions">
             <FindInPage />
             {/*
              * The group goes rather than emptying out, because an empty group
@@ -954,7 +876,7 @@ export function AppTitlebar({
                 aria-controls={showAssistant ? "mail-assistant" : undefined}
                 aria-label={t`Mail assistant`}
                 title={t`Mail assistant`}
-                className={cn(showAssistant && "bg-muted text-foreground")}
+                className="mail-assistant-button"
               >
                 <SparklesIcon />
               </TitlebarIconButton>
@@ -992,10 +914,10 @@ export function AppTitlebar({
             </Button>
           )}
           <AppMenuButton />
-        </TitlebarRightOverlay>
+        </div>
       </>
     );
   };
 
-  return <Titlebar>{renderContent()}</Titlebar>;
+  return <Titlebar className="mail-titlebar">{renderContent()}</Titlebar>;
 }
