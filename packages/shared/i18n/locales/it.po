@@ -2369,6 +2369,7 @@ msgid "Mail assistant provider"
 msgstr "Fornitore dell’assistente di posta"
 
 #: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Mail views"
 msgstr "Viste della posta"
 
@@ -4177,7 +4178,6 @@ msgstr "Disattiva Non disturbare"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
-#: packages/renderer/components/app-titlebar.tsx
 msgid "Turn Do Not Disturb on"
 msgstr "Attiva Non disturbare"
 

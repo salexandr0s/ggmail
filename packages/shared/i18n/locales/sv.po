@@ -2369,6 +2369,7 @@ msgid "Mail assistant provider"
 msgstr "Leverantör för e-postassistenten"
 
 #: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Mail views"
 msgstr "E-postvyer"
 
@@ -4177,7 +4178,6 @@ msgstr "Stäng av Stör ej"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
-#: packages/renderer/components/app-titlebar.tsx
 msgid "Turn Do Not Disturb on"
 msgstr "Aktivera Stör ej"
 

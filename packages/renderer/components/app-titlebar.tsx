@@ -129,15 +129,9 @@ function DoNotDisturb() {
 
         ipc.main.send("doNotDisturb.showOptions");
       }}
-      title={
-        config["doNotDisturb.enabled"] ? t`Turn Do Not Disturb off` : t`Turn Do Not Disturb on`
-      }
+      title={t`Turn Do Not Disturb off`}
     >
-      <MoonIcon
-        className={cn({
-          "text-violet-600": config["doNotDisturb.enabled"],
-        })}
-      />
+      <MoonIcon className="text-violet-600 dark:text-violet-400" />
     </TitlebarIconButton>
   );
 }

@@ -65,8 +65,10 @@ function resolveMail(visit: MailVisit) {
 // Chromium owns each tab's history. Keep only references to its entries and
 // interleave the renderer pages and account switches in the order they were seen.
 class ShellHistory {
-  private visits: Visit[] = [];
-  private cursor = -1;
+  // A library can open before the first Gmail navigation commits. Give it a
+  // way back immediately, then fill in the mailbox entry when Chromium is ready.
+  private visits: Visit[] = ["/"];
+  private cursor = 0;
   private restoring?: MailVisit;
   private restoringSurface = false;
 
@@ -88,7 +90,9 @@ class ShellHistory {
       }
       this.restoring = undefined;
     }
-    if (!sameVisit(this.visits[this.cursor], visit)) {
+    if (this.visits[this.cursor] === "/" && typeof visit !== "string") {
+      this.visits[this.cursor] = visit;
+    } else if (!sameVisit(this.visits[this.cursor], visit)) {
       this.visits.splice(this.cursor + 1, Infinity, visit);
       if (this.visits.length > 256) {
         this.visits.shift();
@@ -108,6 +112,11 @@ class ShellHistory {
       ) {
         return i;
       }
+    }
+    // The original mailbox may have signed out or closed while a library was
+    // visible. Returning to the shell is still possible without reviving it.
+    if (step === -1 && this.cursor > 0 && main.location !== "/") {
+      return 0;
     }
     return -1;
   }
@@ -150,6 +159,8 @@ class ShellHistory {
       } else {
         const target = resolveMail(visit);
         if (!target) {
+          this.visits[index] = "/";
+          main.navigate("/");
           return;
         }
         const { account, contents } = target;

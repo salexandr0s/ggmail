@@ -2369,6 +2369,7 @@ msgid "Mail assistant provider"
 msgstr "Aanbieder van de e-mailassistent"
 
 #: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Mail views"
 msgstr "E-mailweergaven"
 
@@ -4177,7 +4178,6 @@ msgstr "Zet Niet storen uit"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
-#: packages/renderer/components/app-titlebar.tsx
 msgid "Turn Do Not Disturb on"
 msgstr "Zet Niet storen aan"
 
