@@ -322,7 +322,7 @@ export type IpcMainEvents =
         accountId: string,
         mailboxKey: string,
         fileId: string,
-        category: AttachmentCategory | null,
+        category: AttachmentCategory[] | null,
       ) => void;
       "attachments.act": (
         accountId: string,

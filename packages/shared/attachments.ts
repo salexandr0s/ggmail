@@ -16,12 +16,32 @@ export function isAttachmentCategory(value: unknown): value is AttachmentCategor
   return attachmentCategories.some((category) => category === value);
 }
 
+export function normalizeAttachmentCategories(
+  values: readonly AttachmentCategory[],
+): AttachmentCategory[] {
+  const selected = attachmentCategories.filter(
+    (value) => value !== "uncategorized" && values.includes(value),
+  );
+  return selected.length ? selected : ["uncategorized"];
+}
+
+export function isCategorySelection(value: unknown): value is AttachmentCategory[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.length <= attachmentCategories.length &&
+    value.every(isAttachmentCategory) &&
+    new Set(value).size === value.length &&
+    (value.length === 1 || !value.includes("uncategorized"))
+  );
+}
+
 export type MailAttachment = {
   id: string;
   name: string;
   subject: string;
-  detectedCategory: AttachmentCategory;
-  categoryOverride?: AttachmentCategory;
+  detectedCategories: AttachmentCategory[];
+  categoryOverride?: AttachmentCategory[];
   sender: string;
   senderPhotoUrl?: string;
   receivedAt: number;

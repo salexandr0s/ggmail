@@ -1,8 +1,13 @@
 import { createHash } from "node:crypto";
-import { isAttachmentCategory, type AttachmentCategory } from "@ggmail/shared/attachments";
+import {
+  isAttachmentCategory,
+  isCategorySelection,
+  normalizeAttachmentCategories,
+  type AttachmentCategory,
+} from "@ggmail/shared/attachments";
 import { CachedStore } from "@/lib/cached-store";
 
-type Overrides = Record<string, AttachmentCategory>;
+type Overrides = Record<string, AttachmentCategory | AttachmentCategory[]>;
 let store: CachedStore<Record<string, Overrides>> | undefined;
 
 function categoryStore() {
@@ -40,10 +45,13 @@ export class AttachmentCategoryOverrides {
 
   get(fileId: string) {
     const category = this.values[this.mailboxKey + "/" + fileId];
-    return isAttachmentCategory(category) ? category : undefined;
+    if (isAttachmentCategory(category)) {
+      return [category]; // Single choices saved by earlier versions.
+    }
+    return isCategorySelection(category) ? normalizeAttachmentCategories(category) : undefined;
   }
 
-  set(fileId: string, category: AttachmentCategory | null) {
+  set(fileId: string, category: AttachmentCategory[] | null) {
     const categories = categoryStore();
     const values = categories.get(this.accountId) ?? {};
     const key = this.mailboxKey + "/" + fileId;

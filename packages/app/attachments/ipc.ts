@@ -1,5 +1,5 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail selectors, request parameters and IPC errors. The renderer localizes status messages. */
-import { isAttachmentCategory } from "@ggmail/shared/attachments";
+import { isCategorySelection } from "@ggmail/shared/attachments";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { IpcMainInvokeEvent } from "electron";
 import { accounts } from "@/accounts";
@@ -37,7 +37,7 @@ export function registerAttachmentIpc({ main: listener }: typeof ipc) {
   });
 
   listener.handle("attachments.setCategory", (event, id, mailboxKey, fileId, category) => {
-    if (category !== null && !isAttachmentCategory(category)) {
+    if (category !== null && !isCategorySelection(category)) {
       throw new Error("Invalid category");
     }
     const account = accountFor(event, id);

@@ -62,7 +62,7 @@ describe("Gmail attachment metadata", () => {
       thread,
       "Votre facture",
     );
-    expect(files.map((entry) => entry.file.detectedCategory)).toEqual([
+    expect(files.map((entry) => entry.file.detectedCategories.join(" + "))).toEqual([
       "uncategorized",
       "contract",
     ]);
@@ -72,7 +72,7 @@ describe("Gmail attachment metadata", () => {
         mailbox,
         thread,
         "Votre facture",
-      )[0]?.file.detectedCategory,
+      )[0]?.file.detectedCategories.join(" + "),
     ).toBe("invoice");
   });
 
@@ -83,7 +83,7 @@ describe("Gmail attachment metadata", () => {
         mailbox,
         thread,
         "Documents",
-      )[0]?.file.detectedCategory;
+      )[0]?.file.detectedCategories.join(" + ");
     expect(parse("<p>Ci-joint votre facture.</p><blockquote>Contract attached.</blockquote>")).toBe(
       "invoice",
     );
@@ -102,8 +102,8 @@ describe("Gmail attachment metadata", () => {
     );
     const second = printDocument(tile(link.replace(message, thread), "export.pdf"), "Many thanks.");
     expect(
-      readPrintAttachments(first + second, mailbox, thread, "Contract").map(
-        (entry) => entry.file.detectedCategory,
+      readPrintAttachments(first + second, mailbox, thread, "Contract").map((entry) =>
+        entry.file.detectedCategories.join(" + "),
       ),
     ).toEqual(["invoice", "receipt", "uncategorized"]);
   });
@@ -113,8 +113,12 @@ describe("Gmail attachment metadata", () => {
     const body =
       '<div style="display: none">Attached invoice.</div><p>In allegato la ricevuta di pagamento.</p><div id="divRplyFwdMsg">From earlier mail</div><p>Contract attached.</p>';
     expect(
-      readPrintAttachments(printDocument(attachment, body), mailbox, thread, "Votre commande")[0]
-        ?.file.detectedCategory,
+      readPrintAttachments(
+        printDocument(attachment, body),
+        mailbox,
+        thread,
+        "Votre commande",
+      )[0]?.file.detectedCategories.join(" + "),
     ).toBe("receipt");
   });
 

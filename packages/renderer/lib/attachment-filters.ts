@@ -77,7 +77,7 @@ export function indexAttachment<T extends MailAttachment & { account: { id: stri
     fields: [fold(file.name), fold(file.subject), sender],
     kind: fileKind(file.name),
     extension: attachmentExtension(file.name),
-    category: file.categoryOverride ?? file.detectedCategory,
+    categories: file.categoryOverride ?? file.detectedCategories,
     size: attachmentSizeBand(file.size),
   } as const;
 }
@@ -95,9 +95,11 @@ export type FacetCounts<T> = { total: number; values: Map<T, number> };
 function facet<T>(): FacetCounts<T> {
   return { total: 0, values: new Map() };
 }
-function count<T>(facet: FacetCounts<T>, value: T) {
+function count<T>(facet: FacetCounts<T>, ...values: T[]) {
   facet.total++;
-  facet.values.set(value, (facet.values.get(value) ?? 0) + 1);
+  for (const value of values) {
+    facet.values.set(value, (facet.values.get(value) ?? 0) + 1);
+  }
 }
 
 export function filterAttachments<T extends MailAttachment & { account: { id: string } }>(
@@ -126,7 +128,9 @@ export function filterAttachments<T extends MailAttachment & { account: { id: st
     }
     const account = !filters.accountIds.length || filters.accountIds.includes(item.file.account.id);
     const kind = !filters.kinds.length || filters.kinds.includes(item.kind);
-    const category = !filters.categories.length || filters.categories.includes(item.category);
+    const category =
+      !filters.categories.length ||
+      item.categories.some((label) => filters.categories.includes(label));
     const extension = filters.extension === null || filters.extension === item.extension;
     const size = filters.size === null || filters.size === item.size;
     // Each facet ignores only its own selection, so alternatives keep meaningful counts.
@@ -145,7 +149,7 @@ export function filterAttachments<T extends MailAttachment & { account: { id: st
       count(kinds, item.kind);
     }
     if (!misses || !category) {
-      count(categories, item.category);
+      count(categories, ...item.categories);
     }
     if (!misses || !extension) {
       count(extensions, item.extension);

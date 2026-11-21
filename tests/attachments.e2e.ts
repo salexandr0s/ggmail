@@ -1,7 +1,9 @@
-import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { readdir, readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { expect, test, type Locator } from "@playwright/test";
 import { useApp } from "./lib/app";
 
@@ -69,11 +71,13 @@ const mail = {
 };
 type ThreadId = keyof typeof mail.Work;
 
+const webBookingTicket = "Web Booking eTicket (ZX72QK) - ALEX EXAMPLE.pdf";
 const mixedDocuments = [
   ["01.pdf", "invoice"],
   ["02.pdf", "receipt"],
   ["Acuerdo de confidencialidad.pdf", "contract"],
   ["Bordkarte zur Buchung Q5.pkpass", "ticket"],
+  [webBookingTicket, "ticket booking"],
   ["Επιβεβαίωση κράτησης.pdf", "booking"],
   ["Estratto conto corrente.pdf", "statement"],
   ["Purchase order for quotation 310.xlsx", "order"],
@@ -331,6 +335,14 @@ async function choose(trigger: Locator, name: string | RegExp) {
   await ggmail.renderer.getByRole("option", { name, exact: typeof name === "string" }).click();
 }
 
+async function toggleCategory(trigger: Locator, name: string | RegExp) {
+  await choose(trigger, name);
+  const list = ggmail.renderer.getByRole("listbox");
+  if (await list.isVisible()) {
+    await list.press("Escape");
+  }
+}
+
 test("browse, filter, preview, and download attachments in their own account", async () => {
   const page = ggmail.renderer;
   await identifyWorkMailbox();
@@ -472,7 +484,7 @@ test("combines categories with format, account and search and remembers correcti
     .filter({ hasText: "Míra Chen" })
     .filter({ hasText: "Notes.txt" });
   const picker = work.getByRole("combobox", { name: "Category for Notes.txt" });
-  await choose(picker, "Receipt");
+  await toggleCategory(picker, "Receipt");
   await filter("Receipt").click();
   await expect(page.getByRole("listitem")).toHaveCount(1);
   await expect(work).toBeVisible();
@@ -634,7 +646,83 @@ test("categorizes a mixed-language message per attachment and uses those categor
   await page.getByRole("button", { name: "Receipt", exact: true }).click();
   await expect(page.getByRole("listitem")).toHaveCount(1);
   await expect(page.getByRole("listitem")).toContainText("02.pdf");
+  await page.getByRole("button", { name: "Receipt", exact: true }).click();
+  await page.getByRole("button", { name: "Ticket", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(2);
+  await expect(
+    page.getByRole("button", {
+      name: "Web Booking eTicket (ZX72QK) - ALEX EXAMPLE.pdf",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Reservation", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(3);
+  await page.getByRole("button", { name: "Ticket", exact: true }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(2);
+  await expect(page.getByRole("button", { name: webBookingTicket, exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Grid view" }).click();
+  await expect(page.getByRole("combobox", { name: "Category for " + webBookingTicket })).toHaveText(
+    /Ticket.*Reservation/,
+  );
   expect(fileRequests).toBe(0);
+});
+
+test("upgrades a cached e-ticket before Gmail responds and keeps manual categories", async () => {
+  useMixedDocuments = true;
+  await identifyProfiles();
+  const open = () =>
+    ggmail.renderer.getByRole("button", { name: "Attachments", exact: true }).click();
+  const category = (name: string) =>
+    ggmail.renderer.getByRole("combobox", { name: "Category for " + name, exact: true });
+  const boardingPass = "Bordkarte zur Buchung Q5.pkpass";
+  await open();
+  await expect(category(webBookingTicket)).toHaveText(/Ticket.*Reservation/);
+  await toggleCategory(category(boardingPass), "Reservation");
+  await expect(category(boardingPass)).toHaveText(/Ticket.*Reservation/);
+  await expect(category("Project handover.pdf")).toBeVisible();
+  const indexed = [...workPrints];
+
+  holdListing = true;
+  try {
+    await ggmail.relaunch();
+    // Seed the old on-disk result in the temporary profile before the library opens.
+    const directory = path.join(
+      ggmail.userDataDir,
+      "attachment-index",
+      createHash("sha256").update("Work").digest("hex"),
+    );
+    const [filename] = await readdir(directory);
+    if (!filename) {
+      throw new Error("Fixture mailbox index missing");
+    }
+    const db = new DatabaseSync(path.join(directory, filename));
+    try {
+      for (const name of [webBookingTicket, boardingPass]) {
+        const key = mixedDocuments.findIndex(([title]) => title === name);
+        expect(
+          db
+            .prepare(
+              "UPDATE threads SET files = json_set(json_remove(files, ?), ?, 'uncategorized') WHERE id = ?",
+            )
+            .run("$[" + key + "].detectedCategories", "$[" + key + "].detectedCategory", first)
+            .changes,
+        ).toBe(1);
+      }
+      db.exec("PRAGMA user_version = 0");
+    } finally {
+      db.close();
+    }
+    await identifyProfiles();
+    await open();
+    await expect(category(webBookingTicket)).toHaveText(/Ticket.*Reservation/);
+    await expect(category(boardingPass)).toHaveText(/Ticket.*Reservation/);
+    await toggleCategory(category(boardingPass), /^Automatic/);
+    await expect(category(boardingPass)).toHaveText("Ticket");
+    expect(workPrints).toEqual(indexed);
+    expect(fileRequests).toBe(0);
+  } finally {
+    holdListing = false;
+  }
 });
 
 test("an explicit Uncategorized survives restart until automatic detection is restored", async () => {
@@ -644,13 +732,13 @@ test("an explicit Uncategorized survives restart until automatic detection is re
   const category = () =>
     ggmail.renderer.getByRole("combobox", { name: "Category for Project handover.pdf" });
   await open();
-  await choose(category(), "Uncategorized");
+  await toggleCategory(category(), "Uncategorized");
   await expect(category()).toHaveText("Uncategorized");
   await ggmail.relaunch();
   await identifyWorkMailbox();
   await open();
   await expect(category()).toHaveText("Uncategorized");
-  await choose(category(), /^Automatic/);
+  await toggleCategory(category(), /^Automatic/);
   await ggmail.renderer.getByRole("button", { name: "Contract", exact: true }).click();
   await expect(category()).toHaveText("Contract");
   await expect(ggmail.renderer.getByRole("listitem")).toHaveCount(1);

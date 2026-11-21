@@ -1,11 +1,15 @@
 import { expect, test } from "bun:test";
 import type { AttachmentCategory } from "@ggmail/shared/attachments";
-import { classifyMessageAttachments } from "./classify";
+import { classifyMessageAttachments as detectCategories } from "./classify";
+
+function classifyMessageAttachments(...args: Parameters<typeof detectCategories>) {
+  return detectCategories(...args).map((categories) => categories.join(" + "));
+}
 
 // The columns are English, German, Spanish, Greek, Italian and French.
 // Keep lookalikes together so improving recall in one category cannot hide a false positive in another.
 const languages = ["en", "de", "es", "el", "it", "fr"] as const;
-const titles: [AttachmentCategory, string, string, string, string, string, string][] = [
+const titles: [string, string, string, string, string, string, string][] = [
   [
     "invoice",
     "VAT invoice for order 429",
@@ -88,6 +92,42 @@ const titles: [AttachmentCategory, string, string, string, string, string, strin
     "Confirmation de réservation",
   ],
   [
+    "ticket + booking",
+    "Web Booking eTicket ZX72QK",
+    "Buchung – Online-Ticket 431",
+    "Reserva – billete electrónico 431",
+    "Κράτηση – ηλεκτρονικό εισιτήριο 431",
+    "Prenotazione – biglietto elettronico 431",
+    "Réservation – e-billet 431",
+  ],
+  [
+    "booking",
+    "Accommodation voucher",
+    "Buchungsübersicht",
+    "Bono de alojamiento",
+    "Στοιχεία κράτησης",
+    "Voucher alberghiero",
+    "Bon de séjour",
+  ],
+  [
+    "ticket",
+    "Electronic ticket (booking reference Q5)",
+    "Flugticket (Buchungsreferenz Q5)",
+    "Billete electrónico (código de reserva Q5)",
+    "Εισιτήριο (κωδικός κράτησης Q5)",
+    "Biglietto (codice di prenotazione Q5)",
+    "Billet (référence de réservation Q5)",
+  ],
+  [
+    "ticket + booking",
+    "Reservation and boarding pass",
+    "Buchung und Bordkarte",
+    "Reserva y tarjeta de embarque",
+    "Κράτηση και κάρτα επιβίβασης",
+    "Prenotazione e carta d’imbarco",
+    "Réservation et carte d’embarquement",
+  ],
+  [
     "statement",
     "Checking account statement",
     "Kreditkartenabrechnung",
@@ -150,15 +190,6 @@ const titles: [AttachmentCategory, string, string, string, string, string, strin
     "Ticket di assistenza 284",
     "Ticket d’incident 284",
   ],
-  [
-    "uncategorized",
-    "Invoice and contract",
-    "Rechnung und Vertrag",
-    "Factura y contrato",
-    "Τιμολόγιο και σύμβαση",
-    "Fattura e contratto",
-    "Facture et contrat",
-  ],
 ];
 for (const [category, ...examples] of titles) {
   examples.forEach((title, index) => {
@@ -196,6 +227,42 @@ const details: [AttachmentCategory, string, string, string, string, string, stri
     "Πύλη Α1, ομάδα επιβίβασης 3",
     "Gate A1, gruppo d’imbarco 3",
     "Porte d’embarquement A1, groupe d’embarquement 3",
+  ],
+  [
+    "booking",
+    "Check-in date May 4, check-out date May 12",
+    "Anreisedatum 4. Mai, Abreisedatum 12. Mai",
+    "Fecha de entrada 4 de mayo, fecha de salida 12 de mayo",
+    "Ημερομηνία άφιξης 4 Μαΐου, ημερομηνία αναχώρησης 12 Μαΐου",
+    "Data di arrivo 4 maggio, data di partenza 12 maggio",
+    "Date d’arrivée 4 mai, date de départ 12 mai",
+  ],
+  [
+    "contract",
+    "Contracting parties and effective date",
+    "Vertragsparteien und Inkrafttreten",
+    "Partes contratantes y fecha de entrada en vigor",
+    "Συμβαλλόμενα μέρη και έναρξη ισχύος",
+    "Parti contraenti e data di decorrenza",
+    "Parties contractantes et date de prise d’effet",
+  ],
+  [
+    "order",
+    "Order number 123, quantity ordered 2",
+    "Bestellnummer 123, Bestellmenge 2",
+    "Número de pedido 123, cantidad pedida 2",
+    "Αριθμός παραγγελίας 123, παραγγελθείσα ποσότητα 2",
+    "Numero d’ordine 123, quantità ordinata 2",
+    "Numéro de commande 123, quantité commandée 2",
+  ],
+  [
+    "quote",
+    "Quoted price €95, valid until May 12",
+    "Angebotspreis 95 €, gültig bis 12. Mai",
+    "Precio ofertado 95 €, válido hasta el 12 de mayo",
+    "Προσφερόμενη τιμή 95 €, ισχύει έως 12 Μαΐου",
+    "Prezzo proposto 95 €, valido fino al 12 maggio",
+    "Prix proposé 95 €, valable jusqu’au 12 mai",
   ],
   [
     "statement",
@@ -249,4 +316,34 @@ test.each([
 ])("distinguishes acknowledging an invoice from supplying one or paying it: %s", (subject) => {
   expect(classifyMessageAttachments(["scan.pdf"], subject)).toEqual(["uncategorized"]);
   expect(classifyMessageAttachments(["Receipt.pdf"], subject)).toEqual(["receipt"]);
+});
+
+const combined = [
+  ["Invoice and receipt", "Invoice and contract"],
+  ["Rechnung und Quittung", "Rechnung und Vertrag"],
+  ["Factura y recibo", "Factura y contrato"],
+  ["Τιμολόγιο και απόδειξη", "Τιμολόγιο και σύμβαση"],
+  ["Fattura e ricevuta", "Fattura e contratto"],
+  ["Facture et reçu", "Facture et contrat"],
+] as const;
+test.each(combined)(
+  "recognizes explicitly combined files separately from email references: %s",
+  (financial, legal) => {
+    expect(detectCategories([financial + ".pdf", legal + ".pdf"], "")).toEqual([
+      ["invoice", "receipt"],
+      ["invoice", "contract"],
+    ]);
+    expect(detectCategories(["scan.pdf"], legal)).toEqual([["uncategorized"]]);
+    expect(detectCategories(["scan.pdf"], financial)).toEqual([["invoice", "receipt"]]);
+  },
+);
+
+test("keeps joint labels for a named attachment and avoids assigning them to its sibling", () => {
+  expect(
+    detectCategories(
+      ["a.pdf", "b.pdf"],
+      "",
+      () => "Web Booking eTicket: a.pdf. Invoice for the flight ticket: b.pdf.",
+    ),
+  ).toEqual([["ticket", "booking"], ["invoice"]]);
 });

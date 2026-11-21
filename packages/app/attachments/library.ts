@@ -101,7 +101,7 @@ class AttachmentLibrary {
     return this.categories.mailboxKey;
   }
 
-  setCategory(mailboxKey: string, fileId: string, category: AttachmentCategory | null) {
+  setCategory(mailboxKey: string, fileId: string, category: AttachmentCategory[] | null) {
     const entry = this.entries.get(fileId);
     if (mailboxKey !== this.categories.mailboxKey || !entry) {
       throw new Error("Attachment unavailable");

@@ -1,5 +1,6 @@
 import {
   attachmentCategories,
+  normalizeAttachmentCategories,
   type AttachmentCategory,
   type MailAttachment,
 } from "@ggmail/shared/attachments";
@@ -22,7 +23,7 @@ import {
   TagIcon,
   TicketIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export const categoryIcons = {
@@ -57,31 +58,47 @@ export function CategoryPicker({
   onChange,
 }: {
   file: MailAttachment;
-  onChange: (category: AttachmentCategory | null) => Promise<void>;
+  onChange: (category: AttachmentCategory[] | null) => Promise<void>;
 }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const labels = useCategoryLabels();
   const [saving, setSaving] = useState(false);
-  const detected = labels[file.detectedCategory];
+  const formatter = useMemo(
+    () => new Intl.ListFormat(i18n.locale, { type: "unit" }),
+    [i18n.locale],
+  );
+  const formatLabels = (values: AttachmentCategory[]) =>
+    formatter.format(values.map((value) => labels[value]));
+  const detected = formatLabels(file.detectedCategories);
   const name = file.name;
-  const category = file.categoryOverride ?? file.detectedCategory;
-  const Icon = categoryIcons[category];
+  const categories = file.categoryOverride ?? file.detectedCategories;
+  const label = formatLabels(categories);
+  const [first] = categories;
+  const Icon = first && categories.length === 1 ? categoryIcons[first] : TagIcon;
   const items = [
     { value: "auto" as const, label: t`Automatic (${detected})` },
     ...attachmentCategories.map((value) => ({ value, label: labels[value] })),
   ];
   return (
-    <Select<AttachmentCategory | "auto">
+    <Select<AttachmentCategory | "auto", true>
+      multiple
       items={items}
-      value={file.categoryOverride ?? "auto"}
-      disabled={saving}
+      value={file.categoryOverride ?? ["auto", ...categories]}
       onValueChange={async (choice) => {
-        if (!choice) {
+        if (saving || (!file.categoryOverride && !choice.includes("auto"))) {
           return;
         }
         setSaving(true);
         try {
-          await onChange(choice === "auto" ? null : choice);
+          if (file.categoryOverride && choice.includes("auto")) {
+            await onChange(null);
+          } else if (!categories.includes("uncategorized") && choice.includes("uncategorized")) {
+            await onChange(["uncategorized"]);
+          } else {
+            await onChange(
+              normalizeAttachmentCategories(choice.filter((value) => value !== "auto")),
+            );
+          }
         } catch {
           toast.error(t`Couldn’t save the category. Try again.`);
         } finally {
@@ -91,17 +108,19 @@ export function CategoryPicker({
     >
       <SelectTrigger
         aria-label={t`Category for ${name}`}
-        title={t`Category for ${name}`}
+        aria-description={label}
+        title={label}
         className="attachment-category-picker"
-        data-assigned={category !== "uncategorized"}
-        data-attachment-category={category}
+        data-assigned={!categories.includes("uncategorized")}
+        data-multiple={categories.length > 1}
+        data-attachment-category={categories.join(" ")}
       >
         <Icon aria-hidden="true" className="size-3.5" />
-        <SelectValue>{labels[category]}</SelectValue>
+        <SelectValue>{label}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         {items.map(({ value, label }) => (
-          <SelectItem key={value} value={value}>
+          <SelectItem key={value} value={value} disabled={saving}>
             {label}
           </SelectItem>
         ))}

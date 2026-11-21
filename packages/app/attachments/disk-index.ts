@@ -3,11 +3,16 @@ import { createHash } from "node:crypto";
 import { chmodSync, mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { attachmentCategories } from "@ggmail/shared/attachments";
+import {
+  attachmentCategories,
+  isAttachmentCategory,
+  isCategorySelection,
+} from "@ggmail/shared/attachments";
 import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { app } from "electron";
 import { z } from "zod";
 import { log } from "@/lib/log";
+import { classifyIndexedFilename } from "./classify";
 import type { AttachmentEntry } from "./metadata";
 
 function indexDirectory(accountId?: string) {
@@ -27,23 +32,69 @@ const storedFile = z.object({
   subject: z.string(),
   sender: z.string(),
   senderPhotoUrl: z.string().optional(),
-  detectedCategory: z.enum(attachmentCategories),
+  detectedCategories: z.array(z.enum(attachmentCategories)).refine(isCategorySelection),
   thumbnailView: z.enum(["snatt", "fimg", "att"]).optional(),
   size: z.string(),
   receivedAt: z.number(),
 });
+// Old indexes stored one detected category. Both formats can be restored even
+// when SQLite is temporarily unable to commit a migration.
+const readableFile = z.preprocess((raw) => {
+  if (
+    raw &&
+    typeof raw === "object" &&
+    !("detectedCategories" in raw) &&
+    "detectedCategory" in raw &&
+    isAttachmentCategory(raw.detectedCategory) &&
+    "name" in raw &&
+    typeof raw.name === "string"
+  ) {
+    return {
+      ...raw,
+      detectedCategories: classifyIndexedFilename(raw.name) ?? [raw.detectedCategory],
+    };
+  }
+  return raw;
+}, storedFile);
 const storedThread = z.object({
   id: z.string().regex(/^[\da-f]{15,16}$/i),
   signature: z.string(),
   files: z.string().transform((json, ctx) => {
     try {
-      return storedFile.array().parse(JSON.parse(json));
+      return readableFile.array().parse(JSON.parse(json));
     } catch {
       ctx.addIssue({ code: "custom", message: "Invalid attachment metadata" });
       return z.NEVER;
     }
   }),
 });
+
+// Previous versions stored one category per attachment. Upgrade in place so
+// unchanged conversations still match their Gmail signatures on the next scan.
+function upgradeCategories(db: DatabaseSync) {
+  if (Number(db.prepare("PRAGMA user_version").get()?.user_version) >= 2) {
+    return;
+  }
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const update = db.prepare("UPDATE threads SET files = ? WHERE id = ?");
+    for (const row of db.prepare("SELECT id, signature, files FROM threads").all()) {
+      const stored = storedThread.safeParse(row);
+      if (!stored.success) {
+        continue;
+      }
+      const { files, id } = stored.data;
+      if (files.length) {
+        update.run(JSON.stringify(files), id);
+      }
+    }
+    db.exec("PRAGMA user_version = 2");
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
 
 // A committed row is one successfully read conversation, including conversations with
 // zero files. An interrupted scan never advances a separate cursor past unsaved data.
@@ -69,6 +120,14 @@ export class AttachmentDiskIndex {
       ) {
         // This is a disposable metadata index. Rebuild a corrupt database on the next visit.
         rmSync(filename, { force: true });
+      }
+    }
+    if (this.db) {
+      try {
+        upgradeCategories(this.db);
+      } catch {
+        // The previously saved files are still readable if the upgrade could not commit.
+        log.warn("Could not update saved attachment categories; will retry when the index reopens");
       }
     }
   }

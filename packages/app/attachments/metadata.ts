@@ -135,7 +135,7 @@ export function readPrintAttachments(
           file: {
             id,
             name,
-            detectedCategory: "uncategorized",
+            detectedCategories: ["uncategorized"],
             subject,
             sender,
             senderPhotoUrl,
@@ -174,7 +174,7 @@ export function readPrintAttachments(
       readMessageText,
     );
     entries.forEach((entry, index) => {
-      entry.file.detectedCategory = detected[index] ?? "uncategorized";
+      entry.file.detectedCategories = detected[index] ?? ["uncategorized"];
       files.set(entry.file.id, entry);
     });
   }

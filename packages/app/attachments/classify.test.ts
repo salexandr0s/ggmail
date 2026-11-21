@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import type { AttachmentCategory } from "@ggmail/shared/attachments";
-import { classifyMessageAttachments } from "./classify";
+import { classifyMessageAttachments as detectCategories } from "./classify";
+
+function classifyMessageAttachments(...args: Parameters<typeof detectCategories>) {
+  return detectCategories(...args).map((categories) => categories.join(" + "));
+}
 
 function classifyAttachment(name: string, subject: string, readMessageText?: () => string) {
   return classifyMessageAttachments([name], subject, readMessageText)[0];
@@ -239,4 +243,67 @@ test("distinguishes shop slips from travel tickets and names without extensions 
   expect(classifyAttachment("Rechnung-044", "")).toBe("invoice");
   expect(classifyAttachment("unknown", "Invoice")).toBe("uncategorized");
   expect(classifyAttachment("invoice.exe", "Invoice")).toBe("uncategorized");
+});
+
+test.each([
+  ["Web Booking eTicket (ZX72QK) - ALEX EXAMPLE.pdf", "ticket + booking"],
+  ["web_booking_ETICKET_001.pdf", "ticket + booking"],
+  ["Booking_e-tkt_001.pdf", "ticket + booking"],
+  ["ETICKETS.pkpass", "ticket"],
+  ["electronic ticket itinerary / receipt.pdf", "receipt + ticket + booking"],
+  ["Invoice for Web Booking eTicket.pdf", "invoice"],
+  ["Payment receipt for booking e-ticket.pdf", "receipt"],
+  ["Booking confirmation for flight ticket.pdf", "booking"],
+  ["Reservation & eTicket.pdf", "ticket + booking"],
+  ["Flight ticket and payment receipt.pdf", "receipt + ticket"],
+  ["Parking ticket.pdf", "uncategorized"],
+  ["Ticket de caisse 44.pdf", "receipt"],
+  ["eTicket de caisse 44.pdf", "receipt"],
+  ["ETICKET de compra 44.pdf", "receipt"],
+  ["E-ticket cancellation.pdf", "uncategorized"],
+  ["eTicket de soporte 89.pdf", "uncategorized"],
+  ["Rechnung Nr. 342 für Vertrag 993.pdf", "invoice"],
+  ["Receipt 42 for booking e-ticket.pdf", "receipt"],
+  ["E-ticket itinerary template.pdf", "uncategorized"],
+  ["Quote no. 604 - Example Studio.pdf", "quote"],
+  ["Order 604 - Example Studio.pdf", "order"],
+  ["Quote of the day 604.pdf", "uncategorized"],
+  ["Bank statement for reservation.pdf", "statement"],
+  ["Factura de acuerdo con el contrato.pdf", "invoice"],
+  ["Facture 304 - numéro de commande 927.pdf", "invoice"],
+] as const)("recognizes the document described by the whole filename: %s", (name, expected) => {
+  expect(classifyMessageAttachments([name, "contract.pdf"], "Your receipt")).toEqual([
+    expected,
+    "contract",
+  ]);
+});
+
+test("a reservation reference or one generic detail cannot identify a document", () => {
+  for (const text of [
+    "Booking reference Q5",
+    "Fecha de entrada",
+    "Prix proposé 30 €",
+    "Effective date July 12",
+    "Quantity ordered 2",
+  ]) {
+    expect(classifyAttachment("scan.pdf", text)).toBe("uncategorized");
+  }
+});
+
+test("uses context for a bare electronic ticket as well as a bare ticket", () => {
+  expect(classifyAttachment("ETICKET-193.pdf", "Votre ticket de caisse")).toBe("receipt");
+  expect(classifyAttachment("eTicket.pdf", "Helpdesk incident 19")).toBe("uncategorized");
+  expect(classifyAttachment("ETICKET.pdf", "")).toBe("ticket");
+});
+
+test("keeps references scoped and permits a genuinely combined title", () => {
+  expect(detectCategories(["Invoice for a ticket and reservation.pdf"], "")).toEqual([["invoice"]]);
+  expect(detectCategories(["Invoice / Receipt.pdf", "Factura-Recibo.pdf"], "")).toEqual([
+    ["invoice", "receipt"],
+    ["invoice", "receipt"],
+  ]);
+  expect(detectCategories(["Web Booking (ZX72QK) eTicket.pdf"], "")).toEqual([
+    ["ticket", "booking"],
+  ]);
+  expect(detectCategories(["Ticket.pdf"], "Your booking eTicket")).toEqual([["ticket", "booking"]]);
 });

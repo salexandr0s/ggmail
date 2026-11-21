@@ -17,17 +17,17 @@ function file(name: string, account: string, properties: Partial<MailAttachment>
     receivedAt: +new Date(2026, 2, 29, 12),
     sender: "Inès Weiß <πληροφορίες@example.test>",
     subject: "March studio work",
-    detectedCategory: "invoice",
+    detectedCategories: ["invoice"],
     size: "1,2 Mo",
     ...properties,
   });
 }
 const index = [
   file("Τιμολόγιο_Μαρτίου.PDF", "work"),
-  file("Draft.tsv", "team", { categoryOverride: "quote", size: "17K" }),
-  file("Notes", "personal", { detectedCategory: "uncategorized", size: "" }),
+  file("Draft.tsv", "team", { categoryOverride: ["quote"], size: "17K" }),
+  file("Notes", "personal", { detectedCategories: ["uncategorized"], size: "" }),
   file("Old.pdf", "work", {
-    detectedCategory: "receipt",
+    detectedCategories: ["receipt"],
     receivedAt: +new Date(2026, 2, 28, 23, 59),
   }),
   file("April.pdf", "team", { receivedAt: +new Date(2026, 2, 30) }),
@@ -111,4 +111,25 @@ describe("attachment filters", () => {
     expect(match({}).sizes.total).toBe(5);
     expect(match({ size: "small" }).results.map((f) => f.name)).toEqual(["Draft.tsv"]);
   });
+});
+
+test("counts a dual-purpose file once in the results and in each of its category buckets", () => {
+  const files = [
+    file("Booking eTicket.pdf", "work", { detectedCategories: ["ticket", "booking"] }),
+    file("Reservation.pdf", "work", { detectedCategories: ["booking"] }),
+  ];
+  for (const [categories, count] of [
+    [["ticket"], 1],
+    [["booking"], 2],
+    [["ticket", "booking"], 2],
+  ] as const) {
+    const result = filterAttachments(files, {
+      ...emptyAttachmentFilters,
+      categories: [...categories],
+    });
+    expect(result.results).toHaveLength(count);
+    expect(result.categories.total).toBe(2);
+    expect(result.categories.values.get("ticket")).toBe(1);
+    expect(result.categories.values.get("booking")).toBe(2);
+  }
 });

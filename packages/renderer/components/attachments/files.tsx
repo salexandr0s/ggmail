@@ -92,7 +92,7 @@ export function FileItem({
   item: LibraryFile;
   grid: boolean;
   onOpenSource: (button: HTMLButtonElement) => void;
-  onCategory: (category: AttachmentCategory | null) => Promise<void>;
+  onCategory: (category: AttachmentCategory[] | null) => Promise<void>;
   showAccount: boolean;
   showSenderIcons: boolean;
   date: Intl.DateTimeFormat;

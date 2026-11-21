@@ -147,6 +147,10 @@
   color: var(--foreground);
   background: var(--muted);
 }
+.attachment-category-picker[data-multiple="true"] [data-slot="select-value"] {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .attachment-category-picker:hover,
 .attachment-category-picker:focus-within {
   border-color: var(--input);

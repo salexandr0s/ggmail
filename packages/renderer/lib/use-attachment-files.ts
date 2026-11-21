@@ -126,7 +126,7 @@ export function useAttachmentFiles(scope: string, refresh: number) {
     accountId: string,
     mailboxKey: string,
     id: string,
-    category: AttachmentCategory | null,
+    category: AttachmentCategory[] | null,
   ) {
     await ipc.main.invoke("attachments.setCategory", accountId, mailboxKey, id, category);
     setMailboxes((previous) => {
