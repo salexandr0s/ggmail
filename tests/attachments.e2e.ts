@@ -574,7 +574,7 @@ test("Back from a source email restores the filtered file and its scroll positio
   await expect.poll(scrollTop).toBe(before);
 });
 
-test("combines multiple accounts and formats, with counts for each available alternative", async () => {
+test("switches the file type while retaining selected accounts and counting alternatives", async () => {
   await identifyWorkMailbox();
   const page = ggmail.renderer;
   await page.getByRole("button", { name: "Attachments", exact: true }).click();
@@ -584,18 +584,25 @@ test("combines multiple accounts and formats, with counts for each available alt
   for (const name of ["Work", "Personal"]) {
     await account.getByRole("button", { name, exact: true }).click();
   }
-  for (const name of ["PDF", "Spreadsheets"]) {
-    await formats.getByRole("button", { name, exact: true }).click();
-  }
-  await expect(page.getByRole("listitem")).toHaveCount(4);
+  const pdf = formats.getByRole("button", { name: "PDF", exact: true });
+  const sheets = formats.getByRole("button", { name: "Spreadsheets", exact: true });
+  await pdf.click();
+  await expect(page.getByRole("listitem")).toHaveCount(2);
+  await sheets.click();
+  await expect(pdf).toHaveAttribute("aria-pressed", "false");
+  await expect(formats.locator('[aria-pressed="true"]')).toHaveCount(1);
+  await expect(account.locator('[aria-pressed="true"]')).toHaveCount(2);
+  await sheets.click();
+  await expect(sheets).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("listitem")).toHaveCount(2);
   await expect(
     account.getByRole("button", { name: "Work", exact: true }),
-  ).toHaveAccessibleDescription("3");
+  ).toHaveAccessibleDescription("1");
   await expect(
     account.getByRole("button", { name: "Personal", exact: true }),
   ).toHaveAccessibleDescription("1");
   await account.getByRole("button", { name: "Personal", exact: true }).click();
-  await expect(page.getByRole("listitem")).toHaveCount(3);
+  await expect(page.getByRole("listitem")).toHaveCount(1);
   await expect(
     formats.getByRole("button", { name: "Images", exact: true }),
   ).toHaveAccessibleDescription("1");
@@ -908,6 +915,9 @@ test("renders image and PDF covers when a Gmail thumbnail is a placeholder or mi
   await expect.poll(width).toBe(32);
   await search.fill("Project handover.pdf");
   await expect.poll(width).toBeGreaterThan(32);
+  const pageCover = page.locator('.attachment-cover[data-file-kind="pdf"] img');
+  await expect(pageCover).toHaveCSS("object-fit", "cover");
+  await expect(pageCover).toHaveCSS("object-position", "50% 0%");
   expect(fileRequests).toBe(2);
 });
 

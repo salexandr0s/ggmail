@@ -145,6 +145,9 @@ export type WorkspaceAppBookmarkState = {
   bookmarked: boolean;
 };
 
+export const sidebarWorkspaceApps = ["calendar", "tasks", "meet"] as const;
+export type SidebarWorkspaceApp = (typeof sidebarWorkspaceApps)[number];
+
 export function getAdditionalLauncherApps(apps: LauncherWorkspaceApp[]) {
-  return apps.filter((app) => app !== "calendar" && app !== "tasks");
+  return apps.filter((app) => !sidebarWorkspaceApps.some((shortcut) => shortcut === app));
 }

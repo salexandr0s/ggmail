@@ -394,6 +394,12 @@
   object-fit: scale-down;
   object-position: center;
 }
+.attachment-cover img {
+  object-fit: cover;
+}
+.attachment-cover:not([data-file-kind="image"]) img {
+  object-position: center top;
+}
 .attachment-miniature {
   display: grid;
   place-items: center;

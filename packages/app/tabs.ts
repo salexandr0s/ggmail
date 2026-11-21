@@ -10,7 +10,7 @@ import {
   type SidebarWorkspaceApp,
   tabSections,
 } from "@ggmail/shared/tabs";
-import type { SupportedWorkspaceApp } from "@ggmail/shared/workspace-apps";
+import { sidebarWorkspaceApps, type SupportedWorkspaceApp } from "@ggmail/shared/workspace-apps";
 import type { RestoreOptions, WebContents, WebContentsView } from "electron";
 import { accounts } from "./accounts";
 import { bookmarks } from "./bookmarks";
@@ -265,7 +265,7 @@ export class Tabs {
   }
 
   get activeSidebarApp(): SidebarWorkspaceApp | undefined {
-    for (const app of ["calendar", "tasks"] as const) {
+    for (const app of sidebarWorkspaceApps) {
       if (this.sidebarTab(app)?.id === this.activeTabId) {
         return app;
       }
@@ -902,11 +902,16 @@ export class Tabs {
   }
 
   serialize(): TabState[] {
-    const calendar = this.sidebarTab("calendar");
-    const tasks = this.sidebarTab("tasks");
+    const shortcuts = new Map<Tab, SidebarWorkspaceApp>();
+    for (const app of sidebarWorkspaceApps) {
+      const tab = this.sidebarTab(app);
+      if (tab) {
+        shortcuts.set(tab, app);
+      }
+    }
     return this.tabs.map((tab) => ({
       id: tab.id,
-      sidebarApp: tab === calendar ? "calendar" : tab === tasks ? "tasks" : undefined,
+      sidebarApp: shortcuts.get(tab),
       app: tab.app,
       title: tab.title,
       pinned: tab.pinned,

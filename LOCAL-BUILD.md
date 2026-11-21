@@ -43,13 +43,13 @@ the selected provider. You can close the sidebar and reopen it in the same mail 
 
 ## Workspace sidebar
 
-The sidebar keeps Mail, Calendar, Bookmarks and Google Tasks in the same order on every mail view. Settings opens from the gear at the bottom. Calendar and Google Tasks open for the selected mailbox. Switch mailboxes in the title bar to switch accounts within either app. Reopening a shortcut returns to its existing tab. Each shortcut follows your Workspace preference for opening that app in the default browser.
+The sidebar keeps Mail, Calendar, Google Tasks and Google Meet in the same order on every mail view. Bookmarks sits at the bottom, above the separator and Settings gear. Calendar, Tasks and Meet open for the selected mailbox. Switch mailboxes in the title bar to switch accounts within these apps. Reopening a shortcut returns to its existing tab. Each shortcut follows your Workspace preference for opening that app in the default browser.
 
 ## Attachments
 
 Choose **View → Attachments**, select **Attachments** in the title bar, or open it from **Mail views** in a compact window. Search across filenames, senders and subjects. Words can appear in any order and in different fields. Enclose a phrase in quotation marks to keep its words together.
 
-Choose one category and any number of accounts and file types. For example, select **Receipt** and **PDF** to see PDF receipts. Choosing **Invoice** next switches to PDF invoices. The count beside each option reflects the other filters. Open **More filters** to enter a sender’s name or email, choose an exact extension, set either or both received dates, or select a size range. Both dates include the whole day in your local time zone. Size ranges use the size Gmail displays.
+Choose one category, one file type and any number of accounts. For example, select **Receipt** and **PDF** to see PDF receipts. Choosing **Invoice** next switches to PDF invoices. The count beside each option reflects the other filters. Open **More filters** to enter a sender’s name or email, choose an exact extension, set either or both received dates, or select a size range. Both dates include the whole day in your local time zone. Size ranges use the size Gmail displays.
 
 In a narrow window, open **Filters** for all controls and the live result count. Remove an active filter with its × button or choose **Clear filters** to clear the search and all selections. Switch between list and grid with the controls beside the sort menu.
 

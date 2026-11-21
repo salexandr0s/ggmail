@@ -1,6 +1,10 @@
 import { msg } from "@lingui/core/macro";
 import type { AccountConfig } from "./schemas";
-import type { SupportedWorkspaceApp, WorkspaceAppsMode } from "./workspace-apps";
+import type {
+  SidebarWorkspaceApp,
+  SupportedWorkspaceApp,
+  WorkspaceAppsMode,
+} from "./workspace-apps";
 
 export const GMAIL_TAB_ID = "gmail";
 
@@ -25,7 +29,7 @@ export function showsGmailUnreadCount(
   return !(mode === "whenInactive" && gmailTabActive);
 }
 
-export type SidebarWorkspaceApp = "calendar" | "tasks";
+export type { SidebarWorkspaceApp } from "./workspace-apps";
 
 export type TabState = {
   sidebarApp?: SidebarWorkspaceApp;

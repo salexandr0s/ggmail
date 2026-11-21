@@ -2002,6 +2002,10 @@ msgid "Go forward"
 msgstr "Ir adelante"
 
 #: packages/renderer/components/workspace-sidebar.tsx
+msgid "Google Meet"
+msgstr "Google Meet"
+
+#: packages/renderer/components/workspace-sidebar.tsx
 msgid "Google Tasks"
 msgstr "Google Tasks"
 

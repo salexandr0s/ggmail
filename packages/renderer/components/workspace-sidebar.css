@@ -102,15 +102,14 @@
   height: 14px;
 }
 
-.workspace-sidebar-footer::before {
+.workspace-sidebar-divider {
   width: 20px;
   height: 1px;
-  margin-bottom: 3px;
+  margin-block: 3px;
   background: var(--border);
-  content: "";
 }
 
-.workspace-sidebar-footer svg {
+.workspace-sidebar-footer > :last-child svg {
   width: 18px;
   height: 18px;
   stroke-width: 1.8;

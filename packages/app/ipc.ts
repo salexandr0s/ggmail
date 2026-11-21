@@ -13,7 +13,7 @@ import { ms } from "@ggmail/shared/ms";
 import { byPlatform } from "@ggmail/shared/platform";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { IpcMainEvents, IpcRendererEvent } from "@ggmail/shared/types";
-import { workspaceApps } from "@ggmail/shared/workspace-apps";
+import { sidebarWorkspaceApps, workspaceApps } from "@ggmail/shared/workspace-apps";
 import { select, t } from "@lingui/core/macro";
 import {
   app,
@@ -405,7 +405,7 @@ class Ipc {
       if (
         event.sender === main.window.webContents &&
         event.senderFrame === event.sender.mainFrame &&
-        (app === "calendar" || app === "tasks")
+        sidebarWorkspaceApps.includes(app)
       ) {
         accounts.getSelectedAccount().instance.tabs.openSidebarApp(app);
       }

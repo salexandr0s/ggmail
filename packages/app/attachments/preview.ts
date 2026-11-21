@@ -209,12 +209,14 @@ export async function generateCover(
   const { nativeImage } = await import("electron");
   const buffer = Buffer.from(original.bytes);
   let image;
-  if (original.mime === "application/pdf") {
+  const pdf = original.mime === "application/pdf";
+  const bounds = pdf ? { width: 640, height: 960 } : { width: 640, height: 480 };
+  if (pdf) {
     const directory = await mkdtemp(join(tmpdir(), "ggmail-cover-"));
     try {
       const path = join(directory, "preview.pdf");
       await writeFile(path, buffer, { mode: 0o600, signal });
-      image = await nativeImage.createThumbnailFromPath(path, { width: 480, height: 300 });
+      image = await nativeImage.createThumbnailFromPath(path, bounds);
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
@@ -226,7 +228,7 @@ export async function generateCover(
     return null;
   }
   const { width, height } = image.getSize();
-  const scale = Math.min(1, 480 / width, 300 / height);
+  const scale = Math.min(1, bounds.width / width, bounds.height / height);
   if (scale < 1) {
     image = image.resize({
       width: Math.max(1, Math.round(width * scale)),

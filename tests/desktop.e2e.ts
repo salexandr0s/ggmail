@@ -144,10 +144,10 @@ test("Calendar opens from the fixed sidebar and follows mailbox switches", async
   await expect(nav.getByRole("button", { name: "Calendar" })).toHaveCount(0);
   await nav.getByRole("button", { name: "Attachments" }).click();
   const buttons = sidebar.getByRole("button");
-  await expect(buttons).toHaveCount(5);
+  await expect(buttons).toHaveCount(6);
   expect(
     await buttons.evaluateAll((elements) => elements.map((el) => el.getAttribute("aria-label"))),
-  ).toEqual(["Mail", "Calendar", "Bookmarks", "Google Tasks", "Settings"]);
+  ).toEqual(["Mail", "Calendar", "Google Tasks", "Google Meet", "Bookmarks", "Settings"]);
   await button.click();
   await page.locator('[data-account-id="second-account"]').click();
 
@@ -187,7 +187,7 @@ test("Calendar opens from the fixed sidebar and follows mailbox switches", async
   await expect(button).not.toHaveAttribute("aria-current", "page");
 });
 
-test("sidebar shortcuts reuse Tasks, open bookmarks and keep Settings at the bottom", async () => {
+test("sidebar shortcuts reuse Tasks and Meet and put Bookmarks above the Settings separator", async () => {
   const page = ggmail.renderer;
   const sidebar = page.getByRole("navigation", { name: "Workspace apps" });
   const tasks = sidebar.getByRole("button", { name: "Google Tasks" });
@@ -217,6 +217,22 @@ test("sidebar shortcuts reuse Tasks, open bookmarks and keep Settings at the bot
   await tasks.click();
   await expect(tasks).toHaveAttribute("aria-current", "page");
   expect(await taskViews()).toEqual(original);
+  const meet = sidebar.getByRole("button", { name: "Google Meet" });
+  await meet.click();
+  await expect(meet).toHaveAttribute("aria-current", "page");
+  const meetings = () =>
+    ggmail.app.evaluate(({ webContents }) =>
+      webContents
+        .getAllWebContents()
+        .filter((wc) => wc.getURL().startsWith("https://meet.google.com/"))
+        .map((wc) => wc.id),
+    );
+  await expect.poll(meetings).toHaveLength(1);
+  const firstMeet = await meetings();
+  await tasks.click();
+  await meet.click();
+  await expect(meet).toHaveAttribute("aria-current", "page");
+  expect(await meetings()).toEqual(firstMeet);
   const popupPromise = page.context().waitForEvent("page");
   await bookmarks.click();
   const popup = await popupPromise;
@@ -245,6 +261,10 @@ test("sidebar shortcuts reuse Tasks, open bookmarks and keep Settings at the bot
     );
     const bounds = await sidebar.boundingBox();
     const gear = await settings.boundingBox();
+    const saved = await bookmarks.boundingBox();
+    const divider = await sidebar.locator(".workspace-sidebar-divider").boundingBox();
+    expect(saved && divider && saved.y + saved.height < divider.y).toBe(true);
+    expect(divider && gear && divider.y + divider.height < gear.y).toBe(true);
     expect(bounds?.width).toBe(52);
     await expect(tasks.locator("svg")).toHaveCSS("width", "20px");
     expect(bounds && gear && bounds.y + bounds.height - gear.y - gear.height).toBeLessThan(20);

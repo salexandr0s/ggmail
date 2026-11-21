@@ -258,7 +258,7 @@ export function Attachments() {
         key: "format-" + value,
         label,
         Icon: FileIcon,
-        remove: () => changeFilters({ kinds: kinds.filter((kind) => kind !== value) }),
+        remove: () => changeFilters({ kinds: [] }),
       })),
     ...categories.map((category) => ({
       key: category,
@@ -274,7 +274,7 @@ export function Attachments() {
       kinds={kindOptions}
       selected={kinds}
       counts={matches.kinds}
-      onKind={(kind) => changeFilters({ kinds: kind === "all" ? [] : toggleValue(kinds, kind) })}
+      onKind={(kind) => changeFilters({ kinds: kind === "all" ? [] : [kind] })}
     />
   );
   const filters = (

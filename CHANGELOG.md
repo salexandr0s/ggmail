@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.65.8 — 2026-11-21
+
+- The workspace sidebar now has Mail, Calendar, Google Tasks and Google Meet at the top. Bookmarks sits above the divider over Settings.
+- Document covers fill the attachment card width and show the top of the page. File-type filters now select one type at a time.
+
 ## 3.65.7 — 2026-11-21
 
 - The Attachments grid can render image and PDF covers when Gmail supplies a placeholder. Filenames have a fixed two-line slot so details and actions align on every card.
