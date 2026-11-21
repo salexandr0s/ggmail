@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@ggmail/ui/components/popover";
 import { Plural, useLingui } from "@lingui/react/macro";
-import { CheckIcon, FilesIcon, LayersIcon, SlidersHorizontalIcon } from "lucide-react";
+import { FilesIcon, LayersIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
 import { AccountFilters, FilterButton } from "@/components/account-filters";
 import type { FacetCounts } from "@/lib/attachment-filters";
@@ -97,7 +97,7 @@ export function LibraryFilters({
         />
         {attachmentCategories.map((value) => {
           const selected = categories.includes(value);
-          const Icon = selected ? CheckIcon : categoryIcons[value];
+          const Icon = categoryIcons[value];
           return (
             <FilterButton
               key={value}

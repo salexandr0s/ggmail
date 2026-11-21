@@ -12,7 +12,7 @@ function usePreview(
   account: string,
   mailboxKey: string,
   id: string,
-  size: "full" | "thumbnail",
+  size: "full" | "thumbnail" | "cover",
   enabled: boolean,
 ) {
   const [preview, setPreview] = useState<{ mime: string; url: string; text?: string } | null>();
@@ -78,7 +78,13 @@ export function FileThumbnail({
     }
     return () => observer.disconnect();
   }, []);
-  const preview = usePreview(item.account.id, item.mailboxKey, item.id, "thumbnail", visible);
+  const preview = usePreview(
+    item.account.id,
+    item.mailboxKey,
+    item.id,
+    large ? "cover" : "thumbnail",
+    visible,
+  );
   return (
     <span
       ref={element}

@@ -101,6 +101,7 @@ let workSearchStarts = 0;
 let handoverThumbnails = 0;
 let searchImageRequests = 0;
 let fileRequests = 0;
+let missingSnapshots = false;
 
 test.beforeEach(() => {
   useMixedDocuments = false;
@@ -120,6 +121,7 @@ test.beforeEach(() => {
   handoverThumbnails = 0;
   searchImageRequests = 0;
   fileRequests = 0;
+  missingSnapshots = false;
 });
 
 const server = createServer(async (request, response) => {
@@ -128,14 +130,20 @@ const server = createServer(async (request, response) => {
   const label = work ? "Work" : "Personal";
   const threads = mail[label];
   if (url.searchParams.get("disp") === "thd") {
-    if (
-      work &&
-      url.searchParams.get("view") === "snatt" &&
-      url.searchParams.get("attid") === "0.1"
-    ) {
-      if (url.searchParams.get("th") === older) {
-        handoverThumbnails++;
-      }
+    const id = url.searchParams.get("th") as ThreadId;
+    const part = url.searchParams.get("attid");
+    const index = Number(part?.split(".").at(-1)) - 1;
+    const name =
+      useMixedDocuments && work && id === first
+        ? mixedDocuments[index]?.[0]
+        : threads[id]?.files[index]?.[0];
+    if (work && id === older && part === "0.1") {
+      handoverThumbnails++;
+    }
+    if (missingSnapshots && work && id === second && part === "0.2") {
+      response.setHeader("Content-Type", "image/png");
+      response.end(await readFile(path.join(process.cwd(), "build/icons/16x16.png")));
+    } else if (!missingSnapshots && /\.(?:pdf|png|jpg)$/i.test(name ?? "")) {
       response.setHeader("Content-Type", "image/png");
       response.end(await readFile(picture));
     } else {
@@ -494,7 +502,10 @@ test("combines categories with format, account and search and remembers correcti
   await expect(page.getByRole("listitem")).toHaveCount(1);
   await expect(page.getByRole("listitem")).toContainText("Τιμολόγιο");
   await filter("Contract").click();
-  await expect(page.getByRole("listitem")).toHaveCount(2);
+  await expect(filter("Invoice")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await filter("Contract").click();
+  await expect(filter("Contract")).toHaveAttribute("aria-pressed", "true");
   await page
     .getByRole("group", { name: "File type" })
     .getByRole("button", { name: "PDF", exact: true })
@@ -502,8 +513,8 @@ test("combines categories with format, account and search and remembers correcti
   await expect(filter("Invoice")).toHaveAccessibleDescription("0");
   await expect(page.getByRole("listitem")).toHaveCount(1);
   await page.getByRole("button", { name: "Remove filter “Contract”" }).press("Enter");
-  await expect(page.getByText("No matching files")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Remove filter “Invoice”" })).toBeFocused();
+  await expect(filter("All categories")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Remove filter “Invoice”" })).toHaveCount(0);
   await filter("Contract").click();
   await filter("Personal").click();
   await expect(page.getByText("No matching files")).toBeVisible();
@@ -689,7 +700,7 @@ test("categorizes a mixed-language message per attachment and uses those categor
     }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Reservation", exact: true }).click();
-  await expect(page.getByRole("listitem")).toHaveCount(3);
+  await expect(page.getByRole("listitem")).toHaveCount(2);
   await page.getByRole("button", { name: "Ticket", exact: true }).click();
   await expect(page.getByRole("listitem")).toHaveCount(2);
   await expect(page.getByRole("button", { name: webBookingTicket, exact: true })).toBeVisible();
@@ -878,6 +889,67 @@ test("reuses the Gmail search document and loaded thumbnails across layouts", as
   await expect(page.locator(".attachment-cover img")).toBeVisible();
   expect(handoverThumbnails).toBe(1);
   expect(fileRequests).toBe(0);
+});
+
+test("renders image and PDF covers when a Gmail thumbnail is a placeholder or missing", async () => {
+  missingSnapshots = true;
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  const search = page.getByRole("searchbox");
+  await search.fill("Wordmark studies.png");
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  expect(fileRequests).toBe(0);
+  await page.getByRole("button", { name: "Grid view" }).click();
+  const width = () =>
+    page
+      .locator(".attachment-cover img")
+      .evaluateAll((images) => (images[0] as HTMLImageElement | undefined)?.naturalWidth ?? 0);
+  await expect.poll(width).toBe(32);
+  await search.fill("Project handover.pdf");
+  await expect.poll(width).toBeGreaterThan(32);
+  expect(fileRequests).toBe(2);
+});
+
+test("aligns every card detail with short and long filenames", async () => {
+  useMixedDocuments = true;
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await page.getByRole("button", { name: "Grid view" }).click();
+  await expect(page.getByRole("button", { name: webBookingTicket, exact: true })).toBeVisible();
+  const offsets = await page.locator(".attachment-card").evaluateAll((cards) =>
+    cards.map((card) => {
+      const box = card.getBoundingClientRect();
+      const positions = [
+        ".attachment-cover",
+        ".attachment-preview",
+        ".attachment-subject",
+        ".attachment-card-category",
+        ".attachment-card-sender",
+        ".attachment-card-footer",
+        ".attachment-actions",
+      ].map((selector) => {
+        const slot = card.querySelector(selector);
+        if (!slot) {
+          throw new Error("Missing card detail " + selector);
+        }
+        return Math.round(slot.getBoundingClientRect().top - box.top);
+      });
+      const title = card.querySelector(".attachment-preview span");
+      if (!title) {
+        throw new Error("Missing filename");
+      }
+      return {
+        positions: [Math.round(box.height), ...positions],
+        titleLines: Math.round(
+          title.getBoundingClientRect().height / parseFloat(getComputedStyle(title).lineHeight),
+        ),
+      };
+    }),
+  );
+  expect(new Set(offsets.map((card) => JSON.stringify(card.positions))).size).toBe(1);
+  expect(new Set(offsets.map((card) => card.titleLines))).toEqual(new Set([1, 2]));
 });
 
 test("retains partial results, retries only unreadable mail, and refreshes to an empty mailbox", async () => {

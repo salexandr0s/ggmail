@@ -174,7 +174,7 @@ export function FileItem({
         <FileThumbnail item={item} large>
           <FileMark name={item.name} large />
         </FileThumbnail>
-        <div className="attachment-card-body">
+        <div className="attachment-card-body" data-show-account={showAccount}>
           {preview}
           {subject}
           <div className="attachment-card-category">{category}</div>
@@ -188,7 +188,7 @@ export function FileItem({
           </div>
         </div>
         <div className="attachment-card-footer">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground tabular-nums">
+          <div className="flex min-w-0 items-center gap-x-1.5 overflow-hidden text-xs whitespace-nowrap text-muted-foreground tabular-nums">
             <time dateTime={new Date(item.receivedAt).toISOString()}>{received}</time>
             {item.size && (
               <>

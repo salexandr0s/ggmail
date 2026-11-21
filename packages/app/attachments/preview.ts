@@ -1,5 +1,8 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail request parameters and MIME types. */
-import { fileKind, type AttachmentPreview } from "@ggmail/shared/attachments";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { attachmentExtension, fileKind, type AttachmentPreview } from "@ggmail/shared/attachments";
 import type { Session } from "electron";
 import type { AttachmentEntry } from "./metadata";
 
@@ -36,11 +39,18 @@ export class AttachmentThumbnails {
     { visit: AbortSignal; request: Promise<AttachmentPreview | null> }
   >();
 
-  get(entry: AttachmentEntry, visit: AbortSignal, read: () => Promise<AttachmentPreview | null>) {
-    const cached = this.images.get(entry);
-    if (cached) {
+  cached(entry: AttachmentEntry) {
+    const image = this.images.get(entry);
+    if (image) {
       this.images.delete(entry);
-      this.images.set(entry, cached);
+      this.images.set(entry, image);
+    }
+    return image;
+  }
+
+  get(entry: AttachmentEntry, visit: AbortSignal, read: () => Promise<AttachmentPreview | null>) {
+    const cached = this.cached(entry);
+    if (cached) {
       return cached;
     }
     const pending = this.pending.get(entry);
@@ -110,14 +120,15 @@ export async function readAttachmentPreview(
   entry: AttachmentEntry,
   size: "thumbnail" | "full",
   signal: AbortSignal,
+  maxBytes?: number,
 ): Promise<AttachmentPreview | null> {
-  const extension = /\.([a-z0-9]+)$/i.exec(entry.file.name)?.[1]?.toLowerCase() ?? "";
+  const extension = attachmentExtension(entry.file.name);
   const nativeMime = Object.hasOwn(previewTypes, extension) ? previewTypes[extension] : undefined;
   const snapshot = size === "thumbnail" || !nativeMime;
   const url = snapshot ? snapshotUrl(entry, size === "full", mailbox) : downloadUrl(entry, mailbox);
   const response = await session.fetch(url.href, { credentials: "include", signal });
   const mime = response.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
-  const limit = (size === "thumbnail" ? 1 : snapshot ? 8 : 32) * 1024 * 1024;
+  const limit = maxBytes ?? (size === "thumbnail" ? 1 : snapshot ? 8 : 32) * 1024 * 1024;
   if (
     !response.ok ||
     !response.body ||
@@ -160,8 +171,67 @@ export async function readAttachmentPreview(
   ) {
     return null;
   }
+  if (snapshot && size === "thumbnail") {
+    const { nativeImage } = await import("electron");
+    const buffer = Buffer.from(bytes.buffer);
+    // Gmail's missing-preview response is a successful image of a tiny file icon.
+    const dimensions =
+      mime === "image/gif" && buffer.length >= 10
+        ? { width: buffer.readUInt16LE(6), height: buffer.readUInt16LE(8) }
+        : nativeImage.createFromBuffer(buffer).getSize();
+    if (
+      (mime === "image/png" || mime === "image/jpeg" || dimensions.width || dimensions.height) &&
+      Math.max(dimensions.width, dimensions.height) <= 16
+    ) {
+      return null;
+    }
+  }
   return {
     mime: snapshot ? mime : nativeMime,
     bytes: bytes.buffer,
   };
+}
+
+export function canGenerateCover(entry: AttachmentEntry) {
+  const mime = previewTypes[attachmentExtension(entry.file.name)];
+  return (
+    !!mime &&
+    (rasterMime.test(mime) || (mime === "application/pdf" && process.platform === "darwin"))
+  );
+}
+
+/** Render a bounded original when Gmail has no usable snapshot for a visible card. */
+export async function generateCover(
+  original: AttachmentPreview,
+  signal: AbortSignal,
+): Promise<AttachmentPreview | null> {
+  signal.throwIfAborted();
+  const { nativeImage } = await import("electron");
+  const buffer = Buffer.from(original.bytes);
+  let image;
+  if (original.mime === "application/pdf") {
+    const directory = await mkdtemp(join(tmpdir(), "ggmail-cover-"));
+    try {
+      const path = join(directory, "preview.pdf");
+      await writeFile(path, buffer, { mode: 0o600, signal });
+      image = await nativeImage.createThumbnailFromPath(path, { width: 480, height: 300 });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  } else {
+    image = nativeImage.createFromBuffer(buffer);
+  }
+  signal.throwIfAborted();
+  if (image.isEmpty()) {
+    return null;
+  }
+  const { width, height } = image.getSize();
+  const scale = Math.min(1, 480 / width, 300 / height);
+  if (scale < 1) {
+    image = image.resize({
+      width: Math.max(1, Math.round(width * scale)),
+      height: Math.max(1, Math.round(height * scale)),
+    });
+  }
+  return { mime: "image/png", bytes: Uint8Array.from(image.toPNG()).buffer };
 }

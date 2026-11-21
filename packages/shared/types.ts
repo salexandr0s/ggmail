@@ -322,7 +322,7 @@ export type IpcMainEvents =
         accountId: string,
         mailboxKey: string,
         fileId: string,
-        size: "thumbnail" | "full",
+        size: "thumbnail" | "cover" | "full",
       ) => AttachmentPreview | null;
       "assistant.status": () => AssistantConnection;
       "assistant.openSettings": () => void;

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.65.7 — 2026-11-21
+
+- The Attachments grid can render image and PDF covers when Gmail supplies a placeholder. Filenames have a fixed two-line slot so details and actions align on every card.
+- Selecting a category in Attachments switches the filter immediately.
+
 ## 3.65.6 — 2026-11-21
 
 - Account tabs and Settings now load Google profile photos served through an account-specific redirect.

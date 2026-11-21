@@ -264,7 +264,7 @@ export function Attachments() {
       key: category,
       label: categoryLabels[category],
       Icon: categoryIcons[category],
-      remove: () => changeFilters({ categories: toggleValue(categories, category) }),
+      remove: () => changeFilters({ categories: [] }),
     })),
     ...details,
   ];
@@ -282,9 +282,7 @@ export function Attachments() {
       categories={categories}
       categoryLabels={categoryLabels}
       categoryCounts={matches.categories}
-      onCategory={(category) =>
-        changeFilters({ categories: category === "all" ? [] : toggleValue(categories, category) })
-      }
+      onCategory={(category) => changeFilters({ categories: category === "all" ? [] : [category] })}
       accounts={accounts.map((a) => a.config)}
       chosen={chosen}
       accountCounts={matches.accounts}

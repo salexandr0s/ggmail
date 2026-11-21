@@ -140,7 +140,7 @@ describe("Gmail attachment metadata", () => {
     const photo = "https://lh3.googleusercontent.com/a/sender";
     const parse = (src: string) => {
       const [entry] = readPrintAttachments(
-        printDocument(tile(target).replace("<img>", `<img src="${src}">`)),
+        printDocument(tile(target).replace("<img>", `<img src="${src}">`) + tile(target)),
         mailbox,
         thread,
         "",

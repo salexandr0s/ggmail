@@ -48,7 +48,7 @@ export function registerAttachmentIpc({ main: listener }: typeof ipc) {
   });
 
   listener.handle("attachments.preview", async (event, id, mailboxKey, fileId, size) => {
-    if (size !== "thumbnail" && size !== "full") {
+    if (size !== "thumbnail" && size !== "cover" && size !== "full") {
       throw new Error("Unknown preview size");
     }
     const getLibrary = () => {

@@ -134,7 +134,7 @@ export function readPrintAttachments(
             thumbnail.messageId === locator.messageId &&
             thumbnail.part === locator.part
               ? thumbnail.downloadUrl
-              : undefined,
+              : messageFiles.get(id)?.thumbnailUrl,
           threadId,
           file: {
             id,

@@ -9,7 +9,12 @@ import { createSearchView, getSearchMailbox } from "@/gmail/search";
 import { AttachmentCategoryOverrides } from "./categories";
 import { AttachmentDiskIndex } from "./disk-index";
 import { readPrintAttachments, type AttachmentEntry } from "./metadata";
-import { AttachmentThumbnails, readAttachmentPreview } from "./preview";
+import {
+  AttachmentThumbnails,
+  canGenerateCover,
+  generateCover,
+  readAttachmentPreview,
+} from "./preview";
 
 type Thread = {
   id: string;
@@ -72,6 +77,8 @@ class AttachmentLibrary {
   private completed = new Map<Thread, PromiseSettledResult<AttachmentEntry[] | null>>();
   private search?: ReturnType<typeof createSearchView>;
   private thumbnails = new AttachmentThumbnails();
+  private covers = new AttachmentThumbnails();
+  private coverQueue = Promise.resolve();
   private lifetime = new AbortController();
 
   private disk?: AttachmentDiskIndex;
@@ -119,9 +126,9 @@ class AttachmentLibrary {
 
   // Gmail may require short-lived parameters for downloads or thumbnails. Resolve
   // them only for a file being used, sharing one request across siblings in a thread.
-  async liveEntry(fileId: string) {
+  async liveEntry(fileId: string, refreshExpired = false) {
     const entry = this.entries.get(fileId);
-    if (!entry || entry.downloadUrl) {
+    if (!entry || (entry.downloadUrl && !refreshExpired)) {
       return entry;
     }
     const { threadId, file } = entry;
@@ -132,7 +139,7 @@ class AttachmentLibrary {
           this.lifetime.signal.throwIfAborted();
           for (const live of entries ?? []) {
             const existing = this.entries.get(live.file.id);
-            if (existing && !existing.downloadUrl && existing.threadId === threadId) {
+            if (existing && existing.threadId === threadId) {
               existing.downloadUrl = live.downloadUrl;
               existing.thumbnailUrl = live.thumbnailUrl;
               existing.thumbnailView = undefined;
@@ -147,34 +154,63 @@ class AttachmentLibrary {
     return live?.downloadUrl ? live : undefined;
   }
 
-  preview(fileId: string, size: "thumbnail" | "full") {
+  async preview(fileId: string, size: "thumbnail" | "cover" | "full") {
     const entry = this.entries.get(fileId);
     if (!entry) {
       throw new Error("Attachment unavailable");
     }
-    const read = async () => {
-      const signal = AbortSignal.any([
-        this.lifetime.signal,
-        visit.signal,
-        AbortSignal.timeout(ms("30s")),
-      ]);
-      const preview = await readAttachmentPreview(
-        this.gmail.session,
-        this.mailbox,
-        entry,
-        size,
-        signal,
+    const currentVisit = visit.signal;
+    const signalForRead = () =>
+      AbortSignal.any([this.lifetime.signal, currentVisit, AbortSignal.timeout(ms("30s"))]);
+    const read = (
+      target: AttachmentEntry,
+      kind: "thumbnail" | "full",
+      signal: AbortSignal,
+      maxBytes?: number,
+    ) =>
+      readAttachmentPreview(this.gmail.session, this.mailbox, target, kind, signal, maxBytes).catch(
+        () => {
+          signal.throwIfAborted();
+          return null;
+        },
       );
-      if (preview || size === "thumbnail" || entry.downloadUrl) {
-        return preview;
+    const original = async (signal: AbortSignal, maxBytes?: number) => {
+      const previousUrl = entry.downloadUrl;
+      const result = await read(entry, "full", signal, maxBytes);
+      if (result) {
+        return result;
       }
       signal.throwIfAborted();
-      const live = await this.liveEntry(fileId);
-      return live
-        ? await readAttachmentPreview(this.gmail.session, this.mailbox, live, size, signal)
-        : null;
+      const live = await this.liveEntry(fileId, true);
+      return live && live.downloadUrl !== previousUrl ? read(live, "full", signal, maxBytes) : null;
     };
-    return size === "thumbnail" ? this.thumbnails.get(entry, visit.signal, read) : read();
+    if (size === "full") {
+      return original(signalForRead());
+    }
+    const cachedCover = this.covers.cached(entry);
+    if (cachedCover) {
+      return cachedCover;
+    }
+    const thumbnail = await this.thumbnails.get(entry, currentVisit, () =>
+      read(entry, "thumbnail", signalForRead()),
+    );
+    if (thumbnail || size === "thumbnail" || !canGenerateCover(entry)) {
+      return thumbnail;
+    }
+    return this.covers.get(entry, currentVisit, () => {
+      // Bound concurrent original downloads and native PDF renders per mailbox.
+      const cover = this.coverQueue.then(async () => {
+        const signal = signalForRead();
+        signal.throwIfAborted();
+        const file = await original(signal, 12 * 1024 * 1024);
+        return file ? generateCover(file, signal) : null;
+      });
+      this.coverQueue = cover.then(
+        () => {},
+        () => {},
+      );
+      return cover;
+    });
   }
 
   // A visit may end between IPC calls, while sibling reads are still in flight.
