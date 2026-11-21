@@ -34,7 +34,7 @@ export function useAttachmentFiles(scope: string, refresh: number) {
     const accounts: { id: string; signedOut: boolean }[] = JSON.parse(scope);
     if (mode === "snapshot") {
       indexes.clear();
-      setMailboxes({});
+      setMailboxes((previous) => (Object.keys(previous).length ? {} : previous));
     }
     const scanning = new Map<string, AbortController>();
     async function scan(id: string, initial: "snapshot" | "refresh" | "retry") {

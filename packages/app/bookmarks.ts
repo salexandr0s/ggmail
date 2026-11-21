@@ -1,40 +1,47 @@
 import { randomUUID } from "node:crypto";
-import { APP_TITLEBAR_HEIGHT, BASE_SPACING } from "@ggmail/shared/constants";
+import {
+  APP_TITLEBAR_HEIGHT,
+  BASE_SPACING,
+  WORKSPACE_SIDEBAR_WIDTH,
+} from "@ggmail/shared/constants";
 import type { AccountConfig, Bookmark, BookmarkState } from "@ggmail/shared/schemas";
-import type { BookmarksPopupPlacement } from "@ggmail/shared/types";
 import { clamp } from "@ggmail/shared/utils";
 import type { BrowserWindow } from "electron";
 import { accounts } from "./accounts";
 import { config } from "./config";
 import { ipc } from "./ipc";
 import { Popup } from "./lib/popup";
+import { main } from "./main";
 
 /**
  * The URLs an account has saved. A bookmark keeps the URL, title and app it was
  * created from and never follows what the user browses to afterwards — opening
  * one loads that URL again.
- *
- * A popup is the one surface that lists them, and the titlebar button that opens
- * it is always there — unlike the vertical tabs strip, which is gone in `New
- * Windows` mode and absent in `Tabs` mode until a second tab opens.
  */
 class Bookmarks {
   popup = new Popup();
 
-  togglePopup(parentWindow: BrowserWindow, placement: BookmarksPopupPlacement) {
-    return this.popup.toggle(parentWindow, {
+  togglePopup(parentWindow: BrowserWindow) {
+    const open = this.popup.toggle(parentWindow, {
       page: "bookmarks",
       width: BASE_SPACING * 40,
       height: "fill",
-      anchor:
-        placement === "verticalTabs"
-          ? {
-              x: accounts.getVerticalTabsWidth() + BASE_SPACING,
-              y: APP_TITLEBAR_HEIGHT + BASE_SPACING,
-              align: "start",
-            }
-          : undefined,
+      anchor: {
+        x: WORKSPACE_SIDEBAR_WIDTH + BASE_SPACING,
+        y: APP_TITLEBAR_HEIGHT + BASE_SPACING,
+        align: "start",
+      },
     });
+    if (open) {
+      ipc.renderer.send(parentWindow.webContents, "bookmarks.popupOpen", true);
+      const contents = this.popup.webContents;
+      contents?.once("did-finish-load", () => contents.focus());
+      contents?.once("destroyed", () => {
+        if (!this.popup.webContents && !parentWindow.isDestroyed()) {
+          ipc.renderer.send(parentWindow.webContents, "bookmarks.popupOpen", false);
+        }
+      });
+    }
   }
 
   getAccountBookmarks(accountId: AccountConfig["id"]): Bookmark[] {
@@ -112,8 +119,11 @@ class Bookmarks {
 
     const account = accounts.getAccount(accountId);
 
-    if (!account.instance.tabs.openInAppLinksTab(openedBookmark.url)) {
+    const tab =
+      account.instance.tabs.openInAppLinksTab(openedBookmark.url) ??
       account.instance.tabs.openUrl(openedBookmark.url);
+    if (tab && !tab.isWindowed) {
+      main.navigate("/");
     }
 
     if (account.config.selected) {

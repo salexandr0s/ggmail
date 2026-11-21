@@ -58,6 +58,7 @@ export async function anthropicReply(options: ResponseOptions, key: string) {
       headers: { ...apiHeaders("anthropic", key), "Content-Type": "application/json" },
       body: JSON.stringify({
         model: options.model,
+        ...(options.effort && { output_config: { effort: options.effort } }),
         max_tokens: 8192,
         stream: true,
         system: options.instructions,

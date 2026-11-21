@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { platform } from "@electron-toolkit/utils";
 import { getAccountLabel } from "@ggmail/shared/accounts";
-import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
+import { WORKSPACE_SIDEBAR_WIDTH, APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
 import {
   createGmailDelegatedAccountUrl,
   GMAIL_DELEGATED_ACCOUNT_URL_REGEXP,
@@ -19,6 +19,7 @@ import {
   inboxFeedPollDelay,
   parseGmailMessageId,
 } from "@ggmail/shared/gmail";
+import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { i18n } from "@ggmail/shared/i18n";
 import { ms } from "@ggmail/shared/ms";
 import { clamp, wait } from "@ggmail/shared/utils";
@@ -62,6 +63,7 @@ import { registerTabBroadcasts } from "@/tabs";
 import { appTray } from "@/tray";
 import { WorkspaceApp } from "@/workspace-app";
 import { syncGmailDarkTheme } from "./dark-theme";
+import { readProfilePhoto } from "./profile-photo";
 import { cancelUnifiedSearch } from "./unified-search";
 import { gmailUrl } from "./url";
 import ggmailCSS from "./ggmail.css";
@@ -226,6 +228,35 @@ export class Gmail {
     return parseGmailMessageId(new URL(viewUrl).hash);
   }
 
+  private photoRequest?: AbortController;
+  private photoSource?: string;
+
+  setProfilePhoto(value?: string | null) {
+    const url = value && value.length <= 4096 ? getGoogleProfilePhotoUrl(value) : undefined;
+    if (url === this.photoSource) {
+      return;
+    }
+    this.photoRequest?.abort();
+    this.photoSource = url;
+    this.store.setState({ profilePhoto: undefined });
+    if (!url) {
+      return;
+    }
+    const request = new AbortController();
+    this.photoRequest = request;
+    void readProfilePhoto(
+      this.session,
+      url,
+      AbortSignal.any([request.signal, AbortSignal.timeout(15000)]),
+    )
+      .then((profilePhoto) => {
+        if (!request.signal.aborted && profilePhoto) {
+          this.store.setState({ profilePhoto });
+        }
+      })
+      .catch(() => {});
+  }
+
   userEmail: string | null = null;
   mailboxGeneration = 0;
 
@@ -235,6 +266,7 @@ export class Gmail {
 
   store = createStore(
     subscribeWithSelector<{
+      profilePhoto?: string;
       unreadCount: number;
       outOfOffice: boolean;
       attentionRequired: boolean;
@@ -538,6 +570,7 @@ export class Gmail {
       WorkspaceApp.handleNavigate(url, this.session);
 
       if (window === this.view) {
+        this.setProfilePhoto();
         this.userEmail = null;
         this.invalidateMailboxReads();
         this.store.setState({
@@ -576,12 +609,12 @@ export class Gmail {
       return;
     }
 
-    const verticalTabsWidth = accounts.getVerticalTabsWidth();
+    const sidebarWidth = WORKSPACE_SIDEBAR_WIDTH;
 
     this.view.setBounds({
-      x: verticalTabsWidth,
+      x: sidebarWidth,
       y: APP_TITLEBAR_HEIGHT,
-      width: main.embeddedViewWidth(width, verticalTabsWidth),
+      width: main.embeddedViewWidth(width, sidebarWidth),
       height: height - APP_TITLEBAR_HEIGHT,
     });
   }
@@ -639,6 +672,7 @@ export class Gmail {
   }
 
   destroy() {
+    this.photoRequest?.abort();
     this.invalidateMailboxReads();
     removeWebContentsListeners(this.view.webContents);
 
@@ -1325,6 +1359,14 @@ export class Gmail {
   }
 
   subscribeToStore() {
+    this.storeUnsubscribers.push(
+      this.store.subscribe(
+        (state) => state.profilePhoto,
+        () => {
+          void accounts.sendAccountsChangedToRenderer();
+        },
+      ),
+    );
     this.storeUnsubscribers.push(
       this.store.subscribe(
         (state) => state.attentionRequired,

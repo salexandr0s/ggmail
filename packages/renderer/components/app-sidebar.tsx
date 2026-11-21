@@ -21,7 +21,7 @@ import {
   ShieldBan,
   ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
+  MessageSquareText,
   SunMoon,
   UsersRound,
   X,
@@ -120,7 +120,12 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
         icon: Bookmark,
         component: SavedSearchesSettings,
       },
-      { label: settingsPageLabels.ai, path: "/settings/ai", icon: Sparkles, component: AISettings },
+      {
+        label: settingsPageLabels.ai,
+        path: "/settings/ai",
+        icon: MessageSquareText,
+        component: AISettings,
+      },
       {
         label: settingsPageLabels.workspaceApps,
         path: "/settings/workspace-apps",
@@ -184,9 +189,7 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
   },
 ];
 
-export const settingsPages = groups.flatMap((group) =>
-  group.pages.map((page) => ({ ...page, group: group.label })),
-);
+export const settingsPages = groups.flatMap((group) => group.pages);
 
 export function AppSidebar() {
   const [location, navigate] = useLocation();
@@ -287,7 +290,7 @@ export function AppSidebar() {
             )}
             {matches.map((group) => (
               <div key={group.label.id} role="group" aria-label={t(group.label)}>
-                <div className="settings-nav-label" aria-hidden="true">
+                <div className="mail-nav-heading" aria-hidden="true">
                   {t(group.label)}
                 </div>
                 {group.pages.map(({ path, label, icon: Icon }) => (
@@ -296,7 +299,7 @@ export function AppSidebar() {
                     ref={location === path ? activeButton : undefined}
                     aria-current={location === path ? "page" : undefined}
                     variant="ghost"
-                    className="settings-nav-item"
+                    className="mail-nav-row settings-nav-item"
                     onClick={() => {
                       setQuery("");
                       navigate(path);

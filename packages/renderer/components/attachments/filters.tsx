@@ -53,10 +53,10 @@ export function FormatFilters({
             onClick={() => onKind(value)}
           >
             <Icon aria-hidden="true" />
+            <span className="attachment-format-name">{label}</span>
             <span className="attachment-format-count" id={countId}>
               {value === "all" ? counts.total : (counts.values.get(value) ?? 0)}
             </span>
-            <span className="attachment-format-name">{label}</span>
           </button>
         );
       })}
@@ -87,7 +87,7 @@ export function LibraryFilters({
   return (
     <div className="attachment-facets">
       <div role="group" aria-label={t`Category`}>
-        <h2>{t`Category`}</h2>
+        <h2 className="mail-nav-heading">{t`Category`}</h2>
         <FilterButton
           label={t`All categories`}
           active={!categories.length}

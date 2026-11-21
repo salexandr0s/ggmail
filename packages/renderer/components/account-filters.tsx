@@ -1,10 +1,10 @@
-import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
+import { getAccountLabel } from "@ggmail/shared/accounts";
 import type { AccountConfig } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
-import { cn } from "@ggmail/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
-import { LayersIcon, MailIcon } from "lucide-react";
+import { InboxIcon } from "lucide-react";
 import { type ReactNode, useId } from "react";
+import { AccountAvatar } from "./account-avatar";
 
 export function FilterButton({
   label,
@@ -29,15 +29,12 @@ export function FilterButton({
       aria-pressed={active}
       title={label}
       onClick={onClick}
-      className="h-8 w-full justify-start gap-2.5 rounded-md px-2 text-[13px] font-normal text-muted-foreground aria-pressed:bg-foreground/8 aria-pressed:font-medium aria-pressed:text-foreground"
+      className="mail-nav-row"
     >
       {icon}
       <span className="truncate">{label}</span>
       {count !== undefined && (
-        <span
-          id={countId}
-          className="ml-auto pl-1 text-[11px] font-normal text-muted-foreground tabular-nums"
-        >
+        <span id={countId} className="mail-nav-count">
           {count}
         </span>
       )}
@@ -61,14 +58,12 @@ export function AccountFilters({
   const { t } = useLingui();
   return (
     <div role="group" aria-label={label ?? t`Account`}>
-      <h2 className="mb-1.5 px-2 text-xs font-medium text-muted-foreground">
-        {label ?? t`Account`}
-      </h2>
+      <h2 className="mail-nav-heading">{label ?? t`Account`}</h2>
       <FilterButton
         label={t`All accounts`}
         active={!chosen.length}
         count={counts?.total}
-        icon={<LayersIcon />}
+        icon={<InboxIcon />}
         onClick={() => onAccount("")}
       />
       {accounts.map((a) => (
@@ -77,15 +72,7 @@ export function AccountFilters({
           label={getAccountLabel(a.label)}
           active={typeof chosen === "string" ? chosen === a.id : chosen.includes(a.id)}
           count={counts && (counts.values.get(a.id) ?? 0)}
-          icon={
-            a.color ? (
-              <span className="grid size-3.5 shrink-0 place-items-center">
-                <span className={cn("size-2 rounded-full", accountColorsMap[a.color].className)} />
-              </span>
-            ) : (
-              <MailIcon />
-            )
-          }
+          icon={<AccountAvatar account={a} />}
           onClick={() => onAccount(a.id)}
         />
       ))}

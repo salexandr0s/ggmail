@@ -138,7 +138,7 @@ test("a screen picked in the screen share picker reaches the page as a live vide
 
   await picker.getByRole("tab", { name: "Screens" }).click();
 
-  const screens = picker.getByRole("tabpanel").getByRole("img");
+  const screens = picker.getByRole("tabpanel").getByRole("button");
 
   // The sources come from the system, so the list is waited for rather than
   // assumed: an empty one means the platform listed no screen to share.

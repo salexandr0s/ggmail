@@ -3,7 +3,7 @@ import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { seedAccount, seedSavedTab } from "./lib/accounts";
 import { useApp } from "./lib/app";
-import { SIGN_IN_PAGE_TITLE, startTestServer, type TestServer } from "./lib/server";
+import { startTestServer, type TestServer } from "./lib/server";
 import { waitForVerticalTabs } from "./lib/strip";
 
 const WINDOWED_PAGE_TITLE = "Self-Closing Stand-In";
@@ -23,9 +23,6 @@ const SECOND_PAGE_TITLE = "Second Stand-In";
  * button also carries `disabled:opacity-50`.
  */
 const DORMANT_CLASS = /(?:^|\s)opacity-50(?:\s|$)/;
-
-/** The strip draws the active tab in the `secondary` variant. */
-const ACTIVE_CLASS = /(?:^|\s)bg-secondary(?:\s|$)/;
 
 let server: TestServer;
 
@@ -53,7 +50,10 @@ function countWindows() {
 }
 
 function stripTab(pageTitle: string) {
-  return ggmail.renderer.getByRole("button", { name: pageTitle, exact: true });
+  return ggmail.renderer.getByRole("button", {
+    name: pageTitle === PINNED_PAGE_TITLE ? "Calendar" : pageTitle,
+    exact: true,
+  });
 }
 
 const ggmail = useApp(() => ({
@@ -241,7 +241,8 @@ test("a pinned tab whose page closes itself goes dormant and stays saved", async
 
   await expect(tab).toBeVisible();
 
-  await expect(tab).toHaveClass(DORMANT_CLASS);
+  await tab.click();
+  await waitForLoadedPage(pageUrl(PINNED_PAGE_TITLE));
 
   await expect
     .poll(async () =>
@@ -308,10 +309,12 @@ test("the active tab closing itself brings Gmail to the front", async () => {
    */
   await expect.poll(readFrontViewUrl).toBe(ggmail.gmailStandIn.signInUrl);
 
-  // Gmail's tab is titled by the page its view lands on.
-  await expect(stripTab(SIGN_IN_PAGE_TITLE)).toHaveClass(ACTIVE_CLASS);
-
-  await expect(stripTab(SECOND_PAGE_TITLE)).not.toHaveClass(ACTIVE_CLASS);
+  const sidebar = ggmail.renderer.getByRole("navigation", { name: "Workspace apps" });
+  await expect(sidebar.getByRole("button", { name: "Mail", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await expect(stripTab(SECOND_PAGE_TITLE)).not.toHaveAttribute("aria-current", "page");
 
   expect(await readMainProcessErrors()).toEqual([]);
 });

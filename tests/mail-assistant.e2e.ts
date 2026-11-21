@@ -1358,8 +1358,12 @@ test("model identity follows selection between Settings and chat in light and da
       provider: "claude-cli",
       status: "connected",
       models: [
-        { id: "sonnet", label: "Claude Sonnet" },
-        { id: "haiku", label: "Claude Haiku" },
+        {
+          id: "opus",
+          label: "Claude Opus 5.5",
+          efforts: ["low", "medium", "high", "xhigh", "max"],
+        },
+        { id: "haiku", label: "Claude Haiku 4.5" },
       ],
     };
     ipcMain.removeHandler("assistant.status");
@@ -1375,8 +1379,11 @@ test("model identity follows selection between Settings and chat in light and da
   const panel = page.getByRole("complementary", { name: "Mail assistant" });
   const header = panel.locator("header");
   const chatModel = panel.getByRole("combobox", { name: "Assistant model" });
-  await expect(header.locator('[data-brand="claude"]')).toBeVisible();
-  await expect(header).toContainText("Claude Sonnet");
+  await expect(header.locator('[data-brand="claude"]')).toHaveCSS(
+    "background-color",
+    "rgb(217, 119, 87)",
+  );
+  await expect(header).toContainText("Claude Opus 5.5");
   await expect(chatModel.locator('[data-brand="claude"]')).toBeVisible();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
   await panel.screenshot({
@@ -1396,6 +1403,11 @@ test("model identity follows selection between Settings and chat in light and da
   await expect(provider.locator('[data-brand="claude"]')).toBeVisible();
   await expect(settingsModel.locator('[data-brand="claude"]')).toBeVisible();
 
+  const settingsEffort = settings.getByRole("combobox", { name: "Reasoning effort" });
+  const chatEffort = panel.getByRole("combobox", { name: "Reasoning effort" });
+  await settingsEffort.click();
+  await settings.getByRole("option", { name: "XHigh", exact: true }).click();
+  await expect(chatEffort).toContainText("XHigh");
   await provider.click();
   for (const [name, brand] of [
     ["OpenAI Subscription (ChatGPT)", "openai"],
@@ -1414,19 +1426,22 @@ test("model identity follows selection between Settings and chat in light and da
   });
   await settings.keyboard.press("Escape");
   await settingsModel.click();
-  const haiku = settings.getByRole("option", { name: "Claude Haiku", exact: true });
+  const haiku = settings.getByRole("option", { name: "Claude Haiku 4.5", exact: true });
   await expect(haiku.locator('[data-brand="claude"]')).toBeVisible();
   await haiku.click();
-  await expect(chatModel).toContainText("Claude Haiku");
-  await expect(header).toContainText("Claude Haiku");
+  await expect(chatModel).toContainText("Claude Haiku 4.5");
+  await expect(chatEffort).toHaveCount(0);
+  await expect(header).toContainText("Claude Haiku 4.5");
   await expect(composer).toHaveValue("Check the planning email");
 
   await chatModel.click();
-  const sonnet = page.getByRole("option", { name: "Claude Sonnet", exact: true });
-  await expect(sonnet.locator('[data-brand="claude"]')).toBeVisible();
-  await sonnet.click();
-  await expect(settingsModel).toContainText("Claude Sonnet");
-  await expect(header).toContainText("Claude Sonnet");
+  const opus = page.getByRole("option", { name: "Claude Opus 5.5", exact: true });
+  await expect(opus.locator('[data-brand="claude"]')).toBeVisible();
+  await opus.click();
+  await expect(chatEffort).toContainText("XHigh");
+  await expect(settingsEffort).toContainText("XHigh");
+  await expect(settingsModel).toContainText("Claude Opus 5.5");
+  await expect(header).toContainText("Claude Opus 5.5");
   await ggmail.closeSettings();
   await composer.fill("");
   await composer.blur();
@@ -1435,7 +1450,10 @@ test("model identity follows selection between Settings and chat in light and da
     nativeTheme.themeSource = "dark";
   });
   await expect(page.locator("html")).toHaveClass(/dark/);
-  await expect(header.locator('[data-brand="claude"]')).toBeVisible();
+  await expect(header.locator('[data-brand="claude"]')).toHaveCSS(
+    "background-color",
+    "rgb(217, 119, 87)",
+  );
   await panel.screenshot({
     path: test.info().outputPath("assistant-dark.png"),
     animations: "disabled",
@@ -1457,7 +1475,7 @@ test("AI settings connect each API, route mail actions, and remember separate ke
     const services: Record<string, [string, string]> = {
       "api.anthropic.com": ["claude-sonnet-4-6", "anthropic"],
       "api.deepseek.com": ["deepseek-flash", "deepseek"],
-      "api.openai.com": ["gpt-4.1", "openai"],
+      "api.openai.com": ["gpt-6.1-terra", "openai"],
     };
     globalThis.fetch = (async (input, init) => {
       const url = new URL(String(input));
@@ -1475,10 +1493,25 @@ test("AI settings connect each API, route mail actions, and remember separate ke
         return Response.json({}, { status: 401 });
       }
       if (url.pathname.endsWith("/models")) {
-        return Response.json({ data: [{ id: model }], has_more: false });
+        return Response.json({
+          data: [
+            {
+              id: model,
+              ...(provider === "anthropic" && {
+                capabilities: {
+                  effort: { high: { supported: true }, xhigh: { supported: false } },
+                },
+              }),
+            },
+          ],
+          has_more: false,
+        });
       }
       const body = JSON.parse(String(init?.body));
-      if (body.model !== model) {
+      if (
+        body.model !== model ||
+        (provider === "anthropic" ? body.output_config?.effort : body.reasoning?.effort) !== "high"
+      ) {
         throw new Error("Incorrect provider model");
       }
       const draft = { subject: "Schedule", body: "Friday works for " + provider };
@@ -1562,6 +1595,10 @@ test("AI settings connect each API, route mail actions, and remember separate ke
     await settings.getByLabel("API key").fill("fixture-" + provider);
     await settings.getByRole("button", { name: "Connect", exact: true }).click();
     await expect(settings.getByRole("status").filter({ hasText: "Connected" })).toBeVisible();
+    const effort = settings.getByRole("combobox", { name: "Reasoning effort" });
+    await effort.click();
+    await settings.getByRole("option", { name: "High", exact: true }).click();
+    await expect(panel.getByRole("combobox", { name: "Reasoning effort" })).toContainText("High");
     const brand = provider === "anthropic" ? "claude" : provider;
     await expect(panel.locator(`header [data-brand="${brand}"]`)).toBeVisible();
     const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
@@ -1603,7 +1640,7 @@ test("the locally signed-in Claude Code session answers a synthetic prompt", asy
   await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
   const panel = page.getByRole("complementary", { name: "Mail assistant" });
   await panel.getByRole("combobox", { name: "Assistant model" }).click();
-  await page.getByRole("option", { name: "Claude Haiku", exact: true }).click();
+  await page.getByRole("option", { name: /^Claude Haiku(?: 5\.5)?$/ }).click();
   const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
   await composer.fill(
     "Draft a new email with subject Sample and body exactly: The sample meeting starts at noon.",

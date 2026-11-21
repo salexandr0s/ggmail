@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import {
   type LauncherWorkspaceApp,
@@ -6,15 +5,7 @@ import {
   resolveWorkspaceAppsLauncherDisplay,
   type WorkspaceAppsLauncherDisplay,
 } from "@ggmail/shared/workspace-apps";
-import { Button } from "@ggmail/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuBackdrop,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@ggmail/ui/components/dropdown-menu";
-import { cn } from "@ggmail/ui/lib/utils";
+import { useLingui } from "@lingui/react/macro";
 import { LayoutGridIcon } from "lucide-react";
 import { type MouseEvent, useState } from "react";
 import {
@@ -23,7 +14,6 @@ import {
   TitlebarIconButton,
 } from "@/components/titlebar";
 import { WorkspaceAppIcon } from "@/components/workspace-app-icon";
-import { useChromeMenu } from "@/lib/chrome-menu";
 import { useCloseOnWindowBlur } from "@/lib/hooks";
 import { getModifierOpenBehavior } from "@/lib/workspace-apps";
 
@@ -92,75 +82,5 @@ export function WorkspaceAppsLauncher({
         </TitlebarDropdownMenuItem>
       ))}
     </TitlebarDropdownMenu>
-  );
-}
-
-/**
- * Always a single button: the strip is a column of app icons already, so
- * launcher apps laid out inline there would read as tabs rather than as a way
- * to open one. The display setting stays a titlebar concern.
- */
-export function VerticalTabsWorkspaceAppsLauncher({
-  launcherApps,
-  isWide,
-}: {
-  launcherApps: LauncherWorkspaceApp[];
-  isWide: boolean;
-}) {
-  const { t } = useLingui();
-
-  const { isOpen, setIsOpen, getLauncherAppProps } = useLauncherApps();
-
-  const openAppLabel = t({
-    message: "Open app",
-    comment: "Button in the vertical tabs strip that opens the launcher of Google Workspace apps",
-  });
-
-  const { rootProps, triggerProps, contentProps } = useChromeMenu(isOpen, setIsOpen);
-
-  return (
-    <DropdownMenu {...rootProps}>
-      <DropdownMenuTrigger
-        {...triggerProps}
-        render={
-          <Button
-            variant="ghost"
-            size={isWide ? "sm" : "icon"}
-            // Colours transition, the box never does: the button takes its new
-            // width in the same step the strip does rather than animating into
-            // it once the strip has already arrived
-            className={cn(
-              "text-muted-foreground transition-colors",
-              isWide && "w-full justify-start",
-            )}
-            title={openAppLabel}
-          >
-            <LayoutGridIcon />
-            {isWide && openAppLabel}
-          </Button>
-        }
-      />
-      <DropdownMenuBackdrop />
-      {/* Opens at trigger width so it stays inside the strip — anything wider
-          would be painted over by the workspace app view next to it. That
-          leaves room for app names only in the wide strip. */}
-      <DropdownMenuContent
-        {...contentProps}
-        align="center"
-        collisionPadding={0}
-        className={cn("flex flex-col gap-1 p-0.5", !isWide && "w-auto min-w-0")}
-      >
-        {launcherApps.map((app) => (
-          <DropdownMenuItem
-            key={app}
-            className={cn(!isWide && "justify-center")}
-            {...getLauncherAppProps(app)}
-          >
-            <WorkspaceAppIcon app={app} className="size-4" />
-            {isWide && launcherWorkspaceApps[app]}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }

@@ -359,7 +359,7 @@ export function SavedSearchesSettings() {
       </SettingsHeader>
       <SettingsContent>
         {config["gmail.savedSearches"].length === 0 && (
-          <div className="settings-empty settings-surface">
+          <div className="settings-empty">
             <BookmarkIcon aria-hidden="true" className="size-6" />
             <p>
               <Trans>No saved searches yet.</Trans>

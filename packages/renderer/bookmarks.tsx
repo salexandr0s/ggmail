@@ -1,7 +1,6 @@
 import { move } from "@dnd-kit/helpers";
 import { type DragEndEvent, DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { BookmarkState } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
@@ -14,8 +13,10 @@ import {
 } from "@ggmail/ui/components/empty";
 import { ScrollArea } from "@ggmail/ui/components/scroll-area";
 import { cn } from "@ggmail/ui/lib/utils";
-import { BookOpenIcon, XIcon } from "lucide-react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { XIcon } from "lucide-react";
 import type { Ref } from "react";
+import { BookmarksIcon } from "@/components/bookmarks-icon";
 import { Popup } from "@/components/popup";
 import { TabIcon } from "@/components/tab-icon";
 import { sortablePlugins, sortableSensors } from "@/lib/dnd";
@@ -42,7 +43,7 @@ function Bookmark({
       <Button
         variant="ghost"
         size="sm"
-        className="w-full justify-start group-hover:pr-7"
+        className="h-10 w-full justify-start gap-2.5 rounded-xl ps-2 pe-9 text-sm font-normal"
         title={title}
         onClick={() => {
           ipc.main.send("bookmarks.openBookmark", accountId, id);
@@ -50,16 +51,16 @@ function Bookmark({
           closePopup();
         }}
       >
-        <TabIcon app={app} />
-        <span className="min-w-0 flex-1 overflow-hidden mask-r-from-[calc(100%-1.5rem)] text-left whitespace-nowrap">
-          {title}
+        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-secondary/65">
+          <TabIcon app={app} />
         </span>
+        <span className="min-w-0 flex-1 truncate text-start">{title}</span>
       </Button>
       <Button
-        variant="secondary"
+        variant="ghost"
         size="icon"
         data-sortable-action
-        className="absolute inset-y-0 right-1 my-auto size-5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+        className="absolute inset-y-0 end-1 my-auto size-7 text-muted-foreground group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-accent hover:text-foreground [@media(hover:hover)]:opacity-0"
         title={t({
           message: "Remove bookmark",
           comment: "Button on a bookmark in the bookmarks popup that removes it",
@@ -131,17 +132,14 @@ function BookmarkList() {
     return (
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <BookOpenIcon />
+          <EmptyMedia variant="icon" className="size-12 rounded-2xl bg-secondary [&_svg]:size-7">
+            <BookmarksIcon />
           </EmptyMedia>
           <EmptyTitle>
             <Trans>No bookmarks yet</Trans>
           </EmptyTitle>
           <EmptyDescription>
-            <Trans>
-              Bookmark a page with the star on its tab or window titlebar, or from a tab's context
-              menu.
-            </Trans>
+            <Trans>Right-click a Workspace tab and choose Bookmark to save its page here.</Trans>
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -156,7 +154,7 @@ function BookmarkList() {
         moveBookmark(bookmarks, event);
       }}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col">
         {bookmarks.map((bookmark, bookmarkIndex) => (
           <SortableBookmark key={bookmark.id} bookmark={bookmark} index={bookmarkIndex} />
         ))}
@@ -165,39 +163,17 @@ function BookmarkList() {
   );
 }
 
-function Bookmarks() {
-  const { t } = useLingui();
-
+function BookmarksPopup() {
   return (
-    <>
-      <div className="p-4 font-semibold">
-        <Trans comment="Heading of the bookmarks popup">Bookmarks</Trans>
-      </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="absolute top-2 right-2 size-7"
-        onClick={closePopup}
-        title={t({
-          message: "Close",
-          comment: "Button that closes the bookmarks popup",
-        })}
-      >
-        <XIcon />
-      </Button>
-      <ScrollArea className="flex-1 overflow-hidden px-4 pb-4">
+    <Popup
+      title={<Trans comment="Heading of the bookmarks popup">Bookmarks</Trans>}
+      onClose={closePopup}
+    >
+      <ScrollArea className="min-h-0 flex-1 overflow-hidden p-2">
         <div className="flex h-full flex-col">
           <BookmarkList />
         </div>
       </ScrollArea>
-    </>
-  );
-}
-
-function BookmarksPopup() {
-  return (
-    <Popup onClose={closePopup}>
-      <Bookmarks />
     </Popup>
   );
 }

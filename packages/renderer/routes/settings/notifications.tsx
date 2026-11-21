@@ -254,7 +254,6 @@ export function NotificationsSettings() {
                             type="time"
                             value={time.start}
                             onChange={(event) => updateTime(time.id, "start", event.target.value)}
-                            className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                           />
                           <span className="shrink-0 text-sm text-muted-foreground">
                             <Trans comment="Sits between a start time field and an end time field, as in 09:00 to 17:00">
@@ -265,7 +264,6 @@ export function NotificationsSettings() {
                             type="time"
                             value={time.end}
                             onChange={(event) => updateTime(time.id, "end", event.target.value)}
-                            className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                           />
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -275,10 +273,10 @@ export function NotificationsSettings() {
                             return (
                               <Button
                                 key={dayIndex}
-                                variant={isActive ? "default" : "outline"}
+                                variant="outline"
                                 aria-pressed={isActive}
                                 size="sm"
-                                className="w-9 px-0"
+                                className="w-9 px-0 aria-pressed:border-primary aria-pressed:bg-selected aria-pressed:text-selected-foreground"
                                 onClick={() => updateTimeDays(time.id, dayIndex)}
                               >
                                 {getWeekdayLabel(dayIndex)}

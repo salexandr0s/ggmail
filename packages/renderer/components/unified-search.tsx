@@ -20,7 +20,6 @@ import {
   ChevronDownIcon,
   KeyRoundIcon,
   Loader2Icon,
-  MailsIcon,
   SearchIcon,
   SearchXIcon,
   SlidersHorizontalIcon,
@@ -58,7 +57,7 @@ function highlight(text: string, pattern: RegExp | null) {
   return pattern
     ? text.split(pattern).map((part, index) =>
         index % 2 ? (
-          <mark key={index} className="rounded-xs bg-amber-100 text-inherit dark:bg-amber-400/25">
+          <mark key={index} className="rounded-xs bg-selected font-semibold text-inherit">
             {part}
           </mark>
         ) : (
@@ -231,14 +230,9 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
   return (
     <>
       <header className="all-mail-header">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="all-mail-mark" aria-hidden="true">
-            <MailsIcon />
-          </span>
-          <SettingsTitle className="all-mail-title">
-            <Trans comment="Title of All Mail page">All Mail</Trans>
-          </SettingsTitle>
-        </div>
+        <SettingsTitle>
+          <Trans comment="Title of All Mail page">All Mail</Trans>
+        </SettingsTitle>
         <form
           className="all-mail-search"
           role="search"
@@ -247,7 +241,7 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
             submitUnifiedSearch(draft);
           }}
         >
-          <InputGroup className="all-mail-search-field">
+          <InputGroup className="mail-search-field flex-1">
             <InputGroupAddon>
               <InputGroupButton type="submit" size="icon-sm" title={t`Search all accounts`}>
                 <SearchIcon />
@@ -330,7 +324,7 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
       </header>
       {search ? (
         <div
-          className="all-mail-results space-y-4"
+          className="all-mail-results"
           ref={results}
           onKeyDown={(event) => {
             if (

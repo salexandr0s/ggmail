@@ -1,6 +1,6 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Fixed Gmail DOM reader and internal IPC errors. */
 import { randomUUID } from "node:crypto";
-import { localDay, type FollowUpRow } from "@ggmail/shared/follow-ups";
+import { localDay, SCHEDULE_FOLLOW_UP_PATH, type FollowUpRow } from "@ggmail/shared/follow-ups";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
@@ -12,14 +12,13 @@ import { main } from "@/main";
 import { readFollowUpMessages } from "./messages";
 import { reminders, removeReminders, saveReminder } from "./store";
 
-function authorize(event: IpcMainInvokeEvent, allowInbox = false) {
+function authorize(event: IpcMainInvokeEvent, page: "scheduler" | "list") {
   const view = main.windowIfCreated?.webContents;
-  if (
-    !view ||
-    event.sender !== view ||
-    event.senderFrame !== view.mainFrame ||
-    !(main.location === "/waiting" || (allowInbox && main.location === "/unified-inbox"))
-  ) {
+  const allowed =
+    page === "scheduler"
+      ? main.location === SCHEDULE_FOLLOW_UP_PATH
+      : main.location === "/waiting" || main.location === "/unified-inbox";
+  if (!view || event.sender !== view || event.senderFrame !== view.mainFrame || !allowed) {
     throw new Error("Waiting list required");
   }
 }
@@ -106,11 +105,11 @@ async function currentThread() {
 
 export function registerFollowUpIpc({ main: listener }: typeof ipc) {
   listener.handle("followUps.current", (event) => {
-    authorize(event);
+    authorize(event, "scheduler");
     return currentThread();
   });
   listener.handle("followUps.schedule", async (event, accountId, threadId, due) => {
-    authorize(event);
+    authorize(event, "scheduler");
     z.iso.date().parse(due);
     const thread = await currentThread();
     const box = mailboxFor(accountId);
@@ -123,9 +122,9 @@ export function registerFollowUpIpc({ main: listener }: typeof ipc) {
       throw new Error("Thread or date changed");
     }
     const latest = (await readMessages(box, threadId)).at(-1);
-    authorize(event);
+    authorize(event, "scheduler");
     const selected = await currentThread();
-    authorize(event);
+    authorize(event, "scheduler");
     if (
       selected?.accountId !== accountId ||
       selected.threadId !== threadId ||
@@ -152,7 +151,7 @@ export function registerFollowUpIpc({ main: listener }: typeof ipc) {
     return true;
   });
   listener.handle("followUps.list", async (event, accountId) => {
-    authorize(event, true);
+    authorize(event, "list");
     const dueOnly = main.location === "/unified-inbox";
     const today = localDay();
     const box = mailboxFor(accountId);
@@ -162,7 +161,7 @@ export function registerFollowUpIpc({ main: listener }: typeof ipc) {
     }
     const rows: FollowUpRow[] = [];
     for (const row of stored) {
-      authorize(event, true);
+      authorize(event, "list");
       if (row.owner !== box.owner || row.mailbox !== box.mailbox || (dueOnly && row.due > today)) {
         continue;
       }
@@ -187,7 +186,7 @@ export function registerFollowUpIpc({ main: listener }: typeof ipc) {
       }
       rows.push({ id: row.id, subject: row.subject, due: row.due, recipient, lastSent, status });
     }
-    authorize(event, true);
+    authorize(event, "list");
     if (!isCurrentMailbox(box)) {
       return { rows: [], unavailable: true };
     }
@@ -198,7 +197,7 @@ export function registerFollowUpIpc({ main: listener }: typeof ipc) {
     };
   });
   listener.handle("followUps.act", async (event, accountId, id, action) => {
-    authorize(event, true);
+    authorize(event, "list");
     const box = mailboxFor(accountId);
     const row =
       box &&

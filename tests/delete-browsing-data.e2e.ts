@@ -284,7 +284,10 @@ test.describe("with a pinned tab and an unpinned one", () => {
   }
 
   function stripTab(pageTitle: string) {
-    return ggmail.renderer.getByRole("button", { name: pageTitle, exact: true });
+    return ggmail.renderer.getByRole("button", {
+      name: pageTitle === PINNED_PAGE_TITLE ? "Calendar" : pageTitle,
+      exact: true,
+    });
   }
 
   async function readSavedTabUrls() {
@@ -346,8 +349,8 @@ test.describe("with a pinned tab and an unpinned one", () => {
 
     await expect(stripTab(UNPINNED_PAGE_TITLE)).toHaveCount(0);
 
-    // Dormant, which the strip draws faded.
-    await expect(stripTab(PINNED_PAGE_TITLE)).toHaveClass(/(?:^|\s)opacity-50(?:\s|$)/);
+    await stripTab(PINNED_PAGE_TITLE).click();
+    await expect.poll(() => hasLoadedPage(pageUrl(PINNED_PAGE_TITLE))).toBe(true);
   });
 
   test("deleting the cache leaves every tab open", async () => {
@@ -372,6 +375,6 @@ test.describe("with a pinned tab and an unpinned one", () => {
 
     await expect(stripTab(UNPINNED_PAGE_TITLE)).toBeVisible();
 
-    await expect(stripTab(PINNED_PAGE_TITLE)).not.toHaveClass(/(?:^|\s)opacity-50(?:\s|$)/);
+    await expect(stripTab(PINNED_PAGE_TITLE)).toBeVisible();
   });
 });

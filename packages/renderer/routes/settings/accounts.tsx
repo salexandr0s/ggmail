@@ -16,7 +16,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@ggmail/ui/components/alert-dialog";
-import { Badge } from "@ggmail/ui/components/badge";
 import { Button } from "@ggmail/ui/components/button";
 import { Checkbox } from "@ggmail/ui/components/checkbox";
 import {
@@ -61,6 +60,7 @@ import { UsersRoundIcon, GripVerticalIcon, MoreHorizontalIcon, XIcon } from "luc
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Entries } from "type-fest";
+import { AccountAvatar } from "@/components/account-avatar";
 import { AccountLogoField } from "@/components/account-logo-field";
 import { EmojiPickerButton } from "@/components/emoji-picker-button";
 import { SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
@@ -627,8 +627,8 @@ function AccountActions({
           render={
             <Button
               size="icon"
-              className="size-8 p-0"
-              variant="outline"
+              className="size-8 rounded-full p-0 text-muted-foreground"
+              variant="ghost"
               title={t({
                 message: "Account actions",
                 comment: "Button on an account's row in Settings that opens a menu of its actions",
@@ -698,53 +698,32 @@ function SortableAccountItem({
   const { t } = useLingui();
 
   const label = getAccountLabel(account.label);
+  const options = [
+    account.disabled && t(accountOptionLabels.disabled),
+    account.gmail.unreadBadge && t(unreadBadgeRowLabel),
+    account.gmail.unifiedInbox && t(accountOptionLabels.unifiedInbox),
+    account.notifications && t(accountOptionLabels.notifications),
+  ].filter(Boolean);
 
   return (
-    <Item ref={ref} className={isDragging ? "opacity-50" : undefined} variant="muted">
+    <Item ref={ref} className={cn("settings-account-row", isDragging && "opacity-50")}>
       <Button
         ref={handleRef}
         size="icon"
-        className="size-8 cursor-grab touch-none p-0"
+        className="size-7 cursor-grab touch-none p-0 text-muted-foreground"
         variant="ghost"
         disabled={disabled}
         aria-label={t`Drag ${label} to reorder`}
       >
         <GripVerticalIcon />
       </Button>
-      {/* Shrinkable, so long badges wrap inside the content rather than push the actions under the handle. */}
-      <ItemContent className={cn("min-w-0 gap-2", account.disabled && "opacity-60")}>
+      <AccountAvatar account={account} large />
+      <ItemContent className={cn("min-w-0 gap-1", account.disabled && "opacity-60")}>
         <ItemTitle className="min-w-0">
-          <div
-            className={cn(
-              "size-2 shrink-0 rounded-full",
-              account.color ? `${accountColorsMap[account.color].className}` : "border",
-            )}
-          />
-          {/* A label such as an address has nowhere to break, and would otherwise run under the actions. */}
           <span className="min-w-0 [overflow-wrap:anywhere]">{label}</span>
-          {account.logo && (
-            <img
-              src={account.logo}
-              alt=""
-              draggable={false}
-              className="size-4 shrink-0 object-contain"
-            />
-          )}
         </ItemTitle>
-        {(account.disabled ||
-          account.gmail.unreadBadge ||
-          account.gmail.unifiedInbox ||
-          account.notifications) && (
-          <div className="flex flex-wrap gap-2">
-            {account.disabled && <Badge variant="outline">{t(accountOptionLabels.disabled)}</Badge>}
-            {account.gmail.unreadBadge && <Badge variant="outline">{t(unreadBadgeRowLabel)}</Badge>}
-            {account.gmail.unifiedInbox && (
-              <Badge variant="outline">{t(accountOptionLabels.unifiedInbox)}</Badge>
-            )}
-            {account.notifications && (
-              <Badge variant="outline">{t(accountOptionLabels.notifications)}</Badge>
-            )}
-          </div>
+        {options.length > 0 && (
+          <p className="text-xs leading-normal text-muted-foreground">{options.join(" · ")}</p>
         )}
       </ItemContent>
       <ItemActions>
@@ -779,7 +758,7 @@ export function AccountsSettings() {
       </SettingsHeader>
       <SettingsContent>
         {config.accounts.length === 0 && (
-          <div className="settings-empty settings-surface">
+          <div className="settings-empty">
             <UsersRoundIcon aria-hidden="true" className="size-6" />
             <p>
               <Trans>No accounts yet.</Trans>

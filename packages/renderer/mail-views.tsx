@@ -1,6 +1,5 @@
-import { accountColorsMap } from "@ggmail/shared/accounts";
+import type { MailViewsPopupState } from "@ggmail/shared/mail-views";
 import { ipc } from "@ggmail/shared/renderer/ipc";
-import type { AccountConfig } from "@ggmail/shared/schemas";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,22 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@ggmail/ui/components/dropdown-menu";
-import { cn } from "@ggmail/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
-import { MailIcon } from "lucide-react";
+import { CircleAlertIcon } from "lucide-react";
+import { AccountAvatar } from "@/components/account-avatar";
 import { getMailViews } from "@/lib/mail-views";
 import { renderApp } from "@/lib/react";
 import "@/components/mail-titlebar.css";
 
-type AccountChoice = { value: string; label: string; color: AccountConfig["color"] };
-
 function MailViews() {
   const { t } = useLingui();
-  const {
-    unified,
-    accountItems,
-    selected,
-  }: { unified: boolean; accountItems: AccountChoice[]; selected: string } = JSON.parse(
+  const { unified, accountItems, selectedView, selectedAccount }: MailViewsPopupState = JSON.parse(
     new URLSearchParams(location.search).get("choices") ?? "{}",
   );
   const choose = (value: string | null) => ipc.main.send("titleBar.chooseMailView", value);
@@ -52,9 +45,9 @@ function MailViews() {
         className="mail-picker-menu"
         finalFocus={false}
       >
-        <DropdownMenuRadioGroup value={selected}>
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>{t`Mail views`}</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>{t`Mail views`}</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={selectedView ?? null}>
             {getMailViews(unified).map(({ value, label, Icon }) => (
               <DropdownMenuRadioItem
                 key={value}
@@ -67,36 +60,47 @@ function MailViews() {
                 <span className="truncate">{label}</span>
               </DropdownMenuRadioItem>
             ))}
-          </DropdownMenuGroup>
-          {accountItems.length > 0 && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>{t`Accounts`}</DropdownMenuLabel>
-                {accountItems.map(({ value, label, color }) => (
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
+        {accountItems.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{t`Accounts`}</DropdownMenuLabel>
+              <DropdownMenuRadioGroup value={selectedAccount ?? null}>
+                {accountItems.map(({ value, label, color, logo, profilePhoto, signIn, unread }) => (
                   <DropdownMenuRadioItem
                     key={value}
                     value={value}
                     closeOnClick={false}
                     onClick={() => choose(value)}
-                    title={label}
+                    title={signIn ? t`Sign in to ${label}` : label}
+                    aria-label={label}
+                    aria-description={
+                      signIn ? t`Sign in` : unread ? `${t`Unread messages`} (${unread})` : undefined
+                    }
                   >
-                    <span aria-hidden="true" className="grid size-4 shrink-0 place-items-center">
-                      {color ? (
-                        <span
-                          className={cn("size-2 rounded-full", accountColorsMap[color].className)}
-                        />
-                      ) : (
-                        <MailIcon />
-                      )}
-                    </span>
+                    <AccountAvatar
+                      account={{ id: value.slice("account/".length), label, color, logo }}
+                      photo={profilePhoto}
+                    />
                     <span className="truncate">{label}</span>
+                    {signIn ? (
+                      <CircleAlertIcon
+                        aria-hidden="true"
+                        className="ms-auto size-3.5 text-warning"
+                      />
+                    ) : unread ? (
+                      <span aria-hidden="true" className="mail-picker-count">
+                        {unread.toLocaleString()}
+                      </span>
+                    ) : null}
                   </DropdownMenuRadioItem>
                 ))}
-              </DropdownMenuGroup>
-            </>
-          )}
-        </DropdownMenuRadioGroup>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -18,6 +18,7 @@ import type {
 import type { FollowUpRow } from "./follow-ups";
 import type { GmailAction, InboxUpdate, GmailSearchPage } from "./gmail";
 import type { CatalogTag } from "./i18n";
+import type { MailViewId } from "./mail-views";
 import type {
   AccountConfig,
   AccountConfigInput,
@@ -29,15 +30,9 @@ import type {
   GmailSavedSearches,
 } from "./schemas";
 import type { PageScrollEdge } from "./scroll-edge";
-import type {
-  AccountTabsState,
-  VerticalTabsGmailUnreadBadge,
-  VerticalTabsSessionWidth,
-  VerticalTabsWidth,
-} from "./tabs";
+import type { AccountTabsState, VerticalTabsGmailUnreadBadge, SidebarWorkspaceApp } from "./tabs";
 import type { VerificationCodeCopyMode } from "./verification-codes";
 import type {
-  LauncherAndBookmarksPlacement,
   LauncherWorkspaceApp,
   SupportedWorkspaceApp,
   WorkspaceAppBookmarkState,
@@ -74,8 +69,6 @@ export type NotificationTime = {
 };
 
 /** Which button asked for the bookmarks popup, and so where it hangs. */
-export type BookmarksPopupPlacement = "titlebar" | "verticalTabs";
-
 /** A curated extension as it is installed on disk, which config alone can't tell. */
 export type InstalledExtensionState = {
   id: string;
@@ -185,8 +178,6 @@ export type Config = {
   "workspaceApps.mode": WorkspaceAppsMode;
   "workspaceApps.launcherApps": LauncherWorkspaceApp[];
   "workspaceApps.launcherDisplay": WorkspaceAppsLauncherDisplay;
-  "workspaceApps.launcherAndBookmarksPlacement": LauncherAndBookmarksPlacement;
-  "workspaceApps.showBookmarksButton": boolean;
   "workspaceApps.persistZoom": boolean;
   "workspaceApps.zoomFactors": Partial<Record<SupportedWorkspaceApp, number>>;
   "workspaceApps.hidePasskeyDialog": boolean;
@@ -206,8 +197,6 @@ export type Config = {
   "unifiedInbox.rowsPerPage": number;
   "spellchecker.languages": string[];
   "verticalTabs.showWindows": boolean;
-  "verticalTabs.width": VerticalTabsWidth;
-  "verticalTabs.showWidthToggle": boolean;
   "verticalTabs.gmailUnreadBadge": VerticalTabsGmailUnreadBadge;
   "verticalTabs.showAppLinksBadge": boolean;
   "extensions.enabled": boolean;
@@ -250,12 +239,14 @@ export type IpcMainEvents =
       "gmail.navigateTo": [hashLocation: GmailHashLocation];
       "gmail.closeComposeWindow": [];
       "gmail.undoMessageSent": [browserWindowId: number];
-      "gmail.setUserEmail": [email: string];
+      "gmail.setUserEmail": [email: string | undefined, profilePhotoUrl?: string | null];
       "gmail.openInboxSignIn": [accountId: string];
       "gmail.openMessage": [messageId: string, accountId?: string];
       "gmail.messageHandled": [requestId: string, success: boolean];
       "titleBar.chooseMailView": [value: string | null];
-      "titleBar.openCalendar": [anchor: { x: number; y: number }];
+      "titleBar.openMailView": [value: MailViewId];
+      "sidebar.openApp": [app: SidebarWorkspaceApp];
+      "sidebar.openSettings": [];
       "titleBar.showMailViews": [anchor: { x: number; y: number }];
       "titleBar.toggleAppMenu": [anchor?: { x: number; y: number }];
       "window.focusActiveView": [];
@@ -274,15 +265,11 @@ export type IpcMainEvents =
       "tabs.moveTab": [accountId: AccountConfig["id"], tabId: string, targetSectionIndex: number];
       "tabs.showTabContextMenu": [accountId: AccountConfig["id"], tabId: string];
       "tabs.showVerticalTabsContextMenu": [accountId: AccountConfig["id"]];
-      "tabs.setVerticalTabsWidth": [
-        accountId: AccountConfig["id"],
-        width: VerticalTabsSessionWidth,
-      ];
       "workspaceApps.openApp": [
         app: SupportedWorkspaceApp,
         openBehavior?: WorkspaceAppOpenBehavior,
       ];
-      "bookmarks.togglePopup": [placement: BookmarksPopupPlacement];
+      "bookmarks.togglePopup": [];
       "bookmarks.closePopup": [];
       "bookmarks.setPopupCloseOnBlurEnabled": [enabled: boolean];
       "bookmarks.openBookmark": [accountId: AccountConfig["id"], bookmarkId: Bookmark["id"]];
@@ -388,6 +375,7 @@ export type IpcMainEvents =
 export type IpcRendererEvent = {
   navigate: [to: string];
   "titleBar.mailViewsOpen": [open: boolean];
+  "bookmarks.popupOpen": [open: boolean];
   "shell.historyChanged": [state: { canGoBack: boolean; canGoForward: boolean }];
   "downloads.activityChanged": [active: boolean];
   "gmail.mailboxChanged": [accountId: string];

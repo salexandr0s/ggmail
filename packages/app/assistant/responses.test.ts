@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
-import { readResponseStream } from "./responses";
+import { expect, spyOn, test } from "bun:test";
+import { listModels, readResponseStream, respond } from "./responses";
 
 function stream(...frames: unknown[]) {
   const payload = frames.map((frame) => `data: ${JSON.stringify(frame)}\r\n\r\n`).join("");
@@ -85,3 +85,53 @@ for (const provider of ["chatgpt", "openai", "deepseek"] as const) {
     },
   );
 }
+
+test("the subscription picker respects the account's effort catalog and sends the selected level", async () => {
+  const fetchMock = spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    Response.json({
+      models: [
+        {
+          slug: "account-model",
+          display_name: "Account model",
+          visibility: "list",
+          supported_reasoning_levels: [{ effort: "low" }, { effort: "xhigh" }, { effort: "ultra" }],
+        },
+        {
+          slug: "gpt-6.2-sol",
+          display_name: "Fixed configuration",
+          visibility: "list",
+          supported_reasoning_levels: [],
+        },
+      ],
+    }),
+  );
+  try {
+    const [choice, fixed] = await listModels("fixture");
+    if (!choice || !fixed) {
+      throw new Error("Missing fixture model");
+    }
+    expect(choice.efforts).toEqual(["low", "xhigh", "ultra"]);
+    expect(fixed.efforts).toEqual([]);
+    const options = {
+      model: choice.id,
+      instructions: "",
+      input: [],
+      tools: [],
+      token: "fixture",
+      signal: new AbortController().signal,
+      onText() {},
+    };
+    for (const effort of ["xhigh", undefined] as const) {
+      fetchMock.mockResolvedValueOnce(
+        new Response(
+          stream({ type: "response.completed", response: { status: "completed", output: [] } }),
+        ),
+      );
+      await respond({ ...options, effort });
+      const payload = JSON.parse(String(fetchMock.mock.lastCall?.[1]?.body));
+      expect(payload.reasoning).toEqual(effort && { effort });
+    }
+  } finally {
+    fetchMock.mockRestore();
+  }
+});

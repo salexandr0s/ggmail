@@ -1,5 +1,6 @@
 import { getAccountLabel } from "@ggmail/shared/accounts";
 import {
+  assistantCoversMail,
   assistantPanelWidth,
   providerNames,
   type AssistantContext,
@@ -17,6 +18,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { MailAssistantIcon } from "@/components/mail-icons";
 import { useAccountsStore } from "@/lib/stores";
 import { useAssistantConnection } from "@/lib/use-assistant-connection";
 import { useAssistantModel } from "@/lib/use-assistant-model";
@@ -156,7 +158,10 @@ function AssistantPanel({
   const panel = useRef<HTMLElement>(null);
   const { connection, refresh } = useAssistantConnection();
   const provider = connection?.provider ?? "chatgpt";
-  const { model, chooseModel } = useAssistantModel(provider, connection?.models ?? []);
+  const { model, chooseModel, effort, chooseEffort } = useAssistantModel(
+    provider,
+    connection?.models ?? [],
+  );
   const [revision, setRevision] = useState(0);
 
   useLayoutEffect(() => {
@@ -187,7 +192,7 @@ function AssistantPanel({
       ref={panel}
       tabIndex={-1}
       aria-label={t`Mail assistant`}
-      className="group/panel absolute inset-y-0 left-0 flex min-w-0 flex-col border-l border-sidebar-border bg-background outline-none"
+      className="group/panel absolute inset-y-0 left-0 flex min-w-0 flex-col border-l border-sidebar-border bg-card outline-none"
       style={{ width }}
       onKeyDown={(event) => {
         if (
@@ -202,17 +207,17 @@ function AssistantPanel({
         }
       }}
     >
-      <header className="shrink-0 border-b bg-sidebar">
+      <header className="shrink-0 border-b bg-toolbar">
         <div className="flex items-center gap-3 px-4 py-3">
-          <div className="grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-background text-foreground shadow-xs">
+          <div className="grid size-6 shrink-0 place-items-center text-muted-foreground">
             {connection ? (
               <ModelLogo provider={provider} model={model?.id} className="size-5" />
             ) : (
-              <MailOpenIcon aria-hidden="true" className="size-5 text-muted-foreground" />
+              <MailAssistantIcon className="size-5" />
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-sm leading-snug font-semibold tracking-tight">
+            <h1 className="text-base leading-snug font-medium">
               <Trans>Mail assistant</Trans>
             </h1>
             {connection && (
@@ -293,9 +298,11 @@ function AssistantPanel({
             models={connection.models}
             model={model}
             chooseModel={chooseModel}
+            effort={effort}
+            chooseEffort={chooseEffort}
             onReplyError={() => void refresh()}
             onInserted={() => {
-              if (getWidth() === window.innerWidth) {
+              if (assistantCoversMail(window.innerWidth)) {
                 close(false);
               }
             }}
@@ -310,11 +317,8 @@ function AssistantPanel({
       )}
       {!checkingConnection && !ready && (
         <div className="min-h-0 flex-1 overflow-y-auto px-5">
-          <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-start justify-center py-8">
-            <div className="mb-4 grid size-10 place-items-center rounded-xl bg-muted text-foreground">
-              <MailOpenIcon aria-hidden="true" className="size-5" />
-            </div>
-            <h2 className="text-xl font-semibold tracking-tight">
+          <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-start justify-end py-6">
+            <h2 className="text-xl font-normal">
               <Trans>Set up the mail assistant</Trans>
             </h2>
             <p className="mt-2 mb-5 text-sm leading-relaxed text-muted-foreground">

@@ -18,9 +18,9 @@ jobs:
       - run: bun run lint
       - run: bun run types:ci
       - run: bun run test
-      - run: bun run build:mac:local
-      - name: Archive the verified app
-        run: ditto -c -k --keepParent dist/mac-arm64/ggmail.app dist/ggmail-mac-arm64-ci.zip
+      - run: bun run build:mac:local --adhoc
+      - name: Archive the CI build for verification and release signing
+        run: ditto -c -k --keepParent dist/adhoc/mac-arm64/ggmail.app dist/ggmail-mac-arm64-ci.zip
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ggmail-mac-arm64-ci

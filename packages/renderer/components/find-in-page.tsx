@@ -47,12 +47,12 @@ export function FindInPage({
 
   return (
     <div className="titlebar-find flex min-w-0 items-center gap-1 draggable-none">
-      <div className="flex min-w-0 items-center rounded-lg border border-input bg-background focus-within:border-ring">
+      <div className="flex min-w-0 items-center rounded-full border border-transparent bg-(--search-surface) focus-within:border-ring focus-within:bg-card">
         <Input
           ref={inputRef}
           aria-label={t`Find…`}
           placeholder={t`Find…`}
-          className="h-6 border-0 px-2 text-xs focus-visible:ring-0 md:text-xs dark:bg-transparent"
+          className="h-6 rounded-full border-0 bg-transparent px-2.5 text-xs focus-visible:ring-0 md:text-xs"
           autoFocus
           value={text}
           onChange={(event) => {

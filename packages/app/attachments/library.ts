@@ -224,10 +224,16 @@ class AttachmentLibrary {
       this.pending.push(...this.failed);
       this.failed = [];
     }
+    // A cold visit has nothing to paint yet. Deliver the first reads in this
+    // response instead of making the renderer round-trip for an empty snapshot.
+    const status = this.status();
+    if (mode === "snapshot" && !this.entries.size && status === "loading") {
+      return this.next();
+    }
     return {
       mailboxKey: this.categories.mailboxKey,
       files: Array.from(this.entries.values(), (entry) => entry.file),
-      status: this.status(),
+      status,
     };
   }
 

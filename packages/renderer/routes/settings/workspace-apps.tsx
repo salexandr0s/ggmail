@@ -2,14 +2,10 @@ import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { byPlatform } from "@ggmail/shared/platform";
-import {
-  GMAIL_TAB_ID,
-  verticalTabsGmailUnreadBadges,
-  verticalTabsWidths,
-} from "@ggmail/shared/tabs";
+import { GMAIL_TAB_ID, verticalTabsGmailUnreadBadges } from "@ggmail/shared/tabs";
 import {
   DEV_WORKSPACE_APPS_HIBERNATION_TIMEOUT,
-  launcherAndBookmarksPlacements,
+  getAdditionalLauncherApps,
   type LauncherWorkspaceApp,
   launcherWorkspaceApps,
   type SupportedWorkspaceApp,
@@ -34,7 +30,6 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-  FieldTitle,
 } from "@ggmail/ui/components/field";
 import { Kbd } from "@ggmail/ui/components/kbd";
 import { plural, select } from "@lingui/core/macro";
@@ -131,11 +126,11 @@ export function WorkspaceAppsSettings() {
     return;
   }
 
-  const launcherApps = config["workspaceApps.launcherApps"];
+  const launcherApps = getAdditionalLauncherApps(config["workspaceApps.launcherApps"]);
 
-  const availableApps = (Object.keys(launcherWorkspaceApps) as LauncherWorkspaceApp[]).filter(
-    (app) => !launcherApps.includes(app),
-  );
+  const availableApps = getAdditionalLauncherApps(
+    Object.keys(launcherWorkspaceApps) as LauncherWorkspaceApp[],
+  ).filter((app) => !launcherApps.includes(app));
 
   const excludedApps = config["workspaceApps.openInAppExcludedApps"];
 
@@ -319,68 +314,39 @@ export function WorkspaceAppsSettings() {
             </>
           )}
         </SettingsPanel>
-        {config["workspaceApps.mode"] === "tabs" && (
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the settings for the vertical tabs sidebar">
-                Vertical tabs
-              </Trans>
-            </FieldLegend>
-            <SettingsPanel>
+        <FieldSet>
+          <FieldLegend>
+            <Trans>Tabs</Trans>
+          </FieldLegend>
+          <SettingsPanel>
+            {config["workspaceApps.mode"] === "tabs" && (
               <ConfigSwitchField
                 label={t`Show windows`}
-                description={t`List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward.`}
+                description={t`List Workspace windows alongside open tabs. Select one to bring its window forward.`}
                 configKey="verticalTabs.showWindows"
               />
-              <ConfigSelectField
-                label={t({
-                  message: "Width",
-                  comment: "Setting for how wide the vertical tabs sidebar is",
-                })}
-                description={t({
-                  message:
-                    "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back.",
-                  comment:
-                    "Auto quotes this setting's option and Reset Width the sidebar's context menu item, so they match those messages' wording",
-                })}
-                configKey="verticalTabs.width"
-                items={Object.entries(verticalTabsWidths).map(([value, label]) => ({
-                  value,
-                  label: t(label),
-                }))}
-              />
-              <ConfigSwitchField
-                label={t`Show width button`}
-                description={t({
-                  message:
-                    "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
-                  comment:
-                    "Reset Width quotes the sidebar's context menu item and Width the setting above, so they match those messages' wording",
-                })}
-                configKey="verticalTabs.showWidthToggle"
-              />
-              <ConfigSelectField
-                label={t`Show Gmail unread badge`}
-                description={t({
-                  message:
-                    "Show the unread count on the Gmail tab. When another tab is active hides it while Gmail is in front, where the inbox already shows it. Accounts that need attention are still flagged whichever you pick.",
-                  comment:
-                    "When another tab is active quotes this setting's option, so it matches that option's wording",
-                })}
-                configKey="verticalTabs.gmailUnreadBadge"
-                items={Object.entries(verticalTabsGmailUnreadBadges).map(([value, label]) => ({
-                  value,
-                  label: t(label),
-                }))}
-              />
-              <ConfigSwitchField
-                label={t`Show app links badge`}
-                description={t`Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so.`}
-                configKey="verticalTabs.showAppLinksBadge"
-              />
-            </SettingsPanel>
-          </FieldSet>
-        )}
+            )}
+            <ConfigSelectField
+              label={t`Show Gmail unread badge`}
+              description={t({
+                message:
+                  "Show the unread count on the Gmail tab. When another tab is active hides it while Gmail is in front, where the inbox already shows it. Accounts that need attention are still flagged whichever you pick.",
+                comment:
+                  "When another tab is active quotes this setting's option, so it matches that option's wording",
+              })}
+              configKey="verticalTabs.gmailUnreadBadge"
+              items={Object.entries(verticalTabsGmailUnreadBadges).map(([value, label]) => ({
+                value,
+                label: t(label),
+              }))}
+            />
+            <ConfigSwitchField
+              label={t`Show app links badge`}
+              description={t`Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so.`}
+              configKey="verticalTabs.showAppLinksBadge"
+            />
+          </SettingsPanel>
+        </FieldSet>
 
         <SettingsPanel>
           <ConfigSwitchField
@@ -393,7 +359,7 @@ export function WorkspaceAppsSettings() {
             label={t`Hibernate idle tabs`}
             description={t({
               message:
-                "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place in the sidebar and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu.",
+                "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu.",
               comment:
                 "Unpinned tabs and Selected tabs quote this setting's options and Hibernate When Idle the tab's context menu item, so they match those messages' wording",
             })}
@@ -420,18 +386,13 @@ export function WorkspaceAppsSettings() {
         </SettingsPanel>
         <FieldSet>
           <FieldLegend>
-            <Trans comment="Heading of the settings for the Workspace apps launcher and the bookmarks button">
-              Launcher and bookmarks
+            <Trans comment="Setting that picks the Workspace apps in the launcher">
+              Launcher apps
             </Trans>
           </FieldLegend>
           <SettingsPanel>
             <Field>
               <FieldContent>
-                <FieldTitle>
-                  <Trans comment="Setting that picks the Workspace apps in the launcher">
-                    Launcher apps
-                  </Trans>
-                </FieldTitle>
                 <FieldDescription>
                   <Trans>Add Workspace apps to the launcher on the right of the titlebar.</Trans>
                 </FieldDescription>
@@ -531,31 +492,6 @@ export function WorkspaceAppsSettings() {
                 value,
                 label: t(label),
               }))}
-            />
-            {config["workspaceApps.mode"] === "tabs" && (
-              <ConfigSelectField
-                label={t({
-                  message: "Placement",
-                  comment:
-                    "Setting for where the Workspace apps launcher and the bookmarks button sit",
-                })}
-                description={t({
-                  message:
-                    "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times.",
-                  comment:
-                    "Auto, Sidebar and Titlebar quote this setting's options, so they match those options' wording",
-                })}
-                configKey="workspaceApps.launcherAndBookmarksPlacement"
-                items={Object.entries(launcherAndBookmarksPlacements).map(([value, label]) => ({
-                  value,
-                  label: t(label),
-                }))}
-              />
-            )}
-            <ConfigSwitchField
-              label={t`Show bookmarks button`}
-              description={t`Show the button that opens bookmarks.`}
-              configKey="workspaceApps.showBookmarksButton"
             />
           </SettingsPanel>
         </FieldSet>

@@ -1,13 +1,17 @@
+import type { MailViewId } from "@ggmail/shared/mail-views";
 import { t } from "@lingui/core/macro";
-import { CalendarDaysIcon, ClockIcon, InboxIcon, PaperclipIcon } from "lucide-react";
+import { AllMailIcon, AttachmentIcon, MailIcon, WaitingIcon } from "@/components/mail-icons";
 
-export function getMailViews(unified: boolean) {
-  /* oxlint-disable lingui/no-unlocalized-strings -- Values identify routes and the Calendar action. */
+export function getMailViews(
+  unified: boolean,
+): { value: MailViewId; label: string; Icon: typeof MailIcon }[] {
+  /* oxlint-disable lingui/no-unlocalized-strings -- Values identify routes. */
   return [
-    ...(unified ? [{ value: "/unified-inbox", label: t`All Mail`, Icon: InboxIcon }] : []),
-    { value: "/attachments", label: t`Attachments`, Icon: PaperclipIcon },
-    { value: "/waiting", label: t`Waiting for reply`, Icon: ClockIcon },
-    { value: "calendar", label: t`Calendar`, Icon: CalendarDaysIcon },
+    unified
+      ? { value: "/unified-inbox", label: t`All Mail`, Icon: AllMailIcon }
+      : { value: "gmail", label: t`Mail`, Icon: MailIcon },
+    { value: "/attachments", label: t`Attachments`, Icon: AttachmentIcon },
+    { value: "/waiting", label: t`Waiting for reply`, Icon: WaitingIcon },
   ];
   /* oxlint-enable lingui/no-unlocalized-strings */
 }

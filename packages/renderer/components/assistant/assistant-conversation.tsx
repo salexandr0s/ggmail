@@ -3,6 +3,7 @@ import {
   type AssistantActivity as Activity,
   type AssistantDraft,
   type AssistantModel,
+  type AssistantEffort,
   type AssistantProvider,
   providerNames,
   type AssistantReply as Reply,
@@ -22,8 +23,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
-  ArrowUpRightIcon,
-  ChevronRightIcon,
   ClipboardListIcon,
   FilePenLineIcon,
   MailSearchIcon,
@@ -35,6 +34,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 
 import { Answer } from "./answer";
 import { AssistantActivity } from "./assistant-activity";
 import { AssistantReply, DraftCard } from "./assistant-reply";
+import { EffortPicker } from "./effort-picker";
 import { ModelLogo } from "./model-logo";
 import { SourcePreview } from "./source-preview";
 
@@ -74,6 +74,8 @@ export function AssistantConversation({
   models,
   model,
   chooseModel,
+  effort,
+  chooseEffort,
   onReplyError,
   onInserted,
 }: {
@@ -83,6 +85,8 @@ export function AssistantConversation({
   models: AssistantModel[];
   model: AssistantModel;
   chooseModel: (id: string) => void;
+  effort?: AssistantEffort;
+  chooseEffort: (level?: AssistantEffort) => void;
   onReplyError: () => void;
   onInserted: () => void;
 }) {
@@ -226,6 +230,7 @@ export function AssistantConversation({
         id,
         prompt: input,
         model: model.id,
+        effort,
         provider,
         scopeKey: contextKey,
       });
@@ -336,16 +341,13 @@ export function AssistantConversation({
           }}
         >
           {entries.length === 0 ? (
-            <div className="mx-auto flex min-h-full w-full max-w-sm flex-col justify-center py-8">
-              <h2 className="text-2xl leading-tight font-semibold tracking-tight text-balance">
-                <Trans>What can I help you with?</Trans>
-              </h2>
-              <div className="mt-5 grid gap-2">
+            <div className="flex min-h-full flex-col justify-end py-2">
+              <div>
                 {starters.map(({ icon: Icon, label, prompt: value }) => (
                   <button
                     key={label}
                     type="button"
-                    className="group flex min-h-12 w-full items-center gap-3 rounded-xl border bg-card px-3 py-2 text-left text-sm font-medium transition-colors hover:border-input hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    className="flex min-h-10 w-full items-center gap-3 rounded-sm px-1.5 py-2 text-start text-sm hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                     onClick={() => {
                       if (value) {
                         void send(value, "starter");
@@ -358,21 +360,8 @@ export function AssistantConversation({
                       }
                     }}
                   >
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground group-hover:text-foreground">
-                      <Icon aria-hidden="true" className="size-4" />
-                    </span>
-                    <span className="min-w-0 flex-1">{label}</span>
-                    {value ? (
-                      <ChevronRightIcon
-                        aria-hidden="true"
-                        className="size-3.5 shrink-0 text-muted-foreground"
-                      />
-                    ) : (
-                      <ArrowUpRightIcon
-                        aria-hidden="true"
-                        className="size-3.5 shrink-0 text-muted-foreground"
-                      />
-                    )}
+                    <Icon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0">{label}</span>
                   </button>
                 ))}
               </div>
@@ -475,9 +464,9 @@ export function AssistantConversation({
           event.preventDefault();
           submit();
         }}
-        className="shrink-0 bg-background px-4 pt-2 pb-4"
+        className="shrink-0 bg-card px-4 pt-2 pb-4"
       >
-        <div className="rounded-2xl border border-input bg-card shadow-xs transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/40">
+        <div className="rounded-3xl border border-transparent bg-secondary transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/40">
           <Textarea
             ref={composer}
             aria-label={t`Message the mail assistant`}
@@ -497,46 +486,49 @@ export function AssistantConversation({
               submit();
             }}
           />
-          <div className="flex min-w-0 items-center justify-between gap-2 px-2 pb-2">
-            <Select
-              items={models.map(({ id, label }) => ({ value: id, label }))}
-              value={model.id}
-              onValueChange={(value) => value && chooseModel(value)}
-            >
-              <SelectTrigger
-                size="sm"
-                className="max-w-[68%] min-w-0 border-transparent px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-transparent dark:hover:bg-muted"
-                title={providerNames[provider]}
-                aria-label={t`Assistant model`}
+          {prompt.length >= ASSISTANT_PROMPT_LIMIT - 200 && (
+            <span className="block px-3 pb-1 text-right text-xs text-muted-foreground tabular-nums">
+              {prompt.length}/{ASSISTANT_PROMPT_LIMIT}
+            </span>
+          )}
+          <div className="flex min-w-0 items-center justify-between gap-1 px-2 pb-2">
+            <div className="flex min-w-0 items-center gap-0.5">
+              <Select
+                items={models.map(({ id, label }) => ({ value: id, label }))}
+                value={model.id}
+                onValueChange={(value) => value && chooseModel(value)}
               >
-                <ModelLogo provider={provider} model={model.id} className="size-3.5" />
-                <SelectValue className="min-w-0 truncate">{model.label}</SelectValue>
-              </SelectTrigger>
-              <SelectContent
-                align="start"
-                side="top"
-                alignItemWithTrigger={false}
-                className="w-max max-w-[min(20rem,var(--available-width))] min-w-48"
-              >
-                {models.map(({ id, label }) => (
-                  <SelectItem
-                    key={id}
-                    value={id}
-                    className="min-h-8 [&>span:first-child]:min-w-0 [&>span:first-child]:shrink"
-                  >
-                    <ModelLogo provider={provider} model={id} className="size-4 self-center" />
-                    <span className="truncate" title={label}>
-                      {label}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {prompt.length >= ASSISTANT_PROMPT_LIMIT - 200 && (
-              <span className="ml-auto text-xs text-muted-foreground tabular-nums">
-                {prompt.length}/{ASSISTANT_PROMPT_LIMIT}
-              </span>
-            )}
+                <SelectTrigger
+                  size="sm"
+                  className="max-w-56 min-w-0 border-transparent px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-transparent dark:hover:bg-muted"
+                  title={providerNames[provider]}
+                  aria-label={t`Assistant model`}
+                >
+                  <ModelLogo provider={provider} model={model.id} className="size-3.5" />
+                  <SelectValue className="min-w-0 truncate">{model.label}</SelectValue>
+                </SelectTrigger>
+                <SelectContent
+                  align="start"
+                  side="top"
+                  alignItemWithTrigger={false}
+                  className="w-max max-w-[min(20rem,var(--available-width))] min-w-48"
+                >
+                  {models.map(({ id, label }) => (
+                    <SelectItem
+                      key={id}
+                      value={id}
+                      className="min-h-8 [&>span:first-child]:min-w-0 [&>span:first-child]:shrink"
+                    >
+                      <ModelLogo provider={provider} model={id} className="size-4 self-center" />
+                      <span className="truncate" title={label}>
+                        {label}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <EffortPicker compact model={model} effort={effort} chooseEffort={chooseEffort} />
+            </div>
             {pending ? (
               <Button
                 type="button"

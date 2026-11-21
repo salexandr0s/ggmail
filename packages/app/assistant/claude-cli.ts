@@ -4,7 +4,7 @@ import { constants } from "node:fs";
 import { access, mkdtemp, rm } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import path from "node:path";
-import type { AssistantModel } from "@ggmail/shared/assistant";
+import { assistantEffortSchema, type AssistantModel } from "@ggmail/shared/assistant";
 import { ms } from "@ggmail/shared/ms";
 import { t } from "@lingui/core/macro";
 import { z } from "zod";
@@ -12,7 +12,7 @@ import { ClaudeCliStream } from "./claude-cli-stream";
 import { AssistantError, type FunctionCall, type ResponseOptions } from "./responses";
 
 /* oxlint-disable lingui/no-unlocalized-strings -- Claude model names, flags and installation paths. */
-export const cliModels: AssistantModel[] = [
+const legacyModels: AssistantModel[] = [
   { id: "default", label: "Claude Code" },
   { id: "sonnet", label: "Claude Sonnet" },
   { id: "opus", label: "Claude Opus" },
@@ -61,6 +61,7 @@ async function runCLI(
   input?: string,
   stream?: ClaudeCliStream,
 ) {
+  const catalogOnly = args.includes("--input-format");
   const file = await executable();
   const dir = await mkdtemp(path.join(tmpdir(), "ggmail-claude-"));
   try {
@@ -77,7 +78,13 @@ async function runCLI(
       APPDATA: process.env.APPDATA,
       LOCALAPPDATA: process.env.LOCALAPPDATA,
       CLAUDE_CONFIG_DIR: process.env.CLAUDE_CONFIG_DIR,
-      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1",
+      // The CLI counts its model catalog as nonessential traffic. Only initialization
+      // may refresh it. Respect local opt-outs and keep every mail turn isolated.
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: catalogOnly
+        ? process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
+        : "1",
+      DISABLE_TELEMETRY: process.env.DISABLE_TELEMETRY,
+      DISABLE_ERROR_REPORTING: "1",
       DISABLE_AUTOUPDATER: "1",
     };
     // Keep mail on stdin and out of process arguments. Never return raw CLI diagnostics.
@@ -85,7 +92,7 @@ async function runCLI(
       cwd: dir,
       env,
       windowsHide: true,
-      timeout: input ? ms("3 minutes") : ms("15 seconds"),
+      timeout: stream ? ms("3 minutes") : ms("15 seconds"),
       signal,
       killSignal: "SIGKILL",
       stdio: ["pipe", "pipe", "ignore"],
@@ -128,7 +135,19 @@ async function runCLI(
           t`Claude Code couldn't complete the request. Check your sign-in, CLI version, and usage limits.`,
         );
       }
-      return stream ? stream.finish() : (JSON.parse(output) as unknown);
+      if (stream) {
+        return stream.finish();
+      }
+      if (catalogOnly) {
+        for (const line of output.trim().split("\n")) {
+          const frame = JSON.parse(line);
+          if (frame.type === "control_response" && frame.response?.request_id === "catalog") {
+            return frame.response.response?.models as unknown;
+          }
+        }
+        return undefined;
+      }
+      return JSON.parse(output) as unknown;
     } finally {
       if (child.exitCode === null && child.signalCode === null) {
         child.kill("SIGKILL");
@@ -137,6 +156,77 @@ async function runCLI(
     }
   } finally {
     await rm(dir, { recursive: true, force: true });
+  }
+}
+
+// Initialize the local CLI without sending a user turn. It resolves aliases and account-specific models.
+export async function cliModels(): Promise<AssistantModel[]> {
+  try {
+    const result = await runCLI(
+      [
+        "--print",
+        "--no-session-persistence",
+        "--input-format",
+        "stream-json",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+      ],
+      undefined,
+      JSON.stringify({
+        type: "control_request",
+        request_id: "catalog",
+        request: { subtype: "initialize" },
+      }) + "\n",
+    );
+    const catalog = z
+      .array(
+        z.object({
+          value: z.string().min(1).max(128),
+          displayName: z.string().min(1).max(180),
+          resolvedModel: z.string().min(1).max(128).nullish(),
+          supportedEffortLevels: z.array(z.string()).optional(),
+          supportsEffort: z.boolean().optional(),
+        }),
+      )
+      .min(1)
+      .max(512)
+      .parse(result);
+    return catalog.map(
+      ({ value, displayName, resolvedModel, supportedEffortLevels, supportsEffort }) => {
+        const version =
+          /^claude-(opus|fable|sonnet|haiku|mythos)-(\d+)(?:-(\d{1,2}))?(?:-\d{8})?$/.exec(
+            resolvedModel ?? "",
+          );
+        const family = version?.[1];
+        const resolvedName =
+          family && version?.[2]
+            ? `${family.charAt(0).toUpperCase()}${family.slice(1)} ${version[2]}${version[3] ? "." + version[3] : ""}`
+            : undefined;
+        const name = resolvedName ?? displayName;
+        const label =
+          value === "default" && resolvedName
+            ? t`Default (${resolvedName})`
+            : /^(Opus|Sonnet|Haiku|Fable|Mythos)\b/.test(name)
+              ? // oxlint-disable-next-line lingui/no-unlocalized-strings -- Provider model name.
+                `Claude ${name}`
+              : displayName;
+        return {
+          id: value,
+          label,
+          resolvedId: resolvedModel ?? undefined,
+          efforts:
+            supportsEffort === false
+              ? []
+              : assistantEffortSchema.options.filter((level) =>
+                  supportedEffortLevels?.includes(level),
+                ),
+        };
+      },
+    );
+  } catch {
+    // Older CLI versions still accept the original model aliases.
+    return legacyModels;
   }
 }
 
@@ -200,6 +290,9 @@ export async function claudeCliReply(options: ResponseOptions, fingerprint: stri
   ];
   if (options.model !== "default") {
     args.push("--model", options.model);
+  }
+  if (options.effort) {
+    args.push("--effort", options.effort);
   }
   // Claude Code can expand @file references in user prompts, including mail addresses.
   const input = JSON.stringify({ history: options.input, actions: options.tools }).replaceAll(

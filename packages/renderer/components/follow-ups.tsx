@@ -1,9 +1,12 @@
 import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
-import { type FollowUpRow, localDay, nextFriday } from "@ggmail/shared/follow-ups";
+import {
+  type FollowUpRow,
+  localDay,
+  nextFriday,
+  SCHEDULE_FOLLOW_UP_PATH,
+} from "@ggmail/shared/follow-ups";
 import { ipc } from "@ggmail/shared/renderer/ipc";
-import type { AccountConfig } from "@ggmail/shared/schemas";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
-import { Badge } from "@ggmail/ui/components/badge";
 import { Button } from "@ggmail/ui/components/button";
 import { Input } from "@ggmail/ui/components/input";
 import { cn } from "@ggmail/ui/lib/utils";
@@ -18,25 +21,24 @@ import {
 } from "@tanstack/react-query";
 import {
   AlarmClockIcon,
+  ArrowLeftIcon,
   ArrowRightIcon,
   CalendarDaysIcon,
   CalendarPlusIcon,
-  CheckIcon,
-  Clock3Icon,
+  ClockIcon,
   InboxIcon,
   Loader2Icon,
   MailIcon,
   RefreshCwIcon,
-  SendIcon,
   TriangleAlertIcon,
   XIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Route } from "wouter";
 import { navigate } from "wouter/use-hash-location";
 import { dayjs } from "@/lib/date";
 import { useAccountsStore, useMailboxRevisions } from "@/lib/stores";
-import { AccountBadge } from "./account-badge";
 import { MailboxSection } from "./mail-page";
 import "./follow-ups.css";
 
@@ -44,17 +46,17 @@ const statuses = {
   due: {
     label: msg`Due for follow-up`,
     icon: AlarmClockIcon,
-    className: "bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-200",
+    className: "text-warning",
   },
   scheduled: {
     label: msg`Scheduled`,
     icon: CalendarDaysIcon,
-    className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200",
+    className: "text-muted-foreground",
   },
   unverified: {
     label: msg`Couldn’t verify replies`,
     icon: TriangleAlertIcon,
-    className: "bg-rose-50 text-rose-900 dark:bg-rose-950 dark:text-rose-200",
+    className: "text-warning",
   },
 };
 
@@ -83,7 +85,6 @@ function useFollowUpMailboxes(dueOnly: boolean) {
   });
 }
 
-type Mailboxes = ReturnType<typeof useFollowUpMailboxes>;
 type Filter = "all" | "due" | "scheduled";
 
 function FollowUpRows({
@@ -111,28 +112,14 @@ function FollowUpRows({
     <ul className={cn("follow-up-rows", compact && "follow-up-rows-compact")}>
       {rows.map(({ id, status, due, subject, recipient, lastSent }) => {
         const { label, icon: Icon, className } = statuses[status];
-        const date = dayjs(due);
-        const dueDate = date.format("ll");
+        const dueDate = dayjs(due).format("ll");
         return (
-          <li key={id} className="follow-up-row">
+          <li key={id} className="follow-up-row" data-status={status}>
             <button
               type="button"
               className="follow-up-open"
               onClick={() => action.mutate({ id, action: "open" })}
             >
-              {!compact && (
-                <time
-                  className="follow-up-day"
-                  data-status={status}
-                  dateTime={due}
-                  title={dueDate}
-                  aria-label={dueDate}
-                >
-                  <span>{date.format("MMM")}</span>
-                  <strong>{date.format("D")}</strong>
-                  {date.year() !== dayjs().year() && <small>{date.format("YYYY")}</small>}
-                </time>
-              )}
               <span className="follow-up-details">
                 <strong title={subject}>{subject || t`(no subject)`}</strong>
                 <span title={recipient}>{recipient}</span>
@@ -140,24 +127,18 @@ function FollowUpRows({
               </span>
               {!compact && (
                 <span className="follow-up-sent-date">
-                  <small>
-                    <Trans>Last sent</Trans>
-                  </small>
-                  <span>{lastSent}</span>
+                  <span className="sr-only">
+                    <Trans>Last sent</Trans>{" "}
+                  </span>
+                  {lastSent}
                 </span>
               )}
               <span className="follow-up-status">
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "h-auto max-w-full gap-1.5 border-current/10 px-2 py-0.5 text-start whitespace-normal",
-                    className,
-                  )}
-                >
+                <time dateTime={due}>{dueDate}</time>
+                <span className={cn("follow-up-status-label", className)}>
                   <Icon aria-hidden="true" />
                   {t(label)}
-                </Badge>
-                {compact && <time dateTime={due}>{dueDate}</time>}
+                </span>
               </span>
             </button>
             {!compact && (
@@ -181,10 +162,24 @@ function FollowUpRows({
   );
 }
 
-function ScheduleFollowUp({ selected }: { selected?: AccountConfig }) {
-  const { t } = useLingui();
+function ScheduleFollowUp() {
+  const { t, i18n } = useLingui();
   const client = useQueryClient();
   const [day, setDay] = useState(nextFriday);
+  const today = dayjs();
+  const relativeDay = new Intl.RelativeTimeFormat(i18n.locale, { numeric: "auto" });
+  const tomorrow = localDay(today.add(1, "day").toDate());
+  const friday = nextFriday(today.toDate());
+  const presets = [
+    { value: localDay(today.toDate()), label: relativeDay.format(0, "day") },
+    { value: tomorrow, label: relativeDay.format(1, "day") },
+  ];
+  if (friday !== tomorrow) {
+    presets.push({ value: friday, label: dayjs(friday).format("dddd") });
+  }
+  const selected = useAccountsStore(
+    (state) => state.accounts.find(({ config }) => config.selected)?.config,
+  );
   const selectedId = selected?.id;
   const revision = useMailboxRevisions((state) => (selectedId ? state[selectedId] : undefined));
   const current = useQuery({
@@ -219,17 +214,45 @@ function ScheduleFollowUp({ selected }: { selected?: AccountConfig }) {
   });
 
   return (
-    <section className="follow-up-scheduler" aria-label={t`Schedule follow-up`}>
+    <main className="follow-up-scheduler">
+      <header>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t`All follow-ups`}
+          title={t`All follow-ups`}
+          onClick={() => navigate("/waiting")}
+        >
+          <ArrowLeftIcon aria-hidden="true" className="rtl:rotate-180" />
+        </Button>
+        <h1 className="page-heading-title">
+          <Trans>Schedule follow-up</Trans>
+        </h1>
+      </header>
       <div className="follow-up-context">
-        <div className="follow-up-context-label">
-          <SendIcon aria-hidden="true" />
-          {current.data ? <Trans>Current mail view</Trans> : <Trans>Schedule follow-up</Trans>}
-          {selected && (!current.data || selected.id === current.data.accountId) && (
-            <AccountBadge label={getAccountLabel(selected.label)} color={selected.color} />
-          )}
-        </div>
         {current.data ? (
-          <h2>{current.data.subject || t`(no subject)`}</h2>
+          <div className="follow-up-thread">
+            <span className="follow-up-thread-icon">
+              <MailIcon aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="follow-up-context-label">{current.data.subject || t`(no subject)`}</h2>
+              {selected?.id === current.data.accountId && (
+                <p className="follow-up-current-account">
+                  {selected.color && (
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "size-2 shrink-0 rounded-full",
+                        accountColorsMap[selected.color].className,
+                      )}
+                    />
+                  )}
+                  {getAccountLabel(selected.label)}
+                </p>
+              )}
+            </div>
+          </div>
         ) : current.isPending ? (
           <p role="status">
             <Loader2Icon aria-hidden="true" className="size-4 motion-safe:animate-spin" />
@@ -253,35 +276,65 @@ function ScheduleFollowUp({ selected }: { selected?: AccountConfig }) {
           className="follow-up-form"
           onSubmit={(event) => {
             event.preventDefault();
-            schedule.mutate();
+            schedule.mutate(undefined, {
+              onSuccess: (ok) => {
+                if (ok) {
+                  ipc.main.send("workspaceApp.goBack");
+                }
+              },
+            });
           }}
         >
-          <label>
-            <span>
+          <div className="follow-up-date-fields">
+            <label htmlFor="follow-up-date">
               <Trans>Follow-up date</Trans>
-            </span>
+            </label>
+            <div className="follow-up-presets">
+              {presets.map(({ value, label }) => (
+                <Button
+                  key={value}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  aria-pressed={value === day}
+                  onClick={() => setDay(value)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
             <Input
+              id="follow-up-date"
               type="date"
               required
               min={localDay()}
               value={day}
               onChange={(event) => setDay(event.target.value)}
-              className="h-9 bg-background dark:scheme-dark"
+              className="h-9"
             />
-          </label>
-          <Button
-            type="submit"
-            size="lg"
-            className="follow-up-primary"
-            disabled={schedule.isPending}
-          >
-            {schedule.isPending ? (
-              <Loader2Icon aria-hidden="true" className="motion-safe:animate-spin" />
-            ) : (
-              <CalendarPlusIcon aria-hidden="true" />
-            )}
-            {day === nextFriday() ? t`Follow up Friday` : t`Schedule follow-up`}
-          </Button>
+          </div>
+          <div className="follow-up-form-actions">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => ipc.main.send("workspaceApp.goBack")}
+            >
+              <Trans>Cancel</Trans>
+            </Button>
+            <Button
+              type="submit"
+              size="lg"
+              className="follow-up-primary"
+              disabled={schedule.isPending}
+            >
+              {schedule.isPending ? (
+                <Loader2Icon aria-hidden="true" className="motion-safe:animate-spin" />
+              ) : (
+                <CalendarPlusIcon aria-hidden="true" />
+              )}
+              {day === friday ? t`Follow up Friday` : t`Schedule follow-up`}
+            </Button>
+          </div>
         </form>
       ) : current.isError ? (
         <Button
@@ -311,176 +364,206 @@ function ScheduleFollowUp({ selected }: { selected?: AccountConfig }) {
           </Button>
         )
       )}
-    </section>
+    </main>
   );
 }
 
-function FollowUpQueue({ mailboxes }: { mailboxes: Mailboxes }) {
-  const { t, i18n } = useLingui();
+export function FollowUps() {
   const [filter, setFilter] = useState<Filter>("all");
+  return (
+    <>
+      <Route path="/">
+        <WaitingForReply filter={filter} onFilter={setFilter} />
+      </Route>
+      <Route path="/new" component={ScheduleFollowUp} />
+    </>
+  );
+}
+
+function WaitingForReply({
+  filter,
+  onFilter,
+}: {
+  filter: Filter;
+  onFilter: (next: Filter) => void;
+}) {
+  const mailboxes = useFollowUpMailboxes(false);
+  const checking = mailboxes.some(({ list }) => list.isFetching);
+  const { t, i18n } = useLingui();
   const rows = mailboxes.flatMap((mailbox) => mailbox.rows);
   const complete = mailboxes.every(({ list, unavailable }) => !list.isPending && !unavailable);
   const filters = [
-    { id: "all", label: t`All follow-ups`, count: rows.length },
+    { id: "all", icon: ClockIcon, label: t`All follow-ups`, count: rows.length },
     {
       id: "due",
+      icon: AlarmClockIcon,
       label: t`Due`,
       count: rows.filter((row) => row.status === "due").length,
     },
     {
       id: "scheduled",
+      icon: CalendarDaysIcon,
       label: t`Scheduled`,
       count: rows.filter((row) => row.status === "scheduled").length,
     },
   ] as const;
   const hasUnverified = rows.some((row) => row.status === "unverified");
-  const empty =
-    complete &&
-    !rows.some((row) => filter === "all" || row.status === filter) &&
-    (filter === "all" || !hasUnverified);
+  const hasVisibleRows = rows.some((row) => filter === "all" || row.status === filter);
+  const empty = complete && !hasVisibleRows && (filter === "all" || !hasUnverified);
   return (
-    <div className="follow-up-queue">
-      <div role="group" aria-label={t`All follow-ups`} className="follow-up-filters">
-        {filters.map(({ id, label, count }) => (
-          <button key={id} type="button" aria-pressed={id === filter} onClick={() => setFilter(id)}>
-            {label}
-            {complete && <span>{i18n.number(count)}</span>}
-          </button>
-        ))}
-      </div>
-      {mailboxes.map(({ config, list, unavailable, rows }) => {
-        const visible = rows.filter((row) => filter === "all" || row.status === filter);
-        const unverified = rows.some((row) => row.status === "unverified");
-        if (!visible.length && !list.isPending && !unavailable && !unverified) {
-          return null;
-        }
-        const label = getAccountLabel(config.label);
-        return (
-          <section className="follow-up-mailbox" key={config.id} aria-label={label}>
-            <header>
-              <h2>
-                {config.color ? (
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "size-2 shrink-0 rounded-full",
-                      accountColorsMap[config.color].className,
-                    )}
-                  />
-                ) : (
-                  <InboxIcon aria-hidden="true" />
-                )}
+    <main className="waiting-page">
+      <aside className="follow-up-rail">
+        <Button className="follow-up-compose" onClick={() => navigate(SCHEDULE_FOLLOW_UP_PATH)}>
+          <CalendarPlusIcon aria-hidden="true" />
+          <Trans>Schedule follow-up</Trans>
+        </Button>
+        <div role="group" aria-label={t`All follow-ups`} className="follow-up-filters">
+          {filters.map(({ id, label, icon: Icon, count }) => (
+            <Button
+              key={id}
+              variant="ghost"
+              className="mail-nav-row"
+              aria-pressed={id === filter}
+              onClick={() => onFilter(id)}
+            >
+              <Icon aria-hidden="true" />
+              <span className="min-w-0 truncate" title={label}>
                 {label}
-              </h2>
-              {(unavailable || unverified) && (
-                <Button
-                  size="xs"
-                  variant="outline"
-                  disabled={list.isFetching}
-                  onClick={() => list.refetch()}
-                >
-                  <RefreshCwIcon aria-hidden="true" />
-                  <Trans>Retry</Trans>
-                </Button>
-              )}
-            </header>
-            {list.isPending ? (
-              <p className="follow-up-notice" role="status">
-                <Loader2Icon aria-hidden="true" className="motion-safe:animate-spin" />
-                <Trans>Checking for replies…</Trans>
-              </p>
-            ) : unavailable ? (
-              <p className="follow-up-notice" role="status">
-                <TriangleAlertIcon aria-hidden="true" />
-                <Trans>Couldn’t check this mailbox.</Trans>
-              </p>
-            ) : (
-              unverified &&
-              filter !== "all" && (
-                <p className="follow-up-notice" role="status">
-                  <TriangleAlertIcon aria-hidden="true" />
-                  <Trans>Couldn’t verify replies</Trans>
-                </p>
-              )
-            )}
-            {visible.length > 0 && <FollowUpRows accountId={config.id} rows={visible} />}
-          </section>
-        );
-      })}
-      {empty && (
-        <div className="follow-up-empty" role="status">
-          <div aria-hidden="true" className="follow-up-empty-mark">
-            <MailIcon />
-            <span>
-              <CheckIcon />
-            </span>
-          </div>
-          <h2>
-            {filter === "due"
-              ? t`No follow-ups due`
-              : filter === "scheduled"
-                ? t`No scheduled follow-ups`
-                : t`No follow-ups`}
-          </h2>
-          {rows.length > 0 ? (
-            <Button variant="link" size="sm" onClick={() => setFilter("all")}>
-              <Trans>View all follow-ups</Trans>
-              <ArrowRightIcon aria-hidden="true" />
+              </span>
+              {complete && <span className="mail-nav-count">{i18n.number(count)}</span>}
             </Button>
-          ) : (
-            <p>
-              <Trans>You can schedule a follow-up when you sent the last message.</Trans>
+          ))}
+        </div>
+      </aside>
+      <div className="follow-up-queue">
+        <header className="follow-up-heading">
+          <h1 className="page-heading-title">
+            <Trans>Waiting for reply</Trans>
+          </h1>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="follow-up-refresh"
+            aria-label={t`Check for replies`}
+            title={t`Check for replies`}
+            disabled={checking || !mailboxes.length}
+            onClick={() => {
+              for (const { list } of mailboxes) {
+                void list.refetch();
+              }
+            }}
+          >
+            <RefreshCwIcon
+              aria-hidden="true"
+              className={checking ? "motion-safe:animate-spin" : undefined}
+            />
+            <span>
+              <Trans>Check for replies</Trans>
+            </span>
+          </Button>
+        </header>
+        <div className="follow-up-queue-body">
+          {hasVisibleRows && (
+            <div className="follow-up-columns" aria-hidden="true">
+              <span>
+                <Trans>Conversation</Trans>
+              </span>
+              <span>
+                <Trans>Last sent</Trans>
+              </span>
+              <span>
+                <Trans>Follow-up date</Trans>
+              </span>
+            </div>
+          )}
+          {mailboxes.map(({ config, list, unavailable, rows }) => {
+            const visible = rows.filter((row) => filter === "all" || row.status === filter);
+            const unverified = rows.some((row) => row.status === "unverified");
+            if (!visible.length && !list.isPending && !unavailable && !unverified) {
+              return null;
+            }
+            const label = getAccountLabel(config.label);
+            return (
+              <section className="follow-up-mailbox" key={config.id} aria-label={label}>
+                <header>
+                  <h2>
+                    {config.color ? (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "size-2 shrink-0 rounded-full",
+                          accountColorsMap[config.color].className,
+                        )}
+                      />
+                    ) : (
+                      <InboxIcon aria-hidden="true" />
+                    )}
+                    {label}
+                  </h2>
+                  {(unavailable || unverified) && (
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      disabled={list.isFetching}
+                      onClick={() => list.refetch()}
+                    >
+                      <RefreshCwIcon aria-hidden="true" />
+                      <Trans>Retry</Trans>
+                    </Button>
+                  )}
+                </header>
+                {list.isPending ? (
+                  <p className="follow-up-notice" role="status">
+                    <Loader2Icon aria-hidden="true" className="motion-safe:animate-spin" />
+                    <Trans>Checking for replies…</Trans>
+                  </p>
+                ) : unavailable ? (
+                  <p className="follow-up-notice" role="status">
+                    <TriangleAlertIcon aria-hidden="true" />
+                    <Trans>Couldn’t check this mailbox.</Trans>
+                  </p>
+                ) : (
+                  unverified &&
+                  filter !== "all" && (
+                    <p className="follow-up-notice" role="status">
+                      <TriangleAlertIcon aria-hidden="true" />
+                      <Trans>Couldn’t verify replies</Trans>
+                    </p>
+                  )
+                )}
+                {visible.length > 0 && <FollowUpRows accountId={config.id} rows={visible} />}
+              </section>
+            );
+          })}
+          {empty && (
+            <div className="follow-up-empty" role="status">
+              <ClockIcon aria-hidden="true" />
+              <h2>
+                {filter === "due"
+                  ? t`No follow-ups due`
+                  : filter === "scheduled"
+                    ? t`No scheduled follow-ups`
+                    : t`No follow-ups`}
+              </h2>
+              {rows.length > 0 ? (
+                <Button variant="link" size="sm" onClick={() => onFilter("all")}>
+                  <Trans>View all follow-ups</Trans>
+                  <ArrowRightIcon aria-hidden="true" />
+                </Button>
+              ) : (
+                <p>
+                  <Trans>You can schedule a follow-up when you sent the last message.</Trans>
+                </p>
+              )}
+            </div>
+          )}
+          {rows.length > 0 && !empty && (
+            <p className="follow-up-hint">
+              <Trans>Conversations leave this list when a reply arrives.</Trans>
             </p>
           )}
         </div>
-      )}
-    </div>
-  );
-}
-
-export function WaitingForReply() {
-  const { t } = useLingui();
-  const mailboxes = useFollowUpMailboxes(false);
-  const selected = mailboxes.find(({ config }) => config.selected)?.config;
-  const checking = mailboxes.some(({ list }) => list.isFetching);
-  return (
-    <main className="waiting-page">
-      <header className="follow-up-heading">
-        <div className="follow-up-emblem" aria-hidden="true">
-          <Clock3Icon />
-        </div>
-        <div className="follow-up-heading-copy">
-          <h1>
-            <Trans>Waiting for reply</Trans>
-          </h1>
-          <p>
-            <Trans>Conversations leave this list when a reply arrives.</Trans>
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="follow-up-refresh"
-          aria-label={t`Check for replies`}
-          title={t`Check for replies`}
-          disabled={checking || !mailboxes.length}
-          onClick={() => {
-            for (const { list } of mailboxes) {
-              void list.refetch();
-            }
-          }}
-        >
-          <RefreshCwIcon
-            aria-hidden="true"
-            className={checking ? "motion-safe:animate-spin" : undefined}
-          />
-          <span>
-            <Trans>Check for replies</Trans>
-          </span>
-        </Button>
-      </header>
-      <ScheduleFollowUp selected={selected} />
-      <FollowUpQueue mailboxes={mailboxes} />
+      </div>
     </main>
   );
 }
@@ -490,7 +573,7 @@ export function InboxFollowUps({ accountId }: { accountId?: string }) {
   return (
     <div className="mb-6 hidden space-y-2 has-[section]:block">
       <Button size="sm" variant="ghost" className="-ms-2" onClick={() => navigate("/waiting")}>
-        <Clock3Icon aria-hidden="true" />
+        <ClockIcon aria-hidden="true" />
         <Trans>Waiting for reply</Trans>
         <ArrowRightIcon aria-hidden="true" />
       </Button>

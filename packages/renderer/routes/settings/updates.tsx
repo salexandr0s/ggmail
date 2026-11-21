@@ -15,7 +15,7 @@ export function UpdatesSettings() {
         <SettingsTitle>{t(settingsPageLabels.updates)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <div className="settings-surface settings-build-info text-sm">
+        <div className="settings-build-info text-sm">
           <h2>Local source build</h2>
           <p>Automatic app updates are disabled to preserve this local build.</p>
           <p>Rebuild ggmail from the repository to update this installation.</p>

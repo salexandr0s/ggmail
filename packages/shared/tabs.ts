@@ -1,35 +1,8 @@
 import { msg } from "@lingui/core/macro";
-import { VERTICAL_TABS_NARROW_WIDTH, VERTICAL_TABS_WIDE_WIDTH } from "./constants";
 import type { AccountConfig } from "./schemas";
-import type {
-  LauncherAndBookmarksPlacement,
-  SupportedWorkspaceApp,
-  WorkspaceAppsMode,
-} from "./workspace-apps";
+import type { SupportedWorkspaceApp, WorkspaceAppsMode } from "./workspace-apps";
 
 export const GMAIL_TAB_ID = "gmail";
-
-// lingui-set comment="Option of the Width setting for the vertical tabs sidebar"
-export const verticalTabsWidths = {
-  auto: msg({
-    message: "Auto",
-    context: "width",
-    comment:
-      "Option of the Width setting for the vertical tabs sidebar; agrees with the word for width where the language genders it",
-  }),
-  narrow: msg`Narrow`,
-  wide: msg`Wide`,
-} as const;
-// lingui-reset
-
-export type VerticalTabsWidth = keyof typeof verticalTabsWidths;
-
-/**
- * A width picked by hand in the strip, for one account until the app quits. It
- * is one of the two real widths: `auto` is a rule for choosing between them,
- * which is what picking by hand steps over.
- */
-export type VerticalTabsSessionWidth = Exclude<VerticalTabsWidth, "auto">;
 
 // lingui-set comment="Option of the Show Gmail unread badge setting: when the Gmail tab shows its unread count"
 export const verticalTabsGmailUnreadBadges = {
@@ -52,7 +25,10 @@ export function showsGmailUnreadCount(
   return !(mode === "whenInactive" && gmailTabActive);
 }
 
+export type SidebarWorkspaceApp = "calendar" | "tasks";
+
 export type TabState = {
+  sidebarApp?: SidebarWorkspaceApp;
   id: string;
   app: SupportedWorkspaceApp | undefined;
   title: string;
@@ -111,49 +87,4 @@ export function getVisibleVerticalTabs<
   }
 
   return showWindows ? tabs : tabs.filter((tab) => !tab.windowed);
-}
-
-export function getVerticalTabsWidth(
-  tabs: Pick<TabState, "app" | "pinned">[],
-  {
-    configuredWidth,
-    sessionWidth,
-    launcherAndBookmarksPlacement,
-  }: {
-    configuredWidth: VerticalTabsWidth;
-    sessionWidth: VerticalTabsSessionWidth | null;
-    launcherAndBookmarksPlacement: LauncherAndBookmarksPlacement;
-  },
-) {
-  // `sidebar` hands the strip the launcher and the bookmarks button for good,
-  // so it has to stay even with nothing to switch between.
-  if (tabs.length <= 1 && launcherAndBookmarksPlacement !== "sidebar") {
-    return 0;
-  }
-
-  if (sessionWidth) {
-    return sessionWidth === "narrow" ? VERTICAL_TABS_NARROW_WIDTH : VERTICAL_TABS_WIDE_WIDTH;
-  }
-
-  if (configuredWidth === "narrow") {
-    return VERTICAL_TABS_NARROW_WIDTH;
-  }
-
-  if (configuredWidth === "wide") {
-    return VERTICAL_TABS_WIDE_WIDTH;
-  }
-
-  const workspaceAppTabCounts = new Map<SupportedWorkspaceApp, number>();
-
-  for (const tab of tabs) {
-    if (tab.app && !tab.pinned) {
-      workspaceAppTabCounts.set(tab.app, (workspaceAppTabCounts.get(tab.app) ?? 0) + 1);
-    }
-  }
-
-  const hasWorkspaceAppWithMultipleTabs = Array.from(workspaceAppTabCounts.values()).some(
-    (workspaceAppTabCount) => workspaceAppTabCount > 1,
-  );
-
-  return hasWorkspaceAppWithMultipleTabs ? VERTICAL_TABS_WIDE_WIDTH : VERTICAL_TABS_NARROW_WIDTH;
 }

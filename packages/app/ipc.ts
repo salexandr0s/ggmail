@@ -8,6 +8,7 @@ import { MAX_RECENT_DOWNLOAD_HISTORY_ITEMS } from "@ggmail/shared/constants";
 import { curatedExtensions, isCuratedExtensionId } from "@ggmail/shared/extensions";
 import { getWorkspaceAppUrl } from "@ggmail/shared/google";
 import { i18n } from "@ggmail/shared/i18n";
+import { currentMailView, type MailViewsPopupState } from "@ggmail/shared/mail-views";
 import { ms } from "@ggmail/shared/ms";
 import { byPlatform } from "@ggmail/shared/platform";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
@@ -283,49 +284,48 @@ class Ipc {
 
     /* oxlint-disable lingui/no-unlocalized-strings -- Internal route and account identifiers for the mail-view popup. */
     const mailViewsPopup = new Popup();
-    this.main.on("titleBar.openCalendar", (event, anchor) => {
-      if (
-        event.sender === main.window.webContents &&
-        event.senderFrame === event.sender.mainFrame
-      ) {
-        appMenu.chooseCalendarAccount(anchor);
-      }
-    });
-
-    this.main.on("titleBar.showMailViews", (event, anchor) => {
-      if (
-        event.sender !== main.window.webContents ||
-        event.senderFrame !== event.sender.mainFrame
-      ) {
-        return;
-      }
+    const showMailPicker = (anchor: { x: number; y: number }) => {
       const mailboxes = accounts.getAccounts();
       const unified = config.get("unifiedInbox.enabled") && mailboxes.length > 1;
-      const accountItems = mailboxes.map(({ config: account }) => ({
-        value: "account/" + account.id,
-        label: getAccountLabel(account.label),
-        color: account.color,
-      }));
-      const selectedAccount = mailboxes.find(({ config: account }) => account.selected);
-      const selected =
-        main.location === "/" && selectedAccount
-          ? selectedAccount.instance.tabs.activeTab.app === "calendar"
-            ? "calendar"
-            : "account/" + selectedAccount.config.id
-          : main.location;
+      const selected = accounts.getSelectedAccount();
+      const choices: MailViewsPopupState = {
+        unified,
+        selectedView: currentMailView(main.location, selected.instance.tabs.activeTab.app),
+        selectedAccount: main.location === "/" ? "account/" + selected.config.id : undefined,
+        accountItems:
+          mailboxes.length > 1
+            ? mailboxes.map(({ config: account, instance }) => {
+                const { attentionRequired, unreadCount, profilePhoto } =
+                  instance.gmail.store.getState();
+                return {
+                  value: "account/" + account.id,
+                  label: getAccountLabel(account.label),
+                  color: account.color,
+                  logo: account.logo,
+                  profilePhoto,
+                  signIn: attentionRequired,
+                  unread:
+                    config.get("accounts.unreadBadge") && account.gmail.unreadBadge
+                      ? unreadCount
+                      : null,
+                };
+              })
+            : [],
+      };
       if (
         mailViewsPopup.toggle(main.window, {
           page: "mail-views",
           anchor: { ...anchor, align: "start" },
           width: 248,
-          // Two section labels, the divider and padding, plus each 36px menu row.
-          height: 80 + 36 * ((unified ? 4 : 3) + accountItems.length),
+          // Allow 40px per section for its label and padding, and 36px per choice.
+          height:
+            40 + 3 * 36 + (choices.accountItems.length ? 40 + 36 * choices.accountItems.length : 0),
           searchParams: new URLSearchParams({
-            choices: JSON.stringify({ unified, accountItems, selected }),
+            choices: JSON.stringify(choices),
           }),
         })
       ) {
-        const owner = event.sender;
+        const owner = main.window.webContents;
         ipc.renderer.send(owner, "titleBar.mailViewsOpen", true);
         mailViewsPopup.webContents?.once("destroyed", () => {
           if (!owner.isDestroyed() && !mailViewsPopup.webContents) {
@@ -337,19 +337,17 @@ class Ipc {
           mailViewsPopup.webContents?.focus(),
         );
       }
-    });
+    };
 
-    this.main.on("titleBar.chooseMailView", (event, value) => {
-      if (
-        event.sender !== mailViewsPopup.webContents ||
-        event.senderFrame !== event.sender.mainFrame
-      ) {
-        return;
-      }
-      mailViewsPopup.close();
-      if (value === "calendar") {
-        appMenu.chooseCalendarAccount();
-      } else if (value?.startsWith("account/")) {
+    const openMailView = (value: string) => {
+      if (value === "gmail") {
+        const { instance } = accounts.getSelectedAccount();
+        instance.tabs.activateTab(GMAIL_TAB_ID);
+        if (main.location !== "/") {
+          main.navigate("/");
+        }
+        accounts.refreshSelectedAccountView();
+      } else if (value.startsWith("account/")) {
         const id = value.slice("account/".length);
         if (accounts.getAccounts().some((account) => account.config.id === id)) {
           accounts.openAccountPage(id);
@@ -361,13 +359,66 @@ class Ipc {
           config.get("unifiedInbox.enabled") &&
           accounts.getAccounts().length > 1)
       ) {
-        main.navigate(value);
+        if (main.location !== value) {
+          main.navigate(value);
+        }
+      }
+    };
+
+    this.main.on("titleBar.openMailView", (event, value) => {
+      if (
+        event.sender === main.window.webContents &&
+        event.senderFrame === event.sender.mainFrame &&
+        typeof value === "string"
+      ) {
+        openMailView(value);
+      }
+    });
+
+    this.main.on("titleBar.showMailViews", (event, anchor) => {
+      if (
+        event.sender === main.window.webContents &&
+        event.senderFrame === event.sender.mainFrame
+      ) {
+        showMailPicker(anchor);
+      }
+    });
+
+    this.main.on("titleBar.chooseMailView", (event, value) => {
+      if (
+        event.sender !== mailViewsPopup.webContents ||
+        event.senderFrame !== event.sender.mainFrame
+      ) {
+        return;
+      }
+      mailViewsPopup.close();
+      if (typeof value === "string") {
+        openMailView(value);
       } else if (main.location === "/") {
         accounts.focusActiveView();
       }
     });
 
     /* oxlint-enable lingui/no-unlocalized-strings */
+
+    this.main.on("sidebar.openApp", (event, app) => {
+      if (
+        event.sender === main.window.webContents &&
+        event.senderFrame === event.sender.mainFrame &&
+        (app === "calendar" || app === "tasks")
+      ) {
+        accounts.getSelectedAccount().instance.tabs.openSidebarApp(app);
+      }
+    });
+
+    this.main.on("sidebar.openSettings", (event) => {
+      if (
+        event.sender === main.window.webContents &&
+        event.senderFrame === event.sender.mainFrame
+      ) {
+        settingsWindow.open();
+      }
+    });
 
     this.main.on("titleBar.toggleAppMenu", (event, anchor) => {
       appMenu.togglePopup(anchor, settingsWindow.getAppMenuWindow(event.sender));
@@ -538,14 +589,13 @@ class Ipc {
     ipc.main.on("tabs.selectTab", (_event, accountId, tabId) => {
       const account = accounts.getAccount(accountId);
 
-      const selectedTab = account.instance.tabs.getTab(tabId);
-
       account.instance.tabs.activateTab(tabId);
 
-      if (selectedTab instanceof WorkspaceApp && selectedTab.isWindowed) {
+      if (account.instance.tabs.activeTabId !== tabId) {
         return;
       }
 
+      main.navigate("/");
       if (account.config.selected) {
         accounts.refreshSelectedAccountView();
       } else {
@@ -880,27 +930,7 @@ class Ipc {
             }
           },
         },
-        {
-          type: "separator",
-        },
-        // The way back from a width set by the button, which is otherwise the
-        // Width setting's to give — and there is nothing to reset to on `auto`,
-        // where picking it again in settings changes nothing.
-        {
-          label: t({
-            message: "Reset Width",
-            comment: "Context menu item that resets the width of the vertical tabs strip",
-          }),
-          enabled: Boolean(account.instance.verticalTabsWidth),
-          click: () => {
-            accounts.setVerticalTabsWidth(accountId, null);
-          },
-        },
       ]).popup();
-    });
-
-    ipc.main.on("tabs.setVerticalTabsWidth", (_event, accountId, width) => {
-      accounts.setVerticalTabsWidth(accountId, width);
     });
 
     ipc.main.handle("config.getConfig", () => config.store);
@@ -1223,13 +1253,27 @@ class Ipc {
       ipc.renderer.send(composeWorkspaceApp.view.webContents, "gmail.undoMessageSent");
     });
 
-    ipc.main.on("gmail.setUserEmail", (event, email) => {
+    ipc.main.on("gmail.setUserEmail", (event, email, photo) => {
       const accountInstance = accounts.findInstanceByGmailWebContentsId(event.sender.id);
 
-      if (accountInstance && accountInstance.gmail.userEmail !== email) {
+      if (
+        accountInstance &&
+        typeof email === "string" &&
+        accountInstance.gmail.userEmail !== email
+      ) {
         accountInstance.gmail.invalidateMailboxReads();
+        accountInstance.gmail.setProfilePhoto();
         accountInstance.gmail.userEmail = email;
         void accountInstance.gmail.fetchInboxFeed({ retryWhileUnchanged: false });
+      }
+      if (
+        accountInstance &&
+        event.senderFrame === event.sender.mainFrame &&
+        event.senderFrame &&
+        URL.parse(event.senderFrame.url)?.origin === "https://mail.google.com" &&
+        (typeof photo === "string" || photo === null)
+      ) {
+        accountInstance.gmail.setProfilePhoto(photo);
       }
     });
 
@@ -1250,14 +1294,14 @@ class Ipc {
       return bookmarks.serialize();
     });
 
-    ipc.main.on("bookmarks.togglePopup", (event, placement) => {
+    ipc.main.on("bookmarks.togglePopup", (event) => {
       const parentWindow = BrowserWindow.fromWebContents(event.sender);
 
       if (!parentWindow) {
         return;
       }
 
-      bookmarks.togglePopup(parentWindow, placement);
+      bookmarks.togglePopup(parentWindow);
     });
 
     /*

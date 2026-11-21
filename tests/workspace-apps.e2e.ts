@@ -1,11 +1,10 @@
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import { APP_TITLEBAR_HEIGHT, VERTICAL_TABS_NARROW_WIDTH } from "@ggmail/shared/constants";
+import { APP_TITLEBAR_HEIGHT, WORKSPACE_SIDEBAR_WIDTH } from "@ggmail/shared/constants";
 import { expect, test } from "@playwright/test";
 import { seedAccount, seedSavedTab } from "./lib/accounts";
 import { useApp } from "./lib/app";
 import { DOWNLOAD_BODY, DOWNLOAD_FILE_NAME, startTestServer, type TestServer } from "./lib/server";
-import { configSwitch, openSettingsPage } from "./lib/settings";
 import { waitForVerticalTabs } from "./lib/strip";
 import { findViewByUrl, readUnfilledSpace, readViews } from "./lib/views";
 
@@ -57,13 +56,9 @@ const ggmail = useApp(async ({ userDataDir }) => {
 
   return {
     "downloads.location": downloadsLocation,
-    /*
-     * Two, so the launcher menu has more than one thing in it and so one of them
-     * is an app the selected account has never held as a saved tab. The strip's
-     * launcher is a single button with a dropdown whatever the count — the
-     * display setting that lays apps out inline is a titlebar concern.
-     */
-    "workspaceApps.launcherApps": ["calendar", "tasks"],
+    // Exercise the titlebar launcher with apps distinct from the permanent shortcuts.
+    "workspaceApps.launcherApps": ["docs", "drive"],
+    "workspaceApps.launcherDisplay": "collapsed",
     accounts: [
       seedAccount({
         id: FIRST_ACCOUNT_ID,
@@ -159,7 +154,9 @@ test("a saved tab is restored into a child view of its own", async () => {
   await expect(ggmail.renderer.getByRole("button", { name: RESTORED_PAGE_TITLE })).toBeVisible();
 
   await expect(
-    ggmail.renderer.getByTitle("Calendar", { exact: true }).filter({ visible: true }),
+    ggmail.renderer
+      .getByRole("group", { name: "Tabs", exact: true })
+      .getByTitle("Calendar", { exact: true }),
   ).toHaveCount(0);
 });
 
@@ -181,12 +178,8 @@ test("a restored view is inset by the chrome the renderer owns", async () => {
    * renderer, and a view laid over either of them is covering the app's own
    * interface.
    *
-   * The strip is at its narrow width because the selected account has more than
-   * one tab and none of them is an unpinned second tab for the same app, which
-   * is the only thing that widens it while `verticalTabs.width` is left at
-   * `auto`.
    */
-  expect(unfilled.left).toBe(VERTICAL_TABS_NARROW_WIDTH);
+  expect(unfilled.left).toBe(WORKSPACE_SIDEBAR_WIDTH);
   expect(unfilled.top).toBe(APP_TITLEBAR_HEIGHT);
 
   // And it spans everything left over, so no strip of window shows through
@@ -283,7 +276,7 @@ test("the launcher opens a workspace app that was never a saved tab", async () =
 
   const viewCountBefore = (await readViews(ggmail)).length;
 
-  await ggmail.renderer.getByRole("button", { name: "Open app" }).click();
+  await ggmail.renderer.getByRole("button", { name: "Open workspace app" }).click();
 
   const launcherMenu = ggmail.renderer.getByRole("menu");
 
@@ -291,12 +284,6 @@ test("the launcher opens a workspace app that was never a saved tab", async () =
 
   await expect(launcherMenu.getByRole("menuitem")).toHaveCount(2);
 
-  /*
-   * The last item is Tasks, which the selected account has never held as a saved
-   * tab — the first is Calendar, which it has, so opening that one would prove
-   * nothing this test's name claims. Tasks is seeded on the other account, and
-   * an account's tabs are its own.
-   */
   await launcherMenu.getByRole("menuitem").last().click();
 
   /*
@@ -363,59 +350,10 @@ test("a download from a workspace app lands on disk and in the history", async (
   await expect(ggmail.renderer.getByTitle(DOWNLOAD_FILE_NAME)).toBeVisible();
 });
 
-/**
- * Flips Show bookmarks button from the settings page and comes back to the
- * strip, having waited for the write.
- *
- * Through the switch rather than by seeding, because the setting is one a user
- * turns off with the app running and what is being proved is that both hosts
- * follow it live. The config on disk is polled before settings is closed, so
- * a failure afterwards is the button and not a write that had yet to land.
- */
-async function setShowBookmarksButton(shown: boolean) {
-  const settings = await ggmail.openSettings();
-
-  await openSettingsPage(settings, "Workspace apps");
-
-  await configSwitch(settings, "workspaceApps.showBookmarksButton").click();
-
-  await expect
-    .poll(async () => (await ggmail.readConfig())["workspaceApps.showBookmarksButton"])
-    .toBe(shown);
-
-  await ggmail.closeSettings();
-
+test("the fixed sidebar keeps bookmarks available alongside the app launcher", async () => {
   await waitForVerticalTabs(ggmail);
-}
-
-test("the bookmarks button follows its setting, and the launcher beside it stays", async () => {
-  await waitForVerticalTabs(ggmail);
-
-  const bookmarksButton = ggmail.renderer.getByRole("button", { name: "Show bookmarks" });
-
-  /*
-   * Counted rather than asserted visible, throughout. Both hosts draw the
-   * button and only the strip's copy is in the accessibility tree here, but the
-   * titlebar's is hidden by a display transition rather than by not being
-   * rendered — so during the handover, and on the first paint after leaving
-   * settings, the two are briefly there at once. A visibility assertion fails
-   * that as a strict mode violation and never retries; the count rides it out,
-   * and says as much: one copy offered, not two.
-   */
-  await expect(bookmarksButton).toHaveCount(1);
-
-  await setShowBookmarksButton(false);
-
-  await expect(bookmarksButton).toHaveCount(0);
-
-  /*
-   * The launcher shares the group with it, and the group goes only once nothing
-   * is left in it — so this is what says the setting took the button and not
-   * the row.
-   */
-  await expect(ggmail.renderer.getByRole("button", { name: "Open app" })).toHaveCount(1);
-
-  await setShowBookmarksButton(true);
-
-  await expect(bookmarksButton).toHaveCount(1);
+  await expect(ggmail.renderer.getByRole("button", { name: "Bookmarks", exact: true })).toHaveCount(
+    1,
+  );
+  await expect(ggmail.renderer.getByRole("button", { name: "Open workspace app" })).toHaveCount(1);
 });

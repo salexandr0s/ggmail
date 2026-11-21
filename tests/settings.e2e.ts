@@ -203,7 +203,17 @@ test("picker chevrons stay at the right edge of the control", async () => {
 
   async function checkPagePickers() {
     await openSettingsPage(settings, "Workspace apps");
-    await checkChevron(settings.getByRole("combobox", { name: "Mode", exact: true }));
+    const mode = settings.getByRole("combobox", { name: "Mode", exact: true });
+    await checkChevron(mode);
+    await mode.press("Enter");
+    const selected = settings.getByRole("option", { selected: true });
+    const activePage = settings.getByTestId("settings-nav").locator('[aria-current="page"]');
+    await expect(selected).toBeVisible();
+    await expect(activePage).toHaveCSS(
+      "background-color",
+      await selected.evaluate((item) => getComputedStyle(item).backgroundColor),
+    );
+    await settings.keyboard.press("Escape");
     await checkChevron(settings.getByLabel("Excluded apps", { exact: true }));
     await openSettingsPage(settings, "AI");
     await checkChevron(settings.getByRole("combobox", { name: "Mail assistant provider" }));

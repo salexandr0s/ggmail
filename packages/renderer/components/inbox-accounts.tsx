@@ -1,24 +1,22 @@
-import { accountColorsMap } from "@ggmail/shared/accounts";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import { cn } from "@ggmail/ui/lib/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  CheckIcon,
   ChevronRightIcon,
   InboxIcon,
   KeyRoundIcon,
   Loader2Icon,
-  MailIcon,
   RefreshCwIcon,
 } from "lucide-react";
 import type { useUnifiedInbox } from "@/lib/hooks";
+import { AccountAvatar } from "./account-avatar";
 
 const statusDetails = {
   ready: {
-    icon: CheckIcon,
-    label: msg`Up to date`,
+    icon: null,
+    label: null,
     description: (label: string) => msg`${label} is up to date`,
   },
   signIn: {
@@ -50,17 +48,17 @@ export function InboxAccounts({
   const { t, i18n } = useLingui();
   return (
     <aside className="inbox-accounts" aria-labelledby="inbox-accounts-title">
-      <h2 id="inbox-accounts-title" className="inbox-rail-heading">
+      <h2 id="inbox-accounts-title" className="mail-nav-heading">
         <Trans>Accounts</Trans>
       </h2>
       <div className="inbox-account-list" role="group" aria-label={t`Filter by account`}>
         <Button
           variant="ghost"
           aria-pressed={!selected}
-          className="inbox-account"
+          className="mail-nav-row inbox-account"
           onClick={() => onSelect()}
         >
-          <span className="inbox-account-icon">
+          <span className="mail-nav-icon inbox-account-icon">
             <InboxIcon />
           </span>
           <span className="min-w-0 truncate">
@@ -74,38 +72,33 @@ export function InboxAccounts({
           return (
             <Button
               key={id}
-              className="inbox-account"
+              className="mail-nav-row inbox-account"
               variant="ghost"
+              data-unread={messages.length > 0 || undefined}
               aria-label={signIn ? description : label}
               aria-description={signIn ? undefined : description}
               aria-pressed={signIn ? undefined : selected === id}
               title={description}
               onClick={() => (signIn ? ipc.main.send("gmail.openInboxSignIn", id) : onSelect(id))}
             >
-              <span className="inbox-account-icon">
-                <MailIcon aria-hidden="true" />
-                {color && (
-                  <span
-                    aria-hidden="true"
-                    className={cn("inbox-account-color", accountColorsMap[color].className)}
-                  />
-                )}
-              </span>
+              <AccountAvatar account={{ id, label, color }} />
               <span className="grid min-w-0 gap-0.5">
                 <span className="truncate">{label}</span>
-                <span className="inbox-account-status" data-status={status}>
-                  <Icon
-                    aria-hidden="true"
-                    className={cn(status === "syncing" && "motion-safe:animate-spin")}
-                  />
-                  {t(statusLabel)}
-                </span>
+                {Icon && statusLabel && (
+                  <span className="inbox-account-status" data-status={status}>
+                    <Icon
+                      aria-hidden="true"
+                      className={cn(status === "syncing" && "motion-safe:animate-spin")}
+                    />
+                    {t(statusLabel)}
+                  </span>
+                )}
               </span>
               {signIn ? (
                 <ChevronRightIcon aria-hidden="true" className="ms-auto text-muted-foreground" />
               ) : (
                 messages.length > 0 && (
-                  <span className="inbox-account-count">{i18n.number(messages.length)}</span>
+                  <span className="mail-nav-count">{i18n.number(messages.length)}</span>
                 )
               )}
             </Button>

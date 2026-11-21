@@ -33,9 +33,9 @@ test.beforeEach(async () => {
   await stubBrowser(ggmail);
 });
 
-async function openPicker() {
+async function openPicker(populated = false) {
   await ggmail.app.evaluate(
-    ({ desktopCapturer, session }, { partition, title }) => {
+    ({ desktopCapturer, session, nativeImage }, { partition, title, populated }) => {
       session.fromPartition(partition).protocol.handle(
         "https",
         () =>
@@ -46,9 +46,27 @@ async function openPicker() {
 
       // The picker lists sources through this, which on macOS asks for the
       // screen recording permission, a prompt no test is here to answer.
-      desktopCapturer.getSources = async () => [];
+      desktopCapturer.getSources = async () =>
+        populated
+          ? [
+              {
+                id: "window:1:0",
+                name: "Sample window",
+                display_id: "",
+                thumbnail: nativeImage.createEmpty(),
+                appIcon: nativeImage.createEmpty(),
+              },
+              {
+                id: "screen:1:0",
+                name: "Sample display",
+                display_id: "1",
+                thumbnail: nativeImage.createEmpty(),
+                appIcon: nativeImage.createEmpty(),
+              },
+            ]
+          : [];
     },
-    { partition: `persist:${ACCOUNT_ID}`, title: MEET_PAGE_TITLE },
+    { partition: `persist:${ACCOUNT_ID}`, title: MEET_PAGE_TITLE, populated },
   );
 
   await ggmail.renderer.getByRole("button", { name: "Meet" }).click();
@@ -77,4 +95,22 @@ test("a new window from the screen share picker opens in the browser only for a 
 
 test("the screen share picker comes back from about:blank with its bridge", async () => {
   await expectReturnFromNavigation(ggmail, await openPicker(), "about:blank");
+});
+
+test("keyboard selection in the share picker stays on the visible tab", async () => {
+  await openPicker(true);
+  const picker = ggmail.app.windows().find((page) => page.url().includes("desktop-sources.html"));
+  if (!picker) {
+    throw new Error("Missing screen share picker");
+  }
+  const share = picker.getByRole("button", { name: "Share", exact: true });
+  const source = picker.getByRole("button", { name: "Sample window" });
+  await expect(share).toBeDisabled();
+  await source.focus();
+  await source.press("Space");
+  await expect(source).toHaveAttribute("aria-pressed", "true");
+  await expect(share).toBeEnabled();
+  await picker.getByRole("tab", { name: "Screens" }).click();
+  await expect(share).toBeDisabled();
+  await expect(picker.getByRole("button", { name: "Sample display" })).toBeVisible();
 });

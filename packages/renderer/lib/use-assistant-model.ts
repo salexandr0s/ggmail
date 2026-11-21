@@ -1,4 +1,4 @@
-import type { AssistantModel, AssistantProvider } from "@ggmail/shared/assistant";
+import type { AssistantEffort, AssistantModel, AssistantProvider } from "@ggmail/shared/assistant";
 import { useSyncExternalStore } from "react";
 
 const modelChanged = "ggmail-assistant-model-changed";
@@ -18,6 +18,23 @@ export function useAssistantModel(provider: AssistantProvider, models: readonly 
   const preference = useSyncExternalStore(subscribe, () => localStorage.getItem(key));
   const model = models.find(({ id }) => id === preference) ?? models[0];
 
+  // oxlint-disable-next-line lingui/no-unlocalized-strings -- Local storage key.
+  const effortKey = `assistant.effort.${provider}.${model?.id}`;
+  const savedEffort = useSyncExternalStore(subscribe, () => localStorage.getItem(effortKey));
+  const effort = model?.efforts?.find((level) => level === savedEffort);
+
+  function chooseEffort(value: AssistantEffort | undefined) {
+    if (!model || (value && !model.efforts?.includes(value))) {
+      return;
+    }
+    if (value) {
+      localStorage.setItem(effortKey, value);
+    } else {
+      localStorage.removeItem(effortKey);
+    }
+    window.dispatchEvent(new Event(modelChanged));
+  }
+
   function chooseModel(id: string) {
     if (id !== preference && models.some((choice) => choice.id === id)) {
       localStorage.setItem(key, id);
@@ -25,5 +42,5 @@ export function useAssistantModel(provider: AssistantProvider, models: readonly 
       window.dispatchEvent(new Event(modelChanged));
     }
   }
-  return { model, chooseModel };
+  return { model, chooseModel, effort, chooseEffort };
 }

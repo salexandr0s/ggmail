@@ -2,12 +2,7 @@ import { randomUUID } from "node:crypto";
 import { platform } from "@electron-toolkit/utils";
 import { ms } from "@ggmail/shared/ms";
 import type { AccountConfig, AccountConfigs } from "@ggmail/shared/schemas";
-import {
-  GMAIL_TAB_ID,
-  getVerticalTabsWidth,
-  getVisibleVerticalTabs,
-  type VerticalTabsSessionWidth,
-} from "@ggmail/shared/tabs";
+import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { BrowsingDataTypes } from "@ggmail/shared/types";
 import { net, powerMonitor, session } from "electron";
 import { Account } from "./account";
@@ -48,33 +43,6 @@ class Accounts {
       for (const account of accounts.instances.values()) {
         account.gmail.applyLabelColors();
       }
-    });
-
-    // A width chosen in settings speaks for every account, so it takes back the
-    // strips a button press had set aside for this run — otherwise picking a
-    // width there would leave them where they stand and read as broken.
-    config.onDidChange("verticalTabs.width", () => {
-      for (const account of accounts.instances.values()) {
-        account.verticalTabsWidth = null;
-      }
-
-      accounts.updateAllViewBounds();
-
-      accounts.sendAccountsChangedToRenderer();
-    });
-
-    config.onDidChange("verticalTabs.showWindows", () => {
-      accounts.updateAllViewBounds();
-    });
-
-    config.onDidChange("workspaceApps.mode", () => {
-      accounts.updateAllViewBounds();
-    });
-
-    // `sidebar` holds the strip open where the other placements let it go, so
-    // switching between them moves every view sideways.
-    config.onDidChange("workspaceApps.launcherAndBookmarksPlacement", () => {
-      accounts.updateAllViewBounds();
     });
 
     config.onDidChange("workspaceApps.zoomFactors", () => {
@@ -177,31 +145,6 @@ class Accounts {
     main.window.on("restore", () => {
       this.refreshSelectedAccountView();
     });
-  }
-
-  getVerticalTabsWidth() {
-    const selectedAccount = this.getSelectedAccount();
-
-    return getVerticalTabsWidth(
-      getVisibleVerticalTabs(selectedAccount.instance.tabs.serialize(), {
-        workspaceAppsMode: config.get("workspaceApps.mode"),
-        showWindows: config.get("verticalTabs.showWindows"),
-      }),
-      {
-        configuredWidth: config.get("verticalTabs.width"),
-        sessionWidth: selectedAccount.instance.verticalTabsWidth,
-        launcherAndBookmarksPlacement: config.get("workspaceApps.launcherAndBookmarksPlacement"),
-      },
-    );
-  }
-
-  /** `null` hands the width back to the setting, `auto` included. */
-  setVerticalTabsWidth(accountId: AccountConfig["id"], width: VerticalTabsSessionWidth | null) {
-    this.getAccount(accountId).instance.verticalTabsWidth = width;
-
-    this.updateAllViewBounds();
-
-    this.sendAccountsChangedToRenderer();
   }
 
   updateAllViewBounds() {
@@ -424,11 +367,9 @@ class Accounts {
   }
 
   openAccountPage(accountId: string) {
-    if (
-      main.location === "/" &&
-      this.getSelectedAccount().instance.tabs.activeTab.app === "calendar"
-    ) {
-      this.getAccount(accountId).instance.tabs.openCalendar();
+    const currentApp = this.getSelectedAccount().instance.tabs.activeSidebarApp;
+    if (main.location === "/" && currentApp) {
+      this.getAccount(accountId).instance.tabs.openSidebarApp(currentApp);
       return;
     }
     this.selectAccount(accountId);
@@ -855,7 +796,6 @@ class Accounts {
     return this.getAccounts().map((account) => ({
       config: account.config,
       gmail: account.instance.gmail.store.getState(),
-      verticalTabsWidth: account.instance.verticalTabsWidth,
     }));
   }
 

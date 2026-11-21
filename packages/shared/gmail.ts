@@ -102,6 +102,7 @@ export interface GmailInboxMessage {
 }
 
 export type GmailState = {
+  profilePhoto?: string;
   unreadCount: number | null;
   outOfOffice: boolean;
   attentionRequired: boolean;

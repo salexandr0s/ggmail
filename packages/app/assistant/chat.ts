@@ -271,7 +271,7 @@ export class AssistantChat {
       };
     }
 
-    if (!this.connection.allowsModel(request.provider, request.model)) {
+    if (!this.connection.allowsModel(request.provider, request.model, request.effort)) {
       return { status: "error", message: t`Choose an available model in the mail assistant.` };
     }
 
@@ -349,6 +349,7 @@ export class AssistantChat {
         const finish = round >= 16 || budgetUsed();
         const result = await this.connection.reply(request.provider, {
           model: request.model,
+          effort: request.effort,
           instructions: finish ? finishInstructions : instructions,
           input,
           signal,

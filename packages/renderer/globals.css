@@ -19,3 +19,95 @@
     display: none;
   }
 }
+
+.mail-workspace {
+  --mail-gutter: 0.75rem;
+  /* The app switcher, mail navigation and both gutters share Gmail’s 256px desktop width. */
+  --mail-rail-width: clamp(9rem, 18cqi, calc(14.5rem - var(--workspace-sidebar-width, 0px)));
+}
+
+.page-heading-title {
+  min-width: 0;
+  font-size: 1.375rem;
+  font-weight: 400;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.mail-search-field[data-slot="input-group"] {
+  height: 3rem;
+  padding-inline: 0.5rem;
+  border-radius: 999px;
+  border-color: transparent;
+  background: var(--search-surface);
+}
+
+.mail-search-field[data-slot="input-group"]:focus-within {
+  border-color: var(--ring);
+  background: var(--card);
+  box-shadow: 0 0 0 1px var(--ring);
+}
+
+.mail-search-field input {
+  font-size: 1rem;
+}
+
+.mail-nav-heading {
+  margin-block-end: 0.5rem;
+  padding-inline: 0.875rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+}
+
+.mail-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  height: auto;
+  gap: 0.625rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  color: var(--foreground);
+  font: 400 0.875rem/1.25rem var(--font-sans);
+  text-align: start;
+}
+
+.mail-nav-row > svg,
+.mail-nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+  color: var(--muted-foreground);
+}
+
+.mail-nav-row:hover {
+  background: var(--accent);
+}
+
+.mail-nav-row:is([aria-pressed="true"], [aria-current="page"]) {
+  background: var(--selected);
+  color: var(--selected-foreground);
+  font-weight: 700;
+}
+
+.mail-nav-row:is([aria-pressed="true"], [aria-current="page"]) :is(svg, .mail-nav-icon) {
+  color: inherit;
+}
+
+.mail-nav-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.mail-nav-count {
+  flex: none;
+  margin-inline-start: auto;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}

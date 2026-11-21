@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.65.5 — 2026-11-21
+
+- Mac updates installed with `bun run install:mac:local` use the same Developer ID as the release, so Keychain can recognize ggmail across updates.
+- Account tabs and Settings show each mailbox's Google profile photo. The narrower navigation and refreshed Follow-ups, Attachments and Settings pages share Gmail's light and dark colours.
+- The mail assistant shows provider logos, available models and supported reasoning levels in its picker.
+
 ## 3.65.4 — 2026-11-21
 
 - Calendar opens as a tab in the main ggmail window. Choose a mailbox when opening Calendar, or switch accounts from the title bar while viewing it. Each mailbox keeps its own Calendar page.

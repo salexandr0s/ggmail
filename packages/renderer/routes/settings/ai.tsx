@@ -18,6 +18,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { CircleCheckIcon } from "lucide-react";
 import { useState } from "react";
 import chatGPTLogo from "@/components/assistant/chatgpt-logo.svg";
+import { EffortPicker } from "@/components/assistant/effort-picker";
 import { ModelLogo } from "@/components/assistant/model-logo";
 import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
 import { settingsPageLabels } from "@/lib/settings-pages";
@@ -102,7 +103,7 @@ export function AISettings() {
   const email = connection?.email;
   const connected = connection?.status === "connected";
   const models = connection?.models ?? [];
-  const { model, chooseModel } = useAssistantModel(provider, models);
+  const { model, chooseModel, effort, chooseEffort } = useAssistantModel(provider, models);
   const showKey = api && !connected;
   const issue = error || connection?.error;
   const canConnect = !busy && !connected && (!api || Boolean(key.trim()));
@@ -136,8 +137,8 @@ export function AISettings() {
         <SettingsTitle>{t(settingsPageLabels.ai)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <div className="settings-surface">
-          <FieldGroup className="p-4">
+        <div>
+          <FieldGroup className="pb-4">
             <IdentityPicker
               id="ai-provider"
               label={t`Mail assistant provider`}
@@ -156,6 +157,20 @@ export function AISettings() {
                 onSelect={chooseModel}
               />
             )}
+            {connected && model && Boolean(model.efforts?.length) && (
+              <Field className="min-w-0 gap-2">
+                <FieldLabel htmlFor="ai-effort">
+                  <Trans>Reasoning effort</Trans>
+                </FieldLabel>
+                <EffortPicker
+                  id="ai-effort"
+                  model={model}
+                  effort={effort}
+                  chooseEffort={chooseEffort}
+                  disabled={busy}
+                />
+              </Field>
+            )}
           </FieldGroup>
           <form
             onSubmit={(e) => {
@@ -164,7 +179,7 @@ export function AISettings() {
                 void update("connect");
               }
             }}
-            className="space-y-3 rounded-b-xl border-t bg-muted/35 px-4 py-3"
+            className="space-y-3 border-t py-4"
           >
             {showKey && (
               <Field>

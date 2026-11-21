@@ -1,4 +1,9 @@
-import type { ApiProvider, AssistantModel } from "@ggmail/shared/assistant";
+import {
+  assistantEffortSchema,
+  type AssistantEffort,
+  type ApiProvider,
+  type AssistantModel,
+} from "@ggmail/shared/assistant";
 import { ms } from "@ggmail/shared/ms";
 import { t } from "@lingui/core/macro";
 import { z } from "zod";
@@ -68,6 +73,40 @@ export async function checkResponse(
   throw providerError(response.status, provider, parsed.data?.error?.code);
 }
 
+// The public OpenAI Models endpoint returns IDs without reasoning capabilities.
+function openAIEfforts(id: string): AssistantEffort[] {
+  const name = id.replace(/-\d{4}-\d{2}-\d{2}$/, "");
+  const basic: AssistantEffort[] = ["low", "medium", "high"];
+  if (/^o[34](-mini)?$/.test(name)) {
+    return basic;
+  }
+  if (/^gpt-5(-mini|-nano)?$/.test(name)) {
+    return ["minimal", ...basic];
+  }
+  if (name === "gpt-5.1") {
+    return ["none", ...basic];
+  }
+  if (/^gpt-5\.(2|4|5)(-mini|-nano)?$/.test(name)) {
+    return ["none", ...basic, "xhigh"];
+  }
+  if (/^(gpt-6-astra|gpt-6\.1-sol|gpt-6\.2-(astra|sol))$/.test(name)) {
+    return [...basic, "xhigh", "max"];
+  }
+  if (/^(gpt-5\.6(-sol|-terra|-luna)?|gpt-6-(sol|luna)|gpt-6\.1-terra)$/.test(name)) {
+    return ["none", ...basic, "xhigh", "max"];
+  }
+  return [];
+}
+
+const reasoningLevels = z.array(z.union([z.string(), z.object({ effort: z.string() })])).nullish();
+function catalogEfforts(id: string, levels: z.infer<typeof reasoningLevels>) {
+  if (!levels) {
+    return openAIEfforts(id);
+  }
+  const advertised = levels.map((entry) => (typeof entry === "string" ? entry : entry.effort));
+  return assistantEffortSchema.options.filter((level) => advertised.includes(level));
+}
+
 export async function listModels(token: string): Promise<AssistantModel[]> {
   const response = await providerRequest(new URL("models", api), {
     // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
@@ -83,14 +122,23 @@ export async function listModels(token: string): Promise<AssistantModel[]> {
             slug: z.string().min(1).max(128).optional(),
             display_name: z.string().min(1).max(128).optional(),
             visibility: z.string(),
+            supported_reasoning_levels: reasoningLevels,
           }),
         )
         .max(512),
     })
     .parse(await readJson(response, 8_388_608));
 
-  return models.flatMap(({ slug, display_name, visibility }) =>
-    visibility === "list" && slug && display_name ? [{ id: slug, label: display_name }] : [],
+  return models.flatMap(({ slug, display_name, visibility, supported_reasoning_levels }) =>
+    visibility === "list" && slug && display_name
+      ? [
+          {
+            id: slug,
+            label: display_name,
+            efforts: catalogEfforts(slug, supported_reasoning_levels),
+          },
+        ]
+      : [],
   );
 }
 
@@ -278,6 +326,7 @@ export async function readResponseStream(
 }
 
 export type ResponseOptions = {
+  effort?: AssistantEffort;
   model: string;
   instructions: string;
   input: ResponseInput[];
@@ -290,6 +339,7 @@ export async function respond(
   options: ResponseOptions & { token: string; provider?: ResponsesProvider },
 ) {
   const provider = options.provider ?? "chatgpt";
+  const effort = options.effort ?? (provider === "deepseek" ? "none" : undefined);
   const response = await providerRequest(
     new URL("responses", provider === "deepseek" ? endpoints.deepseek : api),
     {
@@ -314,8 +364,9 @@ export async function respond(
                 return item;
               }),
         // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
+        ...(effort && { reasoning: { effort } }),
         ...(provider === "deepseek"
-          ? { reasoning: { effort: "none" } }
+          ? {}
           : // oxlint-disable-next-line lingui/no-unlocalized-strings -- Responses API include field.
             { include: ["reasoning.encrypted_content"], store: false }),
         tools:
@@ -373,6 +424,10 @@ export async function listApiModels(provider: ApiProvider, key: string): Promise
               id: z.string().min(1).max(128),
               display_name: z.string().max(180).optional(),
               lifecycle: z.string().optional(),
+              supported_reasoning_levels: reasoningLevels,
+              capabilities: z
+                .object({ effort: z.record(z.string(), z.unknown()).nullish() })
+                .nullish(),
             }),
           )
           .max(2000),
@@ -386,7 +441,7 @@ export async function listApiModels(provider: ApiProvider, key: string): Promise
       }
       if (
         provider === "openai" &&
-        !/^(?:gpt-(?:4o|4\.1|[56](?:\.\d+)?)(?:-(?:mini|nano|sol|astra|luna))?|o[34](?:-mini)?)(?:-\d{4}-\d{2}-\d{2})?$/.test(
+        !/^(?:gpt-(?:4o|4\.1|[56](?:\.\d+)?)(?:-(?:mini|nano|sol|astra|terra|luna))?|o[34](?:-mini)?)(?:-\d{4}-\d{2}-\d{2})?$/.test(
           entry.id,
         )
       ) {
@@ -395,7 +450,20 @@ export async function listApiModels(provider: ApiProvider, key: string): Promise
       if (provider === "deepseek" && !["deepseek-flash", "deepseek-v4-pro"].includes(entry.id)) {
         continue;
       }
-      models.push({ id: entry.id, label: entry.display_name || entry.id });
+      let efforts: AssistantEffort[];
+      if (provider === "anthropic") {
+        const capability = entry.capabilities?.effort;
+        efforts = assistantEffortSchema.options.filter(
+          (level) =>
+            capability?.supported !== false &&
+            z.object({ supported: z.literal(true) }).safeParse(capability?.[level]).success,
+        );
+      } else if (provider === "deepseek") {
+        efforts = ["none", "low", "high", "max"];
+      } else {
+        efforts = catalogEfforts(entry.id, entry.supported_reasoning_levels);
+      }
+      models.push({ id: entry.id, label: entry.display_name || entry.id, efforts });
     }
     if (provider !== "anthropic" || !catalog.has_more || !catalog.last_id) {
       break;

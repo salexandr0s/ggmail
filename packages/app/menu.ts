@@ -43,23 +43,6 @@ export class AppMenu {
     this._menu = menu;
   }
 
-  private calendarAccounts(): MenuItemConstructorOptions[] {
-    return accounts.getAccounts().map(({ config: account }) => ({
-      label: getAccountLabel(account.label),
-      type: "radio",
-      checked: account.selected,
-      click: () => accounts.instances.get(account.id)?.tabs.openCalendar(),
-    }));
-  }
-
-  chooseCalendarAccount(anchor?: { x: number; y: number }) {
-    if (accounts.getAccounts().length === 1) {
-      accounts.getSelectedAccount().instance.tabs.openCalendar();
-      return;
-    }
-    Menu.buildFromTemplate(this.calendarAccounts()).popup({ window: main.window, ...anchor });
-  }
-
   init() {
     this._subscribeToSelectedAccount();
 
@@ -580,12 +563,6 @@ export class AppMenu {
           {
             label: t`Waiting for reply`,
             click: () => main.navigate("/waiting"),
-          },
-          {
-            label: t`Calendar`,
-            ...(allAccounts.length > 1
-              ? { submenu: this.calendarAccounts() }
-              : { click: () => this.chooseCalendarAccount() }),
           },
           {
             label: config.get("doNotDisturb.enabled")

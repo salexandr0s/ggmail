@@ -3,7 +3,13 @@ import { GOOGLE_ACCOUNTS_URL } from "@ggmail/shared/constants";
 import { getWorkspaceAppFromUrl, getWorkspaceAppUrl } from "@ggmail/shared/google";
 import { ms } from "@ggmail/shared/ms";
 import type { SavedTab } from "@ggmail/shared/schemas";
-import { getTabSection, GMAIL_TAB_ID, type TabState, tabSections } from "@ggmail/shared/tabs";
+import {
+  getTabSection,
+  GMAIL_TAB_ID,
+  type TabState,
+  type SidebarWorkspaceApp,
+  tabSections,
+} from "@ggmail/shared/tabs";
 import type { SupportedWorkspaceApp } from "@ggmail/shared/workspace-apps";
 import type { RestoreOptions, WebContents, WebContentsView } from "electron";
 import { accounts } from "./accounts";
@@ -154,7 +160,7 @@ export class Tabs {
 
   private recentlyClosedTabUrls: string[] = [];
 
-  private calendarTabId?: string;
+  private sidebarTabIds: Partial<Record<SidebarWorkspaceApp, string>> = {};
 
   constructor(accountId: string, gmail: Gmail) {
     this.accountId = accountId;
@@ -247,11 +253,31 @@ export class Tabs {
     return workspaceApp;
   }
 
-  openCalendar() {
-    const url = new URL("/calendar/u/0/r", getWorkspaceAppUrl("calendar")).href;
+  private sidebarTab(app: SidebarWorkspaceApp) {
+    const matches = (tab: Tab | undefined): tab is WorkspaceApp | DormantTab =>
+      ((tab instanceof WorkspaceApp && !tab.isWindowed) ||
+        (tab instanceof DormantTab && !tab.windowed)) &&
+      (tab.app === app ||
+        (tab.id === this.sidebarTabIds[app] && tab.url.startsWith(`${GOOGLE_ACCOUNTS_URL}/`)));
+    const id = this.sidebarTabIds[app];
+    const previous = id ? this.getTab(id) : undefined;
+    return matches(previous) ? previous : this.tabs.find(matches);
+  }
+
+  get activeSidebarApp(): SidebarWorkspaceApp | undefined {
+    for (const app of ["calendar", "tasks"] as const) {
+      if (this.sidebarTab(app)?.id === this.activeTabId) {
+        return app;
+      }
+    }
+  }
+
+  openSidebarApp(app: SidebarWorkspaceApp) {
+    const base = getWorkspaceAppUrl(app);
+    const url = app === "calendar" ? new URL("/calendar/u/0/r", base).href : base;
     const account = accounts.getAccount(this.accountId);
-    if (!canOpenWorkspaceAppInApp("calendar")) {
-      const browserUrl = new URL("/calendar/r", url);
+    if (!canOpenWorkspaceAppInApp(app)) {
+      const browserUrl = new URL(app === "calendar" ? "/calendar/r" : "/", base);
       if (account.instance.gmail.userEmail) {
         browserUrl.searchParams.set("authuser", account.instance.gmail.userEmail);
       }
@@ -259,19 +285,13 @@ export class Tabs {
       return;
     }
 
-    const existing = [this.activeTab, ...this.tabs].find(
-      (tab) =>
-        ((tab instanceof WorkspaceApp && !tab.isWindowed) ||
-          (tab instanceof DormantTab && !tab.windowed)) &&
-        (tab.app === "calendar" ||
-          (tab.id === this.calendarTabId && tab.url.startsWith(`${GOOGLE_ACCOUNTS_URL}/`))),
-    );
-    const calendar =
+    const existing = this.sidebarTab(app);
+    const tab =
       existing instanceof DormantTab
         ? this.materializeDormantTab(existing, undefined, false)
         : (existing ?? this.openTab(url));
-    this.calendarTabId = calendar.id;
-    this.activateTab(calendar.id);
+    this.sidebarTabIds[app] = tab.id;
+    this.activateTab(tab.id);
     if (account.config.selected) {
       accounts.refreshSelectedAccountView();
     } else {
@@ -882,8 +902,11 @@ export class Tabs {
   }
 
   serialize(): TabState[] {
+    const calendar = this.sidebarTab("calendar");
+    const tasks = this.sidebarTab("tasks");
     return this.tabs.map((tab) => ({
       id: tab.id,
+      sidebarApp: tab === calendar ? "calendar" : tab === tasks ? "tasks" : undefined,
       app: tab.app,
       title: tab.title,
       pinned: tab.pinned,

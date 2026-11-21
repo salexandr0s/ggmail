@@ -1,0 +1,130 @@
+.workspace-sidebar {
+  --rail-surface: var(--background);
+  --rail-active: color-mix(in srgb, var(--foreground) 13%, var(--rail-surface));
+  display: flex;
+  width: var(--workspace-sidebar-width);
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 0 8px;
+  border-right: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: var(--rail-surface);
+  color: var(--muted-foreground);
+  user-select: none;
+}
+
+.workspace-sidebar-apps,
+.workspace-sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.workspace-sidebar-apps {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  width: 100%;
+  padding-block: 3px;
+}
+
+.workspace-sidebar-button {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: 38px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.workspace-sidebar-button > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.workspace-sidebar-button:hover {
+  background: color-mix(in srgb, var(--foreground) 7%, var(--rail-surface));
+}
+
+.workspace-sidebar-button[aria-current="page"],
+.workspace-sidebar-button[aria-expanded="true"] {
+  background: var(--rail-active);
+}
+
+.workspace-sidebar-button[aria-current="page"]::before {
+  position: absolute;
+  inset-inline-start: -6px;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--muted-foreground);
+  content: "";
+}
+
+.workspace-sidebar-button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.workspace-sidebar-badge,
+.workspace-sidebar-alert {
+  position: absolute;
+  top: 0;
+  inset-inline-end: -1px;
+  display: grid;
+  place-items: center;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1.5px var(--rail-surface);
+  font: 600 10px/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-sidebar-badge {
+  padding-inline: 3px;
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.workspace-sidebar-alert {
+  background: var(--warning-surface);
+  color: var(--warning);
+}
+
+.workspace-sidebar-alert svg {
+  width: 14px;
+  height: 14px;
+}
+
+.workspace-sidebar-footer::before {
+  width: 20px;
+  height: 1px;
+  margin-bottom: 3px;
+  background: var(--border);
+  content: "";
+}
+
+.workspace-sidebar-footer svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.8;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-sidebar-button {
+    transition: background-color 120ms ease;
+  }
+}
+
+@media (forced-colors: active) {
+  .workspace-sidebar-button:is([aria-current="page"], [aria-expanded="true"]) {
+    outline: 1px solid Highlight;
+    outline-offset: -2px;
+  }
+}

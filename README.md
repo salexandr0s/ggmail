@@ -15,7 +15,7 @@ _The screenshots use fictional mailboxes and files. The assistant conversation i
 
 ## Follow up on sent mail
 
-Open a sent conversation, select **Waiting for reply** in the title bar, then choose **Follow up Friday** or pick a date. **Waiting for reply** shows the account, recipient, and last sent date. Due conversations also appear in All Mail once ggmail checks that nobody has replied.
+Open a sent conversation, then choose **Waiting for reply → Schedule follow-up**. On the scheduling page, choose **Follow up Friday** or pick a date. Saving returns you to the list, which shows the account, recipient, and last sent date. Due conversations also appear in All Mail once ggmail checks that nobody has replied.
 
 ## Read and compose in dark colors
 
@@ -34,7 +34,7 @@ Select **Attachments** in the title bar. In compact windows, choose it from **Ma
 
 Open **Settings → AI** and choose **Claude Code CLI (Subscription)** to use the Claude Code account signed in on this computer. You can also connect a ChatGPT subscription or enter an API key for Claude, OpenAI, or DeepSeek.
 
-Select the sparkle in the title bar to search your signed-in mailboxes. The assistant can read a full conversation to find a deadline or prepare a reply. Select a citation to read its source in the sidebar. **Back to answer** returns to the same chat and its unfinished question. Your chosen provider receives your prompt and the relevant mail. Choose **Insert into reply** to place a draft in the open thread. Gmail fills in the recipients and keeps the reply ready for you to edit and send. You can also ask for revisions, copy the draft, or start a separate message with **Open in Gmail**.
+Select **Mail assistant** in the title bar to search your signed-in mailboxes. The assistant can read a full conversation to find a deadline or prepare a reply. Select a citation to read its source in the sidebar. **Back to answer** returns to the same chat and its unfinished question. Your chosen provider receives your prompt and the relevant mail. Choose **Insert into reply** to place a draft in the open thread. Gmail fills in the recipients and keeps the reply ready for you to edit and send. You can also ask for revisions, copy the draft, or start a separate message with **Open in Gmail**.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/mail-assistant-dark.png">
@@ -47,10 +47,9 @@ Install Bun 1.4, Node.js 24, and the Apple Command Line Tools. From the project 
 
 ```sh
 bun install --frozen-lockfile --ignore-scripts
-DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run build:mac:local
-open dist/mac-arm64/ggmail.app
+DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run install:mac:local
 ```
 
-Sign in to Gmail on first launch. ggmail uses its own account profile. For signing details and verification commands, see the [local build notes](LOCAL-BUILD.md).
+The install command requires ggmail’s Developer ID and opens the verified app in Applications. For a Mac without that identity, use the signed release download above. For test builds and signing details, see the [local build notes](LOCAL-BUILD.md).
 
 Gmail and its icon are trademarks of Google LLC. ggmail is an independent project.

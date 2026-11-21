@@ -75,6 +75,8 @@ export function createSearchView(session: Session, userAgent: string, mailbox: s
       contextIsolation: true,
       nodeIntegration: false,
       backgroundThrottling: false,
+      // Search reads row metadata and avatar URLs directly from the DOM.
+      images: false,
     },
   });
   view.setBounds({ x: 0, y: 0, width: 1100, height: 750 });

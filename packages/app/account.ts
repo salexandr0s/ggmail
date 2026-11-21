@@ -1,9 +1,8 @@
 import { platform } from "@electron-toolkit/utils";
-import { t } from "@lingui/core/macro";
 import { GOOGLE_MEET_URL } from "@ggmail/shared/constants";
 import type { AccountConfig } from "@ggmail/shared/schemas";
-import type { VerticalTabsSessionWidth } from "@ggmail/shared/tabs";
 import type { SelectedDesktopSource } from "@ggmail/shared/types";
+import { t } from "@lingui/core/macro";
 import {
   app,
   type BrowserWindow,
@@ -41,13 +40,6 @@ export class Account {
   gmail: Gmail;
 
   tabs: Tabs;
-
-  /**
-   * The width the strip was last given by hand, kept here rather than in the
-   * config so it belongs to this account for this run of the app and is gone by
-   * the next one. `null` leaves the width to the setting.
-   */
-  verticalTabsWidth: VerticalTabsSessionWidth | null = null;
 
   desktopSourcesWindow: BrowserWindow | null = null;
 

@@ -33,7 +33,10 @@ export function ModelLogo({
       aria-hidden="true"
       data-brand={brand}
       className={cn(
-        "inline-block size-4 shrink-0 bg-current mask-contain mask-center mask-no-repeat",
+        "inline-block size-4 shrink-0 mask-contain mask-center mask-no-repeat",
+        brand === "claude" && "bg-[#d97757]",
+        brand === "deepseek" && "bg-[#4d6bfe]",
+        brand === "openai" && "bg-black dark:bg-white",
         className,
       )}
       style={{ maskImage: `url("${marks[brand]}")` }}

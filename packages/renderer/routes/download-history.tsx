@@ -1,5 +1,5 @@
-import { Trans } from "@lingui/react/macro";
 import { Button } from "@ggmail/ui/components/button";
+import { Trans } from "@lingui/react/macro";
 import { DownloadHistoryList } from "@/components/download-history";
 import { SettingsHeader, SettingsTitle } from "@/components/settings";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
@@ -30,14 +30,16 @@ function DownloadHistoryClearAllButton() {
 
 export function DownloadHistory() {
   return (
-    <>
-      <SettingsHeader>
+    <main className="overflow-hidden rounded-2xl bg-card">
+      <SettingsHeader className="mb-0 flex-wrap items-center gap-3 border-b bg-toolbar px-4 py-3">
         <SettingsTitle>
           <Trans>Download history</Trans>
         </SettingsTitle>
         <DownloadHistoryClearAllButton />
       </SettingsHeader>
-      <DownloadHistoryList />
-    </>
+      <div className="px-3">
+        <DownloadHistoryList />
+      </div>
+    </main>
   );
 }

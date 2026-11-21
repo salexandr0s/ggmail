@@ -148,7 +148,7 @@ const createColumns = ({
   }),
   columnHelper.accessor("subject", {
     cell: ({ getValue, row: { original: message } }) => (
-      <div className="grid min-w-0 gap-0.5">
+      <div className="inbox-message-preview">
         <button type="button" className="inbox-subject" title={getValue()}>
           {getValue() || <Trans>(no subject)</Trans>}
         </button>
@@ -667,7 +667,7 @@ export function UnifiedInbox() {
     return (
       <Empty className="inbox-empty" role="status">
         <EmptyHeader>
-          <EmptyMedia variant="icon" className="inbox-empty-icon">
+          <EmptyMedia variant="icon">
             <Icon className={cn("size-7", Icon === Loader2Icon && "motion-safe:animate-spin")} />
           </EmptyMedia>
           <EmptyTitle className="text-base">{title}</EmptyTitle>

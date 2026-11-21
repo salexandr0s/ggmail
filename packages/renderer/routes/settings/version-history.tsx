@@ -11,7 +11,7 @@ export function VersionHistorySettings() {
       <SettingsHeader>
         <SettingsTitle>{t(settingsPageLabels.versionHistory)}</SettingsTitle>
       </SettingsHeader>
-      <article className="settings-surface settings-history prose dark:prose-invert max-w-none text-sm">
+      <article className="settings-history prose dark:prose-invert max-w-none text-sm">
         <Markdown
           skipHtml
           components={{

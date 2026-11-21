@@ -88,21 +88,6 @@ export function resolveWorkspaceAppsLauncherDisplay(
   return launcherAppCount > LAUNCHER_EXPANDED_APPS_THRESHOLD ? "collapsed" : "expanded";
 }
 
-// lingui-set comment="Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit"
-export const launcherAndBookmarksPlacements = {
-  auto: msg({
-    message: "Auto",
-    context: "placement",
-    comment:
-      "Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit; agrees with the word for placement where the language genders it",
-  }),
-  sidebar: msg`Sidebar`,
-  titlebar: msg`Titlebar`,
-} as const;
-// lingui-reset
-
-export type LauncherAndBookmarksPlacement = keyof typeof launcherAndBookmarksPlacements;
-
 // lingui-set comment="Option of the Workspace apps Mode setting: whether Workspace apps open as tabs in the main window or in windows of their own"
 export const workspaceAppsModes = {
   tabs: msg`Tabs`,
@@ -159,3 +144,7 @@ export type WorkspaceAppBookmarkState = {
   /** Whether the URL on display is among the account's bookmarks. */
   bookmarked: boolean;
 };
+
+export function getAdditionalLauncherApps(apps: LauncherWorkspaceApp[]) {
+  return apps.filter((app) => app !== "calendar" && app !== "tasks");
+}

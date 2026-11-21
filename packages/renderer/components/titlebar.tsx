@@ -26,7 +26,7 @@ export function Titlebar({ children, className }: { children: ReactNode; classNa
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden border-b bg-background select-none draggable",
+        "relative shrink-0 overflow-hidden border-b bg-chrome select-none draggable",
         className,
       )}
       style={{ height: APP_TITLEBAR_HEIGHT }}

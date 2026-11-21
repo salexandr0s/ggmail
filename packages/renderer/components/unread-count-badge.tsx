@@ -10,7 +10,7 @@ export function UnreadCountBadge({
   return (
     <div
       className={cn(
-        "flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#ec3128] px-1 text-[0.5rem] leading-none font-normal text-white",
+        "flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-secondary px-1 text-[0.5rem] leading-none font-semibold text-secondary-foreground",
         className,
       )}
     >

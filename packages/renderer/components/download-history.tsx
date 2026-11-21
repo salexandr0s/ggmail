@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import {
@@ -8,14 +7,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@ggmail/ui/components/empty";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@ggmail/ui/components/item";
+import { Item, ItemActions, ItemContent, ItemDescription } from "@ggmail/ui/components/item";
 import { cn } from "@ggmail/ui/lib/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { DownloadIcon, FolderIcon, XIcon } from "lucide-react";
 import { DateFromNow } from "@/components/date-from-now";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
@@ -52,22 +46,16 @@ export function DownloadHistoryList({ limit }: { limit?: number }) {
   }
 
   return (
-    <div className="space-y-2">
+    <ul className="divide-y divide-border">
       {(limit ? downloadHistory.slice(0, limit) : downloadHistory).map(
         ({ id, fileName, createdAt, filePath, exists }) => (
           <Item
-            variant="outline"
+            render={<li />}
             key={id}
-            className={cn({
-              "transition-colors hover:bg-muted/50": exists,
-            })}
-            onClick={
-              exists
-                ? () => {
-                    ipc.main.send("downloads.openFile", { id, filePath });
-                  }
-                : undefined
-            }
+            className={cn(
+              "relative flex-nowrap rounded-none border-0 px-1.5",
+              exists && "focus-within:bg-muted/60 hover:bg-muted/60",
+            )}
             onDragStart={
               exists
                 ? (event) => {
@@ -80,15 +68,24 @@ export function DownloadHistoryList({ limit }: { limit?: number }) {
             draggable={exists}
           >
             <ItemContent className="overflow-hidden">
-              <ItemTitle
-                className={cn("block w-full truncate", {
-                  "text-muted-foreground line-through": !exists,
-                })}
-                title={fileName}
-              >
-                {fileName}
-              </ItemTitle>
-              <ItemDescription className="first-letter:capitalize">
+              {exists ? (
+                <button
+                  type="button"
+                  title={fileName}
+                  className="block w-full truncate rounded-sm text-start text-sm font-medium after:absolute after:inset-0 hover:underline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+                  onClick={() => ipc.main.send("downloads.openFile", { id, filePath })}
+                >
+                  {fileName}
+                </button>
+              ) : (
+                <span
+                  className="truncate text-sm text-muted-foreground line-through"
+                  title={fileName}
+                >
+                  {fileName}
+                </span>
+              )}
+              <ItemDescription className="text-xs first-letter:capitalize">
                 {exists ? (
                   <DateFromNow timestamp={createdAt} />
                 ) : (
@@ -98,19 +95,17 @@ export function DownloadHistoryList({ limit }: { limit?: number }) {
                 )}
               </ItemDescription>
             </ItemContent>
-            <ItemActions>
+            <ItemActions className="relative shrink-0 gap-0.5">
               {exists && (
                 <Button
-                  size="sm"
+                  size="icon-sm"
                   variant="ghost"
                   title={t({
                     message: "Show in folder",
                     comment:
                       "Button in the download history that shows the file in the file manager",
                   })}
-                  onClick={(event) => {
-                    event.stopPropagation();
-
+                  onClick={() => {
                     ipc.main.send("downloads.showFileInFolder", { id, filePath });
                   }}
                 >
@@ -118,15 +113,13 @@ export function DownloadHistoryList({ limit }: { limit?: number }) {
                 </Button>
               )}
               <Button
-                size="sm"
+                size="icon-sm"
                 variant="ghost"
                 title={t({
                   message: "Remove from history",
                   comment: "Button that removes a download from the download history",
                 })}
-                onClick={(event) => {
-                  event.stopPropagation();
-
+                onClick={() => {
                   configMutation.mutate({
                     "downloads.history": downloadHistory.filter((item) => item.id !== id),
                   });
@@ -138,6 +131,6 @@ export function DownloadHistoryList({ limit }: { limit?: number }) {
           </Item>
         ),
       )}
-    </div>
+    </ul>
   );
 }

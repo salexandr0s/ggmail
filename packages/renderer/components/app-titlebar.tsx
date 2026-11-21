@@ -1,26 +1,27 @@
-import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
+import { getAccountLabel } from "@ggmail/shared/accounts";
 import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
+import { currentMailView } from "@ggmail/shared/mail-views";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { AccountInstances } from "@ggmail/shared/schemas";
+import { getAdditionalLauncherApps } from "@ggmail/shared/workspace-apps";
 import { Button } from "@ggmail/ui/components/button";
 import { cn } from "@ggmail/ui/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  BookOpenIcon,
   BriefcaseIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleAlertIcon,
   DownloadIcon,
-  MailIcon,
   MailSearchIcon,
   MoonIcon,
-  SparklesIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
+import { AccountAvatar } from "@/components/account-avatar";
 import { AppMenuButton } from "@/components/app-menu-button";
 import { FindInPage as UiFindInPage } from "@/components/find-in-page";
+import { MailAssistantIcon } from "@/components/mail-icons";
 import {
   Titlebar,
   TitlebarButtonGroup,
@@ -31,10 +32,9 @@ import {
 } from "@/components/titlebar";
 import { UnreadCountBadge } from "@/components/unread-count-badge";
 import { WorkspaceAppsLauncher } from "@/components/workspace-apps-launcher";
-import { useVerticalTabs } from "@/lib/hooks";
+import { useSelectedAccountTabs } from "@/lib/hooks";
 import { useConfig } from "@/lib/react-query";
 import { submitUnifiedSearch } from "@/lib/unified-search";
-import { HOST_HANDOVER_FADE_CLASS_NAME } from "@/lib/utils";
 import {
   useShellHistory,
   useDownloadActivity,
@@ -42,29 +42,9 @@ import {
   useAppUpdaterStore,
   useFindInPageStore,
 } from "../lib/stores";
-import "./mail-titlebar.css";
 import { MailViewNavigation } from "./mail-view-navigation";
-
-function BookmarksButton() {
-  const { t } = useLingui();
-
-  return (
-    <TitlebarIconButton
-      onClick={() => {
-        ipc.main.send("bookmarks.togglePopup", "titlebar");
-      }}
-      onMouseEnter={() => {
-        ipc.main.send("bookmarks.setPopupCloseOnBlurEnabled", false);
-      }}
-      onMouseLeave={() => {
-        ipc.main.send("bookmarks.setPopupCloseOnBlurEnabled", true);
-      }}
-      title={t`Show bookmarks`}
-    >
-      <BookOpenIcon />
-    </TitlebarIconButton>
-  );
-}
+import "./mail-titlebar.css";
+import { WorkspaceTabs } from "./workspace-tabs";
 
 function RecentDownloadHistoryButton() {
   const { t } = useLingui();
@@ -131,7 +111,7 @@ function DoNotDisturb() {
       }}
       title={t`Turn Do Not Disturb off`}
     >
-      <MoonIcon className="text-violet-600 dark:text-violet-400" />
+      <MoonIcon className="text-primary" />
     </TitlebarIconButton>
   );
 }
@@ -486,7 +466,7 @@ export function AppTitlebar({
 
   const accountRow = useAccountRow(accounts);
 
-  const { tabs: selectedAccountTabs, width: verticalTabsWidth } = useVerticalTabs();
+  const { tabs: selectedAccountTabs } = useSelectedAccountTabs();
 
   const activeTab = selectedAccountTabs.find((tab) => tab.active);
 
@@ -513,21 +493,12 @@ export function AppTitlebar({
 
   const isUnifiedInboxLocation = location === "/unified-inbox";
   const isAttachmentsLocation = location === "/attachments";
-  const waiting = location === "/waiting";
-  const isMailLibraryLocation = isUnifiedInboxLocation || isAttachmentsLocation || waiting;
+  const selectedView = currentMailView(location, activeTab?.app);
+  const isWaitingLocation = selectedView === "/waiting";
+  const isMailLibraryLocation =
+    isUnifiedInboxLocation || isAttachmentsLocation || isWaitingLocation;
 
-  const shouldShowWorkspaceAppsLauncher = config["workspaceApps.launcherApps"].length > 0;
-
-  const shouldShowBookmarksButton = config["workspaceApps.showBookmarksButton"];
-
-  // On `auto` the vertical tabs strip hosts the launcher and the bookmarks
-  // button whenever it is there, so that opening another app or a bookmarked
-  // page stays in the same place as switching between tabs. `sidebar` keeps the
-  // strip there for them, so the width is never 0; `titlebar` keeps them here
-  // whatever the strip does.
-  const areLauncherAndBookmarksPlacementedByVerticalTabs =
-    config["workspaceApps.launcherAndBookmarksPlacement"] !== "titlebar" && verticalTabsWidth > 0;
-
+  const launcherApps = getAdditionalLauncherApps(config["workspaceApps.launcherApps"]);
   const shouldShowUnifiedInboxButton = config["unifiedInbox.enabled"] && accounts.length > 1;
 
   const shouldShowSavedSearchesButton = config["gmail.savedSearches"].length > 0;
@@ -551,6 +522,7 @@ export function AppTitlebar({
         aria-pressed={account.config.selected && isAccountLocation}
         variant="ghost"
         title={getAccountLabel(account.config.label)}
+        aria-description={account.gmail.attentionRequired ? t`Sign in` : undefined}
         size="sm"
         tabIndex={-1}
         className="mail-account-button draggable-none"
@@ -558,30 +530,13 @@ export function AppTitlebar({
           ipc.main.send("accounts.selectAccount", account.config.id, true);
         }}
       >
-        <span aria-hidden="true" className="mail-account-mark">
-          {account.config.logo ? (
-            <img
-              src={account.config.logo}
-              alt=""
-              draggable={false}
-              className="size-4 object-contain"
-            />
-          ) : (
-            <MailIcon className="size-3.5" />
-          )}
-          {account.config.color && (
-            <span
-              className={cn("mail-account-color", accountColorsMap[account.config.color].className)}
-            />
-          )}
-        </span>
+        <AccountAvatar account={account.config} />
         <span className="truncate">{getAccountLabel(account.config.label)}</span>
         {account.gmail.outOfOffice && <BriefcaseIcon />}
-        {account.gmail.attentionRequired && (
-          <CircleAlertIcon className="size-3.5 text-amber-700 dark:text-amber-400" />
-        )}
+        {account.gmail.attentionRequired && <CircleAlertIcon className="size-3.5 text-warning" />}
         {!account.gmail.attentionRequired &&
         config["accounts.unreadBadge"] &&
+        account.config.gmail.unreadBadge &&
         account.gmail.unreadCount ? (
           <UnreadCountBadge unreadCount={account.gmail.unreadCount} />
         ) : null}
@@ -708,9 +663,9 @@ export function AppTitlebar({
             />
           </TitlebarButtonGroup>
           <MailViewNavigation
-            location={isAccountLocation && activeTab?.app === "calendar" ? "calendar" : location}
+            account={isAccountLocation ? selectedAccount?.config : undefined}
+            selectedView={selectedView}
             unified={shouldShowUnifiedInboxButton}
-            multipleAccounts={accounts.length > 1}
             accountLabel={
               isAccountLocation && selectedAccount
                 ? getAccountLabel(selectedAccount.config.label)
@@ -817,26 +772,20 @@ export function AppTitlebar({
         <div data-slot="titlebar-utilities" className="mail-titlebar-utilities">
           <div className="mail-utility-actions">
             <FindInPage />
-            {/*
-             * The group goes rather than emptying out, because an empty group
-             * would still spend the gap between the controls either side of it.
-             */}
-            {(shouldShowWorkspaceAppsLauncher || shouldShowBookmarksButton) && (
-              <TitlebarButtonGroup
-                className={cn(
-                  HOST_HANDOVER_FADE_CLASS_NAME,
-                  areLauncherAndBookmarksPlacementedByVerticalTabs && "hidden opacity-0",
-                )}
-              >
-                {shouldShowWorkspaceAppsLauncher && (
-                  <WorkspaceAppsLauncher
-                    launcherApps={config["workspaceApps.launcherApps"]}
-                    display={config["workspaceApps.launcherDisplay"]}
-                    disabled={isMailLibraryLocation}
-                  />
-                )}
-                {shouldShowBookmarksButton && <BookmarksButton />}
-              </TitlebarButtonGroup>
+            {selectedAccount && (
+              <WorkspaceTabs
+                accountId={selectedAccount.config.id}
+                tabs={selectedAccountTabs}
+                config={config}
+                showActive={isAccountLocation}
+              />
+            )}
+            {launcherApps.length > 0 && (
+              <WorkspaceAppsLauncher
+                launcherApps={launcherApps}
+                display={config["workspaceApps.launcherDisplay"]}
+                disabled={isMailLibraryLocation}
+              />
             )}
             {shouldShowSavedSearchesButton && (
               <TitlebarDropdownMenu
@@ -844,7 +793,7 @@ export function AppTitlebar({
                 icon={<MailSearchIcon />}
                 side="left"
                 disabled={
-                  waiting ||
+                  isWaitingLocation ||
                   isAttachmentsLocation ||
                   (!isUnifiedInboxLocation && isWorkspaceAppTabActive)
                 }
@@ -878,7 +827,7 @@ export function AppTitlebar({
                 title={t`Mail assistant`}
                 className="mail-assistant-button"
               >
-                <SparklesIcon />
+                <MailAssistantIcon className="size-[18px]" />
               </TitlebarIconButton>
             )}
             <RecentDownloadHistoryButton />

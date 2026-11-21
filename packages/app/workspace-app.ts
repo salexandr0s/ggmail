@@ -1,7 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { platform } from "@electron-toolkit/utils";
 import { getAccountLabel } from "@ggmail/shared/accounts";
-import { APP_TITLEBAR_HEIGHT, GOOGLE_ACCOUNTS_URL } from "@ggmail/shared/constants";
+import {
+  WORKSPACE_SIDEBAR_WIDTH,
+  APP_TITLEBAR_HEIGHT,
+  GOOGLE_ACCOUNTS_URL,
+} from "@ggmail/shared/constants";
 import { curatedExtensions } from "@ggmail/shared/extensions";
 import { getWorkspaceAppFromUrl, getWorkspaceAppUrl } from "@ggmail/shared/google";
 import type { AccountConfig } from "@ggmail/shared/schemas";
@@ -1053,12 +1057,12 @@ export class WorkspaceApp {
       return;
     }
 
-    const verticalTabsWidth = this._window ? 0 : accounts.getVerticalTabsWidth();
+    const sidebarWidth = this._window ? 0 : WORKSPACE_SIDEBAR_WIDTH;
 
     this.view.setBounds({
-      x: verticalTabsWidth,
+      x: sidebarWidth,
       y: APP_TITLEBAR_HEIGHT,
-      width: this._window ? width : main.embeddedViewWidth(width, verticalTabsWidth),
+      width: this._window ? width : main.embeddedViewWidth(width, sidebarWidth),
       height: height - APP_TITLEBAR_HEIGHT,
     });
   };

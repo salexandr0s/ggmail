@@ -77,7 +77,7 @@ export function getPreloadPath(name: string) {
 }
 
 export function getBackgroundColor() {
-  return nativeTheme.shouldUseDarkColors ? "#0a0a0a" : "#ffffff";
+  return nativeTheme.shouldUseDarkColors ? "#111111" : "#f6f8fc";
 }
 
 // `hiddenInset` pins the buttons 11px from the top and skips the centering
@@ -91,8 +91,8 @@ export function getTitleBarOptions() {
   const titleBarOverlay =
     !platform.isLinux || isLinuxWindowControlsEnabled()
       ? {
-          color: getBackgroundColor(),
-          symbolColor: nativeTheme.shouldUseDarkColors ? "#fafafa" : "#0a0a0a",
+          color: nativeTheme.shouldUseDarkColors ? "#202124" : "#f6f8fc",
+          symbolColor: nativeTheme.shouldUseDarkColors ? "#fafafa" : "#202124",
           height: APP_TITLEBAR_HEIGHT - 1,
         }
       : false;

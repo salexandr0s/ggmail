@@ -1,8 +1,13 @@
 import { z } from "zod";
+import { WORKSPACE_SIDEBAR_WIDTH } from "./constants";
+
+export function assistantCoversMail(windowWidth: number) {
+  return windowWidth <= 640;
+}
 
 export function assistantPanelWidth(windowWidth: number) {
-  if (windowWidth <= 640) {
-    return windowWidth;
+  if (assistantCoversMail(windowWidth)) {
+    return Math.max(0, windowWidth - WORKSPACE_SIDEBAR_WIDTH);
   }
   return Math.min(480, Math.max(380, Math.round(windowWidth / 3)));
 }
@@ -26,7 +31,23 @@ export const providerNames: Record<AssistantProvider, string> = {
   deepseek: "DeepSeek AI",
 };
 
-export type AssistantModel = { id: string; label: string };
+export const assistantEffortSchema = z.enum([
+  "none",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+  "ultra",
+]);
+export type AssistantEffort = z.infer<typeof assistantEffortSchema>;
+export type AssistantModel = {
+  id: string;
+  label: string;
+  resolvedId?: string;
+  efforts?: AssistantEffort[];
+};
 export type AssistantScope = "thread" | "allMail" | "mailView" | "chat";
 export type AssistantContext = { kind: AssistantScope; key: string; accountLabel: string };
 export type AssistantActivity =
@@ -52,6 +73,7 @@ export const assistantRequestSchema = z.object({
   scopeKey: z.string().min(1).max(2000),
   prompt: z.string().trim().min(1).max(ASSISTANT_PROMPT_LIMIT),
   model: z.string().min(1).max(128),
+  effort: assistantEffortSchema.optional(),
 });
 
 export type AssistantRequest = z.infer<typeof assistantRequestSchema>;

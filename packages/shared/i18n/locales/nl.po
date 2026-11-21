@@ -123,7 +123,7 @@ msgid "{small} to under {large}"
 msgstr "{small} tot minder dan {large}"
 
 #. Tooltip of the tab every link to a Google Workspace app opens in. tabTitle is the page's title; appName is the app's English name, such as Calendar
-#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/components/workspace-tabs.tsx
 msgid "{tabTitle} — opens {appName} links"
 msgstr "{tabTitle} — opent links van {appName}"
 
@@ -327,6 +327,7 @@ msgstr "Accountacties"
 #: packages/app/menu.ts
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/mail-views.tsx
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Accounts"
 msgstr "Accounts"
@@ -442,10 +443,9 @@ msgstr "Alle e-mail"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Switch, and a badge on the account, for including the account in All Mail
 #. Title of All Mail page
-#: packages/app/ipc.ts
 #: packages/app/menu.ts
-#: packages/renderer/components/mail-view-navigation.tsx
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/lib/mail-views.ts
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "All Mail"
@@ -547,9 +547,8 @@ msgid "Assistant model"
 msgstr "Assistentmodel"
 
 #. A menu or a menu item in ggmail's menu bar
-#: packages/app/ipc.ts
 #: packages/app/menu.ts
-#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/lib/mail-views.ts
 #: packages/renderer/routes/attachments.tsx
 msgid "Attachments"
 msgstr "Bijlagen"
@@ -560,21 +559,9 @@ msgctxt "launcher display"
 msgid "Auto"
 msgstr "Auto"
 
-#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit; agrees with the word for placement where the language genders it
-#: packages/shared/workspace-apps.ts
-msgctxt "placement"
-msgid "Auto"
-msgstr "Auto"
-
 #. Option of a label color's Text color setting; agrees with the word for color where the language genders it
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgctxt "text color"
-msgid "Auto"
-msgstr "Auto"
-
-#. Option of the Width setting for the vertical tabs sidebar; agrees with the word for width where the language genders it
-#: packages/shared/tabs.ts
-msgctxt "width"
 msgid "Auto"
 msgstr "Auto"
 
@@ -660,8 +647,6 @@ msgid "Blue"
 msgstr "Blauw"
 
 #. Button that bookmarks the page on display
-#. Button that bookmarks the page on display
-#: packages/renderer/components/vertical-tabs.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "Bookmark"
 msgstr "Voeg bookmark toe"
@@ -672,14 +657,10 @@ msgctxt "context menu"
 msgid "Bookmark"
 msgstr "Bookmark toevoegen"
 
-#: packages/renderer/bookmarks.tsx
-msgid "Bookmark a page with the star on its tab or window titlebar, or from a tab's context menu."
-msgstr "Maak een bookmark van een pagina met de ster op het tabblad of in de titelbalk van het venster, of via het contextmenu van een tabblad."
-
-#. Button in the vertical tabs strip that shows the bookmarks
+#. Heading of the bookmarks popup
 #. Heading of the bookmarks popup
 #: packages/renderer/bookmarks.tsx
-#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
 msgid "Bookmarks"
 msgstr "Bookmarks"
 
@@ -714,15 +695,13 @@ msgstr "Kopieer adres van afbeelding"
 msgid "Cached images and files"
 msgstr "Gecachte afbeeldingen en bestanden"
 
-#. A menu or a menu item in ggmail's menu bar
-#: packages/app/ipc.ts
-#: packages/app/menu.ts
-#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
 msgid "Calendar"
 msgstr "Agenda"
 
 #. Button in a dialog asking to confirm a setting change, which leaves the setting as it was
 #: packages/renderer/components/config-select-field.tsx
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/desktop-sources.tsx
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/extensions.tsx
@@ -931,15 +910,12 @@ msgstr "Filters wissen"
 msgid "Clear search"
 msgstr "Zoekopdracht wissen"
 
-#. Button that closes the bookmarks popup
-#. Button that closes the recent download history popup
 #. Screen reader label of the button that closes a dialog in Settings
 #. Titlebar button that closes the details of an update ggmail couldn't verify
-#: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/attachments/preview.tsx
+#: packages/renderer/components/popup.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
-#: packages/renderer/recent-download-history.tsx
 msgid "Close"
 msgstr "Sluit"
 
@@ -956,7 +932,7 @@ msgid "Close"
 msgstr "Sluiten"
 
 #. Button on a tab in the vertical tabs strip that closes the tab
-#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/components/workspace-tabs.tsx
 msgctxt "tab"
 msgid "Close"
 msgstr "Sluit"
@@ -1079,6 +1055,7 @@ msgid "Contract"
 msgstr "Contract"
 
 #. Heading of the Gmail page's section about reading an email conversation
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Conversation"
 msgstr "Gesprek"
@@ -1325,7 +1302,6 @@ msgid "Cu&t"
 msgstr "K&nippen"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
-#: packages/renderer/components/follow-ups.tsx
 msgid "Current mail view"
 msgstr "Huidige e-mailweergave"
 
@@ -1363,11 +1339,19 @@ msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Donker"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Default"
+msgstr "Standaard"
+
 #. Name of the first account until the user renames it, shown wherever accounts are listed
 #: packages/shared/accounts.ts
 msgctxt "account label"
 msgid "Default"
 msgstr "Standaard"
+
+#: packages/app/assistant/claude-cli.ts
+msgid "Default ({resolvedName})"
+msgstr "Standaard ({resolvedName})"
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Default download location"
@@ -1856,6 +1840,7 @@ msgstr "Actiepunten zoeken"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
+#: packages/renderer/components/find-in-page.tsx
 msgid "Find…"
 msgstr "Zoek…"
 
@@ -2016,6 +2001,10 @@ msgstr "Terug"
 msgid "Go forward"
 msgstr "Vooruit"
 
+#: packages/renderer/components/workspace-sidebar.tsx
+msgid "Google Tasks"
+msgstr "Google Tasks"
+
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
 msgid "Green"
@@ -2148,6 +2137,10 @@ msgstr "Verberg de knop Upgraden in Gmail."
 msgid "Hide upgrade button"
 msgstr "Verberg knop Upgraden"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "High"
+msgstr "Hoog"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "History"
@@ -2161,11 +2154,6 @@ msgstr "Hoe launcher-apps in de titelbalk worden getoond. Auto toont tot drie ap
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "How long a tab has to go unused before it hibernates. The active tab, tabs in their own window, and tabs playing audio are left alone."
 msgstr "Hoelang een tabblad ongebruikt moet zijn voordat het inactief wordt. Het actieve tabblad, tabbladen in een eigen venster en tabbladen die audio afspelen, blijven ongemoeid."
-
-#. Auto quotes this setting's option and Reset Width the sidebar's context menu item, so they match those messages' wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back."
-msgstr "Hoe breed de zijbalk met verticale tabbladen is. Auto wisselt tussen smal en breed op basis van de geopende tabbladen. De knop onder in de zijbalk wisselt voor dat account tussen smal en breed totdat ggmail stopt, zonder deze instelling te wijzigen. Klik met de rechtermuisknop op de zijbalk en kies Breedte resetten om de breedte weer aan deze instelling over te laten."
 
 #. Tabs and New windows quote this setting's options, so they match those options' wording
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -2299,11 +2287,6 @@ msgstr "Start bij inloggen"
 msgid "Launch minimized"
 msgstr "Start geminimaliseerd"
 
-#. Heading of the settings for the Workspace apps launcher and the bookmarks button
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Launcher and bookmarks"
-msgstr "Launcher en bookmarks"
-
 #. Setting that picks the Workspace apps in the launcher
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Launcher apps"
@@ -2347,8 +2330,8 @@ msgid "List view"
 msgstr "Lijstweergave"
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward."
-msgstr "Toon Workspace-apps die in een eigen venster open zijn naast de tabbladen, zodat de zijbalk een overzicht geeft van alles wat open is. Klik op een app om het venster ervan naar voren te halen."
+msgid "List Workspace windows alongside open tabs. Select one to bring its window forward."
+msgstr "Toon Workspace-vensters naast de geopende tabbladen. Selecteer een venster om het naar voren te halen."
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Load clipped messages in full"
@@ -2399,8 +2382,14 @@ msgstr "Zoek ‘{selection}’ op"
 msgid "Looking for attachments…"
 msgstr "Bijlagen zoeken…"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Low"
+msgstr "Laag"
+
 #. Group of pages in the Settings sidebar
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/lib/mail-views.ts
 msgid "Mail"
 msgstr "E-mail"
 
@@ -2459,6 +2448,14 @@ msgstr "Markeer de e-mail als gelezen zodra de verificatiecode ervan is gekopiee
 msgid "Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so."
 msgstr "Markeer het tabblad dat alle links van een app opent, in te stellen via het contextmenu van het tabblad. Als dit uit staat, opent het tabblad de links nog steeds en vermeldt de tooltip dat ook."
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Max"
+msgstr "Maximaal"
+
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Medium"
+msgstr "Gemiddeld"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Menu bar icon"
 msgstr "Pictogram in menubalk"
@@ -2471,6 +2468,10 @@ msgstr "Bericht"
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Bericht aan de e-mailassistent"
+
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Minimal"
+msgstr "Minimaal"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -2528,15 +2529,6 @@ msgstr "Verplaatsen naar tabblad"
 #: packages/renderer/components/attachments/detail-filters.tsx
 msgid "Name or email address"
 msgstr "Naam of e-mailadres"
-
-#. Option of the Width setting for the vertical tabs sidebar
-#: packages/shared/tabs.ts
-msgid "Narrow"
-msgstr "Smal"
-
-#: packages/renderer/components/vertical-tabs.tsx
-msgid "Narrow the tab strip"
-msgstr "Maak de tabbladstrook smaller"
 
 #. Heading of the Settings section about going back and forward between pages
 #: packages/renderer/routes/settings/general.tsx
@@ -2677,6 +2669,10 @@ msgstr "Nog geen vertrouwde hosts. Als je bij het openen van een link Vertrouw a
 msgid "No unread messages"
 msgstr "Geen ongelezen berichten"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "None"
+msgstr "Geen"
+
 #. The account's color when no color is picked; agrees with the word for color where the language genders it
 #: packages/renderer/routes/settings/accounts.tsx
 msgctxt "account color"
@@ -2788,11 +2784,6 @@ msgstr "Open en ontgrendel 1Password opnieuw."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password."
 msgstr "Open en ontgrendel 1Password."
-
-#. Button in the vertical tabs strip that opens the launcher of Google Workspace apps
-#: packages/renderer/components/workspace-apps-launcher.tsx
-msgid "Open app"
-msgstr "Open app"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/attachments/files.tsx
@@ -3009,11 +3000,6 @@ msgstr "Vastzetten"
 msgid "Pink"
 msgstr "Roze"
 
-#. Setting for where the Workspace apps launcher and the bookmarks button sit
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Placement"
-msgstr "Plaatsing"
-
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Play a sound when showing a notification."
 msgstr "Speel een geluid af wanneer een melding wordt getoond."
@@ -3108,6 +3094,11 @@ msgstr "‘{subject}’ lezen"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reading this conversation"
 msgstr "Dit gesprek lezen"
+
+#: packages/renderer/components/assistant/effort-picker.tsx
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Reasoning effort"
+msgstr "Redeneerinspanning"
 
 #: packages/renderer/components/attachments/categories.tsx
 msgid "Receipt"
@@ -3211,9 +3202,7 @@ msgstr "Account verwijderen…"
 
 #. Button on a bookmark in the bookmarks popup that removes it
 #. Button that removes the bookmark of the page on display
-#. Button that removes the bookmark of the page on display
 #: packages/renderer/bookmarks.tsx
-#: packages/renderer/components/vertical-tabs.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "Remove bookmark"
 msgstr "Verwijder bookmark"
@@ -3291,11 +3280,6 @@ msgstr "Reset app"
 msgid "Reset ggmail to its original state?"
 msgstr "ggmail resetten naar de oorspronkelijke staat?"
 
-#. Context menu item that resets the width of the vertical tabs strip
-#: packages/app/ipc.ts
-msgid "Reset Width"
-msgstr "Breedte resetten"
-
 #. Button on the toast after a setting changes, which restarts ggmail now
 #. Dialog button that restarts ggmail
 #. Dialog button that restarts ggmail
@@ -3342,6 +3326,10 @@ msgstr "Keer gesprek om"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reviewing the mail results"
 msgstr "Zoekresultaten doornemen"
+
+#: packages/renderer/bookmarks.tsx
+msgid "Right-click a Workspace tab and choose Bookmark to save its page here."
+msgstr "Klik met de rechtermuisknop op een Workspace-tabblad en kies ‘Bookmark toevoegen’ om de pagina hier op te slaan."
 
 #. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
@@ -3565,6 +3553,7 @@ msgstr "E-mailassistent instellen"
 
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "Instellingen"
@@ -3653,15 +3642,6 @@ msgstr "Toon het aantal ongelezen e-mails naast het pictogram in de menubalk wan
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Show app links badge"
 msgstr "Toon badge voor app-links"
-
-#: packages/renderer/components/app-titlebar.tsx
-#: packages/renderer/components/vertical-tabs.tsx
-msgid "Show bookmarks"
-msgstr "Toon bookmarks"
-
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show bookmarks button"
-msgstr "Toon bookmarkknop"
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show Do Not Disturb button"
@@ -3814,15 +3794,6 @@ msgctxt "Windows"
 msgid "Show the application icon in the system tray."
 msgstr "Toon het app-pictogram in het systeemvak."
 
-#. Reset Width quotes the sidebar's context menu item and Width the setting above, so they match those messages' wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above."
-msgstr "Toon de knop onder in de zijbalk waarmee je wisselt tussen smal en breed. Als dit uit staat, gebruik je Breedte resetten in het contextmenu van de zijbalk of de instelling Breedte hierboven."
-
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show the button that opens bookmarks."
-msgstr "Toon de knop die bookmarks opent."
-
 #. Automatic is this setting's first option; dwm, i3 and sway are window managers
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show the close, minimize and maximize buttons in the titlebar. Automatic hides them on window managers without decorations, such as dwm, i3 and sway."
@@ -3864,23 +3835,18 @@ msgid "Show unread messages from your accounts in one place."
 msgstr "Toon ongelezen berichten uit je accounts op één plek."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show width button"
-msgstr "Toon breedteknop"
-
-#: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Show windows"
 msgstr "Toon vensters"
 
-#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
-#: packages/shared/workspace-apps.ts
-msgid "Sidebar"
-msgstr "Zijbalk"
-
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Sign in"
 msgstr "Inloggen"
 
 #: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Sign in to {label}"
 msgstr "Inloggen bij {label}"
 
@@ -4087,6 +4053,8 @@ msgstr "Pictogram in systeemvak"
 #. A menu or a menu item in ggmail's menu bar
 #. Option of the Workspace apps Mode setting: whether Workspace apps open as tabs in the main window or in windows of their own
 #: packages/app/menu.ts
+#: packages/renderer/components/workspace-tabs.tsx
+#: packages/renderer/routes/settings/workspace-apps.tsx
 #: packages/shared/workspace-apps.ts
 msgid "Tabs"
 msgstr "Tabbladen"
@@ -4220,9 +4188,7 @@ msgid "Ticket"
 msgstr "Ticket"
 
 #. Heading of the Appearance section for the bar along the top of ggmail's window
-#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
 #: packages/renderer/routes/settings/appearance.tsx
-#: packages/shared/workspace-apps.ts
 msgid "Titlebar"
 msgstr "Titelbalk"
 
@@ -4308,8 +4274,8 @@ msgstr "Onbekende afzender"
 
 #. Unpinned tabs and Selected tabs quote this setting's options and Hibernate When Idle the tab's context menu item, so they match those messages' wording
 #: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place in the sidebar and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
-msgstr "Haal tabbladen die ongebruikt zijn uit het geheugen, zodat het geheugen dat ze innemen vrijkomt. Een inactief tabblad houdt zijn plek in de zijbalk en laadt opnieuw wanneer je erop klikt, op de pagina waar je was. Niet-vastgezette tabbladen laat je vastgezette tabbladen geladen, en Geselecteerde tabbladen maakt niets inactief totdat je een tabblad markeert. Wat je ook kiest, je kunt een afzonderlijk tabblad in- of uitsluiten met Inactief maken indien ongebruikt in het contextmenu ervan."
+msgid "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
+msgstr "Haal tabbladen die ongebruikt zijn uit het geheugen, zodat het geheugen dat ze innemen vrijkomt. Een inactief tabblad houdt zijn plek en laadt opnieuw wanneer je erop klikt, op de pagina waar je was. Niet-vastgezette tabbladen laat je vastgezette tabbladen geladen, en Geselecteerde tabbladen maakt niets inactief totdat je een tabblad markeert. Wat je ook kiest, je kunt een afzonderlijk tabblad in- of uitsluiten met Inactief maken indien ongebruikt in het contextmenu ervan."
 
 #: packages/app/assistant/connection.ts
 msgid "Unlock your system credential store to connect the assistant."
@@ -4340,6 +4306,8 @@ msgstr "Ongelezen"
 msgid "Unread count preference"
 msgstr "Voorkeur voor aantal ongelezen"
 
+#: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/mail-views.tsx
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Unread messages"
 msgstr "Ongelezen berichten"
@@ -4348,10 +4316,6 @@ msgstr "Ongelezen berichten"
 #: packages/app/do-not-disturb.ts
 msgid "Until Tomorrow"
 msgstr "Tot morgen"
-
-#: packages/renderer/components/inbox-accounts.tsx
-msgid "Up to date"
-msgstr "Bijgewerkt"
 
 #. Titlebar button that shows the details of a downloaded update, ready to install
 #: packages/renderer/components/app-titlebar.tsx
@@ -4413,11 +4377,6 @@ msgstr "Verificatiecodes"
 msgid "Version {installedVersion}"
 msgstr "Versie {installedVersion}"
 
-#. Heading of the settings for the vertical tabs sidebar
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Vertical tabs"
-msgstr "Verticale tabbladen"
-
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -4460,10 +4419,9 @@ msgid "Waiting for {modelName}"
 msgstr "Wachten op {modelName}"
 
 #. A menu or a menu item in ggmail's menu bar
-#: packages/app/ipc.ts
 #: packages/app/menu.ts
 #: packages/renderer/components/follow-ups.tsx
-#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/lib/mail-views.ts
 msgid "Waiting for reply"
 msgstr "Wachten op antwoord"
 
@@ -4475,10 +4433,6 @@ msgstr "Wachten op de e-mailweergave…"
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Waiting to sync"
 msgstr "Wachten op synchronisatie"
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "What can I help you with?"
-msgstr "Waarmee kan ik je helpen?"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Titlebar button beside a downloaded update that opens the version history
@@ -4505,11 +4459,6 @@ msgstr "Wanneer kopiëren"
 msgid "Where downloaded files are saved."
 msgstr "Waar gedownloade bestanden worden opgeslagen."
 
-#. Auto, Sidebar and Titlebar quote this setting's options, so they match those options' wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times."
-msgstr "Waar de launcher en de bookmarkknop staan. Auto verplaatst ze naar de onderkant van de zijbalk met verticale tabbladen zolang die wordt getoond. Zijbalk houdt ze daar en houdt de zijbalk open, zelfs met één tabblad, en Titelbalk houdt ze altijd in de titelbalk."
-
 #: packages/app/protocol/index.ts
 msgid "Which account should compose this email?"
 msgstr "Met welk account wil je deze e-mail opstellen?"
@@ -4522,20 +4471,6 @@ msgstr "Met welk account wil je deze link openen?"
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "White"
 msgstr "Wit"
-
-#. Option of the Width setting for the vertical tabs sidebar
-#: packages/shared/tabs.ts
-msgid "Wide"
-msgstr "Breed"
-
-#: packages/renderer/components/vertical-tabs.tsx
-msgid "Widen the tab strip"
-msgstr "Maak de tabbladstrook breder"
-
-#. Setting for how wide the vertical tabs sidebar is
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Width"
-msgstr "Breedte"
 
 #. Heading of the Appearance section about ggmail's window
 #: packages/renderer/routes/settings/appearance.tsx
@@ -4576,6 +4511,7 @@ msgstr "Werk"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Notifications section about notifications from Workspace apps
+#: packages/renderer/components/workspace-sidebar.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Workspace apps"
@@ -4585,6 +4521,10 @@ msgstr "Workspace-apps"
 #: packages/shared/accounts.ts
 msgid "Yellow"
 msgstr "Geel"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "You can schedule a follow-up when you sent the last message."
+msgstr "Je kunt een herinnering plannen als je het laatste bericht hebt verzonden."
 
 #. Accessible description of the unread badge on ggmail's taskbar button on Windows
 #: packages/app/ipc.ts
@@ -4612,10 +4552,6 @@ msgstr "Je hebt je gebruikslimiet voor ChatGPT bereikt. Probeer het later opnieu
 #: packages/app/ipc.ts
 msgid "Your test notification request"
 msgstr "Je verzoek om een testmelding"
-
-#: packages/renderer/components/follow-ups.tsx
-msgid "You can schedule a follow-up when you sent the last message."
-msgstr "Je kunt een herinnering plannen als je het laatste bericht hebt verzonden."
 
 #. Window menu item that toggles the window between its size and filling the screen
 #: packages/app/menu.ts

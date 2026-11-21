@@ -1,3 +1,4 @@
+import { Input } from "@ggmail/ui/components/input";
 import {
   Select,
   SelectTrigger,
@@ -70,7 +71,7 @@ export function DetailFilters({
     <div className="attachment-detail-filters">
       <label>
         <span>{t`Sender`}</span>
-        <input
+        <Input
           type="text"
           placeholder={t`Name or email address`}
           value={filters.sender}
@@ -103,7 +104,7 @@ export function DetailFilters({
       <div className="attachment-date-range">
         <label>
           <span>{t`Received from`}</span>
-          <input
+          <Input
             type="date"
             value={filters.from}
             max={filters.through || undefined}
@@ -114,7 +115,7 @@ export function DetailFilters({
         </label>
         <label>
           <span>{t`Received through`}</span>
-          <input
+          <Input
             type="date"
             value={filters.through}
             min={filters.from || undefined}

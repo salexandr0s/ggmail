@@ -2,7 +2,6 @@ import { realpath } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { useApp } from "./lib/app";
 import { findRendererPage } from "./lib/renderer-navigation";
-import { SIGN_IN_PAGE_TITLE } from "./lib/server";
 import { readSettingsPageLabels } from "./lib/settings";
 
 /** The shape `accounts` is stored in, with only the two labels differing. */
@@ -124,12 +123,8 @@ test("All Mail opens from the titlebar", async () => {
   await expect.poll(() => new URL(ggmail.renderer.url()).hash).toBe("#/unified-inbox");
 });
 
-test("Calendar lets you pick and switch mailboxes in a tab in the main window", async () => {
-  type CalendarMenu = typeof globalThis & { calendarMenu?: Electron.Menu };
-  await ggmail.app.evaluate(({ session, Menu }) => {
-    Menu.prototype.popup = function () {
-      (globalThis as CalendarMenu).calendarMenu = this;
-    };
+test("Calendar opens from the fixed sidebar and follows mailbox switches", async () => {
+  await ggmail.app.evaluate(({ session }) => {
     for (const id of ["first-account", "second-account"]) {
       session
         .fromPartition("persist:" + id)
@@ -144,22 +139,17 @@ test("Calendar lets you pick and switch mailboxes in a tab in the main window", 
     window.electron.ipcRenderer.invoke("config.setConfig", { "workspaceApps.mode": "windows" }),
   );
   const nav = page.getByRole("navigation", { name: "Mail views" });
-  const button = nav.getByRole("button", { name: "Calendar" });
+  const sidebar = page.getByRole("navigation", { name: "Workspace apps" });
+  const button = sidebar.getByRole("button", { name: "Calendar" });
+  await expect(nav.getByRole("button", { name: "Calendar" })).toHaveCount(0);
   await nav.getByRole("button", { name: "Attachments" }).click();
+  const buttons = sidebar.getByRole("button");
+  await expect(buttons).toHaveCount(5);
+  expect(
+    await buttons.evaluateAll((elements) => elements.map((el) => el.getAttribute("aria-label"))),
+  ).toEqual(["Mail", "Calendar", "Bookmarks", "Google Tasks", "Settings"]);
   await button.click();
-  await expect
-    .poll(() =>
-      ggmail.app.evaluate(() =>
-        (globalThis as CalendarMenu).calendarMenu?.items.map((item) => [item.label, item.checked]),
-      ),
-    )
-    .toEqual([
-      ["Personal", true],
-      ["Work", false],
-    ]);
-  await ggmail.app.evaluate(() =>
-    (globalThis as CalendarMenu).calendarMenu?.items.find((item) => item.label === "Work")?.click(),
-  );
+  await page.locator('[data-account-id="second-account"]').click();
 
   const readPage = () =>
     ggmail.app.evaluate(({ BrowserWindow }) => {
@@ -181,7 +171,7 @@ test("Calendar lets you pick and switch mailboxes in a tab in the main window", 
   await expect.poll(readPage).toEqual({
     windowCount: 1,
     fullScreen: false,
-    calendars: 1,
+    calendars: 2,
     account: "second-account",
     pageId: expect.any(Number),
   });
@@ -193,11 +183,80 @@ test("Calendar lets you pick and switch mailboxes in a tab in the main window", 
     .toMatchObject({ windowCount: 1, fullScreen: false, calendars: 2, account: "first-account" });
   await page.locator('[data-account-id="second-account"]').click();
   await expect.poll(readPage).toEqual({ ...work, calendars: 2 });
-  await page.getByRole("button", { name: SIGN_IN_PAGE_TITLE, exact: true }).click();
+  await sidebar.getByRole("button", { name: "Mail", exact: true }).click();
   await expect(button).not.toHaveAttribute("aria-current", "page");
 });
 
-test("Back and Forward retrace libraries and account switches at both toolbar widths", async () => {
+test("sidebar shortcuts reuse Tasks, open bookmarks and keep Settings at the bottom", async () => {
+  const page = ggmail.renderer;
+  const sidebar = page.getByRole("navigation", { name: "Workspace apps" });
+  const tasks = sidebar.getByRole("button", { name: "Google Tasks" });
+  const bookmarks = sidebar.getByRole("button", { name: "Bookmarks" });
+  const settings = sidebar.getByRole("button", { name: "Settings" });
+  await ggmail.app.evaluate(({ session }) =>
+    session
+      .fromPartition("persist:first-account")
+      .protocol.handle(
+        "https",
+        () =>
+          new Response("<title>Task list</title>", { headers: { "content-type": "text/html" } }),
+      ),
+  );
+  await tasks.click();
+  await expect(tasks).toHaveAttribute("aria-current", "page");
+  const taskViews = () =>
+    ggmail.app.evaluate(({ webContents }) =>
+      webContents
+        .getAllWebContents()
+        .filter((wc) => wc.getURL().startsWith("https://tasks.google.com/"))
+        .map((wc) => wc.id),
+    );
+  await expect.poll(taskViews).toHaveLength(1);
+  const original = await taskViews();
+  await sidebar.getByRole("button", { name: "Mail", exact: true }).click();
+  await tasks.click();
+  await expect(tasks).toHaveAttribute("aria-current", "page");
+  expect(await taskViews()).toEqual(original);
+  const popupPromise = page.context().waitForEvent("page");
+  await bookmarks.click();
+  const popup = await popupPromise;
+  await popup.waitForURL("**/bookmarks.html*");
+  await expect(bookmarks).toHaveAttribute("aria-expanded", "true");
+  await expect(popup.getByRole("heading", { name: "Bookmarks", exact: true })).toBeVisible();
+  await popup.getByRole("button", { name: "Close" }).click();
+  await page.mouse.move(150, 20);
+  await expect(bookmarks).toHaveAttribute("aria-expanded", "false");
+
+  for (const theme of ["light", "dark"] as const) {
+    await ggmail.app.evaluate(({ nativeTheme, BrowserWindow }, theme) => {
+      nativeTheme.themeSource = theme;
+      const win = BrowserWindow.getAllWindows().find((w) =>
+        w.webContents.getURL().includes("main.html"),
+      );
+      win?.setMinimumSize(320, 360);
+      win?.setContentSize(theme === "dark" ? 480 : 1080, theme === "dark" ? 460 : 650);
+    }, theme);
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.classList.contains("dark")))
+      .toBe(theme === "dark");
+    await expect(sidebar).toHaveCSS(
+      "background-color",
+      theme === "dark" ? "rgb(19, 19, 19)" : "rgb(255, 255, 255)",
+    );
+    const bounds = await sidebar.boundingBox();
+    const gear = await settings.boundingBox();
+    expect(bounds?.width).toBe(52);
+    await expect(tasks.locator("svg")).toHaveCSS("width", "20px");
+    expect(bounds && gear && bounds.y + bounds.height - gear.y - gear.height).toBeLessThan(20);
+    await sidebar.screenshot({ path: test.info().outputPath(`workspace-sidebar-${theme}.png`) });
+  }
+  await settings.focus();
+  await settings.press("Enter");
+  await findRendererPage(ggmail, "settings");
+  await ggmail.closeSettings();
+});
+
+test("Back and Forward retrace libraries and account switches across toolbar layouts", async () => {
   const info = test.info();
   const page = ggmail.renderer;
   const navigation = page.getByRole("navigation", { name: "Mail views" });
@@ -226,23 +285,37 @@ test("Back and Forward retrace libraries and account switches at both toolbar wi
       .find((w) => w.webContents.getURL().includes("main.html"))
       ?.setSize(920, 640);
   });
+  // At a laptop width the full set of destinations is still one click away.
+  await expect(navigation.getByRole("toolbar")).toBeVisible();
+  const waiting = navigation.getByRole("button", { name: "Waiting for reply" });
+  await waiting.focus();
+  await waiting.press("ArrowLeft");
+  await expect(navigation.getByRole("button", { name: "Attachments" })).toBeFocused();
+  await expect(waiting).toHaveAttribute("aria-current", "page");
+  await navigation.getByRole("button", { name: "Attachments" }).press("Enter");
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+  await page.getByRole("button", { name: "Go back" }).click();
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    window?.setMinimumSize(320, 360);
+    window?.setSize(520, 640);
+  });
   const selector = navigation.getByRole("button", { name: "Mail views" });
   await expect(selector).toHaveText("Waiting for reply");
   await expect(navigation.getByRole("button", { name: "All Mail" })).toHaveCount(0);
+  const pickerPromise = page.context().waitForEvent("page");
   await selector.click();
-  await findRendererPage(ggmail, "mail-views");
-  const picker = ggmail.app
-    .context()
-    .pages()
-    .find((popup) => popup.url().includes("mail-views.html"));
-  if (!picker) {
-    throw new Error("The mail views picker did not open");
-  }
+  const picker = await pickerPromise;
+  await picker.waitForURL("**/mail-views.html*");
   await expect(picker.getByRole("menuitemradio", { name: "Waiting for reply" })).toBeChecked();
   await picker.getByRole("menuitemradio", { name: "Attachments" }).click();
   await expect(selector).toHaveText("Attachments");
-  await expect(page.getByRole("button", { name: "Go forward" })).toBeDisabled();
   await page.screenshot({ path: info.outputPath("compact-shell.png") });
+  await expect
+    .poll(() => page.evaluate(() => window.electron.ipcRenderer.invoke("shell.getHistory")))
+    .toMatchObject({ canGoForward: false });
 });
 
 test("the narrow Mail views menu opens above Gmail and supports keyboard selection", async () => {
@@ -264,13 +337,13 @@ test("the narrow Mail views menu opens above Gmail and supports keyboard selecti
         webContents
           .fromId(id)
           ?.executeJavaScript(
-            `Array.from(document.querySelectorAll('[role="menuitemradio"]'), el => el.textContent)`,
+            `Array.from(document.querySelectorAll('[role="menuitemradio"]'), el => el.getAttribute('aria-label') ?? el.textContent)`,
           ),
       id,
     );
   await expect
     .poll(readOptions)
-    .toEqual(["All Mail", "Attachments", "Waiting for reply", "Calendar", "Personal", "Work"]);
+    .toEqual(["All Mail", "Attachments", "Waiting for reply", "Personal", "Work"]);
   await ggmail.app.evaluate(({ webContents }, id) => {
     const popup = webContents.fromId(id);
     for (const keyCode of ["Home", "Down", "Return"]) {
@@ -300,4 +373,80 @@ test("settings opens without an activation page and survives restart", async () 
   expect(await readSettingsPageLabels(settings)).not.toContain("License");
   await ggmail.relaunch();
   await expect(ggmail.renderer.getByRole("button", { name: "Personal" })).toBeVisible();
+});
+
+test("Gmail profile photos follow their own accounts into the toolbar and Accounts settings", async () => {
+  const photoURL = "https://lh3.googleusercontent.com/a/fixture-avatar";
+  await ggmail.app.evaluate(async ({ session, webContents, nativeImage }, photoURL) => {
+    for (const [index, id] of ["first-account", "second-account"].entries()) {
+      const partition = session.fromPartition("persist:" + id);
+      const view = webContents.getAllWebContents().find((w) => w.session === partition);
+      if (!view) {
+        throw new Error("Missing account view");
+      }
+      const bitmap = Buffer.from(index === 0 ? [80, 60, 220, 255] : [220, 160, 30, 255]);
+      const png = nativeImage.createFromBitmap(bitmap, { width: 1, height: 1 }).toPNG();
+      partition.protocol.handle("https", (request) => {
+        const url = new URL(request.url);
+        if (url.hostname === "lh3.googleusercontent.com") {
+          return new Response(new Uint8Array(png), { headers: { "Content-Type": "image/png" } });
+        }
+        const accountHeader =
+          index === 0
+            ? `<meta name="og-profile-acct" content="${id}@example.test"><header id="gb"><a href="https://accounts.google.com/SignOutOptions"><img src="${photoURL}"></a></header>`
+            : `<header role="banner"><button role="button" aria-label="Account (${id}@example.test)"><svg><image href="${photoURL}"/></svg></button></header>`;
+        const sender =
+          '<main><img src="https://lh3.googleusercontent.com/a/unrelated-sender"></main>';
+        const body = (url.pathname.endsWith("/signed-out") ? "" : accountHeader) + sender;
+        return new Response(body, { headers: { "Content-Type": "text/html" } });
+      });
+      await view.loadURL("https://mail.google.com/mail/u/0/#inbox");
+    }
+  }, photoURL);
+
+  const page = ggmail.renderer;
+  const personal = page.locator(
+    'button[data-account-id="first-account"] [data-slot="account-avatar"]',
+  );
+  const work = page.locator(
+    'button[data-account-id="second-account"] [data-slot="account-avatar"]',
+  );
+  await expect(personal.locator("img")).toHaveAttribute("src", /^data:image\/png;base64,/);
+  await expect(work.locator("img")).toHaveAttribute("src", /^data:image\/png;base64,/);
+  const firstPhoto = await personal.locator("img").getAttribute("src");
+  const secondPhoto = await work.locator("img").getAttribute("src");
+  if (!firstPhoto || !secondPhoto) {
+    throw new Error("Missing profile photos");
+  }
+  expect(firstPhoto).not.toBe(secondPhoto);
+  const settings = await ggmail.openSettings();
+  await settings
+    .getByTestId("settings-nav")
+    .getByRole("button", { name: "Accounts", exact: true })
+    .click();
+  const row = (label: string) =>
+    settings
+      .locator(".settings-account-row")
+      .filter({ has: settings.getByText(label, { exact: true }) });
+  await expect(row("Personal").locator("img")).toHaveAttribute("src", firstPhoto);
+  await expect(row("Work").locator("img")).toHaveAttribute("src", secondPhoto);
+  for (const theme of ["light", "dark"] as const) {
+    await ggmail.app.evaluate(({ nativeTheme }, t) => {
+      nativeTheme.themeSource = t;
+    }, theme);
+    await expect(row("Personal")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await settings.screenshot({
+      path: test.info().outputPath("accounts-" + theme + ".png"),
+      animations: "disabled",
+    });
+  }
+  await ggmail.app.evaluate(async ({ session, webContents }) => {
+    const view = webContents
+      .getAllWebContents()
+      .find((w) => w.session === session.fromPartition("persist:first-account"));
+    await view?.loadURL("https://mail.google.com/signed-out");
+  });
+  await expect(personal.locator("img")).toHaveCount(0);
+  await expect(personal).toHaveText("P");
+  await expect(row("Work").locator("img")).toHaveAttribute("src", secondPhoto);
 });

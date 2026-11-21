@@ -37,7 +37,7 @@ export function MailboxSection({
     <section
       aria-label={label}
       hidden={hidden}
-      className="min-w-0 overflow-hidden rounded-xl border bg-card text-card-foreground"
+      className="min-w-0 overflow-hidden bg-card text-card-foreground"
     >
       <div className="flex min-h-9 flex-wrap items-center justify-between gap-2 bg-muted/55 px-3.5 py-2">
         <h2 className="flex max-w-full min-w-0 items-center gap-2 text-sm font-semibold">

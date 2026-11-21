@@ -11,4 +11,12 @@ test("a single mailbox opened before Gmail loads still has a route back from a l
   await expect(page.getByRole("heading", { name: "Attachments" })).toBeHidden();
   await page.getByRole("button", { name: "Go forward" }).click();
   await expect(page.getByRole("heading", { name: "Attachments" })).toBeVisible();
+  const mail = page
+    .getByRole("navigation", { name: "Mail views" })
+    .getByRole("button", { name: "Mail", exact: true });
+  await mail.click();
+  await expect(mail).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("heading", { name: "Attachments" })).toBeHidden();
+  await page.getByRole("button", { name: "Go back" }).click();
+  await expect(page.getByRole("heading", { name: "Attachments" })).toBeVisible();
 });

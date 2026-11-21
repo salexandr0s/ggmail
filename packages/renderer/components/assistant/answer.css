@@ -1,14 +1,10 @@
 .assistant-answer {
   --answer-accent: var(--foreground);
-  color-scheme: light;
   color: var(--foreground);
   font-size: 0.875rem;
   line-height: 1.63;
   overflow-wrap: anywhere;
   user-select: text;
-}
-.dark .assistant-answer {
-  color-scheme: dark;
 }
 .assistant-answer > * + * {
   margin-block-start: 0.8rem;
@@ -21,9 +17,8 @@
   font-weight: 635;
 }
 .assistant-answer a {
-  color: inherit;
+  color: var(--primary);
   text-decoration: underline;
-  text-decoration-color: var(--muted-foreground);
   text-underline-offset: 0.16em;
 }
 .assistant-answer a:hover {

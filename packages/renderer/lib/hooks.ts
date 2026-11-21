@@ -3,10 +3,9 @@ import type { GmailInboxMessage } from "@ggmail/shared/gmail";
 import { ms } from "@ggmail/shared/ms";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { AccountConfig } from "@ggmail/shared/schemas";
-import { getVerticalTabsWidth, getVisibleVerticalTabs } from "@ggmail/shared/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useConfig, unifiedInboxOptions } from "./react-query";
+import { unifiedInboxOptions } from "./react-query";
 import { useAccountsStore, useTabsStore } from "./stores";
 
 export function useMouseAccountSwitching() {
@@ -58,31 +57,6 @@ export function useSelectedAccountTabs() {
       ?.tabs ?? [];
 
   return { selectedAccount, tabs };
-}
-
-/**
- * What the vertical tabs strip renders and the width it takes up. The titlebar
- * reads it too, to determine whether the strip is there to host the Workspace Apps
- * launcher.
- */
-export function useVerticalTabs() {
-  const { selectedAccount, tabs: selectedAccountTabs } = useSelectedAccountTabs();
-
-  const { config } = useConfig();
-
-  const tabs = getVisibleVerticalTabs(selectedAccountTabs, {
-    workspaceAppsMode: config?.["workspaceApps.mode"] ?? "tabs",
-    showWindows: config?.["verticalTabs.showWindows"] ?? true,
-  });
-
-  const width = getVerticalTabsWidth(tabs, {
-    configuredWidth: config?.["verticalTabs.width"] ?? "auto",
-    sessionWidth: selectedAccount?.verticalTabsWidth ?? null,
-    launcherAndBookmarksPlacement:
-      config?.["workspaceApps.launcherAndBookmarksPlacement"] ?? "auto",
-  });
-
-  return { selectedAccount, tabs, width };
 }
 
 export type UnifiedInboxMessage = GmailInboxMessage & {

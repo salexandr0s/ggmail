@@ -1,53 +1,22 @@
-/*
- * A toast, in the shape of the shadcn Base UI toast, written out by hand.
- *
- * The preload cannot reach the interface's stylesheet: importing it is what put
- * 110 KB of compiled Tailwind and seven dead `@font-face` rules into every Gmail
- * renderer. So the classes that toast is built from are resolved here into the
- * values they compile to — `p-4` as 16px, `text-sm` as 14px/20px, `gap-3` as
- * 12px, `size-7` as 28px — against the tokens in `@ggmail/ui/styles/globals.css`.
- *
- * In px rather than rem throughout, deliberately: a `rem` inside a shadow root
- * is measured against the host page's root font size, and that belongs to Gmail
- * rather than to us.
- *
- * The surface follows ggmail's own floating surfaces rather than the shadcn toast,
- * which draws a plain border. `popover.tsx` and `dropdown-menu.tsx` both use
- * `rounded-lg bg-popover text-popover-foreground shadow-lg ring-1
- * ring-foreground/10`, and a toast that sits over Gmail should look like the
- * menus that open next to it.
- */
-
+/* The Gmail preload renders its toast in a shadow root. Use pixel sizes so the
+   Gmail document's root font size does not change the app control geometry. */
 .toaster {
-  /* --popover, --popover-foreground, --muted-foreground, --muted, --border,
-   * --background and --foreground, from the light block. */
-  --toast-surface: oklch(1 0 0);
-  --toast-text: oklch(0.145 0 0);
-  --toast-muted-text: oklch(0.556 0 0);
-  --toast-hover-surface: oklch(0.97 0 0);
-  --toast-ring: oklch(0.145 0 0 / 10%);
-  --toast-button-surface: oklch(1 0 0);
-  --toast-button-border: oklch(0.922 0 0);
-  --toast-button-hover-surface: oklch(0.97 0 0);
+  --toast-surface: #ffffff;
+  --toast-text: #1f1f1f;
+  --toast-muted-text: #444746;
+  --toast-hover-surface: #e8eaed;
+  --toast-ring: #dadce0;
+  --toast-button-border: #80868b;
 }
 
-/*
- * The app's theme, without a single line of IPC. `theme.ts` sets
- * `nativeTheme.themeSource` from the `theme` config key, and Chromium answers
- * this query from it in every renderer — so light, dark and system all arrive
- * here on their own. The interface's `.dark` block, resolved the same way as
- * the light one above.
- */
 @media (prefers-color-scheme: dark) {
   .toaster {
-    --toast-surface: oklch(0.205 0 0);
-    --toast-text: oklch(0.985 0 0);
-    --toast-muted-text: oklch(0.708 0 0);
-    --toast-hover-surface: oklch(0.269 0 0);
-    --toast-ring: oklch(0.985 0 0 / 10%);
-    --toast-button-surface: oklch(1 0 0 / 4.5%);
-    --toast-button-border: oklch(1 0 0 / 15%);
-    --toast-button-hover-surface: oklch(1 0 0 / 7.5%);
+    --toast-surface: #303030;
+    --toast-text: #ffffff;
+    --toast-muted-text: #b7b7b7;
+    --toast-hover-surface: #383838;
+    --toast-ring: #373737;
+    --toast-button-border: #777777;
   }
 }
 
@@ -68,9 +37,7 @@
   flex-direction: column;
   gap: 12px;
   color: var(--toast-text);
-  font-family:
-    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Noto Color Emoji";
+  font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
 }
@@ -80,7 +47,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--toast-surface);
   box-shadow:
     0 0 0 1px var(--toast-ring),
@@ -122,8 +89,8 @@
   justify-content: center;
   padding: 0 10px;
   border: 1px solid var(--toast-button-border);
-  border-radius: 8px;
-  background: var(--toast-button-surface);
+  border-radius: 999px;
+  background: transparent;
   background-clip: padding-box;
   color: inherit;
   font-family: inherit;
@@ -145,7 +112,7 @@
   justify-content: center;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   background: transparent;
   color: var(--toast-muted-text);
   cursor: default;
@@ -155,7 +122,7 @@
 }
 
 .toast-action:hover {
-  background: var(--toast-button-hover-surface);
+  background: var(--toast-hover-surface);
 }
 
 .toast-close:hover {

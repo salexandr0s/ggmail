@@ -199,10 +199,17 @@ test("losing connectivity keeps unread mail visible and withdraws the up-to-date
   await expect(page.getByTitle("Personal is up to date")).toBeVisible({ timeout: 12_000 });
 });
 
+async function openScheduler() {
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Schedule follow-up", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Schedule follow-up", level: 1 })).toBeVisible();
+}
+
 test("a thread change during scheduling leaves the waiting list empty", async () => {
   await openMailbox("Personal");
   const page = ggmail.renderer;
   await page.getByRole("button", { name: "Waiting for reply", exact: true }).first().click();
+  await openScheduler();
   const started = Promise.withResolvers<void>();
   const response = Promise.withResolvers<void>();
   pausePrint = () => {
@@ -224,6 +231,7 @@ test("a thread change during scheduling leaves the waiting list empty", async ()
     response.resolve();
   }
   await expect(page.getByText(/Couldn’t schedule this follow-up/)).toBeVisible();
+  await page.getByRole("button", { name: "All follow-ups", exact: true }).click();
   await expect(page.getByRole("heading", { name: "No follow-ups", exact: true })).toBeVisible();
 });
 
@@ -233,6 +241,15 @@ test("an early reply clears a future follow-up from the waiting list", async () 
   await page.locator('[data-account-id="Work"]').click();
   const waiting = page.getByRole("button", { name: "Waiting for reply", exact: true }).first();
   await waiting.click();
+  await expect(page.getByLabel("Follow-up date")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Work invoice" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "No follow-ups", exact: true })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("waiting-list.png") });
+  await openScheduler();
+  await expect(waiting).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("group", { name: "All follow-ups" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Work invoice" })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("schedule-follow-up.png") });
   await page.getByRole("button", { name: "Follow up Friday" }).click();
   const work = page.getByRole("region", { name: "Work" });
   await expect(work).toContainText("Scheduled");
@@ -250,10 +267,12 @@ test("scheduled follow-ups survive restart and only due threads without replies 
     await ggmail.renderer.locator(`[data-account-id="${account}"]`).click();
     await waiting().click();
     const region = ggmail.renderer.getByRole("region", { name: account });
+    await openScheduler();
     await ggmail.renderer.getByRole("button", { name: "Follow up Friday", exact: true }).click();
     await expect(region).toContainText("Scheduled");
     await expect(region).toContainText("recipient@example.test");
     await expect(region).toContainText(firstDate);
+    await openScheduler();
     await ggmail.renderer.getByLabel("Follow-up date").fill(localDay());
     await ggmail.renderer.getByRole("button", { name: "Schedule follow-up", exact: true }).click();
     await expect(region).toContainText("Due for follow-up");
@@ -292,6 +311,7 @@ test("filtering by status keeps the mailbox and conversation together", async ()
     await openMailbox(account);
     await page.locator(`[data-account-id="${account}"]`).click();
     await waiting.click();
+    await openScheduler();
     if (account === "Work") {
       await page.getByLabel("Follow-up date").fill(localDay());
     }
@@ -352,7 +372,173 @@ test("the scheduling prompt opens sent mail in the selected account", async () =
   await expect(gmail).toHaveURL(/#inbox$/);
   await page.getByRole("button", { name: "Waiting for reply", exact: true }).first().click();
   await expect(page.getByRole("heading", { name: "No follow-ups", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Open sent mail" })).toHaveCount(0);
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows().find((win) =>
+      win.webContents.getURL().includes("main.html"),
+    );
+    window?.setMinimumSize(320, 360);
+    window?.setSize(360, 580);
+  });
+  await openScheduler();
+  await expect(page.getByRole("button", { name: "Open sent mail" })).toBeInViewport();
   await page.getByRole("button", { name: "Open sent mail" }).click();
   await expect(gmail).toHaveURL(/#sent$/);
   await expect(page.getByRole("heading", { name: "Waiting for reply" })).toHaveCount(0);
+});
+
+test("mail and follow-up navigation share the desktop rail and fit a compact window", async () => {
+  const page = ggmail.renderer;
+  await openMailbox("Personal");
+  await openMailbox("Work");
+  const setWidth = (width: number) =>
+    ggmail.app.evaluate(({ BrowserWindow }, width) => {
+      const win = BrowserWindow.getAllWindows().find((w) =>
+        w.webContents.getURL().includes("main.html"),
+      );
+      win?.setMinimumSize(320, 360);
+      win?.setSize(width, 700);
+    }, width);
+  await setWidth(1320);
+
+  for (const theme of ["light", "dark"] as const) {
+    await ggmail.app.evaluate(({ nativeTheme }, theme) => {
+      nativeTheme.themeSource = theme;
+    }, theme);
+    const selectedColor = theme === "dark" ? "rgb(89, 89, 89)" : "rgb(211, 227, 253)";
+    await page
+      .getByRole("navigation", { name: "Mail views" })
+      .getByRole("button", { name: "All Mail" })
+      .click();
+    const accounts = page.getByRole("group", { name: "Filter by account" });
+    const account = accounts.getByRole("button", { name: "Personal", exact: true });
+    await account.click();
+    await expect(account).toHaveCSS("height", "32px");
+    await expect(account).toHaveCSS("background-color", selectedColor);
+    const inboxLeft = await page
+      .locator(".inbox-feed")
+      .evaluate((el) => el.getBoundingClientRect().left);
+    expect(inboxLeft).toBeLessThanOrEqual(256);
+    await page.screenshot({ path: test.info().outputPath(`all-mail-${theme}.png`) });
+
+    await page
+      .getByRole("navigation", { name: "Mail views" })
+      .getByRole("button", { name: "Waiting for reply" })
+      .click();
+    await openScheduler();
+    await expect(page.getByLabel("Follow-up date")).toBeVisible();
+    await page.screenshot({ path: test.info().outputPath(`scheduler-${theme}.png`) });
+    if (theme === "light") {
+      await page.getByRole("button", { name: "Follow up Friday", exact: true }).click();
+    } else {
+      await page.getByRole("button", { name: "All follow-ups", exact: true }).click();
+    }
+    const filters = page.getByRole("group", { name: "All follow-ups" });
+    const scheduled = filters.getByRole("button", { name: /Scheduled/ });
+    await scheduled.click();
+    const allLabel = filters.getByText("All follow-ups", { exact: true });
+    expect(await allLabel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const create = page.getByRole("button", { name: "Schedule follow-up", exact: true });
+    expect(
+      await create.evaluate((el) => {
+        const range = document.createRange();
+        const label = [...el.childNodes].find(
+          (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+        );
+        if (!label) {
+          return 0;
+        }
+        range.selectNodeContents(label);
+        return range.getClientRects().length;
+      }),
+    ).toBe(1);
+    await expect(scheduled).toHaveCSS("height", "32px");
+    await expect(scheduled).toHaveCSS("background-color", selectedColor);
+    await expect(page.getByRole("region", { name: "Personal" })).toContainText("Personal invoice");
+    const queueLeft = await page
+      .locator(".follow-up-queue")
+      .evaluate((el) => el.getBoundingClientRect().left);
+    expect(queueLeft).toBeCloseTo(inboxLeft, 0);
+    await expect(page.getByText("Follow-up scheduled", { exact: true })).toBeHidden({
+      timeout: 10000,
+    });
+    await page.screenshot({ path: test.info().outputPath(`follow-ups-${theme}.png`) });
+  }
+
+  await setWidth(360);
+  const schedule = page.getByRole("button", { name: "Schedule follow-up", exact: true });
+  await expect(schedule).toBeInViewport();
+  await expect(page.getByRole("button", { name: /Scheduled.*1/ })).toBeInViewport();
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
+  await page.screenshot({ path: test.info().outputPath("follow-ups-compact.png") });
+  await schedule.click();
+  const date = page.getByLabel("Follow-up date");
+  await expect(date).toBeInViewport();
+  const tomorrow = page.getByRole("button", { name: /^tomorrow$/i });
+  await tomorrow.focus();
+  await page.keyboard.press("Space");
+  await expect(tomorrow).toHaveAttribute("aria-pressed", "true");
+  const expected = await page.evaluate(() => {
+    const next = new Date();
+    next.setDate(next.getDate() + 1);
+    return [
+      next.getFullYear(),
+      String(next.getMonth() + 1).padStart(2, "0"),
+      String(next.getDate()).padStart(2, "0"),
+    ].join("-");
+  });
+  await expect(date).toHaveValue(expected);
+  await page.screenshot({
+    animations: "disabled",
+    path: test.info().outputPath("follow-up-scheduler-compact.png"),
+  });
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.getByRole("button", { name: /Scheduled.*1/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
+test("scrolling a long follow-up queue keeps its filter and toolbar in place", async () => {
+  const page = ggmail.renderer;
+  await openMailbox("Personal");
+  await ggmail.app.evaluate(({ BrowserWindow, ipcMain }) => {
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("main.html"))
+      ?.setSize(1200, 660);
+    ipcMain.removeHandler("followUps.list");
+    ipcMain.handle("followUps.list", (_event, accountId) => ({
+      unavailable: false,
+      rows:
+        accountId === "Personal"
+          ? Array.from({ length: 70 }, (_, i) => ({
+              id: String(i),
+              subject: "Conversation " + i,
+              recipient: "Reader",
+              due: "2030-01-02",
+              lastSent: "2026-11-19T12:00:00Z",
+              status: "scheduled",
+            }))
+          : [],
+    }));
+  });
+  await page
+    .getByRole("navigation", { name: "Mail views" })
+    .getByRole("button", { name: "Waiting for reply" })
+    .click();
+  await expect(page.getByText("Conversation 69", { exact: true })).toBeAttached();
+  const queue = page.locator(".follow-up-queue-body");
+  const refresh = page.getByRole("button", { name: "Check for replies" });
+  const top = await refresh.boundingBox();
+  await queue.evaluate((node) => {
+    node.scrollTop = node.scrollHeight;
+  });
+  await expect.poll(() => queue.evaluate((node) => node.scrollTop)).toBeGreaterThan(200);
+  await expect(page.getByText("Conversation 69", { exact: true })).toBeInViewport();
+  expect(await refresh.boundingBox()).toEqual(top);
+  await expect(
+    page.getByRole("button", { name: "Schedule follow-up", exact: true }),
+  ).toBeInViewport();
 });

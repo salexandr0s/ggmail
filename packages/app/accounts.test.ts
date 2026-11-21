@@ -53,7 +53,6 @@ function addInstance(id: string) {
   accounts.instances.set(id, {
     gmail: { store: { getState: () => ({ attentionRequired }) } },
     tabs: { serialize: () => [] },
-    verticalTabsWidth: null,
   } as unknown as Account);
 }
 

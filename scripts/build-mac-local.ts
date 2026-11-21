@@ -7,8 +7,24 @@ if (process.platform !== "darwin") {
 }
 
 const projectDir = path.resolve(import.meta.dir, "..");
-const appOutDir = path.join(projectDir, "dist", "mac-arm64");
+const args = process.argv.slice(2);
+if (args.length > 1 || args.some((arg) => arg !== "--install" && arg !== "--adhoc")) {
+  throw new Error("Usage: build-mac-local.ts [--install | --adhoc]");
+}
+const adhoc = args.includes("--adhoc");
+const output = adhoc ? "dist/adhoc" : "dist";
+const appOutDir = path.join(projectDir, output, "mac-arm64");
 const appPath = path.join(appOutDir, "ggmail.app");
+// The published ggmail builds share this Developer ID requirement. It survives
+// certificate renewal within the team and is also how Keychain recognizes an update.
+const team = "97MH8853HX";
+const requirement = [
+  'identifier "com.github.salexandr0s.ggmail"',
+  "anchor apple generic",
+  "certificate 1[field.1.2.840.113635.100.6.2.6] exists",
+  "certificate leaf[field.1.2.840.113635.100.6.1.13] exists",
+  `certificate leaf[subject.OU] = "${team}"`,
+].join(" and ");
 const env: NodeJS.ProcessEnv = {
   ...process.env,
   NODE_ENV: "production",
@@ -49,9 +65,24 @@ await build({
   projectDir,
   targets: Platform.MAC.createTarget("dir", Arch.arm64),
   publish: "never",
-  config: { mac: { identity: "-", notarize: false } },
+  config: {
+    directories: { output },
+    forceCodeSigning: !adhoc,
+    mac: { identity: adhoc ? "-" : `(${team})`, notarize: false },
+  },
 });
 
-await run("codesign", "--verify", "--deep", "--strict", appPath);
+await run(
+  "codesign",
+  "--verify",
+  "--deep",
+  "--strict",
+  ...(adhoc ? [] : [`-R=${requirement}`]),
+  appPath,
+);
 
 console.log(`Built ${appPath}`);
+
+if (args.includes("--install")) {
+  await run("swift", "scripts/install-mac-local.swift", appPath, requirement);
+}

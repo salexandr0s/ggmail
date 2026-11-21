@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { WORKSPACE_SIDEBAR_WIDTH } from "@ggmail/shared/constants";
+import { useState, type CSSProperties } from "react";
 import { Route, Router, Switch } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
 import { AppMain } from "@/components/app-main";
 import { AppTitlebar } from "@/components/app-titlebar";
 import { AppToaster } from "@/components/app-toaster";
 import { AssistantDrawer } from "@/components/assistant/assistant-panel";
-import { VerticalTabs } from "@/components/vertical-tabs";
+import { FollowUps } from "@/components/follow-ups";
+import { WorkspaceSidebar } from "@/components/workspace-sidebar";
 import { useMouseAccountSwitching } from "@/lib/hooks";
 import { renderApp } from "@/lib/react";
 import { Attachments } from "@/routes/attachments";
+import { DownloadHistory } from "@/routes/download-history";
+import { UnifiedInbox } from "@/routes/unified-inbox";
 import "@/lib/ipc";
 
 function Main() {
@@ -22,10 +26,13 @@ function Main() {
           showAssistant={showAssistant}
           toggleAssistant={() => setShowAssistant((value) => !value)}
         />
-        <div className="relative flex flex-1 overflow-hidden">
+        <div
+          className="relative flex flex-1 overflow-hidden"
+          style={{ "--workspace-sidebar-width": `${WORKSPACE_SIDEBAR_WIDTH}px` } as CSSProperties}
+        >
+          <WorkspaceSidebar />
           <Switch>
             <Route path="/">
-              <VerticalTabs />
               <div className="min-w-0 flex-1" />
               <AssistantDrawer
                 open={showAssistant}
@@ -38,14 +45,20 @@ function Main() {
               />
             </Route>
             <Route path="/unified-inbox">
-              <AppMain />
+              <AppMain className="mail-workspace all-mail-page">
+                <UnifiedInbox />
+              </AppMain>
             </Route>
             <Route path="/attachments" component={Attachments} />
-            <Route path="/waiting">
-              <AppMain />
+            <Route path="/waiting" nest>
+              <AppMain className="mail-workspace follow-up-page-container">
+                <FollowUps />
+              </AppMain>
             </Route>
             <Route path="/download-history">
-              <AppMain />
+              <AppMain className="max-w-2xl px-8">
+                <DownloadHistory />
+              </AppMain>
             </Route>
           </Switch>
         </div>

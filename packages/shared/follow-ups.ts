@@ -1,3 +1,5 @@
+export const SCHEDULE_FOLLOW_UP_PATH = "/waiting/new";
+
 export type FollowUpRow = {
   id: string;
   subject: string;

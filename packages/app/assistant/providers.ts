@@ -5,6 +5,7 @@ import {
   type AssistantConnection,
   type AssistantProvider,
   type AssistantModel,
+  type AssistantEffort,
   type ApiProvider,
   type ConnectionState,
 } from "@ggmail/shared/assistant";
@@ -64,7 +65,12 @@ export class AssistantProviders {
           if (bound !== fingerprint) {
             throw new AssistantError(t`The Claude Code account changed. Reconnect in AI settings.`);
           }
-          state = { configured: true, status: "connected", models: cliModels, email };
+          state = {
+            configured: true,
+            status: "connected",
+            models: this.models.length ? this.models : await cliModels(),
+            email,
+          };
         }
       } else if (fs.existsSync(keyPath(provider))) {
         state.configured = true;
@@ -153,18 +159,26 @@ export class AssistantProviders {
     this.chatgpt.cancelSignIn();
   }
 
-  allowsModel(provider: AssistantProvider, model: string) {
+  allowsModel(provider: AssistantProvider, model: string, effort?: AssistantEffort) {
     return (
-      !this.pending && provider === this.provider && this.models.some((entry) => entry.id === model)
+      !this.pending &&
+      provider === this.provider &&
+      this.models.some(
+        (entry) => entry.id === model && (!effort || entry.efforts?.includes(effort)),
+      )
     );
   }
 
   async reply(provider: AssistantProvider, options: ResponseOptions) {
-    if (!this.allowsModel(provider, options.model)) {
+    if (!this.allowsModel(provider, options.model, options.effort)) {
       throw new AssistantError(t`Choose an available model in the mail assistant.`);
     }
     if (provider === "claude-cli") {
-      return claudeCliReply(options, this.settings.get("cliAccount"));
+      const model = this.models.find((entry) => entry.id === options.model);
+      return claudeCliReply(
+        { ...options, model: model?.resolvedId ?? options.model },
+        this.settings.get("cliAccount"),
+      );
     }
     if (provider === "chatgpt") {
       return respond({ ...options, token: await this.chatgpt.accessToken() });

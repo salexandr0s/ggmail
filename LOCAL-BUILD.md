@@ -6,10 +6,12 @@ The macOS bundle, executable and account profile are named `ggmail`. The bundle 
 
 ```sh
 bun install --frozen-lockfile --ignore-scripts
-DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run build:mac:local
+DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run install:mac:local
 ```
 
-The build writes `dist/mac-arm64/ggmail.app` and verifies its ad-hoc signature. It requires no signing credentials.
+The install command builds `dist/mac-arm64/ggmail.app` with the release team's Developer ID Application certificate. It verifies the staged copy, quits the installed app, replaces its bundle and opens it again. The account profile and its persistent partitions live in Application Support. The same Developer ID lets Keychain recognize the updated app when opening encrypted cookies. To build without installing, run `bun run build:mac:local`.
+
+For development on a Mac without that certificate, `bun run build:mac:local --adhoc` writes a test bundle under `dist/adhoc/mac-arm64/`. Launch test bundles with a separate `--user-data-dir`. The GitHub Actions artifact is an ad-hoc intermediate used for verification and release signing. Use the Developer ID-signed download from Releases for an existing account profile.
 
 To build the downloadable Apple Silicon disk image with a Developer ID Application certificate, run `bun run build:mac:dmg`. It writes `dist/ggmail-mac-arm64.dmg`. Set `APPLE_KEYCHAIN_PROFILE` to a configured notarytool profile to notarize the app during packaging.
 
@@ -26,7 +28,7 @@ Open **Settings → AI** and select a mail assistant provider.
 - **OpenAI Subscription (ChatGPT)** uses the existing browser sign-in. Select **Continue with ChatGPT** and allow plan access.
 - **Claude API**, **OpenAI API**, and **DeepSeek AI** each take their own provider's API key. ggmail verifies the key by loading the available models and encrypts the key on this device.
 
-Open the mail assistant using the sparkle button in the title bar.
+Open the mail assistant using the **Mail assistant** button in the title bar.
 Choose a model below the message field. The panel remembers your choice and
 shows the active Gmail view and account in its header.
 
@@ -39,9 +41,9 @@ interrupted request and preserves anything you have typed for your next message.
 When you ask a question, ggmail sends the chat and relevant mail context to
 the selected provider. You can close the sidebar and reopen it in the same mail view to pick up where you left off, including an unfinished message or a reply still coming in. **New chat** clears the conversation. Chat history stays in memory for this app session and clears when you switch providers. Electron's protected storage keeps the ChatGPT connection on this device.
 
-## Calendar
+## Workspace sidebar
 
-Choose **Calendar** in the title bar, **Mail views → Calendar** in a compact window, or **View → Calendar**. With multiple mailboxes, choose the account whose calendar you want to see. Google Calendar opens in a tab beside Gmail in the main window. Select another account in the title bar to see its calendar, or select the Gmail tab to return to mail. Reopening a mailbox’s calendar returns to its existing page. If your Workspace settings send Calendar to the default browser, this shortcut follows that preference.
+The sidebar keeps Mail, Calendar, Bookmarks and Google Tasks in the same order on every mail view. Settings opens from the gear at the bottom. Calendar and Google Tasks open for the selected mailbox. Switch mailboxes in the title bar to switch accounts within either app. Reopening a shortcut returns to its existing tab. Each shortcut follows your Workspace preference for opening that app in the default browser.
 
 ## Attachments
 
@@ -72,10 +74,7 @@ Use `bun run test:e2e --config=playwright.local.config.ts` for the packaged loca
 
 ## Signing and privacy
 
-The `build:mac:local` command signs the app ad hoc. Both main and helper
-processes carry the per-app disable-library-validation entitlement needed to load their
-ad-hoc-signed Electron framework and native addon. DYLD environment-variable access is not
-entitled. System-wide Gatekeeper and other macOS security settings are left unchanged.
+Both the installed executable and its nested helpers are code signed. The installer verifies the Apple certificate chain, Developer ID team and ggmail bundle identifier before it quits the running app.
 
 Cookie encryption is enabled in the local Electron build. Normal macOS Keychain, camera,
 microphone and screen-sharing consent prompts are not suppressed.

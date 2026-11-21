@@ -123,7 +123,7 @@ msgid "{small} to under {large}"
 msgstr "Από {small} έως κάτω από {large}"
 
 #. Tooltip of the tab every link to a Google Workspace app opens in. tabTitle is the page's title; appName is the app's English name, such as Calendar
-#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/components/workspace-tabs.tsx
 msgid "{tabTitle} — opens {appName} links"
 msgstr "{tabTitle} — ανοίγει συνδέσμους {appName}"
 
@@ -327,6 +327,7 @@ msgstr "Ενέργειες λογαριασμού"
 #: packages/app/menu.ts
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
+#: packages/renderer/mail-views.tsx
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Accounts"
 msgstr "Λογαριασμοί"
@@ -442,10 +443,9 @@ msgstr "Όλα τα μηνύματα"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Switch, and a badge on the account, for including the account in All Mail
 #. Title of All Mail page
-#: packages/app/ipc.ts
 #: packages/app/menu.ts
-#: packages/renderer/components/mail-view-navigation.tsx
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/lib/mail-views.ts
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "All Mail"
@@ -547,9 +547,8 @@ msgid "Assistant model"
 msgstr "Μοντέλο βοηθού"
 
 #. A menu or a menu item in ggmail's menu bar
-#: packages/app/ipc.ts
 #: packages/app/menu.ts
-#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/lib/mail-views.ts
 #: packages/renderer/routes/attachments.tsx
 msgid "Attachments"
 msgstr "Συνημμένα"
@@ -560,21 +559,9 @@ msgctxt "launcher display"
 msgid "Auto"
 msgstr "Αυτόματο"
 
-#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit; agrees with the word for placement where the language genders it
-#: packages/shared/workspace-apps.ts
-msgctxt "placement"
-msgid "Auto"
-msgstr "Αυτόματο"
-
 #. Option of a label color's Text color setting; agrees with the word for color where the language genders it
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgctxt "text color"
-msgid "Auto"
-msgstr "Αυτόματο"
-
-#. Option of the Width setting for the vertical tabs sidebar; agrees with the word for width where the language genders it
-#: packages/shared/tabs.ts
-msgctxt "width"
 msgid "Auto"
 msgstr "Αυτόματο"
 
@@ -660,8 +647,6 @@ msgid "Blue"
 msgstr "Μπλε"
 
 #. Button that bookmarks the page on display
-#. Button that bookmarks the page on display
-#: packages/renderer/components/vertical-tabs.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "Bookmark"
 msgstr "Σελιδοδείκτης"
@@ -672,14 +657,10 @@ msgctxt "context menu"
 msgid "Bookmark"
 msgstr "Σελιδοδείκτης"
 
-#: packages/renderer/bookmarks.tsx
-msgid "Bookmark a page with the star on its tab or window titlebar, or from a tab's context menu."
-msgstr "Προσθέστε σελιδοδείκτη από το αστέρι στην καρτέλα ή στη γραμμή τίτλου του παραθύρου, ή από το μενού της καρτέλας."
-
-#. Button in the vertical tabs strip that shows the bookmarks
+#. Heading of the bookmarks popup
 #. Heading of the bookmarks popup
 #: packages/renderer/bookmarks.tsx
-#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
 msgid "Bookmarks"
 msgstr "Σελιδοδείκτες"
 
@@ -714,15 +695,13 @@ msgstr "Αντιγραφή &διεύθυνσης εικόνας"
 msgid "Cached images and files"
 msgstr "Εικόνες και αρχεία στην κρυφή μνήμη"
 
-#. A menu or a menu item in ggmail's menu bar
-#: packages/app/ipc.ts
-#: packages/app/menu.ts
-#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
 msgid "Calendar"
 msgstr "Ημερολόγιο"
 
 #. Button in a dialog asking to confirm a setting change, which leaves the setting as it was
 #: packages/renderer/components/config-select-field.tsx
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/desktop-sources.tsx
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/extensions.tsx
@@ -931,15 +910,12 @@ msgstr "Εκκαθάριση φίλτρων"
 msgid "Clear search"
 msgstr "Εκκαθάριση αναζήτησης"
 
-#. Button that closes the bookmarks popup
-#. Button that closes the recent download history popup
 #. Screen reader label of the button that closes a dialog in Settings
 #. Titlebar button that closes the details of an update ggmail couldn't verify
-#: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/attachments/preview.tsx
+#: packages/renderer/components/popup.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
-#: packages/renderer/recent-download-history.tsx
 msgid "Close"
 msgstr "Κλείσιμο"
 
@@ -956,7 +932,7 @@ msgid "Close"
 msgstr "Κλείσιμο"
 
 #. Button on a tab in the vertical tabs strip that closes the tab
-#: packages/renderer/components/vertical-tabs.tsx
+#: packages/renderer/components/workspace-tabs.tsx
 msgctxt "tab"
 msgid "Close"
 msgstr "Κλείσιμο"
@@ -1079,6 +1055,7 @@ msgid "Contract"
 msgstr "Σύμβαση"
 
 #. Heading of the Gmail page's section about reading an email conversation
+#: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Conversation"
 msgstr "Συνομιλία"
@@ -1325,7 +1302,6 @@ msgid "Cu&t"
 msgstr "Απο&κοπή"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
-#: packages/renderer/components/follow-ups.tsx
 msgid "Current mail view"
 msgstr "Τρέχουσα προβολή αλληλογραφίας"
 
@@ -1363,11 +1339,19 @@ msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Σκούρο"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Default"
+msgstr "Προεπιλογή"
+
 #. Name of the first account until the user renames it, shown wherever accounts are listed
 #: packages/shared/accounts.ts
 msgctxt "account label"
 msgid "Default"
 msgstr "Προεπιλογή"
+
+#: packages/app/assistant/claude-cli.ts
+msgid "Default ({resolvedName})"
+msgstr "Προεπιλογή ({resolvedName})"
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Default download location"
@@ -1856,6 +1840,7 @@ msgstr "Εύρεση εκκρεμοτήτων"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
+#: packages/renderer/components/find-in-page.tsx
 msgid "Find…"
 msgstr "Εύρεση…"
 
@@ -2016,6 +2001,10 @@ msgstr "Μετάβαση πίσω"
 msgid "Go forward"
 msgstr "Μετάβαση εμπρός"
 
+#: packages/renderer/components/workspace-sidebar.tsx
+msgid "Google Tasks"
+msgstr "Google Tasks"
+
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
 msgid "Green"
@@ -2148,6 +2137,10 @@ msgstr "Απόκρυψη του κουμπιού αναβάθμισης στο G
 msgid "Hide upgrade button"
 msgstr "Απόκρυψη κουμπιού αναβάθμισης"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "High"
+msgstr "Υψηλή"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "History"
@@ -2161,11 +2154,6 @@ msgstr "Ορίζει πώς εμφανίζονται οι εφαρμογές σ�
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "How long a tab has to go unused before it hibernates. The active tab, tabs in their own window, and tabs playing audio are left alone."
 msgstr "Χρόνος αδράνειας πριν από την αδρανοποίηση μιας καρτέλας. Εξαιρούνται η ενεργή καρτέλα, οι καρτέλες σε δικά τους παράθυρα και όσες αναπαράγουν ήχο."
-
-#. Auto quotes this setting's option and Reset Width the sidebar's context menu item, so they match those messages' wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back."
-msgstr "Ορίζει το πλάτος της πλαϊνής γραμμής καρτελών. Η αυτόματη ρύθμιση το προσαρμόζει στις ανοιχτές καρτέλες. Το κουμπί στο κάτω μέρος εναλλάσσει το πλάτος για αυτόν τον λογαριασμό μέχρι την έξοδο από το ggmail. Για επαναφορά, κάντε δεξί κλικ στην πλαϊνή γραμμή και επιλέξτε «Επαναφορά πλάτους»."
 
 #. Tabs and New windows quote this setting's options, so they match those options' wording
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -2299,11 +2287,6 @@ msgstr "Εκκίνηση κατά τη σύνδεση"
 msgid "Launch minimized"
 msgstr "Εκκίνηση σε ελαχιστοποίηση"
 
-#. Heading of the settings for the Workspace apps launcher and the bookmarks button
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Launcher and bookmarks"
-msgstr "Εκκίνηση εφαρμογών και σελιδοδείκτες"
-
 #. Setting that picks the Workspace apps in the launcher
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Launcher apps"
@@ -2347,8 +2330,8 @@ msgid "List view"
 msgstr "Προβολή λίστας"
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward."
-msgstr "Εμφάνιση των εφαρμογών Workspace που έχουν δικό τους παράθυρο δίπλα στις καρτέλες, ώστε η πλαϊνή γραμμή να δείχνει όλα όσα είναι ανοιχτά. Κάντε κλικ σε μια εφαρμογή για να φέρετε το παράθυρό της στο προσκήνιο."
+msgid "List Workspace windows alongside open tabs. Select one to bring its window forward."
+msgstr "Εμφάνιση των παραθύρων του Workspace δίπλα στις ανοιχτές καρτέλες. Επιλέξτε ένα παράθυρο για να το φέρετε στο προσκήνιο."
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Load clipped messages in full"
@@ -2399,8 +2382,14 @@ msgstr "Αναζήτηση του «{selection}»"
 msgid "Looking for attachments…"
 msgstr "Αναζήτηση συνημμένων…"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Low"
+msgstr "Χαμηλή"
+
 #. Group of pages in the Settings sidebar
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/lib/mail-views.ts
 msgid "Mail"
 msgstr "Αλληλογραφία"
 
@@ -2459,6 +2448,14 @@ msgstr "Σήμανση του μηνύματος ως αναγνωσμένου �
 msgid "Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so."
 msgstr "Επισήμανση της καρτέλας που ανοίγει όλους τους συνδέσμους μιας εφαρμογής, όπως ορίστηκε από το μενού της καρτέλας. Όταν η επισήμανση είναι απενεργοποιημένη, η καρτέλα συνεχίζει να ανοίγει τους συνδέσμους και η υπόδειξή της το αναφέρει."
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Max"
+msgstr "Μέγιστη"
+
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Medium"
+msgstr "Μέτρια"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Menu bar icon"
 msgstr "Εικονίδιο γραμμής μενού"
@@ -2471,6 +2468,10 @@ msgstr "Μήνυμα"
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Μήνυμα στον βοηθό αλληλογραφίας"
+
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "Minimal"
+msgstr "Ελάχιστη"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -2528,15 +2529,6 @@ msgstr "Μετακίνηση σε καρτέλα"
 #: packages/renderer/components/attachments/detail-filters.tsx
 msgid "Name or email address"
 msgstr "Όνομα ή διεύθυνση email"
-
-#. Option of the Width setting for the vertical tabs sidebar
-#: packages/shared/tabs.ts
-msgid "Narrow"
-msgstr "Στενό"
-
-#: packages/renderer/components/vertical-tabs.tsx
-msgid "Narrow the tab strip"
-msgstr "Στένεμα γραμμής καρτελών"
 
 #. Heading of the Settings section about going back and forward between pages
 #: packages/renderer/routes/settings/general.tsx
@@ -2677,6 +2669,10 @@ msgstr "Δεν υπάρχουν ακόμη αξιόπιστοι ιστότοπο
 msgid "No unread messages"
 msgstr "Δεν υπάρχουν μη αναγνωσμένα μηνύματα"
 
+#: packages/renderer/components/assistant/effort-picker.tsx
+msgid "None"
+msgstr "Καμία"
+
 #. The account's color when no color is picked; agrees with the word for color where the language genders it
 #: packages/renderer/routes/settings/accounts.tsx
 msgctxt "account color"
@@ -2788,11 +2784,6 @@ msgstr "Ανοίξτε και ξεκλειδώστε ξανά το 1Password."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password."
 msgstr "Ανοίξτε και ξεκλειδώστε το 1Password."
-
-#. Button in the vertical tabs strip that opens the launcher of Google Workspace apps
-#: packages/renderer/components/workspace-apps-launcher.tsx
-msgid "Open app"
-msgstr "Άνοιγμα εφαρμογής"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/attachments/files.tsx
@@ -3009,11 +3000,6 @@ msgstr "Καρφίτσωμα"
 msgid "Pink"
 msgstr "Ροζ"
 
-#. Setting for where the Workspace apps launcher and the bookmarks button sit
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Placement"
-msgstr "Τοποθέτηση"
-
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Play a sound when showing a notification."
 msgstr "Αναπαραγωγή ήχου κατά την εμφάνιση ειδοποίησης."
@@ -3108,6 +3094,11 @@ msgstr "Ανάγνωση του «{subject}»"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reading this conversation"
 msgstr "Ανάγνωση αυτής της συνομιλίας"
+
+#: packages/renderer/components/assistant/effort-picker.tsx
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Reasoning effort"
+msgstr "Ένταση συλλογισμού"
 
 #: packages/renderer/components/attachments/categories.tsx
 msgid "Receipt"
@@ -3211,9 +3202,7 @@ msgstr "Κατάργηση λογαριασμού…"
 
 #. Button on a bookmark in the bookmarks popup that removes it
 #. Button that removes the bookmark of the page on display
-#. Button that removes the bookmark of the page on display
 #: packages/renderer/bookmarks.tsx
-#: packages/renderer/components/vertical-tabs.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "Remove bookmark"
 msgstr "Κατάργηση σελιδοδείκτη"
@@ -3291,11 +3280,6 @@ msgstr "Επαναφορά εφαρμογής"
 msgid "Reset ggmail to its original state?"
 msgstr "Επαναφορά του ggmail στην αρχική κατάσταση;"
 
-#. Context menu item that resets the width of the vertical tabs strip
-#: packages/app/ipc.ts
-msgid "Reset Width"
-msgstr "Επαναφορά πλάτους"
-
 #. Button on the toast after a setting changes, which restarts ggmail now
 #. Dialog button that restarts ggmail
 #. Dialog button that restarts ggmail
@@ -3342,6 +3326,10 @@ msgstr "Αντιστροφή σειράς συνομιλίας"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reviewing the mail results"
 msgstr "Εξέταση αποτελεσμάτων αλληλογραφίας"
+
+#: packages/renderer/bookmarks.tsx
+msgid "Right-click a Workspace tab and choose Bookmark to save its page here."
+msgstr "Κάντε δεξί κλικ σε μια καρτέλα του Workspace και επιλέξτε «Σελιδοδείκτης» για να αποθηκεύσετε τη σελίδα εδώ."
 
 #. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
@@ -3565,6 +3553,7 @@ msgstr "Ρύθμιση βοηθού αλληλογραφίας"
 
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "Ρυθμίσεις"
@@ -3653,15 +3642,6 @@ msgstr "Εμφάνιση αριθμού μη αναγνωσμένων δίπλα
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Show app links badge"
 msgstr "Εμφάνιση σήματος συνδέσμων εφαρμογής"
-
-#: packages/renderer/components/app-titlebar.tsx
-#: packages/renderer/components/vertical-tabs.tsx
-msgid "Show bookmarks"
-msgstr "Εμφάνιση σελιδοδεικτών"
-
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show bookmarks button"
-msgstr "Εμφάνιση κουμπιού σελιδοδεικτών"
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show Do Not Disturb button"
@@ -3814,15 +3794,6 @@ msgctxt "Windows"
 msgid "Show the application icon in the system tray."
 msgstr "Εμφάνιση του εικονιδίου της εφαρμογής στην περιοχή ειδοποιήσεων."
 
-#. Reset Width quotes the sidebar's context menu item and Width the setting above, so they match those messages' wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above."
-msgstr "Εμφάνιση κουμπιού αλλαγής πλάτους στο κάτω μέρος της πλαϊνής γραμμής. Αν είναι κρυφό, χρησιμοποιήστε την «Επαναφορά πλάτους» από το μενού της πλαϊνής γραμμής ή την παραπάνω ρύθμιση πλάτους."
-
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show the button that opens bookmarks."
-msgstr "Εμφάνιση του κουμπιού που ανοίγει τους σελιδοδείκτες."
-
 #. Automatic is this setting's first option; dwm, i3 and sway are window managers
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show the close, minimize and maximize buttons in the titlebar. Automatic hides them on window managers without decorations, such as dwm, i3 and sway."
@@ -3864,23 +3835,18 @@ msgid "Show unread messages from your accounts in one place."
 msgstr "Δείτε τα μη αναγνωσμένα μηνύματα των λογαριασμών σας σε ένα μέρος."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Show width button"
-msgstr "Εμφάνιση κουμπιού πλάτους"
-
-#: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Show windows"
 msgstr "Εμφάνιση παραθύρων"
 
-#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
-#: packages/shared/workspace-apps.ts
-msgid "Sidebar"
-msgstr "Πλαϊνή γραμμή"
-
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Sign in"
 msgstr "Σύνδεση"
 
 #: packages/renderer/components/inbox-accounts.tsx
+#: packages/renderer/mail-views.tsx
 msgid "Sign in to {label}"
 msgstr "Σύνδεση στον λογαριασμό {label}"
 
@@ -4087,6 +4053,8 @@ msgstr "Εικονίδιο περιοχής ειδοποιήσεων"
 #. A menu or a menu item in ggmail's menu bar
 #. Option of the Workspace apps Mode setting: whether Workspace apps open as tabs in the main window or in windows of their own
 #: packages/app/menu.ts
+#: packages/renderer/components/workspace-tabs.tsx
+#: packages/renderer/routes/settings/workspace-apps.tsx
 #: packages/shared/workspace-apps.ts
 msgid "Tabs"
 msgstr "Καρτέλες"
@@ -4220,9 +4188,7 @@ msgid "Ticket"
 msgstr "Εισιτήριο"
 
 #. Heading of the Appearance section for the bar along the top of ggmail's window
-#. Option of the Placement setting: where the Workspace apps launcher and the bookmarks button sit
 #: packages/renderer/routes/settings/appearance.tsx
-#: packages/shared/workspace-apps.ts
 msgid "Titlebar"
 msgstr "Γραμμή τίτλου"
 
@@ -4308,8 +4274,8 @@ msgstr "Άγνωστος αποστολέας"
 
 #. Unpinned tabs and Selected tabs quote this setting's options and Hibernate When Idle the tab's context menu item, so they match those messages' wording
 #: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place in the sidebar and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
-msgstr "Αποδέσμευση μνήμης από καρτέλες που παραμένουν ανενεργές. Οι καρτέλες σε αδρανοποίηση κρατούν τη θέση τους στην πλαϊνή γραμμή και ανοίγουν ξανά στην ίδια σελίδα όταν τις επιλέγετε. Με την επιλογή «Μη καρφιτσωμένες καρτέλες» οι καρφιτσωμένες παραμένουν φορτωμένες. Με την επιλογή «Επιλεγμένες καρτέλες» αδρανοποιούνται μόνο όσες επισημάνετε. Μπορείτε να αλλάξετε τη συμπεριφορά κάθε καρτέλας από την επιλογή αδρανοποίησης στο μενού της."
+msgid "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
+msgstr "Αποδέσμευση μνήμης από καρτέλες που παραμένουν ανενεργές. Οι καρτέλες σε αδρανοποίηση κρατούν τη θέση τους και ανοίγουν ξανά στην ίδια σελίδα όταν τις επιλέγετε. Με την επιλογή «Μη καρφιτσωμένες καρτέλες» οι καρφιτσωμένες παραμένουν φορτωμένες. Με την επιλογή «Επιλεγμένες καρτέλες» αδρανοποιούνται μόνο όσες επισημάνετε. Μπορείτε να αλλάξετε τη συμπεριφορά κάθε καρτέλας από την επιλογή αδρανοποίησης στο μενού της."
 
 #: packages/app/assistant/connection.ts
 msgid "Unlock your system credential store to connect the assistant."
@@ -4340,6 +4306,8 @@ msgstr "Σήμα μη αναγνωσμένων"
 msgid "Unread count preference"
 msgstr "Προτίμηση αριθμού μη αναγνωσμένων"
 
+#: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/mail-views.tsx
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Unread messages"
 msgstr "Μη αναγνωσμένα μηνύματα"
@@ -4348,10 +4316,6 @@ msgstr "Μη αναγνωσμένα μηνύματα"
 #: packages/app/do-not-disturb.ts
 msgid "Until Tomorrow"
 msgstr "Μέχρι αύριο"
-
-#: packages/renderer/components/inbox-accounts.tsx
-msgid "Up to date"
-msgstr "Ενημερωμένο"
 
 #. Titlebar button that shows the details of a downloaded update, ready to install
 #: packages/renderer/components/app-titlebar.tsx
@@ -4413,11 +4377,6 @@ msgstr "Κωδικοί επαλήθευσης"
 msgid "Version {installedVersion}"
 msgstr "Έκδοση {installedVersion}"
 
-#. Heading of the settings for the vertical tabs sidebar
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Vertical tabs"
-msgstr "Κάθετες καρτέλες"
-
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgctxt "Linux"
@@ -4460,10 +4419,9 @@ msgid "Waiting for {modelName}"
 msgstr "Αναμονή για το {modelName}"
 
 #. A menu or a menu item in ggmail's menu bar
-#: packages/app/ipc.ts
 #: packages/app/menu.ts
 #: packages/renderer/components/follow-ups.tsx
-#: packages/renderer/components/mail-view-navigation.tsx
+#: packages/renderer/lib/mail-views.ts
 msgid "Waiting for reply"
 msgstr "Σε αναμονή απάντησης"
 
@@ -4475,10 +4433,6 @@ msgstr "Αναμονή για την προβολή αλληλογραφίας�
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Waiting to sync"
 msgstr "Αναμονή για συγχρονισμό"
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "What can I help you with?"
-msgstr "Πώς μπορώ να βοηθήσω;"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Titlebar button beside a downloaded update that opens the version history
@@ -4505,11 +4459,6 @@ msgstr "Πότε να γίνεται αντιγραφή"
 msgid "Where downloaded files are saved."
 msgstr "Τοποθεσία αποθήκευσης ληφθέντων αρχείων."
 
-#. Auto, Sidebar and Titlebar quote this setting's options, so they match those options' wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Where the launcher and the bookmarks button sit. Auto moves them to the bottom of the vertical tabs sidebar while it is shown. Sidebar keeps them there and holds the sidebar open even with a single tab, and Titlebar keeps them in the titlebar at all times."
-msgstr "Ορίζει τη θέση της εκκίνησης εφαρμογών και των σελιδοδεικτών. Η αυτόματη ρύθμιση τα μεταφέρει στο κάτω μέρος της πλαϊνής γραμμής όταν εμφανίζονται κάθετες καρτέλες. Η επιλογή «Πλαϊνή γραμμή» τα κρατά εκεί ακόμη και με μία καρτέλα. Η επιλογή «Γραμμή τίτλου» τα διατηρεί πάντα στη γραμμή τίτλου."
-
 #: packages/app/protocol/index.ts
 msgid "Which account should compose this email?"
 msgstr "Από ποιον λογαριασμό θέλετε να συντάξετε το μήνυμα;"
@@ -4522,20 +4471,6 @@ msgstr "Με ποιον λογαριασμό θέλετε να ανοίξετε 
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "White"
 msgstr "Λευκό"
-
-#. Option of the Width setting for the vertical tabs sidebar
-#: packages/shared/tabs.ts
-msgid "Wide"
-msgstr "Πλατύ"
-
-#: packages/renderer/components/vertical-tabs.tsx
-msgid "Widen the tab strip"
-msgstr "Διεύρυνση γραμμής καρτελών"
-
-#. Setting for how wide the vertical tabs sidebar is
-#: packages/renderer/routes/settings/workspace-apps.tsx
-msgid "Width"
-msgstr "Πλάτος"
 
 #. Heading of the Appearance section about ggmail's window
 #: packages/renderer/routes/settings/appearance.tsx
@@ -4576,6 +4511,7 @@ msgstr "Εργασία"
 
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Notifications section about notifications from Workspace apps
+#: packages/renderer/components/workspace-sidebar.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Workspace apps"
@@ -4585,6 +4521,10 @@ msgstr "Εφαρμογές Workspace"
 #: packages/shared/accounts.ts
 msgid "Yellow"
 msgstr "Κίτρινο"
+
+#: packages/renderer/components/follow-ups.tsx
+msgid "You can schedule a follow-up when you sent the last message."
+msgstr "Μπορείτε να προγραμματίσετε υπενθύμιση αν στείλατε εσείς το τελευταίο μήνυμα."
 
 #. Accessible description of the unread badge on ggmail's taskbar button on Windows
 #: packages/app/ipc.ts
@@ -4612,10 +4552,6 @@ msgstr "Εξαντλήθηκε το όριο χρήσης του ChatGPT. Δοκ
 #: packages/app/ipc.ts
 msgid "Your test notification request"
 msgstr "Το αίτημά σας για δοκιμαστική ειδοποίηση"
-
-#: packages/renderer/components/follow-ups.tsx
-msgid "You can schedule a follow-up when you sent the last message."
-msgstr "Μπορείτε να προγραμματίσετε υπενθύμιση αν στείλατε εσείς το τελευταίο μήνυμα."
 
 #. Window menu item that toggles the window between its size and filling the screen
 #: packages/app/menu.ts

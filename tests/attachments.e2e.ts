@@ -99,6 +99,7 @@ let changedWork = false;
 let workListings = 0;
 let workSearchStarts = 0;
 let handoverThumbnails = 0;
+let searchImageRequests = 0;
 let fileRequests = 0;
 
 test.beforeEach(() => {
@@ -117,6 +118,7 @@ test.beforeEach(() => {
   workListings = 0;
   workSearchStarts = 0;
   handoverThumbnails = 0;
+  searchImageRequests = 0;
   fileRequests = 0;
 });
 
@@ -204,6 +206,12 @@ const server = createServer(async (request, response) => {
     );
     return;
   }
+  if (url.pathname === "/mail/u/0/search-image") {
+    searchImageRequests++;
+    response.setHeader("Content-Type", "image/png");
+    response.end(await readFile(picture));
+    return;
+  }
   if (url.pathname === "/mail/u/0/listing") {
     if (work) {
       workListings++;
@@ -223,6 +231,11 @@ const server = createServer(async (request, response) => {
     let started = false;
     async function render() {
       if (!location.hash.startsWith('#search/')) return;
+      if (!started) {
+        const image = new Image();
+        image.src = '/mail/u/0/search-image';
+        document.querySelector('main').append(image);
+      }
       const path = started ? '/mail/u/0/listing' : '/mail/u/0/listing?start';
       started = true;
       while ((await (await fetch(path)).json()).hold) await new Promise(resolve => setTimeout(resolve, 100));
@@ -602,16 +615,19 @@ test("filters by exact extension, sender, size and received dates, and recovers 
   await page.keyboard.press("Escape");
   await expect(ext).toBeFocused();
   await expect(menu).toBeVisible();
-  const gap = await ext.evaluate((button) => {
+  const spacing = await ext.evaluate((button) => {
     const value = button.querySelector('[data-slot="select-value"]');
     const arrow = button.querySelector("svg");
     if (!value || !arrow) {
       throw new Error("Missing select value or chevron");
     }
-    return arrow.getBoundingClientRect().left - value.getBoundingClientRect().right;
+    return {
+      gap: arrow.getBoundingClientRect().left - value.getBoundingClientRect().right,
+      inset: button.getBoundingClientRect().right - arrow.getBoundingClientRect().right,
+    };
   });
-  expect(gap).toBeGreaterThanOrEqual(3);
-  expect(gap).toBeLessThanOrEqual(10);
+  expect(spacing.gap).toBeGreaterThanOrEqual(3);
+  expect(spacing.inset).toBeLessThanOrEqual(12);
   await choose(ext, /^\.xlsx /);
   await choose(size, /^Under 1 MB/);
   await from.fill("2026-11-17");
@@ -854,6 +870,7 @@ test("reuses the Gmail search document and loaded thumbnails across layouts", as
   await page.getByRole("button", { name: "Attachments", exact: true }).click();
   await expect(page.getByText("10 files", { exact: true })).toBeVisible();
   expect(workSearchStarts).toBe(1);
+  expect(searchImageRequests).toBe(0);
   await page.getByRole("searchbox").fill("Project handover.pdf");
   await expect(page.locator(".attachment-miniature img")).toBeVisible();
   expect(handoverThumbnails).toBe(1);
@@ -1081,7 +1098,7 @@ test("compact windows keep filters, file actions and keyboard navigation reachab
       .find((w) => w.webContents.getURL().includes("main.html"))
       ?.setSize(320, 600);
   });
-  await expect.poll(() => page.getByRole("main").evaluate((el) => el.clientWidth)).toBe(320);
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(320);
   await page.getByRole("button", { name: "Grid view" }).click();
   await expect(page.getByRole("listitem").first()).toBeInViewport();
   expect(

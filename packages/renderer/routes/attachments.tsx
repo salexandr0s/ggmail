@@ -371,18 +371,13 @@ export function Attachments() {
   return (
     <main
       aria-label={t`Attachments`}
-      className="attachment-library @container/library flex min-h-0 min-w-0 flex-1 flex-col bg-background"
+      className="mail-workspace attachment-library @container/library flex min-h-0 min-w-0 flex-1 flex-col bg-background"
     >
       <header className="attachment-header">
-        <div className="attachment-heading">
-          <span className="attachment-library-icon">
-            <PaperclipIcon aria-hidden="true" />
-          </span>
-          <h1>
-            <Trans>Attachments</Trans>
-          </h1>
-        </div>
-        <InputGroup className="attachment-search">
+        <h1 className="page-heading-title">
+          <Trans>Attachments</Trans>
+        </h1>
+        <InputGroup className="mail-search-field attachment-search">
           <InputGroupAddon>
             <SearchIcon />
           </InputGroupAddon>
@@ -431,8 +426,8 @@ export function Attachments() {
           {filters}
         </aside>
         <section aria-label={t`All files`} className="attachment-results @container/results">
-          <div className="attachment-type-bar hidden @min-[54rem]/library:block">{formats}</div>
           <div className="attachment-results-panel">
+            <div className="attachment-type-bar hidden @min-[54rem]/library:block">{formats}</div>
             <div className="attachment-toolbar">
               <h2
                 aria-live="polite"
@@ -633,7 +628,7 @@ export function Attachments() {
                   </ul>
                 </>
               ) : (
-                <Empty className="attachment-empty">
+                <Empty>
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
                       {loading ? (
