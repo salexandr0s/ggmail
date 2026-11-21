@@ -1,31 +1,10 @@
 .attachment-library,
 .attachment-filter-popover {
   color-scheme: light;
-  --library-ink: light-dark(#355e61, #a2d0c9);
-  --library-tint: light-dark(#e7f1ee, #243b39);
-  --library-edge: light-dark(#c8dbd7, #3c5955);
 }
 
 .dark :is(.attachment-library, .attachment-filter-popover) {
   color-scheme: dark;
-}
-
-[data-attachment-category="contract"] {
-  --category-ink: light-dark(#6b467a, #d6bddd);
-  --category-tint: light-dark(#f2eaf6, #392e41);
-}
-:is([data-attachment-category="ticket"], [data-attachment-category="booking"]) {
-  --category-ink: light-dark(#345c84, #b2d1f2);
-  --category-tint: light-dark(#e9f1fa, #263849);
-}
-[data-attachment-category="order"] {
-  --category-ink: light-dark(#795722, #e2c491);
-  --category-tint: light-dark(#f7efdf, #3d3528);
-}
-.attachment-facets
-  button:not([aria-pressed="true"])
-  [data-attachment-category]:not([data-attachment-category="uncategorized"]) {
-  color: var(--category-ink, var(--library-ink));
 }
 
 .attachment-header {
@@ -58,8 +37,8 @@
   height: 2.65rem;
   place-items: center;
   border-radius: 0.85rem;
-  background: var(--library-tint);
-  color: var(--library-ink);
+  background: var(--muted);
+  color: var(--foreground);
 }
 .attachment-library-icon svg {
   width: 1.4rem;
@@ -114,8 +93,8 @@
   font-weight: 450;
 }
 .attachment-facets button[aria-pressed="true"] {
-  color: var(--library-ink);
-  background: var(--library-tint);
+  color: var(--accent-foreground);
+  background: var(--accent);
   font-weight: 630;
 }
 .attachment-facets button[aria-pressed="true"] span:last-child {
@@ -221,10 +200,10 @@
   gap: 0.35rem;
   max-width: min(13rem, 100%);
   min-height: 1.6rem;
-  border: 1px solid var(--library-edge);
+  border: 1px solid var(--border);
   border-radius: 2rem;
   background: var(--background);
-  color: var(--library-ink);
+  color: var(--foreground);
   padding-inline: 0.55rem;
   font-size: 0.73rem;
   font-weight: 550;
@@ -235,10 +214,10 @@
   height: 0.78rem;
 }
 .attachment-filter-chip:hover {
-  background: var(--library-tint);
+  background: var(--accent);
 }
 .attachment-filter-chip:focus-visible {
-  outline: 2px solid var(--library-ink);
+  outline: 2px solid var(--ring);
   outline-offset: 1px;
 }
 
@@ -272,7 +251,7 @@
   font-weight: 400;
 }
 .attachment-detail-filters :is(input, [data-slot="select-trigger"]):focus-visible {
-  outline: 2px solid var(--library-ink);
+  outline: 2px solid var(--ring);
   outline-offset: 1px;
 }
 .attachment-date-range {

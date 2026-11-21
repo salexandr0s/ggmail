@@ -92,7 +92,7 @@ export function LibraryFilters({
               key={value}
               label={categoryLabels[value]}
               active={selected}
-              icon={<Icon data-attachment-category={value} />}
+              icon={<Icon />}
               count={categoryCounts.values.get(value) ?? 0}
               onClick={() => onCategory(value)}
             />

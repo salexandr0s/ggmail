@@ -1,6 +1,5 @@
 import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
 import {
-  fileKind,
   type AttachmentAction,
   type AttachmentCategory,
   type MailAttachment,
@@ -171,7 +170,7 @@ export function FileItem({
   );
   if (grid) {
     return (
-      <li className="attachment-card" data-kind={fileKind(item.name)}>
+      <li className="attachment-card">
         <FileThumbnail item={item} large>
           <FileMark name={item.name} large />
         </FileThumbnail>

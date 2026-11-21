@@ -1,32 +1,32 @@
 /* Only the file mark carries format color. Controls follow the current ggmail theme. */
-:is(.attachment-mark, .attachment-card)[data-kind="pdf"] {
+.attachment-mark[data-kind="pdf"] {
   --file-ink: #ac464e;
 }
-:is(.attachment-mark, .attachment-card)[data-kind="document"] {
+.attachment-mark[data-kind="document"] {
   --file-ink: #366ca4;
 }
-:is(.attachment-mark, .attachment-card)[data-kind="sheet"] {
+.attachment-mark[data-kind="sheet"] {
   --file-ink: #287451;
 }
-:is(.attachment-mark, .attachment-card)[data-kind="image"] {
+.attachment-mark[data-kind="image"] {
   --file-ink: #8058a5;
 }
-:is(.attachment-mark, .attachment-card)[data-kind="other"] {
+.attachment-mark[data-kind="other"] {
   --file-ink: #606b78;
 }
-.dark :is(.attachment-mark, .attachment-card)[data-kind="pdf"] {
+.dark .attachment-mark[data-kind="pdf"] {
   --file-ink: #eaa0a5;
 }
-.dark :is(.attachment-mark, .attachment-card)[data-kind="document"] {
+.dark .attachment-mark[data-kind="document"] {
   --file-ink: #91b9e3;
 }
-.dark :is(.attachment-mark, .attachment-card)[data-kind="sheet"] {
+.dark .attachment-mark[data-kind="sheet"] {
   --file-ink: #91c8a9;
 }
-.dark :is(.attachment-mark, .attachment-card)[data-kind="image"] {
+.dark .attachment-mark[data-kind="image"] {
   --file-ink: #c4a5df;
 }
-.dark :is(.attachment-mark, .attachment-card)[data-kind="other"] {
+.dark .attachment-mark[data-kind="other"] {
   --file-ink: #b6bfca;
 }
 
@@ -144,16 +144,16 @@
   color: var(--muted-foreground);
 }
 .attachment-category-picker[data-slot][data-assigned="true"] {
-  color: var(--category-ink, var(--library-ink));
-  background: var(--category-tint, var(--library-tint));
+  color: var(--foreground);
+  background: var(--muted);
 }
 .attachment-category-picker:hover,
 .attachment-category-picker:focus-within {
-  border-color: var(--library-edge);
-  color: var(--library-ink);
+  border-color: var(--input);
+  color: var(--foreground);
 }
 .attachment-category-picker:focus-within {
-  outline: 2px solid var(--library-ink);
+  outline: 2px solid var(--ring);
   outline-offset: 1px;
 }
 .attachment-subject {
@@ -317,7 +317,7 @@
   overflow: hidden;
   height: 7.5rem;
   border-radius: calc(calc(var(--radius) * 1.4) - 1px) calc(calc(var(--radius) * 1.4) - 1px) 0 0;
-  background: color-mix(in srgb, var(--file-ink) 9%, var(--sidebar));
+  background: var(--sidebar);
   border-bottom: 1px solid var(--border);
 }
 
