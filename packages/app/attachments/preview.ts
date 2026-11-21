@@ -31,7 +31,10 @@ const previewTypes: Record<string, string> = {
 export class AttachmentThumbnails {
   private images = new Map<AttachmentEntry, AttachmentPreview>();
   private bytes = 0;
-  private pending = new Map<AttachmentEntry, { visit: AbortSignal; request: Promise<AttachmentPreview | null> }>();
+  private pending = new Map<
+    AttachmentEntry,
+    { visit: AbortSignal; request: Promise<AttachmentPreview | null> }
+  >();
 
   get(entry: AttachmentEntry, visit: AbortSignal, read: () => Promise<AttachmentPreview | null>) {
     const cached = this.images.get(entry);
@@ -44,24 +47,26 @@ export class AttachmentThumbnails {
     if (pending?.visit === visit) {
       return pending.request;
     }
-    const request = read().then((preview) => {
-      if (preview && !visit.aborted) {
-        this.images.set(entry, preview);
-        this.bytes += preview.bytes.byteLength;
-        for (const [oldest, image] of this.images) {
-          if (this.bytes <= 8 * 1024 * 1024 && this.images.size <= 128) {
-            break;
+    const request = read()
+      .then((preview) => {
+        if (preview && !visit.aborted) {
+          this.images.set(entry, preview);
+          this.bytes += preview.bytes.byteLength;
+          for (const [oldest, image] of this.images) {
+            if (this.bytes <= 8 * 1024 * 1024 && this.images.size <= 128) {
+              break;
+            }
+            this.images.delete(oldest);
+            this.bytes -= image.bytes.byteLength;
           }
-          this.images.delete(oldest);
-          this.bytes -= image.bytes.byteLength;
         }
-      }
-      return preview;
-    }).finally(() => {
-      if (this.pending.get(entry)?.request === request) {
-        this.pending.delete(entry);
-      }
-    });
+        return preview;
+      })
+      .finally(() => {
+        if (this.pending.get(entry)?.request === request) {
+          this.pending.delete(entry);
+        }
+      });
     this.pending.set(entry, { visit, request });
     return request;
   }

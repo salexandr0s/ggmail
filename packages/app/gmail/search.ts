@@ -125,6 +125,9 @@ export function createSearchView(session: Session, userAgent: string, mailbox: s
       } else {
         await webContents.loadURL(url.href);
       }
+      // Reused views often replace the rows on the next frame. Back off when
+      // Gmail is slow so waiting on a mailbox does not keep scanning its DOM.
+      let pollDelay = ms("16ms");
       while (true) {
         stop.throwIfAborted();
         const current = URL.parse(webContents.getURL());
@@ -149,7 +152,8 @@ export function createSearchView(session: Session, userAgent: string, mailbox: s
             }
           }
         }
-        await delay(ms("250ms"), undefined, { signal: stop });
+        await delay(pollDelay, undefined, { signal: stop });
+        pollDelay = Math.min(pollDelay * 2, ms("250ms"));
       }
     } finally {
       stop.removeEventListener("abort", close);

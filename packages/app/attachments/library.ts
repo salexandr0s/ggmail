@@ -1,10 +1,7 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail selectors, request parameters and IPC errors. The renderer localizes status messages. */
 import { createHash } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
-import type {
-  AttachmentBatch,
-  AttachmentCategory,
-} from "@ggmail/shared/attachments";
+import type { AttachmentBatch, AttachmentCategory } from "@ggmail/shared/attachments";
 import { ms } from "@ggmail/shared/ms";
 import type { Gmail } from "@/gmail";
 import { fetchPrintThread } from "@/gmail/print-thread";
@@ -156,14 +153,26 @@ class AttachmentLibrary {
       throw new Error("Attachment unavailable");
     }
     const read = async () => {
-      const signal = AbortSignal.any([this.lifetime.signal, visit.signal, AbortSignal.timeout(ms("30s"))]);
-      const preview = await readAttachmentPreview(this.gmail.session, this.mailbox, entry, size, signal);
+      const signal = AbortSignal.any([
+        this.lifetime.signal,
+        visit.signal,
+        AbortSignal.timeout(ms("30s")),
+      ]);
+      const preview = await readAttachmentPreview(
+        this.gmail.session,
+        this.mailbox,
+        entry,
+        size,
+        signal,
+      );
       if (preview || size === "thumbnail" || entry.downloadUrl) {
         return preview;
       }
       signal.throwIfAborted();
       const live = await this.liveEntry(fileId);
-      return live ? await readAttachmentPreview(this.gmail.session, this.mailbox, live, size, signal) : null;
+      return live
+        ? await readAttachmentPreview(this.gmail.session, this.mailbox, live, size, signal)
+        : null;
     };
     return size === "thumbnail" ? this.thumbnails.get(entry, visit.signal, read) : read();
   }

@@ -67,12 +67,16 @@ export function useAttachmentFiles(scope: string, refresh: number) {
             indexes.set(id, index);
           }
           const hadFiles = index.files.size > 0;
-          const changed = replace || data.files.length || data.removedIds?.length || index.status !== data.status;
+          const changed =
+            replace || data.files.length || data.removedIds?.length || index.status !== data.status;
           for (const fileId of data.removedIds ?? []) {
             index.files.delete(fileId);
           }
           for (const file of data.files) {
-            index.files.set(file.id, indexAttachment({ ...file, accountId: id, mailboxKey: data.mailboxKey }));
+            index.files.set(
+              file.id,
+              indexAttachment({ ...file, accountId: id, mailboxKey: data.mailboxKey }),
+            );
           }
           index.status = data.status;
           if (changed) {
