@@ -41,7 +41,7 @@ the selected provider. You can close the sidebar and reopen it in the same mail 
 
 ## Calendar
 
-Choose **Calendar** in the title bar, **Mail views → Calendar** in a compact window, or **View → Calendar**. Google Calendar opens full screen using the selected mailbox’s sign-in. Choosing Calendar again brings its open window forward. Close the window to return to mail, or choose **More options → Exit full screen** to keep Calendar alongside your inbox. If your Workspace settings send Calendar to the default browser, this shortcut follows that preference.
+Choose **Calendar** in the title bar, **Mail views → Calendar** in a compact window, or **View → Calendar**. With multiple mailboxes, choose the account whose calendar you want to see. Google Calendar opens in a tab beside Gmail in the main window. Select another account in the title bar to see its calendar, or select the Gmail tab to return to mail. Reopening a mailbox’s calendar returns to its existing page. If your Workspace settings send Calendar to the default browser, this shortcut follows that preference.
 
 ## Attachments
 

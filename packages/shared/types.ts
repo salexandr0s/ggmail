@@ -255,7 +255,7 @@ export type IpcMainEvents =
       "gmail.openMessage": [messageId: string, accountId?: string];
       "gmail.messageHandled": [requestId: string, success: boolean];
       "titleBar.chooseMailView": [value: string | null];
-      "titleBar.openCalendar": [];
+      "titleBar.openCalendar": [anchor: { x: number; y: number }];
       "titleBar.showMailViews": [anchor: { x: number; y: number }];
       "titleBar.toggleAppMenu": [anchor?: { x: number; y: number }];
       "window.focusActiveView": [];

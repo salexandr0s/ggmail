@@ -423,6 +423,20 @@ class Accounts {
     }
   }
 
+  openAccountPage(accountId: string) {
+    if (
+      main.location === "/" &&
+      this.getSelectedAccount().instance.tabs.activeTab.app === "calendar"
+    ) {
+      this.getAccount(accountId).instance.tabs.openCalendar();
+      return;
+    }
+    this.selectAccount(accountId);
+    if (main.location !== "/") {
+      main.navigate("/");
+    }
+  }
+
   selectAccount(selectedAccountId: string) {
     config.set(
       "accounts",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.65.4 — 2026-11-21
+
+- Calendar opens as a tab in the main ggmail window. Choose a mailbox when opening Calendar, or switch accounts from the title bar while viewing it. Each mailbox keeps its own Calendar page.
+
 ## 3.65.3 — 2026-11-21
 
 - Open Calendar from the title bar or Mail views to see the selected account’s Google Calendar full screen. Reopening Calendar brings its existing window forward.

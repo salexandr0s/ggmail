@@ -154,7 +154,7 @@ export class Tabs {
 
   private recentlyClosedTabUrls: string[] = [];
 
-  private calendarWindowId?: string;
+  private calendarTabId?: string;
 
   constructor(accountId: string, gmail: Gmail) {
     this.accountId = accountId;
@@ -249,24 +249,35 @@ export class Tabs {
 
   openCalendar() {
     const url = new URL("/calendar/u/0/r", getWorkspaceAppUrl("calendar")).href;
+    const account = accounts.getAccount(this.accountId);
     if (!canOpenWorkspaceAppInApp("calendar")) {
-      openExternalUrl(url, { skipTrustedHostCheck: true });
+      const browserUrl = new URL("/calendar/r", url);
+      if (account.instance.gmail.userEmail) {
+        browserUrl.searchParams.set("authuser", account.instance.gmail.userEmail);
+      }
+      openExternalUrl(browserUrl.href, { skipTrustedHostCheck: true });
       return;
     }
 
-    // Calendar can be sitting on Google's sign-in page when the shortcut is used again.
-    const existing = WorkspaceApp.getAccountWindowedInstances(this.accountId)
-      .reverse()
-      .find(
-        (tab) =>
-          !tab.isPopup &&
-          (tab.app === "calendar" ||
-            (tab.id === this.calendarWindowId && tab.url.startsWith(`${GOOGLE_ACCOUNTS_URL}/`))),
-      );
-    const calendar = existing ?? this.openWindowedTab(url);
-    this.calendarWindowId = calendar.id;
-    calendar.focusWindow();
-    calendar.window.setFullScreen(true);
+    const existing = [this.activeTab, ...this.tabs].find(
+      (tab) =>
+        ((tab instanceof WorkspaceApp && !tab.isWindowed) ||
+          (tab instanceof DormantTab && !tab.windowed)) &&
+        (tab.app === "calendar" ||
+          (tab.id === this.calendarTabId && tab.url.startsWith(`${GOOGLE_ACCOUNTS_URL}/`))),
+    );
+    const calendar =
+      existing instanceof DormantTab
+        ? this.materializeDormantTab(existing, undefined, false)
+        : (existing ?? this.openTab(url));
+    this.calendarTabId = calendar.id;
+    this.activateTab(calendar.id);
+    if (account.config.selected) {
+      accounts.refreshSelectedAccountView();
+    } else {
+      accounts.selectAccount(this.accountId);
+    }
+    main.navigate("/");
   }
 
   adoptTab(workspaceApp: WorkspaceApp) {
@@ -349,7 +360,11 @@ export class Tabs {
     return materializedTab;
   }
 
-  private materializeDormantTab(dormantTab: DormantTab, url?: string) {
+  private materializeDormantTab(
+    dormantTab: DormantTab,
+    url?: string,
+    asWindow = dormantTab.windowed || config.get("workspaceApps.mode") === "windows",
+  ) {
     const workspaceApp = new WorkspaceApp({
       id: dormantTab.id,
       accountId: this.accountId,
@@ -358,7 +373,7 @@ export class Tabs {
       loadOnLaunch: dormantTab.loadOnLaunch,
       hibernatesWhenIdle: dormantTab.hibernatesWhenIdle,
       opensLinksForApp: dormantTab.opensLinksForApp,
-      asWindow: dormantTab.windowed || config.get("workspaceApps.mode") === "windows",
+      asWindow,
       savedAsWindow: dormantTab.windowed,
       app: dormantTab.app,
       zoomFactor: dormantTab.zoomFactor,

@@ -2,6 +2,7 @@ import { realpath } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { useApp } from "./lib/app";
 import { findRendererPage } from "./lib/renderer-navigation";
+import { SIGN_IN_PAGE_TITLE } from "./lib/server";
 import { readSettingsPageLabels } from "./lib/settings";
 
 /** The shape `accounts` is stored in, with only the two labels differing. */
@@ -123,8 +124,12 @@ test("All Mail opens from the titlebar", async () => {
   await expect.poll(() => new URL(ggmail.renderer.url()).hash).toBe("#/unified-inbox");
 });
 
-test("Calendar opens full screen with the selected mailbox and reuses its window", async () => {
-  await ggmail.app.evaluate(({ session }) => {
+test("Calendar lets you pick and switch mailboxes in a tab in the main window", async () => {
+  type CalendarMenu = typeof globalThis & { calendarMenu?: Electron.Menu };
+  await ggmail.app.evaluate(({ session, Menu }) => {
+    Menu.prototype.popup = function () {
+      (globalThis as CalendarMenu).calendarMenu = this;
+    };
     for (const id of ["first-account", "second-account"]) {
       session
         .fromPartition("persist:" + id)
@@ -135,51 +140,63 @@ test("Calendar opens full screen with the selected mailbox and reuses its window
     }
   });
   const page = ggmail.renderer;
-  await page.getByRole("button", { name: "Work", exact: true }).click();
-  const views = page.getByRole("navigation", { name: "Mail views" });
-  await views.getByRole("button", { name: "Attachments" }).click();
-  await views.getByRole("button", { name: "Calendar" }).click();
+  await page.evaluate(() =>
+    window.electron.ipcRenderer.invoke("config.setConfig", { "workspaceApps.mode": "windows" }),
+  );
+  const nav = page.getByRole("navigation", { name: "Mail views" });
+  const button = nav.getByRole("button", { name: "Calendar" });
+  await nav.getByRole("button", { name: "Attachments" }).click();
+  await button.click();
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(() =>
+        (globalThis as CalendarMenu).calendarMenu?.items.map((item) => [item.label, item.checked]),
+      ),
+    )
+    .toEqual([
+      ["Personal", true],
+      ["Work", false],
+    ]);
+  await ggmail.app.evaluate(() =>
+    (globalThis as CalendarMenu).calendarMenu?.items.find((item) => item.label === "Work")?.click(),
+  );
 
-  const readCalendars = () =>
-    ggmail.app.evaluate(({ BrowserWindow }) =>
-      BrowserWindow.getAllWindows()
-        .filter((window) => window.webContents.getURL().includes("workspace-app.html"))
-        .map((window) => {
-          const { webContents } = window.contentView.children[0] as Electron.WebContentsView;
-          return {
-            id: window.id,
-            fullScreen: window.isFullScreen(),
-            origin: new URL(webContents.getURL() || "about:blank").origin,
-            account: webContents.getTitle(),
-          };
-        }),
-    );
-  await expect.poll(readCalendars).toEqual([
-    {
-      id: expect.any(Number),
-      fullScreen: true,
-      origin: "https://calendar.google.com",
+  const readPage = () =>
+    ggmail.app.evaluate(({ BrowserWindow }) => {
+      const windows = BrowserWindow.getAllWindows();
+      const main = windows.find((w) => w.webContents.getURL().includes("main.html"));
+      const views = main?.contentView.children as Electron.WebContentsView[];
+      const calendarViews = views.filter((v) =>
+        v.webContents.getURL().startsWith("https://calendar.google.com/"),
+      );
+      const active = views.at(-1)?.webContents;
+      return {
+        windowCount: windows.length,
+        fullScreen: main?.isFullScreen(),
+        calendars: calendarViews.length,
+        account: active?.getTitle(),
+        pageId: active?.id,
+      };
+    });
+  await expect
+    .poll(readPage)
+    .toEqual({
+      windowCount: 1,
+      fullScreen: false,
+      calendars: 1,
       account: "second-account",
-    },
-  ]);
-  const [calendar] = await readCalendars();
-  if (!calendar) {
-    throw new Error("Calendar did not open");
-  }
-  await ggmail.app.evaluate(
-    ({ BrowserWindow }, id) => BrowserWindow.fromId(id)?.setFullScreen(false),
-    calendar.id,
-  );
-  await expect.poll(readCalendars).toEqual([{ ...calendar, fullScreen: false }]);
-  expect(await ggmail.runMenuCommand("Calendar")).toBe(true);
-  await expect.poll(readCalendars).toEqual([calendar]);
-
-  await ggmail.app.evaluate(
-    ({ BrowserWindow }, id) => BrowserWindow.fromId(id)?.close(),
-    calendar.id,
-  );
-  await expect.poll(readCalendars).toEqual([]);
-  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+      pageId: expect.any(Number),
+    });
+  await expect(button).toHaveAttribute("aria-current", "page");
+  const work = await readPage();
+  await page.locator('[data-account-id="first-account"]').click();
+  await expect
+    .poll(readPage)
+    .toMatchObject({ windowCount: 1, fullScreen: false, calendars: 2, account: "first-account" });
+  await page.locator('[data-account-id="second-account"]').click();
+  await expect.poll(readPage).toEqual({ ...work, calendars: 2 });
+  await page.getByRole("button", { name: SIGN_IN_PAGE_TITLE, exact: true }).click();
+  await expect(button).not.toHaveAttribute("aria-current", "page");
 });
 
 test("Back and Forward retrace libraries and account switches at both toolbar widths", async () => {

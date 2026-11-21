@@ -20,7 +20,15 @@ import { navigate } from "wouter/use-hash-location";
 import { useChromeMenu } from "@/lib/chrome-menu";
 import { useCloseOnWindowBlur } from "@/lib/hooks";
 
-export function MailViewNavigation({ location, unified }: { location: string; unified: boolean }) {
+export function MailViewNavigation({
+  location,
+  unified,
+  multipleAccounts,
+}: {
+  location: string;
+  unified: boolean;
+  multipleAccounts: boolean;
+}) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
   const [compactMenuOpen, setCompactMenuOpen] = useState(false);
@@ -36,9 +44,13 @@ export function MailViewNavigation({ location, unified }: { location: string; un
     { id: "/waiting", label: t`Waiting for reply`, Icon: ClockIcon },
     { id: "calendar", label: t`Calendar`, Icon: CalendarDaysIcon },
   ];
-  const openView = (id: string) => {
+  const openView = (id: string, trigger: HTMLElement) => {
     if (id === "calendar") {
-      ipc.main.send("titleBar.openCalendar");
+      const rect = trigger.getBoundingClientRect();
+      ipc.main.send("titleBar.openCalendar", {
+        x: Math.round(rect.left),
+        y: Math.round(rect.bottom),
+      });
     } else if (location !== id) {
       navigate(id);
     }
@@ -54,10 +66,14 @@ export function MailViewNavigation({ location, unified }: { location: string; un
             variant={location === id ? "secondary" : "ghost"}
             aria-current={location === id ? "page" : undefined}
             className="gap-1.5 px-2 text-xs"
-            onClick={() => openView(id)}
+            aria-haspopup={id === "calendar" && multipleAccounts ? "menu" : undefined}
+            onClick={(event) => openView(id, event.currentTarget)}
           >
             <Icon className="size-3.5" />
             {label}
+            {id === "calendar" && multipleAccounts && (
+              <ChevronDownIcon aria-hidden="true" className="size-3" />
+            )}
           </Button>
         ))}
       </div>
@@ -111,7 +127,7 @@ export function MailViewNavigation({ location, unified }: { location: string; un
               aria-label={label}
               aria-current={location === id ? "page" : undefined}
               className="h-7 justify-center px-1.5 aria-[current=page]:bg-accent"
-              onClick={() => openView(id)}
+              onClick={(event) => openView(id, event.currentTarget)}
             >
               <Icon aria-hidden="true" className="size-3.5" />
               <span className="truncate">{label}</span>

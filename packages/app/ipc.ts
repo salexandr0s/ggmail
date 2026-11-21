@@ -191,9 +191,10 @@ class Ipc {
     });
 
     this.main.on("accounts.selectAccount", (_event, selectedAccountId, showMailbox) => {
-      accounts.selectAccount(selectedAccountId);
-      if (showMailbox && main.location !== "/") {
-        main.navigate("/");
+      if (showMailbox) {
+        accounts.openAccountPage(selectedAccountId);
+      } else {
+        accounts.selectAccount(selectedAccountId);
       }
     });
 
@@ -282,12 +283,12 @@ class Ipc {
 
     /* oxlint-disable lingui/no-unlocalized-strings -- Internal route and account identifiers for the mail-view popup. */
     const mailViewsPopup = new Popup();
-    this.main.on("titleBar.openCalendar", (event) => {
+    this.main.on("titleBar.openCalendar", (event, anchor) => {
       if (
         event.sender === main.window.webContents &&
         event.senderFrame === event.sender.mainFrame
       ) {
-        accounts.getSelectedAccount().instance.tabs.openCalendar();
+        appMenu.chooseCalendarAccount(anchor);
       }
     });
 
@@ -314,7 +315,9 @@ class Ipc {
       const selectedAccount = mailboxes.find(({ config: account }) => account.selected);
       const selected =
         main.location === "/" && selectedAccount
-          ? "account/" + selectedAccount.config.id
+          ? selectedAccount.instance.tabs.activeTab.app === "calendar"
+            ? "calendar"
+            : "account/" + selectedAccount.config.id
           : main.location;
       if (
         mailViewsPopup.toggle(main.window, {
@@ -350,12 +353,11 @@ class Ipc {
       }
       mailViewsPopup.close();
       if (value === "calendar") {
-        accounts.getSelectedAccount().instance.tabs.openCalendar();
+        appMenu.chooseCalendarAccount();
       } else if (value?.startsWith("account/")) {
         const id = value.slice("account/".length);
         if (accounts.getAccounts().some((account) => account.config.id === id)) {
-          accounts.selectAccount(id);
-          main.navigate("/");
+          accounts.openAccountPage(id);
         }
       } else if (
         value === "/attachments" ||

@@ -774,7 +774,11 @@ export function AppTitlebar({
               }}
             />
           </TitlebarButtonGroup>
-          <MailViewNavigation location={location} unified={shouldShowUnifiedInboxButton} />
+          <MailViewNavigation
+            location={isAccountLocation && activeTab?.app === "calendar" ? "calendar" : location}
+            unified={shouldShowUnifiedInboxButton}
+            multipleAccounts={accounts.length > 1}
+          />
           {(shouldShowOutOfOfficeButton || accountButtons) && (
             <TitlebarButtonGroup className="hidden min-w-0 flex-1 before:me-1 before:h-4 before:w-px before:shrink-0 before:bg-border sm:flex">
               {shouldShowOutOfOfficeButton && (
