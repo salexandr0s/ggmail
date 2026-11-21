@@ -4,10 +4,26 @@
  * needs a Gmail account.
  */
 import { expect, test } from "@playwright/test";
+import { seedAccount, seedSavedTab } from "./lib/accounts";
 import { useApp } from "./lib/app";
 import { configSwitch, openSettingsPage, readSettingsPageLabels } from "./lib/settings";
 
-const ggmail = useApp();
+const ggmail = useApp({
+  accounts: [
+    seedAccount({
+      id: "settings",
+      label: "Personal",
+      savedTabs: [
+        seedSavedTab({
+          app: "calendar",
+          title: "Calendar",
+          url: "about:blank",
+          loadOnLaunch: true,
+        }),
+      ],
+    }),
+  ],
+});
 
 test("every settings page renders", async () => {
   const rendererErrors: Error[] = [];
@@ -56,36 +72,21 @@ test("a switch writes its key back to the config", async () => {
 test("a select behind a confirmation writes only once confirmed", async () => {
   const settings = await ggmail.openSettings();
 
-  await openSettingsPage(settings, "Updates");
-
-  const releaseChannel = settings.locator('[id="updates.channel"]');
-
-  await releaseChannel.click();
-
-  await settings.getByRole("option", { name: "Beta" }).click();
+  await openSettingsPage(settings, "Workspace apps");
+  const mode = settings.getByRole("combobox", { name: "Mode", exact: true });
+  await mode.click();
+  await settings.getByRole("option", { name: "New windows", exact: true }).click();
 
   const confirmation = settings.getByRole("dialog");
-
-  await expect(confirmation).toContainText("Switch to the beta channel?");
-
+  await expect(confirmation).toContainText("Switch to New windows?");
   await confirmation.getByRole("button", { name: "Cancel" }).click();
+  await expect(mode).toContainText("Tabs");
+  expect((await ggmail.readConfig())["workspaceApps.mode"]).toBe("tabs");
 
-  // The field goes on rendering the value from the config while the dialog is
-  // open, so cancelling is meant to leave nothing to revert. Contained rather
-  // than equal, because the trigger renders its own chevron alongside the value.
-  await expect(releaseChannel).toContainText("Stable");
-
-  expect((await ggmail.readConfig())["updates.channel"]).toBe("stable");
-
-  await releaseChannel.click();
-
-  await settings.getByRole("option", { name: "Beta" }).click();
-
-  // Changing the channel sends the updater off to check the new feed. That call
-  // is fire and forget, and the app already makes one like it on every launch.
-  await confirmation.getByRole("button", { name: "Switch to beta" }).click();
-
-  await expect.poll(async () => (await ggmail.readConfig())["updates.channel"]).toBe("beta");
+  await mode.click();
+  await settings.getByRole("option", { name: "New windows", exact: true }).click();
+  await confirmation.getByRole("button", { name: "Switch to New windows", exact: true }).click();
+  await expect.poll(async () => (await ggmail.readConfig())["workspaceApps.mode"]).toBe("windows");
 });
 
 test("every field label points at its control", async () => {
