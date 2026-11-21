@@ -4,9 +4,7 @@ import {
   Field,
   FieldContent,
   FieldDescription,
-  FieldGroup,
   FieldLegend,
-  FieldSeparator,
   FieldSet,
   FieldTitle,
 } from "@ggmail/ui/components/field";
@@ -14,7 +12,13 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ConfigSelectField } from "@/components/config-select-field";
 import { ConfigSwitchField } from "@/components/config-switch-field";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { useConfig } from "@/lib/react-query";
 import { GmailLabelColors } from "./label-colors";
 
@@ -71,13 +75,13 @@ export function GmailSettings() {
         <SettingsTitle>Gmail</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Gmail page's section about how Gmail looks">
-                Appearance
-              </Trans>
-            </FieldLegend>
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Gmail page's section about how Gmail looks">
+              Appearance
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <ConfigSwitchField
               label={t`Hide Gmail logo`}
               description={t`Hide the Gmail logo in the top left corner.`}
@@ -129,14 +133,16 @@ export function GmailSettings() {
               })}
               configKey="gmail.extendDarkTheme"
             />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Gmail page's section about writing emails">
-                Compose
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Gmail page's section about writing emails">
+              Compose
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <ConfigSwitchField
               label={t`Always compose new emails in new window`}
               description={t`Open a new window to compose an email, instead of composing inside Gmail.`}
@@ -149,14 +155,16 @@ export function GmailSettings() {
               configKey="gmail.closeComposeWindowAfterSend"
               restartRequired
             />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Gmail page's section about reading an email conversation">
-                Conversation
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Gmail page's section about reading an email conversation">
+              Conversation
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <ConfigSwitchField
               label={t`Reverse conversation`}
               description={t`Show email conversations in reverse order, with the latest message at the top.`}
@@ -204,14 +212,16 @@ export function GmailSettings() {
               configKey="gmail.replyForwardInPopOut"
               restartRequired
             />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Gmail page's section about Gmail's inbox; Inbox follows Gmail's word for it">
-                Inbox
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Gmail page's section about Gmail's inbox; Inbox follows Gmail's word for it">
+              Inbox
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <ConfigSwitchField
               label={t`Hide inbox footer`}
               description={t`Hide the footer at the bottom of the inbox.`}
@@ -254,21 +264,25 @@ export function GmailSettings() {
               }))}
               restartRequired
             />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend className="flex items-center gap-2">
-              <Trans>Label colors</Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend className="flex items-center gap-2">
+            <Trans>Label colors</Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <GmailLabelColors />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Gmail page's section for settings most people leave alone">
-                Advanced
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Gmail page's section for settings most people leave alone">
+              Advanced
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <Field>
               <FieldContent>
                 <FieldTitle>
@@ -306,8 +320,8 @@ export function GmailSettings() {
                 </Button>
               </div>
             </Field>
-          </FieldSet>
-        </FieldGroup>
+          </SettingsPanel>
+        </FieldSet>
       </SettingsContent>
     </Settings>
   );

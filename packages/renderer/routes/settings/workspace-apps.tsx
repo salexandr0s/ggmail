@@ -31,10 +31,8 @@ import {
   Field,
   FieldContent,
   FieldDescription,
-  FieldGroup,
   FieldLabel,
   FieldLegend,
-  FieldSeparator,
   FieldSet,
   FieldTitle,
 } from "@ggmail/ui/components/field";
@@ -46,7 +44,13 @@ import { useId, useMemo } from "react";
 import type { Entries } from "type-fest";
 import { ConfigSelectField } from "@/components/config-select-field";
 import { ConfigSwitchField } from "@/components/config-switch-field";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { WorkspaceAppIcon } from "@/components/workspace-app-icon";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
@@ -214,7 +218,7 @@ export function WorkspaceAppsSettings() {
         <SettingsTitle>{t(settingsPageLabels.workspaceApps)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
+        <SettingsPanel>
           <ConfigSwitchField
             label={t`Open in app`}
             description={t`Open Workspace apps in the app instead of the external browser.`}
@@ -258,7 +262,7 @@ export function WorkspaceAppsSettings() {
                   }),
                 }}
               />
-              <Field>
+              <Field className="settings-choice-row">
                 <FieldContent>
                   <FieldLabel htmlFor={excludedAppsFieldId} className="flex items-center gap-2">
                     <Trans comment="Setting that picks the Workspace apps that open in the external browser">
@@ -276,9 +280,15 @@ export function WorkspaceAppsSettings() {
                   <DropdownMenuTrigger
                     id={excludedAppsFieldId}
                     render={
-                      <Button variant="outline" className="justify-start gap-1.5 font-normal">
-                        {excludedAppsSummary}
-                        <ChevronDownIcon className="opacity-50" />
+                      <Button
+                        variant="outline"
+                        className="settings-picker h-auto min-h-8 justify-start gap-2 py-1 font-normal whitespace-normal"
+                      >
+                        <span className="min-w-0 wrap-anywhere">{excludedAppsSummary}</span>
+                        <ChevronDownIcon
+                          aria-hidden="true"
+                          className="size-3.5 text-muted-foreground"
+                        />
                       </Button>
                     }
                   />
@@ -308,76 +318,77 @@ export function WorkspaceAppsSettings() {
               </Field>
             </>
           )}
-          {config["workspaceApps.mode"] === "tabs" && (
-            <>
-              <FieldSeparator />
-              <FieldSet>
-                <FieldLegend>
-                  <Trans comment="Heading of the settings for the vertical tabs sidebar">
-                    Vertical tabs
-                  </Trans>
-                </FieldLegend>
-                <ConfigSwitchField
-                  label={t`Show windows`}
-                  description={t`List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward.`}
-                  configKey="verticalTabs.showWindows"
-                />
-                <ConfigSelectField
-                  label={t({
-                    message: "Width",
-                    comment: "Setting for how wide the vertical tabs sidebar is",
-                  })}
-                  description={t({
-                    message:
-                      "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back.",
-                    comment:
-                      "Auto quotes this setting's option and Reset Width the sidebar's context menu item, so they match those messages' wording",
-                  })}
-                  configKey="verticalTabs.width"
-                  items={Object.entries(verticalTabsWidths).map(([value, label]) => ({
-                    value,
-                    label: t(label),
-                  }))}
-                />
-                <ConfigSwitchField
-                  label={t`Show width button`}
-                  description={t({
-                    message:
-                      "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
-                    comment:
-                      "Reset Width quotes the sidebar's context menu item and Width the setting above, so they match those messages' wording",
-                  })}
-                  configKey="verticalTabs.showWidthToggle"
-                />
-                <ConfigSelectField
-                  label={t`Show Gmail unread badge`}
-                  description={t({
-                    message:
-                      "Show the unread count on the Gmail tab. When another tab is active hides it while Gmail is in front, where the inbox already shows it. Accounts that need attention are still flagged whichever you pick.",
-                    comment:
-                      "When another tab is active quotes this setting's option, so it matches that option's wording",
-                  })}
-                  configKey="verticalTabs.gmailUnreadBadge"
-                  items={Object.entries(verticalTabsGmailUnreadBadges).map(([value, label]) => ({
-                    value,
-                    label: t(label),
-                  }))}
-                />
-                <ConfigSwitchField
-                  label={t`Show app links badge`}
-                  description={t`Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so.`}
-                  configKey="verticalTabs.showAppLinksBadge"
-                />
-              </FieldSet>
-            </>
-          )}
-          <FieldSeparator />
+        </SettingsPanel>
+        {config["workspaceApps.mode"] === "tabs" && (
+          <FieldSet>
+            <FieldLegend>
+              <Trans comment="Heading of the settings for the vertical tabs sidebar">
+                Vertical tabs
+              </Trans>
+            </FieldLegend>
+            <SettingsPanel>
+              <ConfigSwitchField
+                label={t`Show windows`}
+                description={t`List Workspace apps that are open in their own window alongside the tabs, so the sidebar is an overview of everything open. Click one to bring its window forward.`}
+                configKey="verticalTabs.showWindows"
+              />
+              <ConfigSelectField
+                label={t({
+                  message: "Width",
+                  comment: "Setting for how wide the vertical tabs sidebar is",
+                })}
+                description={t({
+                  message:
+                    "How wide the vertical tabs sidebar is. Auto switches between narrow and wide based on the open tabs. The button at the bottom of the sidebar switches between narrow and wide for that account until ggmail quits, leaving this setting as it is. Right-click the sidebar and choose Reset Width to hand it back.",
+                  comment:
+                    "Auto quotes this setting's option and Reset Width the sidebar's context menu item, so they match those messages' wording",
+                })}
+                configKey="verticalTabs.width"
+                items={Object.entries(verticalTabsWidths).map(([value, label]) => ({
+                  value,
+                  label: t(label),
+                }))}
+              />
+              <ConfigSwitchField
+                label={t`Show width button`}
+                description={t({
+                  message:
+                    "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
+                  comment:
+                    "Reset Width quotes the sidebar's context menu item and Width the setting above, so they match those messages' wording",
+                })}
+                configKey="verticalTabs.showWidthToggle"
+              />
+              <ConfigSelectField
+                label={t`Show Gmail unread badge`}
+                description={t({
+                  message:
+                    "Show the unread count on the Gmail tab. When another tab is active hides it while Gmail is in front, where the inbox already shows it. Accounts that need attention are still flagged whichever you pick.",
+                  comment:
+                    "When another tab is active quotes this setting's option, so it matches that option's wording",
+                })}
+                configKey="verticalTabs.gmailUnreadBadge"
+                items={Object.entries(verticalTabsGmailUnreadBadges).map(([value, label]) => ({
+                  value,
+                  label: t(label),
+                }))}
+              />
+              <ConfigSwitchField
+                label={t`Show app links badge`}
+                description={t`Mark the tab that opens all of an app's links, set from the tab's context menu. With this off, the tab still takes the links, and its tooltip still says so.`}
+                configKey="verticalTabs.showAppLinksBadge"
+              />
+            </SettingsPanel>
+          </FieldSet>
+        )}
+
+        <SettingsPanel>
           <ConfigSwitchField
             label={t`Persist zoom`}
             description={t`Remember the zoom level of Workspace apps across restarts. Each app keeps its own zoom level, shared by all its tabs and windows.`}
             configKey="workspaceApps.persistZoom"
           />
-          <FieldSeparator />
+
           <ConfigSelectField
             label={t`Hibernate idle tabs`}
             description={t({
@@ -406,13 +417,14 @@ export function WorkspaceAppsSettings() {
                 label: t(label),
               }))}
           />
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the settings for the Workspace apps launcher and the bookmarks button">
-                Launcher and bookmarks
-              </Trans>
-            </FieldLegend>
+        </SettingsPanel>
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the settings for the Workspace apps launcher and the bookmarks button">
+              Launcher and bookmarks
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <Field>
               <FieldContent>
                 <FieldTitle>
@@ -545,8 +557,8 @@ export function WorkspaceAppsSettings() {
               description={t`Show the button that opens bookmarks.`}
               configKey="workspaceApps.showBookmarksButton"
             />
-          </FieldSet>
-        </FieldGroup>
+          </SettingsPanel>
+        </FieldSet>
       </SettingsContent>
     </Settings>
   );

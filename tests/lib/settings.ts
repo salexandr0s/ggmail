@@ -17,7 +17,7 @@ export function configSwitch(settings: Page, configKey: keyof Config) {
  * Every settings page, taken from the sidebar the app renders rather than from
  * a list kept here.
  *
- * A list kept here is a copy of `sidebarNavItems` that nothing keeps in step: a
+ * A list kept here is a copy of the settings navigation that nothing keeps in step: a
  * page added to the app is simply never walked, and every caller reports clean
  * without having looked at it. What each page has to satisfy stays with the
  * test; only which pages exist comes from the app.

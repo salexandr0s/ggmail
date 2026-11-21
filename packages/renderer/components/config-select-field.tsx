@@ -78,12 +78,12 @@ export function ConfigSelectField({
   };
 
   return (
-    <Field>
+    <Field className="settings-choice-row">
       <FieldContent>
         <FieldLabel htmlFor={configKey} className="flex items-center gap-2">
           {label}
         </FieldLabel>
-        <FieldDescription>{description}</FieldDescription>
+        <FieldDescription id={`${configKey}-description`}>{description}</FieldDescription>
       </FieldContent>
       <Select
         items={items}
@@ -103,7 +103,7 @@ export function ConfigSelectField({
         }}
         disabled={disabled}
       >
-        <SelectTrigger id={configKey}>
+        <SelectTrigger id={configKey} aria-describedby={`${configKey}-description`}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

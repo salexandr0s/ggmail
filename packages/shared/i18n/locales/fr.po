@@ -505,6 +505,11 @@ msgstr "Menu de l’application"
 msgid "Appearance"
 msgstr "Apparence"
 
+#. Group of pages in the Settings sidebar
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Application"
+msgstr "Application"
+
 #: packages/renderer/routes/settings/about.tsx
 msgid "Application version"
 msgstr "Version de l’application"
@@ -2355,6 +2360,11 @@ msgstr "Rechercher « {selection} »"
 msgid "Looking for attachments…"
 msgstr "Recherche de pièces jointes…"
 
+#. Group of pages in the Settings sidebar
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Mail"
+msgstr "Messagerie"
+
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Mail assistant"
@@ -2530,6 +2540,10 @@ msgstr "Source suivante"
 msgid "No accounts are included in All Mail."
 msgstr "Aucun compte dans Tous les messages."
 
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "No accounts yet."
+msgstr "Aucun compte pour le moment."
+
 #: packages/renderer/routes/settings/languages.tsx
 msgid "No additional languages selected"
 msgstr "Aucune langue supplémentaire sélectionnée"
@@ -2596,6 +2610,10 @@ msgstr "Aucun modèle n’est disponible pour ce compte ChatGPT."
 #: packages/renderer/components/attachments/preview.tsx
 msgid "No preview available"
 msgstr "Aucun aperçu disponible"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "No saved searches yet."
+msgstr "Aucune recherche enregistrée pour le moment."
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -3973,10 +3991,12 @@ msgstr "Passer à « Nouvelles fenêtres »"
 msgid "Switch to New windows?"
 msgstr "Passer à « Nouvelles fenêtres » ?"
 
+#. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
 #. Option of the Sound setting: the operating system's own notification sound
 #. Option of the Theme setting
 #. Option of the system tray icon's Color setting
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/routes/settings/appearance.tsx
 #: packages/renderer/routes/settings/language-field.tsx
 #: packages/renderer/routes/settings/notifications.tsx

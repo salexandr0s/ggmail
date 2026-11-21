@@ -1,9 +1,14 @@
 import { verificationCodeCopyModes } from "@ggmail/shared/verification-codes";
-import { FieldGroup } from "@ggmail/ui/components/field";
 import { useLingui } from "@lingui/react/macro";
 import { ConfigSelectField } from "@/components/config-select-field";
 import { ConfigSwitchField } from "@/components/config-switch-field";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { useConfig } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 
@@ -22,7 +27,7 @@ export function VerificationCodesSettings() {
         <SettingsTitle>{t(settingsPageLabels.verificationCodes)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
+        <SettingsPanel>
           <ConfigSwitchField
             label={t`Copy codes to clipboard`}
             description={t`Detect a verification code in an incoming email and copy it to your clipboard.`}
@@ -61,7 +66,7 @@ export function VerificationCodesSettings() {
             })}
             configKey="verificationCodes.autoDelete"
           />
-        </FieldGroup>
+        </SettingsPanel>
       </SettingsContent>
     </Settings>
   );

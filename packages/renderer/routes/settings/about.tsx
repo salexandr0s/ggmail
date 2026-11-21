@@ -1,13 +1,6 @@
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldSeparator,
-  FieldSet,
-  FieldTitle,
-} from "@ggmail/ui/components/field";
+import { Field, FieldDescription, FieldTitle } from "@ggmail/ui/components/field";
 import {
   Item,
   ItemActions,
@@ -21,7 +14,13 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CopyButton } from "@/components/copy-button";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { settingsPageLabels } from "@/lib/settings-pages";
 
 function DiagnosticInfo() {
@@ -112,15 +111,11 @@ export function AboutSettings() {
         <SettingsTitle>{t(settingsPageLabels.about)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
-          <FieldSet>
-            <DiagnosticInfo />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <ExportLogsField />
-          </FieldSet>
-        </FieldGroup>
+        <DiagnosticInfo />
+
+        <SettingsPanel>
+          <ExportLogsField />
+        </SettingsPanel>
       </SettingsContent>
     </Settings>
   );

@@ -505,6 +505,11 @@ msgstr "App menu"
 msgid "Appearance"
 msgstr "Appearance"
 
+#. Group of pages in the Settings sidebar
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Application"
+msgstr "Application"
+
 #: packages/renderer/routes/settings/about.tsx
 msgid "Application version"
 msgstr "Application version"
@@ -2355,6 +2360,11 @@ msgstr "Look Up “{selection}”"
 msgid "Looking for attachments…"
 msgstr "Looking for attachments…"
 
+#. Group of pages in the Settings sidebar
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Mail"
+msgstr "Mail"
+
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Mail assistant"
@@ -2530,6 +2540,10 @@ msgstr "Next source"
 msgid "No accounts are included in All Mail."
 msgstr "No accounts are included in All Mail."
 
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "No accounts yet."
+msgstr "No accounts yet."
+
 #: packages/renderer/routes/settings/languages.tsx
 msgid "No additional languages selected"
 msgstr "No additional languages selected"
@@ -2596,6 +2610,10 @@ msgstr "No models are available for this ChatGPT account."
 #: packages/renderer/components/attachments/preview.tsx
 msgid "No preview available"
 msgstr "No preview available"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "No saved searches yet."
+msgstr "No saved searches yet."
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -3973,10 +3991,12 @@ msgstr "Switch to New windows"
 msgid "Switch to New windows?"
 msgstr "Switch to New windows?"
 
+#. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
 #. Option of the Sound setting: the operating system's own notification sound
 #. Option of the Theme setting
 #. Option of the system tray icon's Color setting
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/routes/settings/appearance.tsx
 #: packages/renderer/routes/settings/language-field.tsx
 #: packages/renderer/routes/settings/notifications.tsx

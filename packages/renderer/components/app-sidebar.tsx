@@ -1,9 +1,31 @@
 import { Button } from "@ggmail/ui/components/button";
 import { ScrollArea } from "@ggmail/ui/components/scroll-area";
-import { Separator } from "@ggmail/ui/components/separator";
-import { cn } from "@ggmail/ui/lib/utils";
 import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import {
+  Bell,
+  Bookmark,
+  Download,
+  FileClock,
+  Fingerprint,
+  RefreshCw,
+  Inbox,
+  Info,
+  Languages,
+  Mail,
+  PanelsTopLeft,
+  Puzzle,
+  Settings2,
+  ShieldBan,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  SunMoon,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
+import { useEffect, useRef } from "react";
 import { type RouteProps, useLocation } from "wouter";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { platform } from "@/lib/utils";
@@ -27,164 +49,177 @@ import { VerificationCodesSettings } from "@/routes/settings/verification-codes"
 import { VersionHistorySettings } from "@/routes/settings/version-history";
 import { WorkspaceAppsSettings } from "@/routes/settings/workspace-apps";
 
-export const sidebarNavItems: SidebarNavItemProps[] = [
+type SettingsPage = {
+  label: MessageDescriptor | string;
+  path: string;
+  icon: LucideIcon;
+  component: RouteProps["component"];
+  hidden?: boolean;
+};
+
+const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
   {
-    label: settingsPageLabels.general,
-    path: "/settings/general",
-    component: GeneralSettings,
+    label: msg({ message: "Application", comment: "Group of pages in the Settings sidebar" }),
+    pages: [
+      {
+        label: settingsPageLabels.general,
+        path: "/settings/general",
+        icon: Settings2,
+        component: GeneralSettings,
+      },
+      {
+        label: settingsPageLabels.accounts,
+        path: "/settings/accounts",
+        icon: UsersRound,
+        component: AccountsSettings,
+      },
+      {
+        label: settingsPageLabels.appearance,
+        path: "/settings/appearance",
+        icon: SunMoon,
+        component: AppearanceSettings,
+      },
+      {
+        label: settingsPageLabels.notifications,
+        path: "/settings/notifications",
+        icon: Bell,
+        component: NotificationsSettings,
+      },
+      {
+        label: settingsPageLabels.downloads,
+        path: "/settings/downloads",
+        icon: Download,
+        component: DownloadsSettings,
+      },
+      {
+        label: settingsPageLabels.languages,
+        path: "/settings/languages",
+        icon: Languages,
+        component: LanguagesSettings,
+        hidden: platform.isMacOS,
+      },
+    ],
   },
   {
-    label: settingsPageLabels.accounts,
-    path: "/settings/accounts",
-    component: AccountsSettings,
-  },
-  { label: settingsPageLabels.ai, path: "/settings/ai", component: AISettings },
-  {
-    label: settingsPageLabels.appearance,
-    path: "/settings/appearance",
-    component: AppearanceSettings,
-  },
-  { label: settingsPageLabels.blocker, path: "/settings/blocker", component: BlockerSettings },
-  {
-    label: settingsPageLabels.downloads,
-    path: "/settings/downloads",
-    component: DownloadsSettings,
-  },
-  {
-    // oxlint-disable-next-line lingui/no-unlocalized-strings -- a product name, which stays as it is
-    label: "Gmail",
-    path: "/settings/gmail",
-    component: GmailSettings,
-  },
-  {
-    label: settingsPageLabels.workspaceApps,
-    path: "/settings/workspace-apps",
-    component: WorkspaceAppsSettings,
-  },
-  {
-    label: settingsPageLabels.extensions,
-    path: "/settings/extensions",
-    component: ExtensionsSettings,
-  },
-  {
-    label: settingsPageLabels.languages,
-    path: "/settings/languages",
-    component: LanguagesSettings,
-    hidden: platform.isMacOS,
+    label: msg({ message: "Mail", comment: "Group of pages in the Settings sidebar" }),
+    pages: [
+      // oxlint-disable-next-line lingui/no-unlocalized-strings -- a product name
+      { label: "Gmail", path: "/settings/gmail", icon: Mail, component: GmailSettings },
+      {
+        label: settingsPageLabels.unifiedInbox,
+        path: "/settings/unified-inbox",
+        icon: Inbox,
+        component: UnifiedInboxSettings,
+      },
+      {
+        label: settingsPageLabels.savedSearches,
+        path: "/settings/saved-searches",
+        icon: Bookmark,
+        component: SavedSearchesSettings,
+      },
+      { label: settingsPageLabels.ai, path: "/settings/ai", icon: Sparkles, component: AISettings },
+      {
+        label: settingsPageLabels.workspaceApps,
+        path: "/settings/workspace-apps",
+        icon: PanelsTopLeft,
+        component: WorkspaceAppsSettings,
+      },
+      {
+        label: settingsPageLabels.verificationCodes,
+        path: "/settings/verification-codes",
+        icon: Fingerprint,
+        component: VerificationCodesSettings,
+      },
+    ],
   },
   {
-    label: settingsPageLabels.notifications,
-    path: "/settings/notifications",
-    component: NotificationsSettings,
-  },
-  {
-    label: settingsPageLabels.phishingProtection,
-    path: "/settings/phishing-protection",
-    component: PhishingProtectionSettings,
-  },
-  {
-    label: settingsPageLabels.savedSearches,
-    path: "/settings/saved-searches",
-    component: SavedSearchesSettings,
-  },
-  {
-    label: settingsPageLabels.unifiedInbox,
-    path: "/settings/unified-inbox",
-    component: UnifiedInboxSettings,
-  },
-  {
-    label: settingsPageLabels.updates,
-    path: "/settings/updates",
-    component: UpdatesSettings,
-  },
-  {
-    label: settingsPageLabels.verificationCodes,
-    path: "/settings/verification-codes",
-    component: VerificationCodesSettings,
-  },
-  {
-    label: settingsPageLabels.advanced,
-    path: "/settings/advanced",
-    component: AdvancedSettings,
-  },
-  { type: "separator" },
-  {
-    label: settingsPageLabels.versionHistory,
-    path: "/settings/version-history",
-    component: VersionHistorySettings,
-  },
-  {
-    label: settingsPageLabels.about,
-    path: "/settings/about",
-    component: AboutSettings,
+    label: msg({ message: "System", comment: "Group of pages in the Settings sidebar" }),
+    pages: [
+      {
+        label: settingsPageLabels.blocker,
+        path: "/settings/blocker",
+        icon: ShieldBan,
+        component: BlockerSettings,
+      },
+      {
+        label: settingsPageLabels.phishingProtection,
+        path: "/settings/phishing-protection",
+        icon: ShieldCheck,
+        component: PhishingProtectionSettings,
+      },
+      {
+        label: settingsPageLabels.extensions,
+        path: "/settings/extensions",
+        icon: Puzzle,
+        component: ExtensionsSettings,
+      },
+      {
+        label: settingsPageLabels.advanced,
+        path: "/settings/advanced",
+        icon: SlidersHorizontal,
+        component: AdvancedSettings,
+      },
+      {
+        label: settingsPageLabels.updates,
+        path: "/settings/updates",
+        icon: RefreshCw,
+        component: UpdatesSettings,
+      },
+      {
+        label: settingsPageLabels.versionHistory,
+        path: "/settings/version-history",
+        icon: FileClock,
+        component: VersionHistorySettings,
+      },
+      {
+        label: settingsPageLabels.about,
+        path: "/settings/about",
+        icon: Info,
+        component: AboutSettings,
+      },
+    ],
   },
 ];
 
-type SidebarNavItemProps =
-  | {
-      type?: "item";
-      /** A string only for a product name, which is never translated. */
-      label: MessageDescriptor | string;
-      path: string;
-      disabled?: boolean;
-      hidden?: boolean;
-      component: RouteProps["component"];
-    }
-  | {
-      type: "separator";
-      label?: undefined;
-      path?: undefined;
-      disabled?: undefined;
-      hidden?: undefined;
-      component?: undefined;
-    };
+export const settingsPages = groups.flatMap((group) => group.pages);
 
 export function AppSidebar() {
   const [location, navigate] = useLocation();
-
   const { t } = useLingui();
+  const activeButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    activeButton.current?.scrollIntoView({ block: "nearest" });
+  }, [location]);
 
   return (
-    /*
-     * The gutter the items need for their focus rings is set inside the
-     * scroller rather than around it, because the scroller clips at its own
-     * edge and the items are as wide as it is. The padding that used to sit out
-     * here pays for it, so the items land where they always did.
-     */
-    <div className="bg-sidebar py-3 pl-3" data-testid="settings-nav">
-      <ScrollArea className="h-full w-58">
-        <div className="space-y-2 p-1">
-          {sidebarNavItems
-            .filter((item) => !item.hidden)
-            .map(({ type, label, path }, index) => {
-              if (type === "separator") {
-                // biome-ignore lint/suspicious/noArrayIndexKey: Key is acceptable here
-                return <Separator key={index} />;
-              }
-
-              return (
-                <Button
-                  // biome-ignore lint/suspicious/noArrayIndexKey: Key is acceptable here
-                  key={index}
-                  onClick={() => {
-                    navigate(path);
-                  }}
-                  // A label too long for the strip wraps rather than clipping;
-                  // min-h-8 and py-1 keep a one-line item at the Button's h-8.
-                  className={cn(
-                    "h-auto min-h-8 w-full justify-start py-1 text-left font-normal wrap-anywhere whitespace-normal",
-                    {
-                      "text-muted-foreground hover:text-muted-foreground": location !== path,
-                    },
-                  )}
-                  variant={location === path ? "secondary" : "ghost"}
-                >
-                  {typeof label === "string" ? label : t(label)}
-                </Button>
-              );
-            })}
+    <nav className="settings-nav" data-testid="settings-nav">
+      <ScrollArea className="h-full">
+        <div className="settings-nav-groups">
+          {groups.map((group) => (
+            <div key={group.label.id} role="group" aria-label={t(group.label)}>
+              <div className="settings-nav-label" aria-hidden="true">
+                {t(group.label)}
+              </div>
+              {group.pages
+                .filter((page) => !page.hidden)
+                .map(({ path, label, icon: Icon }) => (
+                  <Button
+                    key={path}
+                    ref={location === path ? activeButton : undefined}
+                    aria-current={location === path ? "page" : undefined}
+                    variant="ghost"
+                    className="settings-nav-item"
+                    onClick={() => navigate(path)}
+                  >
+                    <Icon aria-hidden="true" />
+                    <span>{typeof label === "string" ? label : t(label)}</span>
+                  </Button>
+                ))}
+            </div>
+          ))}
         </div>
       </ScrollArea>
-    </div>
+    </nav>
   );
 }

@@ -1,7 +1,12 @@
-import { FieldGroup } from "@ggmail/ui/components/field";
 import { useLingui } from "@lingui/react/macro";
 import { ConfigSwitchField } from "@/components/config-switch-field";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { useConfig } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 
@@ -20,7 +25,7 @@ export function UnifiedInboxSettings() {
         <SettingsTitle>{t(settingsPageLabels.unifiedInbox)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
+        <SettingsPanel>
           <ConfigSwitchField
             label={t`Enable All Mail`}
             description={t`Show unread messages from your accounts in one place.`}
@@ -34,7 +39,7 @@ export function UnifiedInboxSettings() {
               configKey="unifiedInbox.showSenderIcons"
             />
           )}
-        </FieldGroup>
+        </SettingsPanel>
       </SettingsContent>
     </Settings>
   );
