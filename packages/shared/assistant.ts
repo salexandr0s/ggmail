@@ -74,6 +74,13 @@ export const assistantCitationSchema = z.object({
 export type AssistantCitation = z.infer<typeof assistantCitationSchema>;
 export type AssistantSender = NonNullable<AssistantCitation["senders"]>[number];
 
+export function getSenderDomain(address: string) {
+  const host = z.email().safeParse(address).success
+    ? address.slice(address.lastIndexOf("@") + 1).toLowerCase()
+    : undefined;
+  return host && z.hostname().safeParse(host).success ? host : undefined;
+}
+
 export const assistantDraftSchema = z.object({
   subject: z
     .string()
@@ -85,7 +92,13 @@ export const assistantDraftSchema = z.object({
 
 export type AssistantDraft = z.infer<typeof assistantDraftSchema>;
 
-export type SourceMessage = { index: number; sender: string; date: string; body: string };
+export type SourceMessage = {
+  index: number;
+  sender: string;
+  senderPhotoUrl?: string;
+  date: string;
+  body: string;
+};
 export type SourcePreviewPage = {
   accountId: string;
   nextOffset: number | null;

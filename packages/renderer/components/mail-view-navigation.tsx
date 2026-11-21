@@ -8,7 +8,13 @@ import {
   DropdownMenuTrigger,
 } from "@ggmail/ui/components/dropdown-menu";
 import { useLingui } from "@lingui/react/macro";
-import { ChevronDownIcon, ClockIcon, InboxIcon, PaperclipIcon } from "lucide-react";
+import {
+  CalendarDaysIcon,
+  ChevronDownIcon,
+  ClockIcon,
+  InboxIcon,
+  PaperclipIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { navigate } from "wouter/use-hash-location";
 import { useChromeMenu } from "@/lib/chrome-menu";
@@ -25,26 +31,30 @@ export function MailViewNavigation({ location, unified }: { location: string; un
   const menu = useChromeMenu(open, setOpen);
   useCloseOnWindowBlur(open, () => setOpen(false));
   const views = [
-    ...(unified ? [{ path: "/unified-inbox", label: t`All Mail`, Icon: InboxIcon }] : []),
-    { path: "/attachments", label: t`Attachments`, Icon: PaperclipIcon },
-    { path: "/waiting", label: t`Waiting for reply`, Icon: ClockIcon },
+    ...(unified ? [{ id: "/unified-inbox", label: t`All Mail`, Icon: InboxIcon }] : []),
+    { id: "/attachments", label: t`Attachments`, Icon: PaperclipIcon },
+    { id: "/waiting", label: t`Waiting for reply`, Icon: ClockIcon },
+    { id: "calendar", label: t`Calendar`, Icon: CalendarDaysIcon },
   ];
-  const current = views.find((view) => view.path === location);
+  const openView = (id: string) => {
+    if (id === "calendar") {
+      ipc.main.send("titleBar.openCalendar");
+    } else if (location !== id) {
+      navigate(id);
+    }
+  };
+  const current = views.find((view) => view.id === location);
   return (
     <nav aria-label={t`Mail views`} className="shrink-0 draggable-none">
       <div className="hidden items-center gap-0.5 min-[1040px]:flex">
-        {views.map(({ path, label, Icon }) => (
+        {views.map(({ id, label, Icon }) => (
           <Button
-            key={path}
+            key={id}
             size="sm"
-            variant={location === path ? "secondary" : "ghost"}
-            aria-current={location === path ? "page" : undefined}
+            variant={location === id ? "secondary" : "ghost"}
+            aria-current={location === id ? "page" : undefined}
             className="gap-1.5 px-2 text-xs"
-            onClick={() => {
-              if (location !== path) {
-                navigate(path);
-              }
-            }}
+            onClick={() => openView(id)}
           >
             <Icon className="size-3.5" />
             {label}
@@ -94,18 +104,14 @@ export function MailViewNavigation({ location, unified }: { location: string; un
           collisionPadding={0}
           className="flex w-auto min-w-0 flex-row gap-0.5 p-0.5 draggable-none"
         >
-          {views.map(({ path, label, Icon }) => (
+          {views.map(({ id, label, Icon }) => (
             <DropdownMenuItem
-              key={path}
+              key={id}
               title={label}
               aria-label={label}
-              aria-current={location === path ? "page" : undefined}
+              aria-current={location === id ? "page" : undefined}
               className="h-7 justify-center px-1.5 aria-[current=page]:bg-accent"
-              onClick={() => {
-                if (location !== path) {
-                  navigate(path);
-                }
-              }}
+              onClick={() => openView(id)}
             >
               <Icon aria-hidden="true" className="size-3.5" />
               <span className="truncate">{label}</span>

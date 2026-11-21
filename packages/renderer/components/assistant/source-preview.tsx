@@ -1,5 +1,5 @@
 import { getAccountLabel } from "@ggmail/shared/accounts";
-import type { AssistantReply, SourceMessage } from "@ggmail/shared/assistant";
+import { getSenderDomain, type AssistantReply, type SourceMessage } from "@ggmail/shared/assistant";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import { ButtonGroup } from "@ggmail/ui/components/button-group";
@@ -42,7 +42,16 @@ function PreviewMessage({
   const name = address?.[1]?.trim() || sender || t`Unknown sender`;
   const byline = (
     <>
-      {showIcon && <SenderAvatar sender={{ name }} className="size-7 shrink-0 text-lg" />}
+      {showIcon && (
+        <SenderAvatar
+          sender={{
+            name,
+            domain: getSenderDomain(address?.[2] ?? sender),
+            photoUrl: message.senderPhotoUrl,
+          }}
+          className="size-7 shrink-0 text-lg"
+        />
+      )}
       <span className="flex min-w-0 flex-1 flex-col gap-y-0.5 @[18rem]:flex-row @[18rem]:items-baseline @[18rem]:gap-x-2">
         <span className="min-w-0 flex-1">
           <span

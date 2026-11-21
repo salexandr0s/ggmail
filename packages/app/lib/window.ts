@@ -211,7 +211,8 @@ export function loadRenderer(
 
   const pageUrl = `${pageFileUrl}?${searchParams.toString()}${options.hash ? `#${options.hash}` : ""}`;
 
-  keepOnRendererPage(window.webContents, pageUrl);
+  // The main renderer can display web links from mail assistant replies.
+  keepOnRendererPage(window.webContents, pageUrl, options.page !== "main");
 
   loadUrl(window.webContents, pageUrl);
 

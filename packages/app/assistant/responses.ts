@@ -149,6 +149,8 @@ export type AssistantTool = {
 const eventSchema = z.object({
   type: z.string(),
   delta: z.string().optional(),
+  output_index: z.int().nonnegative().nullish(),
+  content_index: z.int().nonnegative().nullish(),
   item: z.unknown().optional(),
   code: z.string().nullish(),
   response: z
@@ -209,12 +211,20 @@ export async function readResponseStream(
   provider: ResponsesProvider = "chatgpt",
 ) {
   const streamedItems: unknown[] = [];
+  const textBlocks: string[][] = [];
   let text = "";
 
   for await (const frame of jsonEventStream(body)) {
     const event = eventSchema.parse(frame);
     if (event.type === "response.output_text.delta" || event.type === "response.refusal.delta") {
-      text += event.delta ?? "";
+      const output = event.output_index ?? 0;
+      const part = event.content_index ?? 0;
+      if (output >= 64 || part >= 24) {
+        throw new AssistantError(t`The AI provider returned a response that is too large.`);
+      }
+      const blocks = (textBlocks[output] ??= []);
+      blocks[part] = (blocks[part] ?? "") + (event.delta ?? "");
+      text = textBlocks.flat().filter(Boolean).join("\n\n");
       if (text.length > 64_000) {
         throw new AssistantError(t`The AI provider returned a response that is too large.`);
       }
@@ -255,14 +265,12 @@ export async function readResponseStream(
         }
         if (item.type === "message") {
           sections.push(
-            item.content
-              .map((part) => (part.type === "output_text" ? part.text : part.refusal))
-              .join("\n"),
+            ...item.content.map((part) => (part.type === "output_text" ? part.text : part.refusal)),
           );
         }
       }
 
-      return { items, calls, text: sections.join("\n\n") || text };
+      return { items, calls, text: sections.filter(Boolean).join("\n\n") || text };
     }
   }
 

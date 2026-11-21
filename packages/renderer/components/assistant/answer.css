@@ -20,6 +20,54 @@
 .assistant-answer strong {
   font-weight: 635;
 }
+.assistant-answer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--muted-foreground);
+  text-underline-offset: 0.16em;
+}
+.assistant-answer a:hover {
+  text-decoration-color: currentColor;
+}
+.assistant-answer :is(a, .answer-image button):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.answer-image {
+  display: block;
+  max-width: 100%;
+  margin-block: 0.35rem;
+}
+.answer-image img {
+  max-inline-size: 100%;
+  max-block-size: 24rem;
+  border-radius: 0.5rem;
+  object-fit: contain;
+}
+.answer-image button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+  text-align: start;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.answer-image button:hover {
+  background: var(--muted);
+}
+.answer-image svg {
+  width: 1rem;
+  flex: none;
+}
+.answer-image small {
+  display: block;
+  color: var(--muted-foreground);
+}
 .assistant-answer :is(h1, h2, h3, h4, h5, h6) {
   margin-block: 1.3rem 0.34rem;
   line-height: 1.32;
@@ -117,13 +165,17 @@
   font-size: 0.85em;
 }
 .assistant-answer pre {
+  direction: ltr;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: 0.55rem;
   background: var(--muted);
   font-size: 0.79rem;
   line-height: 1.55;
-  white-space: pre-wrap;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  white-space: pre;
+  overflow-wrap: normal;
   tab-size: 2;
 }
 .assistant-answer hr {
@@ -200,6 +252,7 @@
   background: color-mix(in srgb, var(--card) 80%, var(--muted));
 }
 .answer-record > div {
+  min-inline-size: 0;
   min-width: 0;
   flex: 1 1 4.5rem;
 }

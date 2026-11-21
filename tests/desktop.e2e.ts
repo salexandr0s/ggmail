@@ -123,6 +123,65 @@ test("All Mail opens from the titlebar", async () => {
   await expect.poll(() => new URL(ggmail.renderer.url()).hash).toBe("#/unified-inbox");
 });
 
+test("Calendar opens full screen with the selected mailbox and reuses its window", async () => {
+  await ggmail.app.evaluate(({ session }) => {
+    for (const id of ["first-account", "second-account"]) {
+      session
+        .fromPartition("persist:" + id)
+        .protocol.handle(
+          "https",
+          () => new Response(`<title>${id}</title>`, { headers: { "content-type": "text/html" } }),
+        );
+    }
+  });
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Work", exact: true }).click();
+  const views = page.getByRole("navigation", { name: "Mail views" });
+  await views.getByRole("button", { name: "Attachments" }).click();
+  await views.getByRole("button", { name: "Calendar" }).click();
+
+  const readCalendars = () =>
+    ggmail.app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()
+        .filter((window) => window.webContents.getURL().includes("workspace-app.html"))
+        .map((window) => {
+          const { webContents } = window.contentView.children[0] as Electron.WebContentsView;
+          return {
+            id: window.id,
+            fullScreen: window.isFullScreen(),
+            origin: new URL(webContents.getURL() || "about:blank").origin,
+            account: webContents.getTitle(),
+          };
+        }),
+    );
+  await expect.poll(readCalendars).toEqual([
+    {
+      id: expect.any(Number),
+      fullScreen: true,
+      origin: "https://calendar.google.com",
+      account: "second-account",
+    },
+  ]);
+  const [calendar] = await readCalendars();
+  if (!calendar) {
+    throw new Error("Calendar did not open");
+  }
+  await ggmail.app.evaluate(
+    ({ BrowserWindow }, id) => BrowserWindow.fromId(id)?.setFullScreen(false),
+    calendar.id,
+  );
+  await expect.poll(readCalendars).toEqual([{ ...calendar, fullScreen: false }]);
+  expect(await ggmail.runMenuCommand("Calendar")).toBe(true);
+  await expect.poll(readCalendars).toEqual([calendar]);
+
+  await ggmail.app.evaluate(
+    ({ BrowserWindow }, id) => BrowserWindow.fromId(id)?.close(),
+    calendar.id,
+  );
+  await expect.poll(readCalendars).toEqual([]);
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+});
+
 test("Back and Forward retrace libraries and account switches at both toolbar widths", async () => {
   const info = test.info();
   const page = ggmail.renderer;
@@ -187,7 +246,7 @@ test("the narrow Mail views menu opens above Gmail and supports keyboard selecti
     );
   await expect
     .poll(readOptions)
-    .toEqual(["All Mail", "Attachments", "Waiting for reply", "Personal", "Work"]);
+    .toEqual(["All Mail", "Attachments", "Waiting for reply", "Calendar", "Personal", "Work"]);
   await ggmail.app.evaluate(({ webContents }, id) => {
     const popup = webContents.fromId(id);
     for (const keyCode of ["Home", "Down", "Return"]) {

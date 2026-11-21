@@ -5,6 +5,7 @@ import { ms } from "@ggmail/shared/ms";
 import { WebContentsView, type Session } from "electron";
 import { z } from "zod";
 import type { Gmail } from "./index";
+import { gmailSenderSchema, readRowSenders } from "./sender-dom";
 import { gmailUrl } from "./url";
 
 /** The authenticated mailbox behind an account, including a delegated mailbox when selected. */
@@ -33,7 +34,7 @@ const resultPage = z.object({
         lastMessageId: z.string().optional(),
         subject: z.string(),
         sender: z.string(),
-        photos: z.array(z.object({ address: z.string(), url: z.string() })).optional(),
+        senders: z.array(gmailSenderSchema).max(8).optional(),
         snippet: z.string(),
         date: z.string(),
       }),
@@ -43,7 +44,7 @@ const resultPage = z.object({
 });
 
 // Read Gmail's search results without opening the threads or disturbing the account's visible tab.
-const readSearchPage = `(includePhotos => {
+const readSearchPage = `(includeDetails => {
   const visible = el => el.getClientRects().length > 0 && !el.closest('[aria-hidden="true"]');
   const main = Array.from(document.querySelectorAll('[role="main"]')).find(visible);
   if (!main) return null;
@@ -51,13 +52,10 @@ const readSearchPage = `(includePhotos => {
   if (!rows.length) return Array.from(main.querySelectorAll('.TC, .TD')).some(visible) ? {threads: [], more: false} : null;
   const threads = rows.map(row => ({
     id: (row.matches('[data-legacy-thread-id]') ? row : row.querySelector('[data-legacy-thread-id]'))?.getAttribute('data-legacy-thread-id')?.replace(/^#/, ''),
-    lastMessageId: includePhotos ? (row.querySelector('[data-legacy-last-message-id]') ?? row).getAttribute('data-legacy-last-message-id') ?? undefined : undefined,
+    lastMessageId: includeDetails ? (row.querySelector('[data-legacy-last-message-id]') ?? row).getAttribute('data-legacy-last-message-id') ?? undefined : undefined,
     subject: row.querySelector('.bog')?.textContent?.trim() ?? '',
     sender: row.querySelector('.yW')?.textContent?.trim() ?? '',
-    photos: includePhotos ? Array.from(row.querySelectorAll('.yW [email]')).slice(0, 8).flatMap((author, _, authors) => {
-      const img = author.querySelector('img') ?? (authors.length === 1 ? row.querySelector('.yW img') : null);
-      return img?.src ? [{address: author.getAttribute('email'), url: img.src}] : [];
-    }) : undefined,
+    senders: includeDetails ? (${readRowSenders})(row) : undefined,
     snippet: row.querySelector('.y2')?.textContent?.trim() ?? '',
     date: row.querySelector('.xW [title]')?.getAttribute('title') ?? row.querySelector('.xW')?.textContent?.trim() ?? ''
   }));
@@ -75,7 +73,7 @@ export async function listSearchThreads(
   query: string,
   page: number,
   signal: AbortSignal,
-  includePhotos = false,
+  includeDetails = false,
   seenThreads?: ReadonlySet<string>,
 ) {
   const url = new URL(mailbox);
@@ -129,7 +127,7 @@ export async function listSearchThreads(
         decodeURIComponent(current.hash.replace(/\+/g, " ")) === decodeURIComponent(url.hash)
       ) {
         const raw: unknown = await webContents.executeJavaScriptInIsolatedWorld(1244, [
-          { code: readSearchPage + "(" + includePhotos + ")" },
+          { code: readSearchPage + "(" + includeDetails + ")" },
         ]);
         if (raw) {
           const result = resultPage.parse(raw);

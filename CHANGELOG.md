@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.65.3 — 2026-11-21
+
+- Open Calendar from the title bar or Mail views to see the selected account’s Google Calendar full screen. Reopening Calendar brings its existing window forward.
+- Mail assistant answers display linked images, recognize citation ranges, and show sender photos or domain icons alongside sources.
+
 ## 3.65.2 — 2026-11-21
 
 - Settings groups pages under Application, Mail, and System. Related controls share panels, dropdown arrows sit at the right edge, and long selections wrap in narrow windows.

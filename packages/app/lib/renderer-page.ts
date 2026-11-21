@@ -9,16 +9,6 @@ function getDocumentUrl(url: string) {
 }
 
 /**
- * Only a web link goes to the browser: `shell.openExternal` hands any other
- * scheme, `file:` and `smb:` among them, to whatever the system registered.
- */
-function openWebUrlInBrowser(url: string) {
-  if (isWebUrl(url)) {
-    openExternalUrl(url, { skipTrustedHostCheck: true });
-  }
-}
-
-/**
  * Whatever a renderer page's `webContents` loads gets every IPC channel through
  * the renderer preload, so it stays on the page it was loaded with, compared
  * without the query and fragment so that a reload, the dev server's included,
@@ -37,12 +27,19 @@ function openWebUrlInBrowser(url: string) {
  * replaced by the page again, once: should that load commit somewhere else as
  * well, loading it again would only repeat that forever.
  */
-export function keepOnRendererPage(webContents: WebContents, pageUrl: string) {
+export function keepOnRendererPage(webContents: WebContents, pageUrl: string, trustedLinks = true) {
   let pageDocumentUrl: string | undefined;
 
   let isReturning = false;
 
   const isOnPage = (url: string) => getDocumentUrl(url) === pageDocumentUrl;
+
+  function openWebUrlInBrowser(url: string) {
+    // Only hand web links to the browser. Other schemes have OS-specific handlers.
+    if (isWebUrl(url)) {
+      openExternalUrl(url, { skipTrustedHostCheck: trustedLinks });
+    }
+  }
 
   webContents.on("will-navigate", (event, url) => {
     if (isOnPage(url)) {

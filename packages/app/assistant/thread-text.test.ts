@@ -42,6 +42,19 @@ test("continuation offsets preserve a long single message through its final line
   expect(() => readThreadText(html, last.totalCharacters + 1)).toThrow();
 });
 
+test("only Gmail profile photos from sender headers reach the email preview", () => {
+  const photo = "https://lh3.googleusercontent.com/a/sender";
+  const bodyImage = `<img src="${photo}">See you Friday`;
+  const html =
+    message(`<img src="${photo}">Sam`, "Nov 1", bodyImage) +
+    message('<img src="https://example.test/image">Lee', "Nov 2", bodyImage) +
+    message("Pat", "Nov 3", bodyImage);
+  expect(
+    readThreadPreview(extractMessages(html), 0).messages.map((item) => item.senderPhotoUrl),
+  ).toEqual([photo, undefined, undefined]);
+  expect(readThreadText(html, 0).text).not.toContain(photo);
+});
+
 test("rejects a sign-in page or incomplete print markup", () => {
   expect(() => readThreadText("<h1>Sign in</h1>", 0)).toThrow();
   expect(() =>

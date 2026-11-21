@@ -7,7 +7,11 @@ import {
   type AssistantResult,
   type SourceMessage,
 } from "@ggmail/shared/assistant";
+import { markCitations } from "@ggmail/shared/assistant-citations";
 import { t } from "@lingui/core/macro";
+import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
 import { z } from "zod";
 import { insertReply } from "./insert-reply";
 import {
@@ -24,6 +28,8 @@ import {
 import { AssistantProviders } from "./providers";
 import { AssistantError, type AssistantTool, type ResponseInput } from "./responses";
 import { readThreadPreview } from "./thread-text";
+
+const markdown = unified().use(remarkParse).use(remarkGfm);
 
 // oxlint-disable-next-line lingui/no-unlocalized-strings -- Internal model instruction, tool result or mailto URL.
 const instructions = `
@@ -447,18 +453,14 @@ export class AssistantChat {
         throw new AssistantError(t`The assistant returned an empty reply. Try asking again.`);
       }
 
-      const references = Array.from(text.matchAll(/\[(\d+(?:\s*,\s*\d+)*)\]/g)).flatMap((match) =>
-        (match[1] ?? "").split(",").map(Number),
-      );
-      if (
-        !references.length &&
-        draft &&
-        scope.kind === "thread" &&
-        sourceNumbers[0] !== undefined
-      ) {
-        references.push(sourceNumbers[0]);
+      const references = new Set<number>();
+      if (sources.size && text.includes("[")) {
+        markCitations(sources, references)(markdown.parse(text));
       }
-      const citations = [...new Set(references)].flatMap((number) => {
+      if (!references.size && draft && scope.kind === "thread" && sourceNumbers[0] !== undefined) {
+        references.add(sourceNumbers[0]);
+      }
+      const citations = [...references].flatMap((number) => {
         const item = sources.get(number);
         if (!item) {
           return [];

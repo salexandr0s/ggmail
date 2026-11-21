@@ -106,7 +106,11 @@ test("citations keep their numbers when rows reorder and can only open in their 
     expect(input.at(-1)).toMatchObject({
       content: expect.stringContaining('"sourceNumbers":[2,1]'),
     });
-    return { text: "Both [1, 2]", items: [], calls: [] };
+    return {
+      text: "Literal `[2]`, [label [2]](https://example.test), unknown [2–9000]. Both [1–2].",
+      items: [],
+      calls: [],
+    };
   });
   const followUp = await chat.send(request("And now?"), quiet);
   expect(followUp.status).toBe("complete");

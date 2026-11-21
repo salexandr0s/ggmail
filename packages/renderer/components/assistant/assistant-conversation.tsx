@@ -54,10 +54,14 @@ type Entry = {
   interrupted?: Preview;
 };
 
-const ReplyPreview = memo(function ReplyPreview({ text, draft }: Pick<Preview, "text" | "draft">) {
+const ReplyPreview = memo(function ReplyPreview({
+  text,
+  draft,
+  streaming,
+}: Pick<Preview, "text" | "draft"> & { streaming?: boolean }) {
   return (
     <>
-      {text && <Answer text={text} />}
+      {text && <Answer text={text} streaming={streaming} />}
       {draft && <DraftCard draft={draft} />}
     </>
   );
@@ -428,7 +432,7 @@ export function AssistantConversation({
                     <>
                       {(preview.text || preview.draft) && (
                         <div aria-live="off" className="min-w-0 space-y-3">
-                          <ReplyPreview text={preview.text} draft={preview.draft} />
+                          <ReplyPreview text={preview.text} draft={preview.draft} streaming />
                         </div>
                       )}
                       {preview.activity && (

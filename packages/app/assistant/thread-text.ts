@@ -1,5 +1,6 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail markup and model tool output. */
 import type { SourceMessage } from "@ggmail/shared/assistant";
+import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { load } from "cheerio/slim";
 
 export function extractMessages(html: string) {
@@ -17,6 +18,9 @@ export function extractMessages(html: string) {
       throw new Error("Incomplete Gmail message");
     }
     const sender = headers.first().text().trim();
+    const senderPhotoUrl = getGoogleProfilePhotoUrl(
+      headers.first().find("img[src]").attr("src") ?? "",
+    );
     const date = headers.last().text().trim();
     const body = rows.slice(1);
     body.find("script, style, template, noscript, iframe, object, [hidden], table.att").remove();
@@ -31,7 +35,7 @@ export function extractMessages(html: string) {
       .replace(/[ \t]+\n/g, "\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
-    messages.push({ index: messages.length, sender, date, body: text });
+    messages.push({ index: messages.length, sender, senderPhotoUrl, date, body: text });
   }
   return messages;
 }

@@ -707,6 +707,13 @@ msgstr "Kopieer adres van afbeelding"
 msgid "Cached images and files"
 msgstr "Gecachte afbeeldingen en bestanden"
 
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/ipc.ts
+#: packages/app/menu.ts
+#: packages/renderer/components/mail-view-navigation.tsx
+msgid "Calendar"
+msgstr "Agenda"
+
 #. Button in a dialog asking to confirm a setting change, which leaves the setting as it was
 #: packages/renderer/components/config-select-field.tsx
 #: packages/renderer/desktop-sources.tsx
@@ -1668,6 +1675,10 @@ msgctxt "Windows"
 msgid "Exit"
 msgstr "Afsluiten"
 
+#: packages/app/ipc.ts
+msgid "Exit full screen"
+msgstr "Volledig scherm verlaten"
+
 #. Option of the Launcher display setting: how the Workspace apps launcher shows its apps in the titlebar
 #: packages/shared/workspace-apps.ts
 msgid "Expanded"
@@ -2607,6 +2618,7 @@ msgstr "Geen overeenkomende bestanden"
 msgid "No models are available for this ChatGPT account."
 msgstr "Voor dit ChatGPT-account zijn geen modellen beschikbaar."
 
+#: packages/renderer/components/assistant/answer-media.tsx
 #: packages/renderer/components/attachments/preview.tsx
 msgid "No preview available"
 msgstr "Geen voorbeeld beschikbaar"
@@ -3266,6 +3278,7 @@ msgstr "Start nu opnieuw"
 msgid "Restrict minimum window size"
 msgstr "Beperk minimale venstergrootte"
 
+#: packages/renderer/components/assistant/answer-media.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx

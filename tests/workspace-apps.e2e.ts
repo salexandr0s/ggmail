@@ -158,9 +158,9 @@ test("a saved tab is restored into a child view of its own", async () => {
    */
   await expect(ggmail.renderer.getByRole("button", { name: RESTORED_PAGE_TITLE })).toBeVisible();
 
-  await expect(ggmail.renderer.getByRole("button", { name: "Calendar", exact: true })).toHaveCount(
-    0,
-  );
+  await expect(
+    ggmail.renderer.getByTitle("Calendar", { exact: true }).filter({ visible: true }),
+  ).toHaveCount(0);
 });
 
 test("a restored view is inset by the chrome the renderer owns", async () => {

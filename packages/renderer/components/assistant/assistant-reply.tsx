@@ -37,11 +37,13 @@ export function DraftCard({
       actions={children}
     >
       {draft.subject && (
-        <p className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
+        <p dir="auto" className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
           {draft.subject}
         </p>
       )}
-      <p className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">{draft.body}</p>
+      <p dir="auto" className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">
+        {draft.body}
+      </p>
     </AssistantMailCard>
   );
 }

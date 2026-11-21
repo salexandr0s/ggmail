@@ -49,3 +49,39 @@ test("a tool call cannot run before ChatGPT completes the response", async () =>
 
   await expect(readResponseStream(body, () => {})).rejects.toThrow();
 });
+
+for (const provider of ["chatgpt", "openai", "deepseek"] as const) {
+  test(
+    provider + " streams distinct Markdown blocks in the same order as the final reply",
+    async () => {
+      const updates: string[] = [];
+      const texts = ["## Decision", "Ship **Friday**.", "- Send the agenda"];
+      const body = stream(
+        { type: "response.output_text.delta", output_index: 0, content_index: 0, delta: texts[0] },
+        { type: "response.output_text.delta", output_index: 1, content_index: 0, delta: texts[2] },
+        { type: "response.output_text.delta", output_index: 0, content_index: 1, delta: texts[1] },
+        {
+          type: "response.completed",
+          response: {
+            status: "completed",
+            output: [
+              {
+                type: "message",
+                role: "assistant",
+                content: texts.slice(0, 2).map((text) => ({ type: "output_text", text })),
+              },
+              {
+                type: "message",
+                role: "assistant",
+                content: [{ type: "output_text", text: texts[2] }],
+              },
+            ],
+          },
+        },
+      );
+      const result = await readResponseStream(body, (text) => updates.push(text), provider);
+      expect(updates.at(-1)).toBe(texts.join("\n\n"));
+      expect(updates.at(-1)).toBe(result.text);
+    },
+  );
+}

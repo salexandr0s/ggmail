@@ -707,6 +707,13 @@ msgstr "Αντιγραφή &διεύθυνσης εικόνας"
 msgid "Cached images and files"
 msgstr "Εικόνες και αρχεία στην κρυφή μνήμη"
 
+#. A menu or a menu item in ggmail's menu bar
+#: packages/app/ipc.ts
+#: packages/app/menu.ts
+#: packages/renderer/components/mail-view-navigation.tsx
+msgid "Calendar"
+msgstr "Ημερολόγιο"
+
 #. Button in a dialog asking to confirm a setting change, which leaves the setting as it was
 #: packages/renderer/components/config-select-field.tsx
 #: packages/renderer/desktop-sources.tsx
@@ -1668,6 +1675,10 @@ msgctxt "Windows"
 msgid "Exit"
 msgstr "Έξοδος"
 
+#: packages/app/ipc.ts
+msgid "Exit full screen"
+msgstr "Έξοδος από την πλήρη οθόνη"
+
 #. Option of the Launcher display setting: how the Workspace apps launcher shows its apps in the titlebar
 #: packages/shared/workspace-apps.ts
 msgid "Expanded"
@@ -2607,6 +2618,7 @@ msgstr "Δεν βρέθηκαν αρχεία που να ταιριάζουν"
 msgid "No models are available for this ChatGPT account."
 msgstr "Δεν υπάρχουν διαθέσιμα μοντέλα για αυτόν τον λογαριασμό ChatGPT."
 
+#: packages/renderer/components/assistant/answer-media.tsx
 #: packages/renderer/components/attachments/preview.tsx
 msgid "No preview available"
 msgstr "Δεν υπάρχει διαθέσιμη προεπισκόπηση"
@@ -3266,6 +3278,7 @@ msgstr "Επανεκκίνηση τώρα"
 msgid "Restrict minimum window size"
 msgstr "Περιορισμός ελάχιστου μεγέθους παραθύρου"
 
+#: packages/renderer/components/assistant/answer-media.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx

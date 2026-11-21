@@ -282,6 +282,15 @@ class Ipc {
 
     /* oxlint-disable lingui/no-unlocalized-strings -- Internal route and account identifiers for the mail-view popup. */
     const mailViewsPopup = new Popup();
+    this.main.on("titleBar.openCalendar", (event) => {
+      if (
+        event.sender === main.window.webContents &&
+        event.senderFrame === event.sender.mainFrame
+      ) {
+        accounts.getSelectedAccount().instance.tabs.openCalendar();
+      }
+    });
+
     this.main.on("titleBar.showMailViews", (event, anchor) => {
       if (
         event.sender !== main.window.webContents ||
@@ -296,6 +305,7 @@ class Ipc {
           : []),
         { value: "/attachments", label: t`Attachments` },
         { value: "/waiting", label: t`Waiting for reply` },
+        { value: "calendar", label: t`Calendar` },
       ];
       const accountItems = mailboxes.map(({ config: account }) => ({
         value: "account/" + account.id,
@@ -339,7 +349,9 @@ class Ipc {
         return;
       }
       mailViewsPopup.close();
-      if (value?.startsWith("account/")) {
+      if (value === "calendar") {
+        accounts.getSelectedAccount().instance.tabs.openCalendar();
+      } else if (value?.startsWith("account/")) {
         const id = value.slice("account/".length);
         if (accounts.getAccounts().some((account) => account.config.id === id)) {
           accounts.selectAccount(id);
@@ -470,6 +482,9 @@ class Ipc {
       const isWindowsMode = config.get("workspaceApps.mode") === "windows";
 
       Menu.buildFromTemplate([
+        ...(workspaceApp.isWindowed && workspaceApp.window.isFullScreen()
+          ? [{ label: t`Exit full screen`, click: () => workspaceApp.window.setFullScreen(false) }]
+          : []),
         ...(workspaceApp.isPopup || isWindowsMode
           ? []
           : [

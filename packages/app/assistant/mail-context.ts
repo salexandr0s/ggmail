@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
-import type { AssistantScope, AssistantSender } from "@ggmail/shared/assistant";
+import {
+  getSenderDomain,
+  type AssistantScope,
+  type AssistantSender,
+} from "@ggmail/shared/assistant";
 import { parseGmailMessageId } from "@ggmail/shared/gmail";
 import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
@@ -10,6 +14,7 @@ import { accounts } from "@/accounts";
 import type { Gmail } from "@/gmail";
 import { fetchPrintThread, legacyThreadId } from "@/gmail/print-thread";
 import { getSearchMailbox, listSearchThreads } from "@/gmail/search";
+import { gmailSenderSchema, readRowSenders, readSender } from "@/gmail/sender-dom";
 import { main } from "@/main";
 import { AssistantError } from "./responses";
 import { extractMessages, readThreadText } from "./thread-text";
@@ -88,19 +93,19 @@ export function getMailScope(): Scope {
 
 // Photos are UI metadata from Gmail's message header. Never load an inline
 // email image as an avatar or include photo URLs in provider input.
-const senderSchema = z
-  .object({
-    name: z.string().max(320),
-    address: z.string().max(320),
-    photo: z.string().max(2048),
-  })
-  .transform(({ name, address, photo }): AssistantSender => {
-    const host = z.email().safeParse(address).success
-      ? address.slice(address.lastIndexOf("@") + 1).toLowerCase()
-      : undefined;
-    const domain = host && z.hostname().safeParse(host).success ? host : undefined;
-    return { name: name || address, domain, photoUrl: getGoogleProfilePhotoUrl(photo) };
-  });
+function getAssistantSender({
+  name,
+  address,
+  photo,
+}: z.infer<typeof gmailSenderSchema>): AssistantSender {
+  return {
+    name: name || address,
+    domain: getSenderDomain(address),
+    photoUrl: getGoogleProfilePhotoUrl(photo),
+  };
+}
+
+const senderSchema = gmailSenderSchema.transform(getAssistantSender);
 
 const snippetSchema = z.object({
   subject: z.string().max(300),
@@ -146,19 +151,16 @@ function snippetsToSources(rows: Snippet[], fallback: string, identity: MailboxI
       threadId: id,
       subject: row.subject,
       hash: id ? `#all/${id}` : fallback,
-      senders: senders.length || !row.sender ? senders : [{ name: row.sender }],
+      senders:
+        senders.length || !row.sender
+          ? senders
+          : [{ name: row.sender, domain: getSenderDomain(row.sender) }],
       rowSender: id ? undefined : row.sender,
       excerpt: row.snippet,
     };
     return { ...row, source };
   });
 }
-
-const readSender = String.raw`(el, img) => ({
-  name: (el?.getAttribute("name") || el?.textContent || "").trim().slice(0, 320),
-  address: (el?.getAttribute("email") || "").trim().slice(0, 320),
-  photo: (img?.currentSrc || img?.src || "").slice(0, 2048),
-})`;
 
 // Run fixed readers in an isolated world. Gmail supplies strings only; page content
 // never becomes code, and no IPC or Electron API is exposed to the mail document.
@@ -173,16 +175,14 @@ const readRows = String.raw`(() => {
   }
   const snippets = rows.map((row) => {
     const subjectElement = row.querySelector(".bog");
-    const authors = Array.from(row.querySelectorAll(".yW [email]")).slice(0, 8);
-    const author = authors[0];
+    const senders = (${readRowSenders})(row);
     const date = row.querySelector(".xW [title]");
     const id = (row.querySelector("[data-legacy-thread-id]")?.getAttribute("data-legacy-thread-id")
       ?? row.getAttribute("data-legacy-thread-id"))?.replace(/^#/, "");
     return {
       subject: subjectElement?.textContent?.trim().slice(0, 300) ?? "",
-      sender: (author?.getAttribute("email") ?? row.querySelector(".yW")?.textContent ?? "").trim().slice(0, 320),
-      senders: authors.map(el => (${readSender})(el, el.querySelector("img") ??
-        (authors.length === 1 ? row.querySelector(".yW img") : null))),
+      sender: senders[0]?.address || (row.querySelector(".yW")?.textContent ?? "").trim().slice(0, 320),
+      senders,
       snippet: row.querySelector(".y2")?.textContent?.trim().slice(0, 700) ?? "",
       date: (date?.getAttribute("title") ?? row.querySelector(".xW")?.textContent ?? "").trim().slice(0, 180),
       id: /^[\da-f]{15,16}$/i.test(id ?? "") ? id : undefined,
@@ -345,19 +345,13 @@ export async function searchAllMail(
     if (!resolveMailbox(account)) {
       return unavailable;
     }
-    const found = threads.map(({ id, sender, subject, snippet, date, photos }) => ({
+    const found = threads.map(({ id, sender, subject, snippet, date, senders }) => ({
       id,
       sender: sender.slice(0, 320),
       subject: subject.slice(0, 300),
       snippet: snippet.slice(0, 700),
       date: date.slice(0, 180),
-      senders: (photos ?? []).map(({ address, url }) =>
-        senderSchema.parse({
-          name: photos?.length === 1 ? sender.slice(0, 320) : "",
-          address: address.slice(0, 320),
-          photo: url.slice(0, 2048),
-        }),
-      ),
+      senders: (senders ?? []).map(getAssistantSender),
     }));
     return {
       rows: snippetsToSources(found, "#all", { accountId, mailbox, ownerEmail }),

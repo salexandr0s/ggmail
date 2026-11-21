@@ -6,8 +6,17 @@ import { getNativeCancelLabel } from "./lib/native-cancel-label";
 import { getIsDefaultBrowser } from "./protocol/default-browser";
 
 export function getCleanUrl(url: string): string {
-  if (url.includes("google.com/url")) {
-    return new URL(url).searchParams.get("q") ?? url;
+  const wrapper = URL.parse(url);
+  if (wrapper && /(^|\.)google\.com$/u.test(wrapper.hostname) && wrapper.pathname === "/url") {
+    const target = URL.parse(wrapper.searchParams.get("q") ?? "");
+    if (
+      target &&
+      (target.protocol === "http:" || target.protocol === "https:") &&
+      !target.username &&
+      !target.password
+    ) {
+      return target.href;
+    }
   }
 
   return url;

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { getWorkspaceAppFromUrl } from "@ggmail/shared/google";
+import { GOOGLE_ACCOUNTS_URL } from "@ggmail/shared/constants";
+import { getWorkspaceAppFromUrl, getWorkspaceAppUrl } from "@ggmail/shared/google";
 import { ms } from "@ggmail/shared/ms";
 import type { SavedTab } from "@ggmail/shared/schemas";
 import { getTabSection, GMAIL_TAB_ID, type TabState, tabSections } from "@ggmail/shared/tabs";
@@ -153,6 +154,8 @@ export class Tabs {
 
   private recentlyClosedTabUrls: string[] = [];
 
+  private calendarWindowId?: string;
+
   constructor(accountId: string, gmail: Gmail) {
     this.accountId = accountId;
 
@@ -242,6 +245,28 @@ export class Tabs {
     this.broadcastTabsChanged();
 
     return workspaceApp;
+  }
+
+  openCalendar() {
+    const url = new URL("/calendar/u/0/r", getWorkspaceAppUrl("calendar")).href;
+    if (!canOpenWorkspaceAppInApp("calendar")) {
+      openExternalUrl(url, { skipTrustedHostCheck: true });
+      return;
+    }
+
+    // Calendar can be sitting on Google's sign-in page when the shortcut is used again.
+    const existing = WorkspaceApp.getAccountWindowedInstances(this.accountId)
+      .reverse()
+      .find(
+        (tab) =>
+          !tab.isPopup &&
+          (tab.app === "calendar" ||
+            (tab.id === this.calendarWindowId && tab.url.startsWith(`${GOOGLE_ACCOUNTS_URL}/`))),
+      );
+    const calendar = existing ?? this.openWindowedTab(url);
+    this.calendarWindowId = calendar.id;
+    calendar.focusWindow();
+    calendar.window.setFullScreen(true);
   }
 
   adoptTab(workspaceApp: WorkspaceApp) {

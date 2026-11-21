@@ -3,9 +3,10 @@ import type {
   AssistantRequest,
   AssistantResult,
 } from "@ggmail/shared/assistant";
-import { assistantPanelWidth } from "@ggmail/shared/assistant";
+import { assistantPanelWidth, assistantProviderSchema } from "@ggmail/shared/assistant";
 import type {} from "@ggmail/shared/electron-api";
 import { expect, test } from "@playwright/test";
+import type { BaseWindow, MessageBoxOptions } from "electron";
 import type { Route } from "playwright";
 import { useApp } from "./lib/app";
 
@@ -104,6 +105,110 @@ function serveAvatar(route: Route) {
     contentType: "image/svg+xml",
     body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="#efc5a6"/><circle cx="16" cy="12" r="6" fill="#513a40"/><path d="M3 32a13 13 0 0 1 26 0" fill="#496d70"/></svg>',
   });
+}
+
+for (const provider of assistantProviderSchema.options) {
+  test(
+    provider +
+      " loads images automatically and renders links and source ranges in a compact answer",
+    async () => {
+      const imageUrl = "https://media.example.test/layout.png";
+      const detailUrl = "https://media.example.test/detail.png";
+      const briefUrl = "https://studio.example/brief";
+      const code = "design-token-".repeat(24);
+      const markdown = [
+        "## Friday review",
+        "Read the [brief](" + briefUrl + ") before **Friday**. [1–2]",
+        "[![Layout proof](" + imageUrl + ")](" + briefUrl + ")",
+        "![Layout detail](" + detailUrl + ")",
+        "![Local preview](file:///unavailable.png)",
+        "```text\n" + code + "\n```",
+      ].join("\n\n");
+      const linkPrompts = await ggmail.app.evaluateHandle(
+        ({ ipcMain, BrowserWindow, dialog, shell }, { provider, markdown }) => {
+          const destinations: string[] = [];
+          dialog.showMessageBox = async (
+            ...args: [MessageBoxOptions] | [BaseWindow, MessageBoxOptions]
+          ) => {
+            const options = args.length === 2 ? args[1] : args[0];
+            if (options.detail) {
+              destinations.push(options.detail);
+            }
+            return { response: 2, checkboxChecked: false };
+          };
+          shell.openExternal = async () => {
+            destinations.push("unexpected open");
+          };
+          ipcMain.removeHandler("assistant.status");
+          ipcMain.handle("assistant.status", () => ({
+            status: "connected",
+            provider,
+            models: [{ id: "fixture", label: provider }],
+          }));
+          ipcMain.removeHandler("assistant.send");
+          ipcMain.handle("assistant.send", (_event, request: AssistantRequest): AssistantResult => {
+            if (request.provider !== provider) {
+              throw new Error("Unexpected provider");
+            }
+            return {
+              status: "complete",
+              reply: {
+                text: markdown,
+                citations: ["Brief", "Agenda"].map((subject, index) => ({
+                  id: crypto.randomUUID(),
+                  number: index + 1,
+                  subject,
+                  senders: [{ name: "Studio" }],
+                })),
+                draft: { subject: "Review", body: "Hi Sam,\n\nFriday works." },
+              },
+            };
+          });
+          BrowserWindow.getAllWindows()
+            .find((win) => win.webContents.getURL().includes("main.html"))
+            ?.setContentSize(380, 760);
+          return destinations;
+        },
+        { provider, markdown },
+      );
+      const page = ggmail.renderer;
+      await page.route(imageUrl, serveAvatar);
+      let detailRequests = 0;
+      await page.route(detailUrl, (route) =>
+        ++detailRequests === 1 ? route.abort() : serveAvatar(route),
+      );
+      await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+      const panel = page.getByRole("complementary", { name: "Mail assistant" });
+      const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+      await composer.fill("Show me the brief");
+      await composer.press("Enter");
+      const answer = panel.locator(".assistant-answer");
+      const image = answer.getByRole("img", { name: "Layout proof" });
+      await expect(image).toBeVisible();
+      await expect
+        .poll(() => image.evaluate((img) => (img as HTMLImageElement).naturalWidth))
+        .toBeGreaterThan(0);
+      await expect(answer.getByRole("heading", { name: "Friday review" })).toBeVisible();
+      const brief = answer.getByRole("link", { name: "brief", exact: true });
+      await expect(brief).toHaveAttribute("href", briefUrl);
+      await brief.click();
+      await expect.poll(() => linkPrompts.jsonValue()).toEqual([briefUrl]);
+      await linkPrompts.dispose();
+      await expect(answer.getByRole("button", { name: "2. Agenda" })).toBeVisible();
+      await expect(answer.locator("pre code")).toHaveText(code);
+      await expect(answer.getByText("Local preview", { exact: true })).toBeVisible();
+      await expect(panel.getByText("Friday works.", { exact: false })).toBeVisible();
+      const retry = answer.getByRole("button", { name: /Retry.*Layout detail/ });
+      await expect(retry).toBeVisible();
+      await retry.press("Enter");
+      const detail = answer.getByRole("img", { name: "Layout detail" });
+      await expect
+        .poll(() => detail.evaluate((img) => (img as HTMLImageElement).naturalWidth))
+        .toBeGreaterThan(0);
+      expect(detailRequests).toBe(2);
+      expect(await answer.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    },
+  );
 }
 
 const answer = [
@@ -855,7 +960,7 @@ test("the inbox assistant searches later result pages and reads a deadline from 
       }
       return [
         [
-          "Mira &lt;mira@studio.example&gt;",
+          (work ? `<img src="${senderPhoto}">` : "") + "Mira &lt;mira@studio.example&gt;",
           "Please approve the layout by " + (work ? workDeadline : deadline) + "." + previewBody,
         ],
         ["Sam", "Thanks for the update."],
@@ -876,7 +981,7 @@ test("the inbox assistant searches later result pages and reads a deadline from 
         const id = page === 1 && !${work} ? '194a92f8c0000002' : '${threadId}';
         const subject = page === 1 && !${work} ? 'Workshop notes' : '${subject}';
         main.innerHTML = '<table><tr class="zA" data-legacy-thread-id="' + id + '"><td class="bog">' + subject +
-          '</td><td class="yW">Mira</td><td class="y2">Thanks for the update.</td></tr></table>' +
+          '</td><td class="yW"><span email="mira@studio.example" name="Mira">Mira</span>, <span email="sam@studio.example" name="Sam">Sam</span> 2</td><td class="y2">Thanks for the update.</td></tr></table>' +
           '<button aria-label="Older" aria-disabled="' + (page === 2 || ${work}) + '"></button>';
       }
     </script>`;
@@ -885,6 +990,8 @@ test("the inbox assistant searches later result pages and reads a deadline from 
   try {
     await inbox.goto(server.gmailUrl + "#inbox");
     const page = ggmail.renderer;
+    await page.route(senderIcon, serveAvatar);
+    await page.route(senderPhoto, serveAvatar);
     const personal = (await ggmail.readConfig()).accounts?.find((account) => account.selected);
     if (!personal) {
       throw new Error("First account unavailable");
@@ -1063,6 +1170,9 @@ test("the inbox assistant searches later result pages and reads a deadline from 
     await expect(answer).toContainText(workDeadline);
     const citations = answer.getByRole("button", { name: /Workshop approval/ });
     await expect(citations).toHaveCount(2);
+    await expect(citations.first().locator("img")).toHaveAttribute("src", senderIcon);
+    await expect(citations.first()).toHaveAttribute("title", subject + " · Mira, Sam");
+    await expect(panel.locator("summary img").first()).toHaveAttribute("src", senderIcon);
     expect(printRequests).toEqual(["personal/" + threadId, "work/" + threadId]);
     await expect(inbox).toHaveURL(server.gmailUrl + "#inbox");
     const followUp = "Did anyone change that date?";
@@ -1072,6 +1182,9 @@ test("the inbox assistant searches later result pages and reads a deadline from 
     const preview = panel.getByRole("region", { name: "Email source" });
     await expect(preview).toContainText(workDeadline);
     await expect(preview.getByRole("heading", { name: "Mira", exact: true })).toBeVisible();
+    await expect(
+      preview.getByRole("button", { name: "Mira", exact: true }).locator("img"),
+    ).toHaveAttribute("src", senderPhoto);
     await expect(preview.getByText("mira@studio.example", { exact: true })).toBeVisible();
     await expect(preview.getByRole("button", { name: "Open in Gmail" })).toBeInViewport({
       ratio: 1,
@@ -1098,6 +1211,9 @@ test("the inbox assistant searches later result pages and reads a deadline from 
     await expect(nextSource).toBeDisabled();
     await previousSource.press("Enter");
     await expect(preview).toContainText(deadline);
+    await expect(
+      preview.getByRole("button", { name: "Mira", exact: true }).locator("img"),
+    ).toHaveAttribute("src", senderIcon);
     await expect(preview).not.toContainText(workDeadline);
     await expect(previousSource).toBeDisabled();
     const mira = preview.getByRole("button", { name: "Mira", exact: true });
@@ -1166,7 +1282,7 @@ test("inbox answers show sender identities, fit the panel, and open the cited th
   await useDraftProvider(
     null,
     [
-      "**Friday’s review needs your confirmation.** The agenda is ready to read. [1, 2]",
+      "**Friday’s review needs your confirmation.** The agenda is ready to read. [1–2]",
       "## Before Friday",
       "- [ ] Confirm the review time with Sam. [1]\n- [x] Read the design team’s notes. [2]",
       "> We can start at 10 if that works for you. [1]",

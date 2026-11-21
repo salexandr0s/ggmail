@@ -277,7 +277,10 @@ class AttachmentLibrary {
       signal.throwIfAborted();
       const fresh = page.threads.filter((thread) => !this.seenThreads.has(thread.id));
       this.pending = fresh.flatMap(
-        ({ id, lastMessageId, subject, photos, sender, snippet, date }) => {
+        ({ id, lastMessageId, subject, senders, sender, snippet, date }) => {
+          const photos = senders?.flatMap(({ address, photo }) =>
+            photo ? [{ address, url: photo }] : [],
+          );
           const signature = createHash("sha256")
             .update(JSON.stringify([lastMessageId, subject, sender, snippet, date]))
             .digest("hex");

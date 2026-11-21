@@ -39,6 +39,10 @@ interrupted request and preserves anything you have typed for your next message.
 When you ask a question, ggmail sends the chat and relevant mail context to
 the selected provider. You can close the sidebar and reopen it in the same mail view to pick up where you left off, including an unfinished message or a reply still coming in. **New chat** clears the conversation. Chat history stays in memory for this app session and clears when you switch providers. Electron's protected storage keeps the ChatGPT connection on this device.
 
+## Calendar
+
+Choose **Calendar** in the title bar, **Mail views → Calendar** in a compact window, or **View → Calendar**. Google Calendar opens full screen using the selected mailbox’s sign-in. Choosing Calendar again brings its open window forward. Close the window to return to mail, or choose **More options → Exit full screen** to keep Calendar alongside your inbox. If your Workspace settings send Calendar to the default browser, this shortcut follows that preference.
+
 ## Attachments
 
 Choose **View → Attachments**, select **Attachments** in the title bar, or open it from **Mail views** in a compact window. Search across filenames, senders and subjects. Words can appear in any order and in different fields. Enclose a phrase in quotation marks to keep its words together.

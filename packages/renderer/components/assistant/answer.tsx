@@ -1,39 +1,14 @@
 import type { AssistantReply } from "@ggmail/shared/assistant";
+import { markCitations } from "@ggmail/shared/assistant-citations";
 import { useLingui } from "@lingui/react/macro";
-import type { PhrasingContent, Root } from "mdast";
-import { findAndReplace } from "mdast-util-find-and-replace";
 import { Children, isValidElement, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { AnswerImage, AnswerLink } from "./answer-media";
 import { SenderAvatar } from "./sender-avatar";
 import "./answer.css";
 
 type Citation = AssistantReply["citations"][number];
-
-function markCitations(sources: Map<number, Citation>) {
-  return (tree: Root) => {
-    findAndReplace(
-      tree,
-      [
-        /\[(\d+(?:\s*,\s*\d+)*)\]/g,
-        (match: string, group: string) => {
-          const numbers = group.split(",").map(Number);
-          if (!numbers.every((number) => sources.has(number))) {
-            return match;
-          }
-          return numbers.map(
-            (number): PhrasingContent => ({
-              type: "emphasis",
-              data: { hName: "sup", hProperties: { dataSource: number } },
-              children: [{ type: "text", value: String(number) }],
-            }),
-          );
-        },
-      ],
-      { ignore: ["link", "linkReference"] },
-    );
-  };
-}
 
 function elements(children: ReactNode) {
   return Children.toArray(children).filter(isValidElement<{ children?: ReactNode }>);
@@ -112,11 +87,13 @@ export function Answer({
   citations = [],
   openSource,
   showSenderIcons = false,
+  streaming = false,
 }: {
   text: string;
   citations?: Citation[];
   openSource?: (id: string, trigger: HTMLButtonElement) => void;
   showSenderIcons?: boolean;
+  streaming?: boolean;
 }) {
   const { t } = useLingui();
   if (!text) {
@@ -124,11 +101,13 @@ export function Answer({
   }
   const sources = new Map(citations.map((source) => [source.number, source]));
   return (
-    <div className="assistant-answer">
+    <div className="assistant-answer" dir="auto">
       <ReactMarkdown
         remarkPlugins={sources.size ? [remarkGfm, [markCitations, sources]] : [remarkGfm]}
         allowedElements={[
           "p",
+          "a",
+          "img",
           "em",
           "strong",
           "del",
@@ -158,6 +137,8 @@ export function Answer({
         skipHtml
         unwrapDisallowed
         components={{
+          a: streaming ? ({ children }) => <>{children}</> : AnswerLink,
+          img: streaming ? ({ alt }) => <>{alt}</> : AnswerImage,
           table: AnswerTable,
           input: ({ checked }) => <input type="checkbox" checked={Boolean(checked)} disabled />,
 

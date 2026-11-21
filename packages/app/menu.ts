@@ -565,6 +565,14 @@ export class AppMenu {
             click: () => main.navigate("/waiting"),
           },
           {
+            label: t`Calendar`,
+            click: () => {
+              const owner =
+                focusedWindow && WorkspaceApp.tryFromWebContents(focusedWindow.webContents);
+              (owner?.account ?? accounts.getSelectedAccount()).instance.tabs.openCalendar();
+            },
+          },
+          {
             label: config.get("doNotDisturb.enabled")
               ? t`Turn Do Not Disturb off`
               : t`Turn Do Not Disturb on`,
