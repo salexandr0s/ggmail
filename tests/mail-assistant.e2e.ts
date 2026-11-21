@@ -228,6 +228,79 @@ async function openThread() {
   );
 }
 
+test("closing the assistant keeps its conversation, pending reply and unsent follow-up", async () => {
+  const mail = await openThread();
+  const first = "When is the review?";
+  const answer = "Friday at ten.";
+  const followUp = "Who will attend?";
+  await useDraftProvider(null, answer);
+  const provider = await ggmail.app.evaluateHandle(() => {
+    const gate = Promise.withResolvers<void>();
+    const histories: unknown[][] = [];
+    const fetch = globalThis.fetch;
+    globalThis.fetch = (async (url, options) => {
+      if (String(url) === "https://api.openai.com/v1/responses") {
+        const { input } = JSON.parse(String(options?.body)) as { input: unknown[] };
+        histories.push(input.slice(0, -1));
+        await gate.promise;
+      }
+      return fetch(url, options);
+    }) as typeof globalThis.fetch;
+    return { histories, finish: gate.resolve };
+  });
+
+  const page = ggmail.renderer;
+  const toggle = page.getByRole("button", { name: "Mail assistant", exact: true });
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await toggle.click();
+  await composer.fill(first);
+  await composer.press("Enter");
+  await expect.poll(() => provider.evaluate(({ histories }) => histories.length)).toBe(1);
+  await composer.fill(followUp);
+  await panel.getByRole("button", { name: "Close mail assistant" }).click();
+  await expect(page.locator(".assistant-drawer")).toHaveCSS("width", "0px");
+  await expect(panel).toHaveCount(0);
+  await provider.evaluate(({ finish }) => finish());
+  await toggle.click();
+  await expect(panel.getByText(first, { exact: true })).toBeVisible();
+  await expect(panel.getByText(answer, { exact: true })).toBeVisible();
+  await expect(composer).toHaveValue(followUp);
+  await composer.press("Enter");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(2);
+  expect(await provider.evaluate(({ histories }) => histories[1])).toEqual([
+    { role: "user", content: first },
+    { role: "assistant", content: expect.stringContaining(answer) },
+  ]);
+
+  await composer.fill("Unsent note");
+  await composer.press("Escape");
+  await expect(toggle).toBeFocused();
+  await expect(page.locator(".assistant-drawer")).toHaveCSS("width", "0px");
+  await toggle.click();
+  await expect(composer).toHaveValue("Unsent note");
+  await panel.getByRole("button", { name: "New chat" }).click();
+  await expect(composer).toHaveValue("");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(0);
+  await expect(panel.getByText(first, { exact: true })).toHaveCount(0);
+  await composer.fill("New topic");
+  await composer.press("Enter");
+  await expect(panel.getByText(answer, { exact: true })).toBeVisible();
+  expect(await provider.evaluate(({ histories }) => histories[2])).toEqual([]);
+
+  await composer.fill("Note for this thread");
+  await toggle.click();
+  await expect(page.locator(".assistant-drawer")).toHaveCSS("width", "0px");
+  await mail.evaluate(() => {
+    location.hash = "#inbox";
+  });
+  await toggle.click();
+  await expect(panel.getByRole("button", { name: "Catch me up" })).toBeVisible();
+  await expect(composer).toHaveValue("");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(0);
+  await provider.dispose();
+});
+
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test(`the assistant drawer tracks the Gmail view with ${reducedMotion} motion`, async () => {
     const mail = await openThread();
@@ -275,8 +348,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       const samples = await page.evaluate(
         async ({ action, full }) => {
           const toggle = document.querySelector<HTMLButtonElement>("#mail-assistant-toggle");
-          if (!toggle) {
-            throw new Error("Missing drawer toggle");
+          const drawer = document.querySelector<HTMLElement>(".assistant-drawer");
+          if (!toggle || !drawer) {
+            throw new Error("Missing assistant drawer or toggle");
           }
           const insets: number[] = [];
           const widths = new Set<number>();
@@ -296,7 +370,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               toggle.click();
               reversed = true;
             }
-            if (action === "open" ? inset === full : !panel && (reversed || action === "close")) {
+            const closed = drawer.inert && drawer.getBoundingClientRect().width === 0;
+            if (action === "open" ? inset === full : closed && (reversed || action === "close")) {
               return { insets, widths: [...widths] };
             }
           }
@@ -307,7 +382,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       await expect
         .poll(() => native.evaluate((tracker) => tracker.inset()))
         .toBe(action === "open" ? full : 0);
-      // Reduced-motion close may unmount before the next paint.
       expect(samples.widths.every((width) => width === full)).toBe(true);
       const nativeInsets = await native.evaluate((tracker) => tracker.samples);
       for (const [source, values] of Object.entries({
@@ -352,6 +426,147 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     }
   });
 }
+
+test("the assistant drawer stays uncovered when switching between mail accounts", async () => {
+  const page = ggmail.renderer;
+  const first = await openMailFixture("#inbox", '<main role="main">First mailbox</main>');
+  const firstContext = await page.evaluate(() =>
+    window.electron.ipcRenderer.invoke("assistant.context"),
+  );
+  await page.evaluate(() => {
+    window.electron.ipcRenderer.send("accounts.addAccount", {
+      label: "Second mailbox",
+      color: null,
+      notifications: false,
+      gmail: { unreadBadge: true, unifiedInbox: true },
+    });
+  });
+  const second = await openMailFixture("#sent", '<main role="main">Second mailbox</main>');
+  const firstUrl = first.url();
+  const secondUrl = second.url();
+  const accounts = page.locator("button[data-account-id]");
+  await expect(accounts).toHaveCount(2);
+  const toggle = page.getByRole("button", { name: "Mail assistant", exact: true });
+  const drawer = page.locator(".assistant-drawer");
+  const width = await page.evaluate(() => innerWidth);
+  const full = assistantPanelWidth(width);
+
+  // Gmail is hosted in native child views above the renderer. A DOM visibility
+  // assertion passes even when another account paints over the entire drawer.
+  const nativeLayout = () =>
+    ggmail.app.evaluate(
+      ({ BrowserWindow, WebContentsView }, urls) => {
+        const win = BrowserWindow.getAllWindows().find((w) =>
+          w.webContents.getURL().includes("main.html"),
+        );
+        if (!win) {
+          throw new Error("Missing main window");
+        }
+        const views = win.contentView.children
+          .filter((child) => child instanceof WebContentsView)
+          .filter((view) => view.getVisible() && urls.includes(view.webContents.getURL()));
+        const edges = views.map((view) => {
+          const { x, width } = view.getBounds();
+          return x + width;
+        });
+        return {
+          front: views.at(-1)?.webContents.getURL(),
+          frontEdge: edges.at(-1),
+          furthestEdge: Math.max(...edges),
+        };
+      },
+      [firstUrl, secondUrl],
+    );
+
+  await expect.poll(async () => (await nativeLayout()).front).toBe(secondUrl);
+  const baseline = (await nativeLayout()).furthestEdge;
+  async function expectLayout(front: string, inset: number) {
+    await expect
+      .poll(() => drawer.evaluate((el) => Math.round(el.getBoundingClientRect().width)))
+      .toBe(inset);
+    await expect.poll(nativeLayout).toEqual({
+      front,
+      frontEdge: baseline - inset,
+      furthestEdge: baseline - inset,
+    });
+  }
+
+  await useDraftProvider(null);
+  await expectLayout(secondUrl, 0);
+  await toggle.click();
+  await expectLayout(secondUrl, full);
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await composer.fill("Private note for the second mailbox");
+
+  // Hold the scope lookup across the account switch. The old composer must
+  // disappear as soon as the account changes, even before the new scope arrives.
+  const gate = await ggmail.app.evaluateHandle(({ BrowserWindow }, context) => {
+    const win = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    if (!win) {
+      throw new Error("Missing main window");
+    }
+    const ipc = win.webContents.mainFrame.ipc;
+    const gate = Promise.withResolvers<void>();
+    ipc.handle("assistant.context", async () => {
+      await gate.promise;
+      return context;
+    });
+    return () => {
+      ipc.removeHandler("assistant.context");
+      gate.resolve();
+    };
+  }, firstContext);
+  try {
+    await accounts.first().click();
+    await expectLayout(firstUrl, full);
+    await expect(panel.getByRole("status")).toHaveText("Waiting for the mail view…");
+    await expect(composer).toBeHidden();
+  } finally {
+    await gate.evaluate((release) => release());
+    await gate.dispose();
+  }
+  await expect(composer).toHaveValue("");
+  await toggle.click();
+  await expectLayout(firstUrl, 0);
+  // Switch again before the opening animation has settled.
+  await toggle.click();
+  await accounts.evaluateAll((buttons) => {
+    for (const index of [1, 0, 1]) {
+      (buttons[index] as HTMLButtonElement).click();
+    }
+  });
+  await expectLayout(secondUrl, full);
+
+  // Exercise Gmail's native fullscreen listeners without moving the test
+  // window into a separate macOS Space.
+  const fullscreen = (enter: boolean) =>
+    ggmail.app.evaluate(
+      ({ webContents }, { url, enter }) => {
+        const mail = webContents.getAllWebContents().find((w) => w.getURL() === url);
+        if (!mail) {
+          throw new Error("Missing fullscreen mailbox");
+        }
+        mail.emit(enter ? "enter-html-full-screen" : "leave-html-full-screen");
+      },
+      { url: secondUrl, enter },
+    );
+  await fullscreen(true);
+  try {
+    for (const inset of [0, full]) {
+      await page.evaluate(async (inset) => {
+        window.electron.ipcRenderer.send("assistant.setInset", inset);
+        await window.electron.ipcRenderer.invoke("assistant.context");
+      }, inset);
+      expect((await nativeLayout()).frontEdge).toBe(baseline);
+    }
+  } finally {
+    await fullscreen(false);
+  }
+  await expectLayout(secondUrl, full);
+});
 
 test("streams answer text and shows a validated draft before the provider finishes", async () => {
   await openThread();

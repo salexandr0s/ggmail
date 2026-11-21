@@ -206,11 +206,27 @@ class Accounts {
     }
   }
 
-  updateSelectedViewBounds() {
-    // Removal can tear down the selected instance before its successor is chosen.
-    const selected = this.getAccountConfigs().find((account) => account.selected);
-    if (selected) {
-      this.instances.get(selected.id)?.tabs.activeTab.updateViewBounds?.();
+  updateEmbeddedViewWidths(windowWidth: number) {
+    // Inactive mailboxes and tabs stay stacked underneath the front view.
+    // All of them share its right edge, or one can cover the assistant.
+    for (const account of this.instances.values()) {
+      for (const tab of account.tabs.tabs) {
+        if (isWindowedTab(tab) || (tab.id === GMAIL_TAB_ID && !account.gmail.hasView)) {
+          continue;
+        }
+        const view = tab.view;
+        if (view) {
+          const bounds = view.getBounds();
+          // HTML fullscreen occupies the titlebar as well as the mail area.
+          if (bounds.y === 0) {
+            continue;
+          }
+          const width = main.embeddedViewWidth(windowWidth, bounds.x);
+          if (bounds.width !== width) {
+            view.setBounds({ ...bounds, width });
+          }
+        }
+      }
     }
   }
 

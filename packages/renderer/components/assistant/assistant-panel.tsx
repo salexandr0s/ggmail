@@ -16,7 +16,8 @@ import {
   MessageSquarePlusIcon,
   XIcon,
 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useAccountsStore } from "@/lib/stores";
 import { useAssistantConnection } from "@/lib/use-assistant-connection";
 import { useAssistantModel } from "@/lib/use-assistant-model";
 import { AssistantConversation } from "./assistant-conversation";
@@ -37,8 +38,14 @@ type ClosePanel = (focusToggle?: boolean) => void;
 export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePanel }) {
   const width = useSyncExternalStore(watchWidth, getWidth);
   const clip = useRef<HTMLDivElement>(null);
-  const nextSession = useRef(0);
-  const [session, setSession] = useState<number | null>(null);
+  const accountId = useAccountsStore(
+    (state) => state.accounts.find((account) => account.config.selected)?.config.id,
+  );
+  const [session, setSession] = useState<{
+    accountId?: string;
+    context: AssistantContext;
+    checked: boolean;
+  }>();
 
   useLayoutEffect(() => {
     const element = clip.current;
@@ -57,51 +64,20 @@ export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePa
         lastInset = inset;
         ipc.main.send("assistant.setInset", inset);
       }
-      if (!entry.contentRect.width && element.inert) {
-        setSession(null);
-      }
     });
     observer.observe(element);
+    ipc.main.send("assistant.setMounted", true);
     return () => {
       observer.disconnect();
-      ipc.main.send("assistant.setInset", 0);
+      ipc.main.send("assistant.setMounted", false);
     };
   }, []);
 
   useLayoutEffect(() => {
     if (!open) {
-      if (!clip.current?.offsetWidth) {
-        setSession(null);
-      }
+      setSession((previous) => (previous?.checked ? { ...previous, checked: false } : previous));
       return;
     }
-    setSession(++nextSession.current);
-    ipc.main.send("assistant.setVisible", true);
-    return () => ipc.main.send("assistant.setVisible", false);
-  }, [open]);
-
-  return (
-    <div
-      ref={clip}
-      inert={!open}
-      data-open={open || undefined}
-      className="assistant-drawer absolute inset-y-0 right-0 overflow-clip"
-      style={{ width: `calc(var(--assistant-reveal) * ${width}px)` }}
-    >
-      {session !== null && <AssistantPanel key={session} width={width} close={close} />}
-    </div>
-  );
-}
-
-function AssistantPanel({ width, close }: { width: number; close: ClosePanel }) {
-  const { t } = useLingui();
-  const panel = useRef<HTMLElement>(null);
-  const { connection, refresh } = useAssistantConnection();
-  const provider = connection?.provider ?? "chatgpt";
-  const { model, chooseModel } = useAssistantModel(provider, connection?.models ?? []);
-  const [context, setContext] = useState<AssistantContext>();
-  const [revision, setRevision] = useState(0);
-  useEffect(() => {
     let mounted = true;
     let readingContext = false;
     async function updateContext() {
@@ -112,29 +88,82 @@ function AssistantPanel({ width, close }: { width: number; close: ClosePanel }) 
       try {
         const next = await ipc.main.invoke("assistant.context");
         if (mounted) {
-          setContext((current) =>
-            current?.key === next.key && current.accountLabel === next.accountLabel
+          setSession((current) =>
+            current?.checked &&
+            current.accountId === accountId &&
+            current.context.key === next.key &&
+            current.context.accountLabel === next.accountLabel
               ? current
-              : next,
+              : { accountId, context: next, checked: true },
           );
         }
       } catch {
         if (mounted) {
-          setContext(undefined);
+          // Retry a missed scope check without discarding a retained transcript.
+          setSession((current) => (current?.checked ? { ...current, checked: false } : current));
         }
       } finally {
         readingContext = false;
       }
     }
 
-    panel.current?.focus();
     void updateContext();
     const timer = setInterval(() => void updateContext(), ms("750 milliseconds"));
     return () => {
       mounted = false;
       clearInterval(timer);
     };
-  }, []);
+  }, [open, accountId]);
+
+  // Check the active mailbox before revealing a conversation that was hidden.
+  const context = session?.accountId === accountId ? session?.context : undefined;
+  return (
+    <div
+      ref={clip}
+      inert={!open}
+      aria-hidden={!open}
+      data-open={open || undefined}
+      className="assistant-drawer absolute inset-y-0 right-0 overflow-clip"
+      style={{ width: `calc(var(--assistant-reveal) * ${width}px)` }}
+    >
+      {(open || session) && (
+        <AssistantPanel
+          open={open}
+          context={context}
+          showContext={!open || session?.checked === true}
+          width={width}
+          close={close}
+        />
+      )}
+    </div>
+  );
+}
+
+function AssistantPanel({
+  open,
+  context,
+  showContext,
+  width,
+  close,
+}: {
+  open: boolean;
+  context?: AssistantContext;
+  showContext: boolean;
+  width: number;
+  close: ClosePanel;
+}) {
+  const { t } = useLingui();
+  const panel = useRef<HTMLElement>(null);
+  const { connection, refresh } = useAssistantConnection();
+  const provider = connection?.provider ?? "chatgpt";
+  const { model, chooseModel } = useAssistantModel(provider, connection?.models ?? []);
+  const [revision, setRevision] = useState(0);
+
+  useLayoutEffect(() => {
+    if (open && panel.current) {
+      (panel.current.querySelector("textarea") ?? panel.current).focus({ preventScroll: true });
+    }
+  }, [open, showContext]);
 
   const scopes = {
     thread: t`Open email`,
@@ -144,6 +173,8 @@ function AssistantPanel({ width, close }: { width: number; close: ClosePanel }) 
   };
   const connected = connection?.status === "connected";
   const ready = connected && Boolean(connection.models.length);
+  const checkingConnection = !connection || connection.status === "connecting";
+  const waitingForMail = ready && (!model || !context || !showContext);
   function newChat() {
     ipc.main.send("assistant.clear");
     panel.current?.focus();
@@ -225,7 +256,7 @@ function AssistantPanel({ width, close }: { width: number; close: ClosePanel }) 
             </Button>
           </div>
         </div>
-        {ready && context && (
+        {ready && context && showContext && (
           <p className="flex min-w-0 items-center gap-2 border-t border-border/70 px-5 py-2 text-xs text-muted-foreground">
             {context.kind === "thread" ? (
               <MailOpenIcon aria-hidden="true" className="size-3.5 shrink-0" />
@@ -252,28 +283,32 @@ function AssistantPanel({ width, close }: { width: number; close: ClosePanel }) 
           {connection.error}
         </p>
       )}
-      {ready && model && connection && context ? (
-        <AssistantConversation
-          key={JSON.stringify([context.key, provider, revision])}
-          provider={provider}
-          scope={context.kind}
-          contextKey={context.key}
-          models={connection.models}
-          model={model}
-          chooseModel={chooseModel}
-          onReplyError={() => void refresh()}
-          onInserted={() => {
-            if (getWidth() === window.innerWidth) {
-              close(false);
-            }
-          }}
-        />
-      ) : !connection || connection.status === "connecting" || ready ? (
+      {ready && model && connection && context && (
+        <div className={showContext ? "contents" : "hidden"}>
+          <AssistantConversation
+            key={JSON.stringify([context.key, provider, revision])}
+            provider={provider}
+            scope={context.kind}
+            contextKey={context.key}
+            models={connection.models}
+            model={model}
+            chooseModel={chooseModel}
+            onReplyError={() => void refresh()}
+            onInserted={() => {
+              if (getWidth() === window.innerWidth) {
+                close(false);
+              }
+            }}
+          />
+        </div>
+      )}
+      {(checkingConnection || waitingForMail) && (
         <p role="status" className="flex items-center gap-2 p-5 text-sm text-muted-foreground">
           <LoaderCircleIcon className="size-4 motion-safe:animate-spin" />
           {ready ? t`Waiting for the mail view…` : t`Checking connection…`}
         </p>
-      ) : (
+      )}
+      {!checkingConnection && !ready && (
         <div className="min-h-0 flex-1 overflow-y-auto px-5">
           <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-start justify-center py-8">
             <div className="mb-4 grid size-10 place-items-center rounded-xl bg-muted text-foreground">
