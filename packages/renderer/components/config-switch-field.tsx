@@ -43,14 +43,20 @@ export function ConfigSwitchField({
   return (
     <Field orientation="horizontal">
       <FieldContent>
-        <FieldLabel htmlFor={configKey} className="flex items-center gap-2">
+        <FieldLabel
+          id={`${configKey}-label`}
+          htmlFor={configKey}
+          className="flex items-center gap-2"
+        >
           {label}
           {maturity && <MaturityFieldBadge maturity={maturity} />}
         </FieldLabel>
-        <FieldDescription>{description}</FieldDescription>
+        <FieldDescription id={`${configKey}-description`}>{description}</FieldDescription>
       </FieldContent>
       <Switch
         id={configKey}
+        aria-labelledby={`${configKey}-label`}
+        aria-describedby={`${configKey}-description`}
         checked={disabled ? false : checked}
         disabled={disabled}
         onCheckedChange={(checked) => {

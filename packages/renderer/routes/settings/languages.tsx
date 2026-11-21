@@ -7,14 +7,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@ggmail/ui/components/dropdown-menu";
-import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from "@ggmail/ui/components/field";
+import { Field, FieldDescription, FieldLegend, FieldSet } from "@ggmail/ui/components/field";
 import { cn } from "@ggmail/ui/lib/utils";
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDownIcon } from "lucide-react";
 import { useMemo } from "react";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 
@@ -96,59 +102,64 @@ export function LanguagesSettings() {
         <SettingsTitle>{t(settingsPageLabels.languages)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
-          <FieldSet>
-            <FieldLegend variant="label" className="flex items-center gap-2">
-              <Trans comment="Setting that picks the languages the spellchecker checks">
-                Spellchecker
-              </Trans>
-            </FieldLegend>
-            <FieldDescription>
-              <Trans>
-                Select additional languages for spellchecking alongside the system language.
-              </Trans>
-            </FieldDescription>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant="outline"
-                    // A summary too long for the trigger wraps rather than
-                    // clipping, the way a settings sidebar item does; min-h-8
-                    // and py-1 keep a one-line trigger at the Button's h-8.
-                    className={cn(
-                      "h-auto min-h-8 w-full justify-start gap-1.5 py-1 text-left font-normal whitespace-normal",
-                      selected.length === 0 && "text-muted-foreground",
-                    )}
-                  >
-                    <span className="min-w-0 wrap-anywhere">{getTriggerLabel()}</span>
-                    <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
-                  </Button>
-                }
-              />
-              <DropdownMenuContent align="start">
-                {osLocale && (
-                  <>
-                    <DropdownMenuCheckboxItem checked disabled>
-                      {getLanguageLabel(osLocale)}
+        <FieldSet>
+          <FieldLegend variant="label" className="flex items-center gap-2">
+            <Trans comment="Setting that picks the languages the spellchecker checks">
+              Spellchecker
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
+            <Field>
+              <FieldDescription>
+                <Trans>
+                  Select additional languages for spellchecking alongside the system language.
+                </Trans>
+              </FieldDescription>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      // A summary too long for the trigger wraps rather than
+                      // clipping, the way a settings sidebar item does; min-h-8
+                      // and py-1 keep a one-line trigger at the Button's h-8.
+                      className={cn(
+                        "settings-picker h-auto min-h-8 w-full justify-start gap-1.5 py-1 text-left font-normal whitespace-normal",
+                        selected.length === 0 && "text-muted-foreground",
+                      )}
+                    >
+                      <span className="min-w-0 wrap-anywhere">{getTriggerLabel()}</span>
+                      <ChevronDownIcon
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0 text-muted-foreground"
+                      />
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="start">
+                  {osLocale && (
+                    <>
+                      <DropdownMenuCheckboxItem checked disabled>
+                        {getLanguageLabel(osLocale)}
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  {languages.map(({ code, label }) => (
+                    <DropdownMenuCheckboxItem
+                      key={code}
+                      checked={selected.includes(code)}
+                      onCheckedChange={(checked) => toggleLanguage(code, checked)}
+                      closeOnClick={false}
+                    >
+                      {label}
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-                {languages.map(({ code, label }) => (
-                  <DropdownMenuCheckboxItem
-                    key={code}
-                    checked={selected.includes(code)}
-                    onCheckedChange={(checked) => toggleLanguage(code, checked)}
-                    closeOnClick={false}
-                  >
-                    {label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </FieldSet>
-        </FieldGroup>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </Field>
+          </SettingsPanel>
+        </FieldSet>
       </SettingsContent>
     </Settings>
   );

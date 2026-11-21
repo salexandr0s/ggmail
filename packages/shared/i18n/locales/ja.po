@@ -505,6 +505,11 @@ msgstr "アプリメニュー"
 msgid "Appearance"
 msgstr "外観"
 
+#. Group of pages in the Settings sidebar
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Application"
+msgstr "アプリ"
+
 #: packages/renderer/routes/settings/about.tsx
 msgid "Application version"
 msgstr "アプリケーションのバージョン"
@@ -2355,6 +2360,11 @@ msgstr "“{selection}”を調べる"
 msgid "Looking for attachments…"
 msgstr "添付ファイルを検索中…"
 
+#. Group of pages in the Settings sidebar
+#: packages/renderer/components/app-sidebar.tsx
+msgid "Mail"
+msgstr "メール"
+
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Mail assistant"
@@ -2530,6 +2540,10 @@ msgstr "次の出典"
 msgid "No accounts are included in All Mail."
 msgstr "「すべてのメール」に含まれるアカウントはありません。"
 
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "No accounts yet."
+msgstr "アカウントはまだありません。"
+
 #: packages/renderer/routes/settings/languages.tsx
 msgid "No additional languages selected"
 msgstr "追加の言語は選択されていません"
@@ -2596,6 +2610,10 @@ msgstr "この ChatGPT アカウントで利用できるモデルはありませ
 #: packages/renderer/components/attachments/preview.tsx
 msgid "No preview available"
 msgstr "プレビューできません"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "No saved searches yet."
+msgstr "保存した検索はまだありません。"
 
 #. Trust all links on quotes the checkbox in the dialog that asks before opening an external link, Trust all links on {origin}, so it matches that checkbox's wording
 #: packages/renderer/routes/settings/phishing-protection.tsx
@@ -3973,10 +3991,12 @@ msgstr "“新しいウィンドウ”に切り替える"
 msgid "Switch to New windows?"
 msgstr "“新しいウィンドウ”に切り替えますか?"
 
+#. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
 #. Option of the Sound setting: the operating system's own notification sound
 #. Option of the Theme setting
 #. Option of the system tray icon's Color setting
+#: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/routes/settings/appearance.tsx
 #: packages/renderer/routes/settings/language-field.tsx
 #: packages/renderer/routes/settings/notifications.tsx

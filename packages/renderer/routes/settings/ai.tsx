@@ -64,15 +64,13 @@ function IdentityPicker<Value extends string>({
       >
         <SelectTrigger
           id={id}
-          className="w-full min-w-0 gap-3 bg-background px-3 shadow-none hover:bg-muted/50 data-[size=default]:h-11 dark:bg-background"
+          className="w-full min-w-0 gap-3 bg-background px-3 shadow-none hover:bg-muted/50 data-[size=default]:h-auto data-[size=default]:min-h-11 dark:bg-background"
           title={selected?.label}
         >
           {selected && (
             <ModelLogo provider={selected.provider} model={selected.model} className="size-5" />
           )}
-          <SelectValue className="min-w-0">
-            <span className="truncate">{selected?.label}</span>
-          </SelectValue>
+          <SelectValue>{selected?.label}</SelectValue>
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}>
           {items.map((item) => (
@@ -83,7 +81,7 @@ function IdentityPicker<Value extends string>({
               className="min-h-9 px-3 pr-8 [&>span:first-child]:min-w-0 [&>span:first-child]:shrink [&>span:first-child]:items-center"
             >
               <ModelLogo provider={item.provider} model={item.model} className="size-5" />
-              <span className="truncate">{item.label}</span>
+              <span className="min-w-0 wrap-anywhere">{item.label}</span>
             </SelectItem>
           ))}
         </SelectContent>
@@ -134,11 +132,11 @@ export function AISettings() {
 
   return (
     <Settings>
-      <SettingsHeader className="mb-5">
+      <SettingsHeader>
         <SettingsTitle>{t(settingsPageLabels.ai)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <div className="rounded-xl border bg-card text-card-foreground shadow-xs">
+        <div className="settings-surface">
           <FieldGroup className="p-4">
             <IdentityPicker
               id="ai-provider"
@@ -279,7 +277,7 @@ export function AISettings() {
             </div>
           </form>
         </div>
-        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+        <p className="text-xs leading-relaxed text-muted-foreground">
           <Trans>
             ggmail sends your prompt and relevant mail to this provider when you ask a question.
             Switching providers starts a new chat.

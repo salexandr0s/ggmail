@@ -3,9 +3,10 @@
  * `ConfigSwitchField` and `ConfigSelectField` over a config key, and none of it
  * needs a Gmail account.
  */
-import { expect, test } from "@playwright/test";
+import { expect, type Locator, test } from "@playwright/test";
 import { seedAccount, seedSavedTab } from "./lib/accounts";
 import { useApp } from "./lib/app";
+import { setMinimumWindowWidth } from "./lib/page-fit";
 import { configSwitch, openSettingsPage, readSettingsPageLabels } from "./lib/settings";
 
 const ggmail = useApp({
@@ -141,4 +142,39 @@ test("a copy button is named for screen readers", async () => {
   await openSettingsPage(settings, "About ggmail");
 
   await expect(settings.getByRole("button", { name: "Copy", exact: true }).first()).toBeVisible();
+});
+
+test("picker chevrons stay at the right edge of the control", async () => {
+  const settings = await ggmail.openSettings();
+
+  async function checkChevron(trigger: Locator) {
+    await expect(trigger).toBeVisible();
+    const chevron = trigger.locator(":scope > svg:last-child");
+    await expect(chevron).toBeVisible();
+    const inset = await chevron.evaluate((svg) => {
+      const trigger = svg.parentElement;
+      if (!trigger) {
+        throw new Error("The chevron has no trigger");
+      }
+      return trigger.getBoundingClientRect().right - svg.getBoundingClientRect().right;
+    });
+    expect(inset).toBeGreaterThanOrEqual(0);
+    expect(inset).toBeLessThanOrEqual(12);
+  }
+
+  async function checkPagePickers() {
+    await openSettingsPage(settings, "Workspace apps");
+    await checkChevron(settings.getByRole("combobox", { name: "Mode", exact: true }));
+    await checkChevron(settings.getByLabel("Excluded apps", { exact: true }));
+    await openSettingsPage(settings, "AI");
+    await checkChevron(settings.getByRole("combobox", { name: "Mail assistant provider" }));
+  }
+
+  await checkPagePickers();
+  await setMinimumWindowWidth(ggmail, settings);
+  await checkPagePickers();
+
+  await openSettingsPage(settings, "Accounts");
+  await settings.getByRole("button", { name: "Add", exact: true }).click();
+  await checkChevron(settings.getByRole("dialog").getByRole("combobox", { name: "Color" }));
 });

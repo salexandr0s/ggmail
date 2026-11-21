@@ -34,10 +34,8 @@ import {
   Field,
   FieldDescription,
   FieldError,
-  FieldGroup,
   FieldLabel,
   FieldLegend,
-  FieldSeparator,
   FieldSet,
 } from "@ggmail/ui/components/field";
 import { Input } from "@ggmail/ui/components/input";
@@ -61,7 +59,13 @@ import { ConfigSwitchField } from "@/components/config-switch-field";
 import { CopyButton } from "@/components/copy-button";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { MaturityFieldBadge } from "@/components/maturity-field-badge";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { SettingsDialogContent } from "@/components/settings-dialog-content";
 import { extensionDescriptions } from "@/lib/extension-descriptions";
 import { queryClient, useConfig, useConfigMutation } from "@/lib/react-query";
@@ -884,46 +888,45 @@ export function ExtensionsSettings() {
         )}
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
-          <ExperimentalAlert />
-          <FieldDescription>
-            <Trans>
-              Extensions add features to ggmail, like filling passwords on the Google sign-in page.
-              Turn one on below and ggmail installs the official version from the Chrome Web Store.
-              Extensions start after a restart, and every account shares one copy, so you sign in to
-              an extension once.
-            </Trans>
-          </FieldDescription>
+        <ExperimentalAlert />
+        <FieldDescription>
+          <Trans>
+            Extensions add features to ggmail, like filling passwords on the Google sign-in page.
+            Turn one on below and ggmail installs the official version from the Chrome Web Store.
+            Extensions start after a restart, and every account shares one copy, so you sign in to
+            an extension once.
+          </Trans>
+        </FieldDescription>
+        <SettingsPanel>
           <ConfigSwitchField
             label={t`Enable extensions`}
             description={t`Run the installed extensions. Turning this off stops them without uninstalling them.`}
             configKey="extensions.enabled"
             restartRequired
           />
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the password manager extensions">Password managers</Trans>
-            </FieldLegend>
-            <PasskeysAlert />
-            <ItemGroup>
-              {curatedExtensions
-                .filter(({ category }) => category === "passwordManager")
-                .map((extension) => (
-                  <ExtensionItem
-                    key={extension.id}
-                    extension={extension}
-                    extensionsEnabled={extensionsEnabled}
-                    installedExtensionIds={config["extensions.installed"]}
-                    installedVersion={
-                      installedExtensions?.find(({ id }) => id === extension.id)?.version
-                    }
-                    additionalSites={config["extensions.additionalSites"]}
-                  />
-                ))}
-            </ItemGroup>
-          </FieldSet>
-        </FieldGroup>
+        </SettingsPanel>
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the password manager extensions">Password managers</Trans>
+          </FieldLegend>
+          <PasskeysAlert />
+          <ItemGroup>
+            {curatedExtensions
+              .filter(({ category }) => category === "passwordManager")
+              .map((extension) => (
+                <ExtensionItem
+                  key={extension.id}
+                  extension={extension}
+                  extensionsEnabled={extensionsEnabled}
+                  installedExtensionIds={config["extensions.installed"]}
+                  installedVersion={
+                    installedExtensions?.find(({ id }) => id === extension.id)?.version
+                  }
+                  additionalSites={config["extensions.additionalSites"]}
+                />
+              ))}
+          </ItemGroup>
+        </FieldSet>
       </SettingsContent>
     </Settings>
   );

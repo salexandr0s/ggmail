@@ -11,7 +11,7 @@ export function VersionHistorySettings() {
       <SettingsHeader>
         <SettingsTitle>{t(settingsPageLabels.versionHistory)}</SettingsTitle>
       </SettingsHeader>
-      <div className="prose dark:prose-invert text-sm">
+      <div className="settings-surface prose dark:prose-invert max-w-none p-5 text-sm">
         <Markdown skipHtml>{changelog}</Markdown>
       </div>
     </>

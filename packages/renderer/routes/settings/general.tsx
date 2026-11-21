@@ -4,10 +4,8 @@ import {
   Field,
   FieldContent,
   FieldDescription,
-  FieldGroup,
   FieldLabel,
   FieldLegend,
-  FieldSeparator,
   FieldSet,
   FieldTitle,
 } from "@ggmail/ui/components/field";
@@ -17,7 +15,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { LoginItemSettings } from "electron";
 import { useEffect, useId } from "react";
 import { ConfigSwitchField } from "@/components/config-switch-field";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { queryClient } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { platform } from "@/lib/utils";
@@ -202,47 +206,46 @@ export function GeneralSettings() {
         <SettingsTitle>{t(settingsPageLabels.general)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
+        <SettingsPanel>
           <LanguageField />
-          <FieldSeparator />
+
           <DefaultMailClientField />
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Settings section about how ggmail starts">
-                Startup
-              </Trans>
-            </FieldLegend>
+        </SettingsPanel>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Settings section about how ggmail starts">Startup</Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <LaunchAtLoginField />
             <ConfigSwitchField
               label={t`Launch minimized`}
               description={t`Start the application minimized.`}
               configKey="launchMinimized"
             />
+          </SettingsPanel>
+        </FieldSet>
+        {platform.isMacOS && (
+          <FieldSet>
+            <FieldLegend>
+              <Trans comment="Heading of the Settings section about going back and forward between pages">
+                Navigation
+              </Trans>
+            </FieldLegend>
+            <SettingsPanel>
+              <ConfigSwitchField
+                label={t`Swipe between pages`}
+                description={t({
+                  message:
+                    "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings.",
+                  comment:
+                    "The second Swipe between pages names the macOS setting of that name in System Settings, so it follows Apple's wording for it",
+                })}
+                configKey="swipeNavigation.enabled"
+              />
+            </SettingsPanel>
           </FieldSet>
-          {platform.isMacOS && (
-            <>
-              <FieldSeparator />
-              <FieldSet>
-                <FieldLegend>
-                  <Trans comment="Heading of the Settings section about going back and forward between pages">
-                    Navigation
-                  </Trans>
-                </FieldLegend>
-                <ConfigSwitchField
-                  label={t`Swipe between pages`}
-                  description={t({
-                    message:
-                      "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings.",
-                    comment:
-                      "The second Swipe between pages names the macOS setting of that name in System Settings, so it follows Apple's wording for it",
-                  })}
-                  configKey="swipeNavigation.enabled"
-                />
-              </FieldSet>
-            </>
-          )}
-        </FieldGroup>
+        )}
       </SettingsContent>
     </Settings>
   );

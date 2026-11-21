@@ -57,7 +57,7 @@ import { cn } from "@ggmail/ui/lib/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { GripVerticalIcon, MoreHorizontalIcon, XIcon } from "lucide-react";
+import { UsersRoundIcon, GripVerticalIcon, MoreHorizontalIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Entries } from "type-fest";
@@ -778,6 +778,14 @@ export function AccountsSettings() {
         <AddAccountButton />
       </SettingsHeader>
       <SettingsContent>
+        {config.accounts.length === 0 && (
+          <div className="settings-empty settings-surface">
+            <UsersRoundIcon aria-hidden="true" className="size-6" />
+            <p>
+              <Trans>No accounts yet.</Trans>
+            </p>
+          </div>
+        )}
         <DragDropProvider
           onDragEnd={(event) => {
             if (event.canceled) {

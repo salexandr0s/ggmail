@@ -4,10 +4,8 @@ import {
   Field,
   FieldContent,
   FieldDescription,
-  FieldGroup,
   FieldLabel,
   FieldLegend,
-  FieldSeparator,
   FieldSet,
 } from "@ggmail/ui/components/field";
 import {
@@ -22,7 +20,13 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useId } from "react";
 import { ConfigSelectField } from "@/components/config-select-field";
 import { ConfigSwitchField } from "@/components/config-switch-field";
-import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
+import {
+  Settings,
+  SettingsContent,
+  SettingsHeader,
+  SettingsPanel,
+  SettingsTitle,
+} from "@/components/settings";
 import { useConfig } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { restartRequiredToast } from "@/lib/toast";
@@ -110,7 +114,7 @@ export function AppearanceSettings() {
             <FieldLegend>
               <Trans>Dock icon</Trans>
             </FieldLegend>
-            <FieldGroup>
+            <SettingsPanel>
               <ConfigSwitchField
                 label={t`Enable dock icon`}
                 description={t`Show the application icon in the dock.`}
@@ -123,14 +127,14 @@ export function AppearanceSettings() {
                 configKey="dock.unreadBadge"
                 restartRequired
               />
-            </FieldGroup>
+            </SettingsPanel>
           </FieldSet>
-          <FieldSeparator />
+
           <FieldSet>
             <FieldLegend>
               <Trans>Menu bar icon</Trans>
             </FieldLegend>
-            <FieldGroup>
+            <SettingsPanel>
               <ConfigSwitchField
                 label={t`Enable menu bar icon`}
                 description={t`Show the application icon in the menu bar.`}
@@ -145,7 +149,7 @@ export function AppearanceSettings() {
                 restartRequired
               />
               {selectAccountWithUnreadField}
-            </FieldGroup>
+            </SettingsPanel>
           </FieldSet>
         </>
       );
@@ -159,35 +163,40 @@ export function AppearanceSettings() {
             ? t({ message: "System tray icon", context: "Windows" })
             : t({ message: "System tray icon", context: "Linux" })}
         </FieldLegend>
-        <ConfigSwitchField
-          label={
-            platform.isWindows
-              ? t({ message: "Enable system tray icon", context: "Windows" })
-              : t({ message: "Enable system tray icon", context: "Linux" })
-          }
-          description={
-            platform.isWindows
-              ? t({ message: "Show the application icon in the system tray.", context: "Windows" })
-              : t({ message: "Show the application icon in the system tray.", context: "Linux" })
-          }
-          configKey="tray.enabled"
-          restartRequired
-        />
-        <ConfigSelectField
-          configKey="tray.iconColor"
-          label={t({
-            message: "Color",
-            comment: "Setting that picks the system tray icon's color",
-          })}
-          description={
-            platform.isWindows
-              ? t({ message: "Choose the color of the system tray icon.", context: "Windows" })
-              : t({ message: "Choose the color of the system tray icon.", context: "Linux" })
-          }
-          items={systemTrayIconColorItems.map(({ value, label }) => ({ value, label: t(label) }))}
-          restartRequired
-        />
-        {selectAccountWithUnreadField}
+        <SettingsPanel>
+          <ConfigSwitchField
+            label={
+              platform.isWindows
+                ? t({ message: "Enable system tray icon", context: "Windows" })
+                : t({ message: "Enable system tray icon", context: "Linux" })
+            }
+            description={
+              platform.isWindows
+                ? t({
+                    message: "Show the application icon in the system tray.",
+                    context: "Windows",
+                  })
+                : t({ message: "Show the application icon in the system tray.", context: "Linux" })
+            }
+            configKey="tray.enabled"
+            restartRequired
+          />
+          <ConfigSelectField
+            configKey="tray.iconColor"
+            label={t({
+              message: "Color",
+              comment: "Setting that picks the system tray icon's color",
+            })}
+            description={
+              platform.isWindows
+                ? t({ message: "Choose the color of the system tray icon.", context: "Windows" })
+                : t({ message: "Choose the color of the system tray icon.", context: "Linux" })
+            }
+            items={systemTrayIconColorItems.map(({ value, label }) => ({ value, label: t(label) }))}
+            restartRequired
+          />
+          {selectAccountWithUnreadField}
+        </SettingsPanel>
       </FieldSet>
     );
   };
@@ -198,14 +207,14 @@ export function AppearanceSettings() {
         <SettingsTitle>{t(settingsPageLabels.appearance)}</SettingsTitle>
       </SettingsHeader>
       <SettingsContent>
-        <FieldGroup>
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Appearance section for the settings that apply to the whole app">
-                General
-              </Trans>
-            </FieldLegend>
-            <Field>
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Appearance section for the settings that apply to the whole app">
+              General
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
+            <Field className="settings-choice-row">
               <FieldContent>
                 <FieldLabel htmlFor={themeFieldId}>
                   <Trans comment="Setting that picks a light or dark appearance">Theme</Trans>
@@ -239,43 +248,47 @@ export function AppearanceSettings() {
                 </SelectContent>
               </Select>
             </Field>
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Appearance section for how accounts look">
-                Accounts
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Appearance section for how accounts look">
+              Accounts
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <ConfigSwitchField
               label={t`Show unread badges`}
               description={t`Show unread badges, following each account's own setting.`}
               configKey="accounts.unreadBadge"
               restartRequired
             />
-          </FieldSet>
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Appearance section for the bar along the top of ggmail's window">
-                Titlebar
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Appearance section for the bar along the top of ggmail's window">
+              Titlebar
+            </Trans>
+          </FieldLegend>
+          <SettingsPanel>
             <ConfigSwitchField
               label={t`Show Do Not Disturb button`}
               description={t`Show a moon in the title bar while Do Not Disturb is on.`}
               configKey="doNotDisturb.showTitlebarButton"
             />
-          </FieldSet>
-          <FieldSeparator />
-          {renderPlatformIconSettings()}
-          <FieldSeparator />
-          <FieldSet>
-            <FieldLegend>
-              <Trans comment="Heading of the Appearance section about ggmail's window">
-                Window
-              </Trans>
-            </FieldLegend>
+          </SettingsPanel>
+        </FieldSet>
+
+        {renderPlatformIconSettings()}
+
+        <FieldSet>
+          <FieldLegend>
+            <Trans comment="Heading of the Appearance section about ggmail's window">Window</Trans>
+          </FieldLegend>
+          <SettingsPanel>
             {platform.isLinux && (
               <ConfigSelectField
                 configKey="window.linuxWindowControls"
@@ -298,8 +311,8 @@ export function AppearanceSettings() {
               description={t`Stop the application window from being resized below a usable minimum.`}
               configKey="window.restrictMinimumSize"
             />
-          </FieldSet>
-        </FieldGroup>
+          </SettingsPanel>
+        </FieldSet>
       </SettingsContent>
     </Settings>
   );

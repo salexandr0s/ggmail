@@ -39,7 +39,7 @@ import {
 } from "@ggmail/ui/components/item";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { GripVerticalIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { BookmarkIcon, GripVerticalIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { EmojiPickerButton } from "@/components/emoji-picker-button";
@@ -358,6 +358,14 @@ export function SavedSearchesSettings() {
         />
       </SettingsHeader>
       <SettingsContent>
+        {config["gmail.savedSearches"].length === 0 && (
+          <div className="settings-empty settings-surface">
+            <BookmarkIcon aria-hidden="true" className="size-6" />
+            <p>
+              <Trans>No saved searches yet.</Trans>
+            </p>
+          </div>
+        )}
         <DragDropProvider
           onDragEnd={(event) => {
             if (event.canceled) {
