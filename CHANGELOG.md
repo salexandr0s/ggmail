@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.65.1 — 2026-11-21
+
+- Reopening the mail assistant in the same mail view restores the conversation and unsent text. Replies can finish while the sidebar is closed. Use **New chat** to start over.
+- Fixed a sidebar bug that let a background mailbox cover the assistant when multiple accounts were open.
+
 ## 3.65.0 — 2026-11-21
 
 ### Added

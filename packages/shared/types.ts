@@ -230,7 +230,7 @@ export type IpcMainEvents =
       "gmail.setOutOfOffice": [outOfOffice: boolean];
       "unifiedSearch.cancel": [accountId: string, requestId: string];
       "gmail.search": [searchQuery: string];
-      "assistant.setVisible": [visible: boolean];
+      "assistant.setMounted": [mounted: boolean];
       "assistant.setInset": [inset: number];
       "assistant.clear": [];
       "assistant.cancelSignIn": [];

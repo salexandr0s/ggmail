@@ -37,8 +37,7 @@ Ask for a draft, then ask for changes to its wording or length. In an open threa
 interrupted request and preserves anything you have typed for your next message.
 
 When you ask a question, ggmail sends the chat and relevant mail context to
-the selected provider. The chat stays in memory and clears when you switch
-providers, close the panel, or start a new chat. Electron's protected storage keeps the ChatGPT connection on this device.
+the selected provider. You can close the sidebar and reopen it in the same mail view to pick up where you left off, including an unfinished message or a reply still coming in. **New chat** clears the conversation. Chat history stays in memory for this app session and clears when you switch providers. Electron's protected storage keeps the ChatGPT connection on this device.
 
 ## Attachments
 

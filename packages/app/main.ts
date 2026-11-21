@@ -44,9 +44,8 @@ class Main {
       return;
     }
     this.assistantInset = inset;
-    if (this.location === "/") {
-      // Switching account or tab lays the newly visible view out on activation.
-      accounts.updateSelectedViewBounds();
+    if (this._window && !this._window.isDestroyed()) {
+      accounts.updateEmbeddedViewWidths(this.getWindowBounds().width);
     }
   }
 

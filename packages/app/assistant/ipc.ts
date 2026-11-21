@@ -89,16 +89,15 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
     authorize(event);
     return assistantChat.context();
   });
-  listener.on("assistant.setVisible", (event, visible) => {
-    if (!isMainFrame(event) || typeof visible !== "boolean") {
+  listener.on("assistant.setMounted", (event, mounted) => {
+    if (!isMainFrame(event) || typeof mounted !== "boolean") {
       return;
     }
-    if (visible) {
+    if (mounted) {
       event.sender.off("did-navigate", closePanel).once("did-navigate", closePanel);
       event.sender.off("render-process-gone", closePanel).once("render-process-gone", closePanel);
     } else {
-      // Stop work immediately; the renderer keeps painting the drawer's exit.
-      assistantChat.clear();
+      closePanel();
     }
   });
   listener.on("assistant.setInset", (event, inset) => {
