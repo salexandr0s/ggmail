@@ -318,6 +318,10 @@ export type TestServer = {
   releaseHeld(): void;
   /** What `GGMAIL_TEST_GMAIL_URL` is set to, so that account views load this server. */
   gmailUrl: string;
+  /** Serve the signed-in Gmail pages a test needs until it calls the returned cleanup. */
+  serveGmailPages(
+    render: (requestUrl: URL, request: IncomingMessage) => string | undefined,
+  ): () => void;
   /**
    * The same, holding the redirect back for `delayMs` first, for a test that
    * needs the gap between a view being attached and its page arriving. A
@@ -332,6 +336,7 @@ export type TestServer = {
 
 export async function startTestServer(): Promise<TestServer> {
   let held: (() => void)[] = [];
+  let gmailPages: ((requestUrl: URL, request: IncomingMessage) => string | undefined) | undefined;
 
   const whenReleased = () =>
     new Promise<void>((resolve) => {
@@ -347,6 +352,20 @@ export async function startTestServer(): Promise<TestServer> {
      * in, on a path carrying a malformed percent escape.
      */
     try {
+      if (gmailPages) {
+        const url = new URL(request.url ?? "/", "http://127.0.0.1");
+        if (url.pathname.replace(/\/$/, "") === GMAIL_PATH) {
+          const page = gmailPages(url, request);
+          if (page !== undefined) {
+            response.writeHead(200, {
+              "content-type": "text/html; charset=utf-8",
+              "cache-control": "no-store",
+            });
+            response.end(page);
+            return;
+          }
+        }
+      }
       respond(request, response, whenReleased);
     } catch {
       response.writeHead(400);
@@ -389,6 +408,12 @@ export async function startTestServer(): Promise<TestServer> {
       }
     },
     gmailUrl: `${origin}${GMAIL_PATH}`,
+    serveGmailPages(render) {
+      gmailPages = render;
+      return () => {
+        gmailPages = undefined;
+      };
+    },
     slowGmailUrl(delayMs) {
       return `${origin}${GMAIL_PATH}${DELAY_PATH}${delayMs}`;
     },

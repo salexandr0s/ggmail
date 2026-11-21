@@ -37,19 +37,22 @@ class Main {
 
   location = "/";
 
-  private assistantVisible = false;
+  private assistantInset = 0;
 
-  setAssistantVisible(visible: boolean) {
-    if (this.assistantVisible === visible) {
+  setAssistantInset(inset: number) {
+    if (this.assistantInset === inset) {
       return;
     }
-    this.assistantVisible = visible;
-    accounts.updateAllViewBounds();
+    this.assistantInset = inset;
+    if (this.location === "/") {
+      // Switching account or tab lays the newly visible view out on activation.
+      accounts.updateSelectedViewBounds();
+    }
   }
 
   embeddedViewWidth(width: number, leftInset: number) {
     const rightInset =
-      this.assistantVisible && this.location === "/" ? assistantPanelWidth(width) : 0;
+      this.location === "/" ? Math.min(this.assistantInset, assistantPanelWidth(width)) : 0;
     return Math.max(0, width - leftInset - rightInset);
   }
 

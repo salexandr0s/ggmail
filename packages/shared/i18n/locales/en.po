@@ -378,7 +378,17 @@ msgstr "Add your own CSS to personalize the Gmail interface further. Changes tak
 msgid "Advanced"
 msgstr "Advanced"
 
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "AI"
+msgstr "AI"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "AI settings"
+msgstr "AI settings"
+
 #: packages/renderer/components/account-filters.tsx
+#: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "All accounts"
@@ -392,6 +402,7 @@ msgstr "All categories"
 msgid "All files"
 msgstr "All files"
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "All mail"
 msgstr "All mail"
@@ -433,6 +444,10 @@ msgstr "Always show trimmed content"
 msgid "Amber"
 msgstr "Amber"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "API key"
+msgstr "API key"
+
 #. Titlebar button on Windows and Linux that opens ggmail's menu, in place of a menu bar
 #: packages/renderer/components/app-menu-button.tsx
 msgid "App menu"
@@ -461,10 +476,6 @@ msgstr "Archive"
 msgid "As soon as it arrives"
 msgstr "As soon as it arrives"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Ask about an email, find to-dos, or draft a reply. When you ask, ChatGPT receives the relevant mail from your current view."
-msgstr "Ask about an email, find to-dos, or draft a reply. When you ask, ChatGPT receives the relevant mail from your current view."
-
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about your mail…"
 msgstr "Ask about your mail…"
@@ -472,6 +483,11 @@ msgstr "Ask about your mail…"
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Ask where to save each file before it downloads."
 msgstr "Ask where to save each file before it downloads."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Assistant model"
+msgstr "Assistant model"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -656,8 +672,7 @@ msgctxt "Windows"
 msgid "Cancel"
 msgstr "Cancel"
 
-#. Cancel ChatGPT sign-in
-#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/routes/settings/ai.tsx
 msgid "Cancel sign-in"
 msgstr "Cancel sign-in"
 
@@ -678,17 +693,9 @@ msgstr "Categories to monitor"
 msgid "Change…"
 msgstr "Change…"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Chat only"
-msgstr "Chat only"
-
 #: packages/app/assistant/connection.ts
 msgid "ChatGPT can't renew this session yet. Try again in a moment."
 msgstr "ChatGPT can't renew this session yet. Try again in a moment."
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "ChatGPT connection"
-msgstr "ChatGPT connection"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT couldn't complete sign-in. Try again."
@@ -697,36 +704,6 @@ msgstr "ChatGPT couldn't complete sign-in. Try again."
 #: packages/app/assistant/responses.ts
 msgid "ChatGPT couldn't complete the request. Try again."
 msgstr "ChatGPT couldn't complete the request. Try again."
-
-#: packages/app/assistant/chat.ts
-msgid "ChatGPT couldn't finish the mail request. Try a narrower question."
-msgstr "ChatGPT couldn't finish the mail request. Try a narrower question."
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "ChatGPT model"
-msgstr "ChatGPT model"
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "ChatGPT models unavailable"
-msgstr "ChatGPT models unavailable"
-
-#: packages/app/assistant/chat.ts
-msgid "ChatGPT requested too many mail actions. Try a narrower question."
-msgstr "ChatGPT requested too many mail actions. Try a narrower question."
-
-#: packages/app/assistant/http.ts
-#: packages/app/assistant/responses.ts
-msgid "ChatGPT returned a response that is too large."
-msgstr "ChatGPT returned a response that is too large."
-
-#: packages/app/assistant/chat.ts
-msgid "ChatGPT returned an empty reply. Try asking again."
-msgstr "ChatGPT returned an empty reply. Try asking again."
-
-#: packages/app/assistant/http.ts
-#: packages/app/assistant/responses.ts
-msgid "ChatGPT returned an empty response."
-msgstr "ChatGPT returned an empty response."
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT returned an invalid identity token."
@@ -758,18 +735,35 @@ msgctxt "Windows"
 msgid "Check for Updates…"
 msgstr "Check for Updates…"
 
+#: packages/app/assistant/responses.ts
+msgid "Check the API key and its permissions in AI settings."
+msgstr "Check the API key and its permissions in AI settings."
+
+#: packages/app/assistant/responses.ts
+msgid "Check your provider's balance or usage limits and try again."
+msgstr "Check your provider's balance or usage limits and try again."
+
 #: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Checking ChatGPT connection…"
-msgstr "Checking ChatGPT connection…"
+msgid "Checking connection…"
+msgstr "Checking connection…"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Checking visible messages"
+msgstr "Checking visible messages"
 
 #. Name of a notification sound, picked in Settings
 #: packages/renderer/lib/notifications/index.ts
 msgid "Chime"
 msgstr "Chime"
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Choose a provider in AI settings to ask about mail or draft a reply."
+msgstr "Choose a provider in AI settings to ask about mail or draft a reply."
+
 #: packages/app/assistant/chat.ts
-msgid "Choose an available ChatGPT model."
-msgstr "Choose an available ChatGPT model."
+#: packages/app/assistant/providers.ts
+msgid "Choose an available model in the mail assistant."
+msgstr "Choose an available model in the mail assistant."
 
 #. Windows Settings is the Settings app of Windows, so it follows Microsoft's name for it
 #: packages/renderer/routes/settings/general.tsx
@@ -809,6 +803,14 @@ msgstr "Choose what to share"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Choose whether every new email or only the emails Gmail marks as important shows a notification."
 msgstr "Choose whether every new email or only the emails Gmail marks as important shows a notification."
+
+#: packages/app/assistant/claude-cli.ts
+msgid "Claude Code couldn't complete the request. Check your sign-in, CLI version, and usage limits."
+msgstr "Claude Code couldn't complete the request. Check your sign-in, CLI version, and usage limits."
+
+#: packages/app/assistant/claude-cli.ts
+msgid "Claude Code returned an incomplete reply. Try again."
+msgstr "Claude Code returned an incomplete reply. Try again."
 
 #. Button that clears the whole download history
 #: packages/renderer/routes/download-history.tsx
@@ -964,19 +966,27 @@ msgstr "Compose"
 msgid "Confirm external links before opening"
 msgstr "Confirm external links before opening"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connect"
+msgstr "Connect"
+
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Connect 1Password"
 msgstr "Connect 1Password"
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Connect ChatGPT"
-msgstr "Connect ChatGPT"
 
 #: packages/app/assistant/connection.ts
 msgid "Connect ChatGPT to use the mail assistant."
 msgstr "Connect ChatGPT to use the mail assistant."
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connected"
+msgstr "Connected"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connected as {email}"
+msgstr "Connected as {email}"
+
+#: packages/renderer/routes/settings/ai.tsx
 msgid "Continue with ChatGPT"
 msgstr "Continue with ChatGPT"
 
@@ -1082,6 +1092,10 @@ msgstr "Copy URL"
 msgid "Couldn't connect to ChatGPT. Try again."
 msgstr "Couldn't connect to ChatGPT. Try again."
 
+#: packages/app/assistant/providers.ts
+msgid "Couldn't connect to the AI provider. Try again."
+msgstr "Couldn't connect to the AI provider. Try again."
+
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Couldn't copy to the clipboard."
 msgstr "Couldn't copy to the clipboard."
@@ -1170,9 +1184,9 @@ msgstr "Couldn't update {failedName}"
 msgid "Couldn't update extensions"
 msgstr "Couldn't update extensions"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Couldn't update the ChatGPT connection. Try again."
-msgstr "Couldn't update the ChatGPT connection. Try again."
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Couldn't update the AI connection. Try again."
+msgstr "Couldn't update the AI connection. Try again."
 
 #. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -1301,10 +1315,6 @@ msgstr "Delete label color"
 msgid "Delete saved search"
 msgstr "Delete saved search"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Describe the email you want to write, or open a Gmail thread to work with its messages."
-msgstr "Describe the email you want to write, or open a Gmail thread to work with its messages."
-
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "Detect a verification code in an incoming email and copy it to your clipboard."
 msgstr "Detect a verification code in an incoming email and copy it to your clipboard."
@@ -1324,10 +1334,9 @@ msgstr "Disable"
 msgid "Disabled"
 msgstr "Disabled"
 
-#. Disconnect the linked ChatGPT account from the mail assistant
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Disconnect ChatGPT"
-msgstr "Disconnect ChatGPT"
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Disconnect"
+msgstr "Disconnect"
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Display the email sender's name in notifications."
@@ -1527,12 +1536,16 @@ msgid "Enter a label"
 msgstr "Enter a label"
 
 #: packages/app/assistant/ipc.ts
-msgid "Enter a message and choose a ChatGPT model."
-msgstr "Enter a message and choose a ChatGPT model."
+msgid "Enter a message and choose a model."
+msgstr "Enter a message and choose a model."
 
 #: packages/renderer/routes/settings/saved-searches.tsx
 msgid "Enter a search query"
 msgstr "Enter a search query"
+
+#: packages/app/assistant/providers.ts
+msgid "Enter a valid API key."
+msgstr "Enter a valid API key."
 
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a valid hex, rgb, or rgba color"
@@ -1699,9 +1712,13 @@ msgstr "Find to-dos"
 msgid "Find…"
 msgstr "Find…"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/routes/settings/ai.tsx
 msgid "Finish signing in in your browser."
 msgstr "Finish signing in in your browser."
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Finishing your reply"
+msgstr "Finishing your reply"
 
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "First page"
@@ -1780,6 +1797,10 @@ msgstr "ggmail doesn't know this extension."
 msgid "ggmail doesn't offer this extension."
 msgstr "ggmail doesn't offer this extension."
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "ggmail encrypts your key on this device."
+msgstr "ggmail encrypts your key on this device."
+
 #: packages/app/dialogs.ts
 msgid "ggmail installs it when you quit."
 msgstr "ggmail installs it when you quit."
@@ -1803,6 +1824,10 @@ msgstr "ggmail keeps this account signed in but doesn't load it."
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail needs at least one account turned on."
 msgstr "ggmail needs at least one account turned on."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
+msgstr "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
@@ -2038,6 +2063,10 @@ msgstr "Inspect Element"
 msgid "Install {extensionName}"
 msgstr "Install {extensionName}"
 
+#: packages/app/assistant/claude-cli.ts
+msgid "Install Claude Code on this computer, then try again."
+msgstr "Install Claude Code on this computer, then try again."
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Jump to latest reply"
 msgstr "Jump to latest reply"
@@ -2199,6 +2228,10 @@ msgstr "Mail assistant"
 msgid "Mail assistant conversation"
 msgstr "Mail assistant conversation"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Mail assistant provider"
+msgstr "Mail assistant provider"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Manage Accounts"
@@ -2357,6 +2390,10 @@ msgstr "No attachments"
 msgid "No bookmarks yet"
 msgstr "No bookmarks yet"
 
+#: packages/app/assistant/responses.ts
+msgid "No compatible mail assistant models are available for this API key."
+msgstr "No compatible mail assistant models are available for this API key."
+
 #: packages/renderer/components/download-history.tsx
 msgid "No downloads yet"
 msgstr "No downloads yet"
@@ -2503,6 +2540,10 @@ msgstr "Open a new window to compose an email, instead of composing inside Gmail
 msgid "Open a reply in this thread and try again."
 msgstr "Open a reply in this thread and try again."
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Open AI settings"
+msgstr "Open AI settings"
+
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password again."
 msgstr "Open and unlock 1Password again."
@@ -2537,10 +2578,6 @@ msgstr "Open folder when done"
 #: packages/renderer/components/app-titlebar.tsx
 msgid "Open Gmail settings to turn off out of office"
 msgstr "Open Gmail settings to turn off out of office"
-
-#: packages/app/assistant/mail-context.ts
-msgid "Open Gmail's All Mail view to search this account."
-msgstr "Open Gmail's All Mail view to search this account."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Open in app"
@@ -2742,10 +2779,6 @@ msgstr "Play a sound when showing a notification."
 msgid "Play sound"
 msgstr "Play sound"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Preparing your draft…"
-msgstr "Preparing your draft…"
-
 #: packages/renderer/components/attachments/files.tsx
 msgid "Preview attachment"
 msgstr "Preview attachment"
@@ -2817,6 +2850,14 @@ msgstr "Quit {appName}"
 msgid "Quit 1Password."
 msgstr "Quit 1Password."
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Reading “{subject}”"
+msgstr "Reading “{subject}”"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Reading this conversation"
+msgstr "Reading this conversation"
+
 #: packages/renderer/components/attachments/files.tsx
 msgid "Received"
 msgstr "Received"
@@ -2862,17 +2903,13 @@ msgctxt "context menu"
 msgid "Reload"
 msgstr "Reload"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Reload ChatGPT models"
-msgstr "Reload ChatGPT models"
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Reload models"
+msgstr "Reload models"
 
 #: packages/renderer/components/titlebar.tsx
 msgid "Reload page"
 msgstr "Reload page"
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Reload the model list to start a conversation."
-msgstr "Reload the model list to start a conversation."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Remember the zoom level of Workspace apps across restarts. Each app keeps its own zoom level, shared by all its tabs and windows."
@@ -3027,6 +3064,10 @@ msgstr "Return to ggmail to finish signing in."
 msgid "Reverse conversation"
 msgstr "Reverse conversation"
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Reviewing the mail results"
+msgstr "Reviewing the mail results"
+
 #. Label of the unified inbox's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Rows per page"
@@ -3097,18 +3138,18 @@ msgstr "Search attachments"
 msgid "Search files, senders, or subjects"
 msgstr "Search files, senders, or subjects"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Search this account for a message, a deadline, or a conversation you need to revisit."
-msgstr "Search this account for a message, a deadline, or a conversation you need to revisit."
-
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
 msgstr "Search…"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Searching All Mail…"
-msgstr "Searching All Mail…"
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching {account}"
+msgstr "Searching {account}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching {account} · page {page}"
+msgstr "Searching {account} · page {page}"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -3233,6 +3274,10 @@ msgstr "Set the volume level for notification sounds."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Set up desktop app"
 msgstr "Set up desktop app"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Set up the mail assistant"
+msgstr "Set up the mail assistant"
 
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/settings.tsx
@@ -3560,6 +3605,10 @@ msgstr "Sign in to Google with a passkey and Windows Hello"
 msgid "Sign in to search this account."
 msgstr "Sign in to search this account."
 
+#: packages/app/assistant/claude-cli.ts
+msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
+msgstr "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
+
 #: packages/app/workspace-app.ts
 msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
 msgstr "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
@@ -3734,13 +3783,46 @@ msgstr "Test notification"
 msgid "Text color"
 msgstr "Text color"
 
+#: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
-msgid "The ChatGPT reply was incomplete. Try again with a shorter request."
-msgstr "The ChatGPT reply was incomplete. Try again with a shorter request."
+msgid "The AI provider couldn't complete the request. Try again."
+msgstr "The AI provider couldn't complete the request. Try again."
 
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/claude-cli-stream.ts
+#: packages/app/assistant/claude-cli.ts
+#: packages/app/assistant/http.ts
 #: packages/app/assistant/responses.ts
-msgid "The connection to ChatGPT ended before the reply finished."
-msgstr "The connection to ChatGPT ended before the reply finished."
+msgid "The AI provider returned a response that is too large."
+msgstr "The AI provider returned a response that is too large."
+
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/http.ts
+#: packages/app/assistant/responses.ts
+msgid "The AI provider returned an empty response."
+msgstr "The AI provider returned an empty response."
+
+#: packages/app/assistant/chat.ts
+msgid "The assistant couldn't finish the mail request. Try a narrower question."
+msgstr "The assistant couldn't finish the mail request. Try a narrower question."
+
+#: packages/app/assistant/chat.ts
+msgid "The assistant requested too many mail actions. Try a narrower question."
+msgstr "The assistant requested too many mail actions. Try a narrower question."
+
+#: packages/app/assistant/chat.ts
+msgid "The assistant returned an empty reply. Try asking again."
+msgstr "The assistant returned an empty reply. Try asking again."
+
+#: packages/app/assistant/claude-cli.ts
+#: packages/app/assistant/providers.ts
+msgid "The Claude Code account changed. Reconnect in AI settings."
+msgstr "The Claude Code account changed. Reconnect in AI settings."
+
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/responses.ts
+msgid "The connection ended before the reply finished."
+msgstr "The connection ended before the reply finished."
 
 #. Message of the error box shown when a download fails; fileName is the file's name
 #: packages/app/downloads.ts
@@ -3760,6 +3842,11 @@ msgstr "The extension starts after ggmail restarts. Restart ggmail, then try aga
 #: packages/app/assistant/mail-context.ts
 msgid "The mail view changed. Ask again to use the new view."
 msgstr "The mail view changed. Ask again to use the new view."
+
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/responses.ts
+msgid "The reply was incomplete. Try again with a shorter request."
+msgstr "The reply was incomplete. Try again with a shorter request."
 
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "The unified inbox shows every unread message from your accounts in one place. A message leaves the list after you read it."
@@ -3882,8 +3969,8 @@ msgid "Unload tabs that have been sitting unused, giving back the memory they ho
 msgstr "Unload tabs that have been sitting unused, giving back the memory they hold. A hibernated tab keeps its place in the sidebar and loads again when you click it, on the page you left. Unpinned tabs leaves your pinned tabs loaded, and Selected tabs hibernates nothing until you mark a tab. Whichever you pick, a single tab can opt in or out with Hibernate When Idle in its context menu."
 
 #: packages/app/assistant/connection.ts
-msgid "Unlock your system credential store to connect ChatGPT."
-msgstr "Unlock your system credential store to connect ChatGPT."
+msgid "Unlock your system credential store to connect the assistant."
+msgstr "Unlock your system credential store to connect the assistant."
 
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/ipc.ts
@@ -3934,6 +4021,10 @@ msgstr "Update not verified"
 msgid "Updates"
 msgstr "Updates"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Use Claude Code session"
+msgstr "Use Claude Code session"
+
 #. Original colors is the label of the toggle on an individual email
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
@@ -3944,9 +4035,9 @@ msgstr "Use dark colors for messages and compose windows. Choose Original colors
 msgid "Use system picker"
 msgstr "Use system picker"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Use the expanded messages in this thread to summarize the exchange or prepare a reply."
-msgstr "Use the expanded messages in this thread to summarize the exchange or prepare a reply."
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Use the Claude Code subscription signed in on this computer. To sign in, run <0>claude auth login</0> in a terminal."
+msgstr "Use the Claude Code subscription signed in on this computer. To sign in, run <0>claude auth login</0> in a terminal."
 
 #: packages/renderer/routes/settings/advanced.tsx
 msgid "Use the system's native screen sharing picker when sharing your screen."
@@ -4008,6 +4099,10 @@ msgstr "Violet"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Volume {percent}"
 msgstr "Volume {percent}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Waiting for {modelName}"
+msgstr "Waiting for {modelName}"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
@@ -4111,24 +4206,12 @@ msgstr "With multiple inboxes, choose which sections count toward the unread cou
 msgid "Work"
 msgstr "Work"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Work with the email snippets visible in this Gmail view."
-msgstr "Work with the email snippets visible in this Gmail view."
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Working on your request…"
-msgstr "Working on your request…"
-
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Notifications section about notifications from Workspace apps
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Workspace apps"
 msgstr "Workspace apps"
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Write a message…"
-msgstr "Write a message…"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts

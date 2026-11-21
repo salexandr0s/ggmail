@@ -972,9 +972,7 @@ export function AppTitlebar({
                 aria-controls={showAssistant ? "mail-assistant" : undefined}
                 aria-label={t`Mail assistant`}
                 title={t`Mail assistant`}
-                className={cn(
-                  showAssistant && "bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200",
-                )}
+                className={cn(showAssistant && "bg-muted text-foreground")}
               >
                 <SparklesIcon />
               </TitlebarIconButton>

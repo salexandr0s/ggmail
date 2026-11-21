@@ -378,7 +378,17 @@ msgstr "Lägg till egen CSS för att anpassa Gmail-gränssnittet ytterligare. Ä
 msgid "Advanced"
 msgstr "Avancerat"
 
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "AI"
+msgstr "AI"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "AI settings"
+msgstr "AI-inställningar"
+
 #: packages/renderer/components/account-filters.tsx
+#: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/unified-search.tsx
 msgid "All accounts"
 msgstr "Alla konton"
@@ -392,6 +402,7 @@ msgstr "Alla kategorier"
 msgid "All files"
 msgstr "Alla filer"
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "All mail"
 msgstr "Alla mail"
@@ -433,6 +444,10 @@ msgstr "Visa alltid förkortat innehåll"
 msgid "Amber"
 msgstr "Bärnstensgul"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "API key"
+msgstr "API-nyckel"
+
 #. Titlebar button on Windows and Linux that opens ggmail's menu, in place of a menu bar
 #: packages/renderer/components/app-menu-button.tsx
 msgid "App menu"
@@ -461,10 +476,6 @@ msgstr "Arkivera"
 msgid "As soon as it arrives"
 msgstr "Så snart den kommer"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Ask about an email, find to-dos, or draft a reply. When you ask, ChatGPT receives the relevant mail from your current view."
-msgstr "Ställ frågor om ett mejl, hitta uppgifter eller skriv ett svarsutkast. När du frågar får ChatGPT relevanta mejl från den aktuella vyn."
-
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about your mail…"
 msgstr "Fråga om dina mejl…"
@@ -472,6 +483,11 @@ msgstr "Fråga om dina mejl…"
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Ask where to save each file before it downloads."
 msgstr "Fråga var varje fil ska sparas innan den laddas ned."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Assistant model"
+msgstr "Assistentmodell"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -656,8 +672,7 @@ msgctxt "Windows"
 msgid "Cancel"
 msgstr "Avbryt"
 
-#. Cancel ChatGPT sign-in
-#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/routes/settings/ai.tsx
 msgid "Cancel sign-in"
 msgstr "Avbryt inloggningen"
 
@@ -678,17 +693,9 @@ msgstr "Kategorier att bevaka"
 msgid "Change…"
 msgstr "Ändra…"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Chat only"
-msgstr "Endast chatt"
-
 #: packages/app/assistant/connection.ts
 msgid "ChatGPT can't renew this session yet. Try again in a moment."
 msgstr "ChatGPT kan inte förnya sessionen ännu. Försök igen om en stund."
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "ChatGPT connection"
-msgstr "ChatGPT-anslutning"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT couldn't complete sign-in. Try again."
@@ -697,36 +704,6 @@ msgstr "Det gick inte att slutföra inloggningen i ChatGPT. Försök igen."
 #: packages/app/assistant/responses.ts
 msgid "ChatGPT couldn't complete the request. Try again."
 msgstr "ChatGPT kunde inte slutföra begäran. Försök igen."
-
-#: packages/app/assistant/chat.ts
-msgid "ChatGPT couldn't finish the mail request. Try a narrower question."
-msgstr "ChatGPT kunde inte besvara frågan om dina mejl. Ställ en mer specifik fråga."
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "ChatGPT model"
-msgstr "ChatGPT-modell"
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "ChatGPT models unavailable"
-msgstr "ChatGPT-modellerna är inte tillgängliga"
-
-#: packages/app/assistant/chat.ts
-msgid "ChatGPT requested too many mail actions. Try a narrower question."
-msgstr "ChatGPT begärde för många mejlåtgärder. Ställ en mer specifik fråga."
-
-#: packages/app/assistant/http.ts
-#: packages/app/assistant/responses.ts
-msgid "ChatGPT returned a response that is too large."
-msgstr "Svaret från ChatGPT är för stort."
-
-#: packages/app/assistant/chat.ts
-msgid "ChatGPT returned an empty reply. Try asking again."
-msgstr "ChatGPT gav ett tomt svar. Prova att fråga igen."
-
-#: packages/app/assistant/http.ts
-#: packages/app/assistant/responses.ts
-msgid "ChatGPT returned an empty response."
-msgstr "ChatGPT gav ett tomt svar."
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT returned an invalid identity token."
@@ -758,18 +735,35 @@ msgctxt "Windows"
 msgid "Check for Updates…"
 msgstr "Sök efter uppdateringar…"
 
+#: packages/app/assistant/responses.ts
+msgid "Check the API key and its permissions in AI settings."
+msgstr "Kontrollera API-nyckeln och dess behörigheter i AI-inställningarna."
+
+#: packages/app/assistant/responses.ts
+msgid "Check your provider's balance or usage limits and try again."
+msgstr "Kontrollera ditt saldo eller leverantörens användningsgränser och försök igen."
+
 #: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Checking ChatGPT connection…"
-msgstr "Kontrollerar ChatGPT-anslutningen…"
+msgid "Checking connection…"
+msgstr "Kontrollerar anslutningen…"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Checking visible messages"
+msgstr "Kontrollerar de synliga meddelandena"
 
 #. Name of a notification sound, picked in Settings
 #: packages/renderer/lib/notifications/index.ts
 msgid "Chime"
 msgstr "Klockspel"
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Choose a provider in AI settings to ask about mail or draft a reply."
+msgstr "Välj en leverantör i AI-inställningarna för att ställa frågor om din e-post eller skriva ett svarsutkast."
+
 #: packages/app/assistant/chat.ts
-msgid "Choose an available ChatGPT model."
-msgstr "Välj en tillgänglig ChatGPT-modell."
+#: packages/app/assistant/providers.ts
+msgid "Choose an available model in the mail assistant."
+msgstr "Välj en tillgänglig modell i e-postassistenten."
 
 #. Windows Settings is the Settings app of Windows, so it follows Microsoft's name for it
 #: packages/renderer/routes/settings/general.tsx
@@ -809,6 +803,14 @@ msgstr "Välj vad du vill dela"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Choose whether every new email or only the emails Gmail marks as important shows a notification."
 msgstr "Välj om varje nytt e-postmeddelande eller bara de som Gmail markerar som viktiga ska visa en avisering."
+
+#: packages/app/assistant/claude-cli.ts
+msgid "Claude Code couldn't complete the request. Check your sign-in, CLI version, and usage limits."
+msgstr "Claude Code kunde inte slutföra begäran. Kontrollera din inloggning, CLI-versionen och användningsgränserna."
+
+#: packages/app/assistant/claude-cli.ts
+msgid "Claude Code returned an incomplete reply. Try again."
+msgstr "Claude Code gav ett ofullständigt svar. Försök igen."
 
 #. Button that clears the whole download history
 #: packages/renderer/routes/download-history.tsx
@@ -964,19 +966,27 @@ msgstr "Nytt e-postmeddelande"
 msgid "Confirm external links before opening"
 msgstr "Bekräfta externa länkar innan de öppnas"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connect"
+msgstr "Anslut"
+
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Connect 1Password"
 msgstr "Anslut 1Password"
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Connect ChatGPT"
-msgstr "Anslut ChatGPT"
 
 #: packages/app/assistant/connection.ts
 msgid "Connect ChatGPT to use the mail assistant."
 msgstr "Anslut ChatGPT för att använda mejlassistenten."
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connected"
+msgstr "Ansluten"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connected as {email}"
+msgstr "Ansluten som {email}"
+
+#: packages/renderer/routes/settings/ai.tsx
 msgid "Continue with ChatGPT"
 msgstr "Fortsätt med ChatGPT"
 
@@ -1082,6 +1092,10 @@ msgstr "Kopiera webbadress"
 msgid "Couldn't connect to ChatGPT. Try again."
 msgstr "Det gick inte att ansluta till ChatGPT. Försök igen."
 
+#: packages/app/assistant/providers.ts
+msgid "Couldn't connect to the AI provider. Try again."
+msgstr "Det gick inte att ansluta till AI-leverantören. Försök igen."
+
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Couldn't copy to the clipboard."
 msgstr "Det gick inte att kopiera till urklipp."
@@ -1170,9 +1184,9 @@ msgstr "Det gick inte att uppdatera {failedName}"
 msgid "Couldn't update extensions"
 msgstr "Det gick inte att uppdatera tilläggen"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Couldn't update the ChatGPT connection. Try again."
-msgstr "Det gick inte att uppdatera ChatGPT-anslutningen. Försök igen."
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Couldn't update the AI connection. Try again."
+msgstr "Det gick inte att uppdatera AI-anslutningen. Försök igen."
 
 #. Name of a keyboard key, as printed on keyboards in that language, e.g. German Windows keyboards print Strg for Ctrl
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -1301,10 +1315,6 @@ msgstr "Radera etikettfärg"
 msgid "Delete saved search"
 msgstr "Radera sparad sökning"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Describe the email you want to write, or open a Gmail thread to work with its messages."
-msgstr "Beskriv mejlet du vill skriva eller öppna en Gmail-tråd för att arbeta med meddelandena i den."
-
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "Detect a verification code in an incoming email and copy it to your clipboard."
 msgstr "Identifiera en verifieringskod i ett inkommande e-postmeddelande och kopiera den till urklipp."
@@ -1324,10 +1334,9 @@ msgstr "Stäng av"
 msgid "Disabled"
 msgstr "Inaktiverat"
 
-#. Disconnect the linked ChatGPT account from the mail assistant
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Disconnect ChatGPT"
-msgstr "Koppla från ChatGPT"
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Disconnect"
+msgstr "Koppla från"
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Display the email sender's name in notifications."
@@ -1527,12 +1536,16 @@ msgid "Enter a label"
 msgstr "Ange ett namn"
 
 #: packages/app/assistant/ipc.ts
-msgid "Enter a message and choose a ChatGPT model."
-msgstr "Skriv ett meddelande och välj en ChatGPT-modell."
+msgid "Enter a message and choose a model."
+msgstr "Skriv ett meddelande och välj en modell."
 
 #: packages/renderer/routes/settings/saved-searches.tsx
 msgid "Enter a search query"
 msgstr "Ange en sökfråga"
+
+#: packages/app/assistant/providers.ts
+msgid "Enter a valid API key."
+msgstr "Ange en giltig API-nyckel."
 
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a valid hex, rgb, or rgba color"
@@ -1699,9 +1712,13 @@ msgstr "Hitta uppgifter"
 msgid "Find…"
 msgstr "Sök…"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
+#: packages/renderer/routes/settings/ai.tsx
 msgid "Finish signing in in your browser."
 msgstr "Slutför inloggningen i webbläsaren."
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Finishing your reply"
+msgstr "Skriver klart svaret"
 
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "First page"
@@ -1780,6 +1797,10 @@ msgstr "ggmail känner inte till det här tillägget."
 msgid "ggmail doesn't offer this extension."
 msgstr "ggmail erbjuder inte det här tillägget."
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "ggmail encrypts your key on this device."
+msgstr "Din nyckel krypteras på den här enheten."
+
 #: packages/app/dialogs.ts
 msgid "ggmail installs it when you quit."
 msgstr "ggmail installerar den när du avslutar."
@@ -1803,6 +1824,10 @@ msgstr "ggmail håller det här kontot inloggat men läser inte in det."
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail needs at least one account turned on."
 msgstr "ggmail behöver minst ett aktiverat konto."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
+msgstr "När du ställer en fråga får den här leverantören din fråga och relevanta e-postmeddelanden. När du byter leverantör startas en ny chatt."
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
@@ -2038,6 +2063,10 @@ msgstr "Inspektera element"
 msgid "Install {extensionName}"
 msgstr "Installera {extensionName}"
 
+#: packages/app/assistant/claude-cli.ts
+msgid "Install Claude Code on this computer, then try again."
+msgstr "Installera Claude Code på den här datorn och försök igen."
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Jump to latest reply"
 msgstr "Gå till senaste svaret"
@@ -2199,6 +2228,10 @@ msgstr "Mejlassistent"
 msgid "Mail assistant conversation"
 msgstr "Chatt med mejlassistenten"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Mail assistant provider"
+msgstr "Leverantör för e-postassistenten"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Manage Accounts"
@@ -2357,6 +2390,10 @@ msgstr "Inga bilagor"
 msgid "No bookmarks yet"
 msgstr "Inga bokmärken ännu"
 
+#: packages/app/assistant/responses.ts
+msgid "No compatible mail assistant models are available for this API key."
+msgstr "Inga modeller som är kompatibla med e-postassistenten är tillgängliga för den här API-nyckeln."
+
 #: packages/renderer/components/download-history.tsx
 msgid "No downloads yet"
 msgstr "Inga nedladdningar ännu"
@@ -2503,6 +2540,10 @@ msgstr "Öppna ett nytt fönster för att skriva ett e-postmeddelande i stället
 msgid "Open a reply in this thread and try again."
 msgstr "Öppna ett svar i den här tråden och försök igen."
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Open AI settings"
+msgstr "Öppna AI-inställningar"
+
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password again."
 msgstr "Öppna och lås upp 1Password igen."
@@ -2537,10 +2578,6 @@ msgstr "Öppna mappen när nedladdningen är klar"
 #: packages/renderer/components/app-titlebar.tsx
 msgid "Open Gmail settings to turn off out of office"
 msgstr "Öppna Gmail-inställningarna för att stänga av autosvaret"
-
-#: packages/app/assistant/mail-context.ts
-msgid "Open Gmail's All Mail view to search this account."
-msgstr "Öppna Alla mail i Gmail för att söka i det här kontot."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Open in app"
@@ -2742,10 +2779,6 @@ msgstr "Spela upp ett ljud när en avisering visas."
 msgid "Play sound"
 msgstr "Spela upp ljud"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Preparing your draft…"
-msgstr "Förbereder ditt utkast…"
-
 #: packages/renderer/components/attachments/files.tsx
 msgid "Preview attachment"
 msgstr "Förhandsvisa bilaga"
@@ -2817,6 +2850,14 @@ msgstr "Avsluta {appName}"
 msgid "Quit 1Password."
 msgstr "Avsluta 1Password."
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Reading “{subject}”"
+msgstr "Läser ”{subject}”"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Reading this conversation"
+msgstr "Läser den här konversationen"
+
 #: packages/renderer/components/attachments/files.tsx
 msgid "Received"
 msgstr "Mottaget"
@@ -2862,17 +2903,13 @@ msgctxt "context menu"
 msgid "Reload"
 msgstr "Läs in igen"
 
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Reload ChatGPT models"
-msgstr "Läs in ChatGPT-modeller igen"
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Reload models"
+msgstr "Läs in modellerna igen"
 
 #: packages/renderer/components/titlebar.tsx
 msgid "Reload page"
 msgstr "Läs in sidan igen"
-
-#: packages/renderer/components/assistant/assistant-panel.tsx
-msgid "Reload the model list to start a conversation."
-msgstr "Läs in modellistan igen för att starta en konversation."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Remember the zoom level of Workspace apps across restarts. Each app keeps its own zoom level, shared by all its tabs and windows."
@@ -3027,6 +3064,10 @@ msgstr "Återgå till ggmail för att slutföra inloggningen."
 msgid "Reverse conversation"
 msgstr "Vänd ordningen i konversationer"
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Reviewing the mail results"
+msgstr "Går igenom sökresultaten"
+
 #. Label of the unified inbox's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Rows per page"
@@ -3097,18 +3138,18 @@ msgstr "Sök bland bilagor"
 msgid "Search files, senders, or subjects"
 msgstr "Sök efter filer, avsändare eller ämnen"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Search this account for a message, a deadline, or a conversation you need to revisit."
-msgstr "Sök i det här kontot efter ett meddelande, en tidsfrist eller en konversation du vill återkomma till."
-
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
 msgstr "Sök…"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Searching All Mail…"
-msgstr "Söker i Alla mail…"
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching {account}"
+msgstr "Söker i {account}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching {account} · page {page}"
+msgstr "Söker i {account} · sida {page}"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -3233,6 +3274,10 @@ msgstr "Ange volymen för aviseringsljud."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Set up desktop app"
 msgstr "Konfigurera skrivbordsappen"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Set up the mail assistant"
+msgstr "Konfigurera e-postassistenten"
 
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/settings.tsx
@@ -3560,6 +3605,10 @@ msgstr "Logga in på Google med en nyckel och Windows Hello"
 msgid "Sign in to search this account."
 msgstr "Logga in för att söka i det här kontot."
 
+#: packages/app/assistant/claude-cli.ts
+msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
+msgstr "Logga in på ditt abonnemang med ”claude auth login” i en terminal och anslut sedan här."
+
 #: packages/app/workspace-app.ts
 msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
 msgstr "Logga in med ditt lösenord eller en annan tillgänglig tvåstegsmetod. Om kontot inte har något lösenord lägger du först till ett på myaccount.google.com i en webbläsare och loggar sedan in här."
@@ -3734,13 +3783,46 @@ msgstr "Testavisering"
 msgid "Text color"
 msgstr "Textfärg"
 
+#: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
-msgid "The ChatGPT reply was incomplete. Try again with a shorter request."
-msgstr "Svaret från ChatGPT var ofullständigt. Försök igen med en kortare fråga."
+msgid "The AI provider couldn't complete the request. Try again."
+msgstr "AI-leverantören kunde inte slutföra begäran. Försök igen."
 
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/claude-cli-stream.ts
+#: packages/app/assistant/claude-cli.ts
+#: packages/app/assistant/http.ts
 #: packages/app/assistant/responses.ts
-msgid "The connection to ChatGPT ended before the reply finished."
-msgstr "Anslutningen till ChatGPT bröts innan svaret var klart."
+msgid "The AI provider returned a response that is too large."
+msgstr "AI-leverantören gav ett för stort svar."
+
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/http.ts
+#: packages/app/assistant/responses.ts
+msgid "The AI provider returned an empty response."
+msgstr "AI-leverantören gav ett tomt svar."
+
+#: packages/app/assistant/chat.ts
+msgid "The assistant couldn't finish the mail request. Try a narrower question."
+msgstr "Assistenten kunde inte slutföra e-postbegäran. Ställ en mer specifik fråga."
+
+#: packages/app/assistant/chat.ts
+msgid "The assistant requested too many mail actions. Try a narrower question."
+msgstr "Assistenten begärde för många e-poståtgärder. Ställ en mer specifik fråga."
+
+#: packages/app/assistant/chat.ts
+msgid "The assistant returned an empty reply. Try asking again."
+msgstr "Assistenten gav ett tomt svar. Ställ frågan igen."
+
+#: packages/app/assistant/claude-cli.ts
+#: packages/app/assistant/providers.ts
+msgid "The Claude Code account changed. Reconnect in AI settings."
+msgstr "Claude Code-kontot har ändrats. Anslut igen i AI-inställningarna."
+
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/responses.ts
+msgid "The connection ended before the reply finished."
+msgstr "Anslutningen bröts innan svaret var klart."
 
 #. Message of the error box shown when a download fails; fileName is the file's name
 #: packages/app/downloads.ts
@@ -3760,6 +3842,11 @@ msgstr "Tillägget startar när ggmail har startats om. Starta om ggmail och fö
 #: packages/app/assistant/mail-context.ts
 msgid "The mail view changed. Ask again to use the new view."
 msgstr "Mejlvyn har ändrats. Fråga igen för att använda den nya vyn."
+
+#: packages/app/assistant/anthropic.ts
+#: packages/app/assistant/responses.ts
+msgid "The reply was incomplete. Try again with a shorter request."
+msgstr "Svaret var ofullständigt. Försök igen med en kortare begäran."
 
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "The unified inbox shows every unread message from your accounts in one place. A message leaves the list after you read it."
@@ -3882,8 +3969,8 @@ msgid "Unload tabs that have been sitting unused, giving back the memory they ho
 msgstr "Ladda ur flikar som har stått oanvända och frigör minnet de använder. En inaktiv flik behåller sin plats i sidofältet och läses in igen när du klickar på den, på sidan du lämnade. Ej fästa flikar låter dina fästa flikar vara inlästa, och Valda flikar gör ingen flik inaktiv förrän du markerar en. Oavsett vad du väljer kan en enskild flik väljas till eller bort med Gör inaktiv när oanvänd i dess snabbmeny."
 
 #: packages/app/assistant/connection.ts
-msgid "Unlock your system credential store to connect ChatGPT."
-msgstr "Lås upp systemets lagring av inloggningsuppgifter för att ansluta ChatGPT."
+msgid "Unlock your system credential store to connect the assistant."
+msgstr "Lås upp systemets lagring för inloggningsuppgifter för att ansluta assistenten."
 
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/ipc.ts
@@ -3934,6 +4021,10 @@ msgstr "Uppdatering ej verifierad"
 msgid "Updates"
 msgstr "Uppdateringar"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Use Claude Code session"
+msgstr "Använd Claude Code-sessionen"
+
 #. Original colors is the label of the toggle on an individual email
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
@@ -3944,9 +4035,9 @@ msgstr "Visa meddelanden och skrivfönster i mörka färger. Välj Ursprungliga 
 msgid "Use system picker"
 msgstr "Använd systemets väljare"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Use the expanded messages in this thread to summarize the exchange or prepare a reply."
-msgstr "Använd de utfällda meddelandena i tråden för att sammanfatta samtalet eller skriva ett svar."
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Use the Claude Code subscription signed in on this computer. To sign in, run <0>claude auth login</0> in a terminal."
+msgstr "Använd det Claude Code-abonnemang som du är inloggad på på den här datorn. Logga in genom att köra <0>claude auth login</0> i en terminal."
 
 #: packages/renderer/routes/settings/advanced.tsx
 msgid "Use the system's native screen sharing picker when sharing your screen."
@@ -4008,6 +4099,10 @@ msgstr "Violett"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Volume {percent}"
 msgstr "Volym {percent}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Waiting for {modelName}"
+msgstr "Väntar på {modelName}"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
@@ -4111,24 +4206,12 @@ msgstr "Välj vilka avsnitt som räknas med i antalet olästa som visas i appen 
 msgid "Work"
 msgstr "Arbete"
 
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Work with the email snippets visible in this Gmail view."
-msgstr "Arbeta med de meddelandeutdrag som syns i den här Gmail-vyn."
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Working on your request…"
-msgstr "Bearbetar din fråga…"
-
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Notifications section about notifications from Workspace apps
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Workspace apps"
 msgstr "Workspace-appar"
-
-#: packages/renderer/components/assistant/assistant-conversation.tsx
-msgid "Write a message…"
-msgstr "Skriv ett meddelande…"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts

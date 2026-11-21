@@ -1,9 +1,9 @@
 import { createHash, createPublicKey, randomBytes, timingSafeEqual, verify } from "node:crypto";
 import { createServer } from "node:http";
-import { t } from "@lingui/core/macro";
 import { ms } from "@ggmail/shared/ms";
+import { t } from "@lingui/core/macro";
 import { z } from "zod";
-import { openAIRequest, readJson } from "./http";
+import { providerRequest, readJson } from "./http";
 
 // oxlint-disable-next-line lingui/no-unlocalized-strings -- OAuth endpoint, wire value or encoding.
 const issuer = "https://auth.openai.com";
@@ -112,7 +112,7 @@ export async function verifyIdentity(idToken: string, clientId: string, nonce?: 
     throw new Error(t`ChatGPT returned an invalid identity token.`);
   }
 
-  const response = await openAIRequest(new URL("/.well-known/jwks.json", issuer));
+  const response = await providerRequest(new URL("/.well-known/jwks.json", issuer));
   const keys = z
     .object({
       keys: z
@@ -159,7 +159,7 @@ export async function verifyIdentity(idToken: string, clientId: string, nonce?: 
 export class InvalidGrantError extends Error {}
 
 export async function exchangeTokens(form: Record<string, string>) {
-  const response = await openAIRequest(new URL("/api/accounts/oauth/token", issuer), {
+  const response = await providerRequest(new URL("/api/accounts/oauth/token", issuer), {
     method: "POST",
     body: new URLSearchParams({ ...form, resource }),
   });
@@ -192,7 +192,7 @@ export function buildCredentials(tokens: TokenResponse, previous?: Credentials):
 }
 
 export async function revokeSession(clientId: string, refreshToken: string) {
-  const response = await openAIRequest(
+  const response = await providerRequest(
     new URL("/api/accounts/oauth/revoke", issuer),
     {
       method: "POST",

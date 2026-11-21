@@ -15,29 +15,55 @@ const editReply = String.raw`(expectedUrl, body, canOpen) => {
   }
 
   const visible = (el) => el.checkVisibility({ visibilityProperty: true }) && !el.closest('[aria-hidden="true"]');
-  const inThread = (el) => !el.closest('[role="dialog"], .AD, .a3s, .gmail_quote');
-  const headings = Array.from(document.querySelectorAll('[role="main"] h2:is(.hP, [data-legacy-thread-id])'))
-    .filter((el) => visible(el) && inThread(el));
-  if (headings.length !== 1) return "unavailable";
-  const heading = headings[0];
-  const legacyId = heading.getAttribute("data-legacy-thread-id")?.replace(/^#/, "");
+  const excluded = '[role="dialog"], [role="menu"], .J-M, .a3s, .gmail_quote, .gmail_signature, [data-smartmail="gmail_signature"]';
+  const chromeOnly = excluded + ', [contenteditable]';
   const routeId = expected.hash.split("/").at(-1);
-  if (legacyId && /^[\da-f]{15,32}$/i.test(routeId) && legacyId !== routeId) return "unavailable";
+  const legacyRoute = /^[\da-f]{15,32}$/i.test(routeId);
 
-  const thread = heading.closest(".nH.id, .g.id") ?? heading.closest('[role="main"]');
-  const editors = Array.from(thread.querySelectorAll('.ip [contenteditable="true"]:is([g_editable="true"], .Am[role="textbox"])'))
-    .filter((el) => visible(el) && inThread(el.closest(".ip")) && !el.closest(".a3s, .gmail_quote"));
-  const editor = editors.find((el) => el === document.activeElement) ?? editors[0];
+  // Gmail can mount the inline composer beside the subject's layout wrapper.
+  // Search each native main separately so a split-pane inbox is not a thread.
+  const inlineRoot = (el) => {
+    if (el.closest(excluded) || el.parentElement?.closest('[contenteditable]')) return null;
+    const reply = el.closest(".ip");
+    if (reply) return reply;
+    const compose = el.closest(".HM");
+    if (el.closest(".M9, .I5") && compose &&
+        Array.from(compose.querySelectorAll(".HQ .Un")).some(node => !node.closest(chromeOnly))) return compose;
+    return null;
+  };
+  const contexts = [];
+  for (const main of document.querySelectorAll('[role="main"]')) {
+    if (!visible(main) || main.closest(chromeOnly)) continue;
+    const own = el => el.closest('[role="main"]') === main && visible(el);
+    const headings = Array.from(main.querySelectorAll('h2.hP, h2[data-legacy-thread-id], .ha h2'))
+      .filter(el => own(el) && !el.closest(chromeOnly + ', .AD'));
+    const editors = Array.from(main.querySelectorAll('.ip [contenteditable], .HM [contenteditable]'))
+      .filter(el => own(el) && el.isContentEditable && inlineRoot(el) &&
+        (el.matches('[g_editable="true"], [role="textbox"], .Am') || el.closest(".Ap")));
+    if (!headings.length && !editors.length) continue;
+    if (headings.length > 1) return "unavailable";
+    const id = headings[0]?.getAttribute("data-legacy-thread-id")?.replace(/^#/, "");
+    if (legacyRoute && id && id.toLowerCase() !== routeId.toLowerCase()) continue;
+    contexts.push({main, heading: headings[0], editors, matched: legacyRoute && !!id});
+  }
+  const matched = contexts.filter(context => context.matched);
+  const targets = matched.length ? matched : contexts;
+  if (targets.length !== 1) return "unavailable";
+  const {main, heading, editors} = targets[0];
+  const editor = editors.find(el => el === document.activeElement) ?? editors[0];
   if (editors.length > 1 && editor !== document.activeElement) return "unavailable";
   if (!editor) {
     if (!canOpen) return "waiting";
-    const reply = Array.from(thread.querySelectorAll(".amn .ams:is(.bkH, .bkI)"))
-      .find((el) => visible(el) && inThread(el));
+    if (!heading) return "unavailable";
+    const reply = Array.from(main.querySelectorAll(".amn .ams:is(.bkH, .bkI)"))
+      .find(el => el.closest('[role="main"]') === main && visible(el) && !el.closest(chromeOnly + ', .AD'));
     if (!reply) return "unavailable";
     reply.click();
     return "waiting";
   }
-  if (editor.closest(".ip").querySelector(".Un.J-JN-M-I .mI")) return "unavailable";
+  const forward = Array.from(inlineRoot(editor).querySelectorAll(".Un.J-JN-M-I .mI"))
+    .some(el => visible(el) && !el.closest(chromeOnly + ', [role="menuitem"]'));
+  if (forward) return "unavailable";
 
   // Insert before any existing text, signature or quoted history. A native
   // editing transaction lets Gmail autosave the change and supports Undo.
@@ -52,9 +78,21 @@ const editReply = String.raw`(expectedUrl, body, canOpen) => {
   const hasContent = editor.textContent.trim() || editor.querySelector("img, hr, table");
   // Chromium's multiline insertText adds block wrappers around blank lines.
   // Encode the body as text first, then supply only our own line breaks.
+  // Gmail supplies its own formatted signature. Only omit an identical trailing
+  // signature from the suggestion when the user has not added any draft text.
+  const signatures = Array.from(editor.querySelectorAll('.gmail_signature, [data-smartmail="gmail_signature"]'))
+    .filter(el => visible(el) && !el.closest('.gmail_quote'));
+  if (signatures.length === 1) {
+    const signature = signatures[0].innerText.trim();
+    const draft = body.trimEnd();
+    if (signature && editor.innerText.trim() === signature && draft.endsWith("\n" + signature)) {
+      body = draft.slice(0, -signature.length).trimEnd();
+    }
+  }
+  const suffix = hasContent ? "\n\n" : "";
   const plain = document.createElement("div");
-  plain.textContent = body;
-  const html = plain.innerHTML.replace(/\r\n?|\n/g, "<br>") + (hasContent ? "<br><br>" : "");
+  plain.textContent = body + suffix;
+  const html = plain.innerHTML.replace(/\r\n?|\n/g, "<br>");
   return document.execCommand("insertHTML", false, html) ? "inserted" : "unavailable";
 }`;
 
@@ -69,6 +107,10 @@ export async function insertReply(
   const view = scope.gmail.view.webContents;
   const url = new URL(scope.hash, scope.mailbox).href;
   const deadline = Date.now() + ms("4 seconds");
+  // The click is in the separate assistant renderer. Give the Gmail editing
+  // command a focused WebContents even when its editor was already open.
+  ensureCurrentScope(scope, signal);
+  view.focus();
   let canOpen = true;
   do {
     ensureCurrentScope(scope, signal);
@@ -77,9 +119,6 @@ export async function insertReply(
       { code: `(${editReply})(${args})` },
     ]);
     if (result === "inserted") {
-      if (!signal.aborted && !view.isDestroyed() && getMailScope().key === scope.key) {
-        view.focus();
-      }
       return;
     }
     if (result !== "waiting") {

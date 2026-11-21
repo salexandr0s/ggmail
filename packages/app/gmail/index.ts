@@ -226,6 +226,7 @@ export class Gmail {
   }
 
   userEmail: string | null = null;
+  mailboxGeneration = 0;
 
   unreadCountEnabled = true;
 
@@ -586,6 +587,7 @@ export class Gmail {
   }
 
   invalidateMailboxReads() {
+    this.mailboxGeneration++;
     if (cancelUnifiedSearch(this.accountId) && main.location === "/unified-inbox") {
       ipc.renderer.send(main.window.webContents, "unifiedSearch.invalidated", this.accountId);
     }

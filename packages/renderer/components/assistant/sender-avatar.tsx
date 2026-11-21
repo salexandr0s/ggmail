@@ -33,7 +33,7 @@ export function SenderAvatar({
           }}
         />
       )}
-      <AvatarFallback className="bg-teal-100 text-[0.63em] font-semibold text-teal-800 dark:bg-teal-900 dark:text-teal-100">
+      <AvatarFallback className="bg-muted text-[0.63em] font-semibold text-foreground">
         {initials}
       </AvatarFallback>
     </Avatar>

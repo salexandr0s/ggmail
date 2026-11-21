@@ -1,7 +1,10 @@
 import {
   ASSISTANT_PROMPT_LIMIT,
-  type AssistantActivity,
+  type AssistantActivity as Activity,
+  type AssistantDraft,
   type AssistantModel,
+  type AssistantProvider,
+  providerNames,
   type AssistantReply as Reply,
   type AssistantScope,
 } from "@ggmail/shared/assistant";
@@ -23,40 +26,58 @@ import {
   ChevronRightIcon,
   ClipboardListIcon,
   FilePenLineIcon,
-  LoaderCircleIcon,
   MailSearchIcon,
   RotateCcwIcon,
   SquareIcon,
   TextIcon,
 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Answer } from "./answer";
-import { AssistantReply } from "./assistant-reply";
+import { AssistantActivity } from "./assistant-activity";
+import { AssistantReply, DraftCard } from "./assistant-reply";
+import { ModelLogo } from "./model-logo";
 
 type PromptOrigin = "starter" | "written";
+type Preview = {
+  text: string;
+  draft?: AssistantDraft;
+  activity?: Activity;
+};
 type Entry = {
   id: string;
   prompt: string;
   origin: PromptOrigin;
+  modelName: string;
   reply?: Reply;
   error?: string;
-  interrupted?: string;
+  interrupted?: Preview;
 };
 
+const ReplyPreview = memo(function ReplyPreview({ text, draft }: Pick<Preview, "text" | "draft">) {
+  return (
+    <>
+      {text && <Answer text={text} />}
+      {draft && <DraftCard draft={draft} />}
+    </>
+  );
+});
+
 export function AssistantConversation({
+  provider,
   scope,
   contextKey,
-  model,
   models,
+  model,
   chooseModel,
   onReplyError,
   onInserted,
 }: {
+  provider: AssistantProvider;
   scope: AssistantScope;
   contextKey: string;
-  model: string;
   models: AssistantModel[];
-  chooseModel: (model: string) => void;
+  model: AssistantModel;
+  chooseModel: (id: string) => void;
   onReplyError: () => void;
   onInserted: () => void;
 }) {
@@ -66,10 +87,9 @@ export function AssistantConversation({
   const [composerOrigin, setComposerOrigin] = useState<PromptOrigin>("written");
   const [pending, setPending] = useState("");
   const [stopping, setStopping] = useState(false);
-  const [partial, setPartial] = useState("");
-  const [activity, setActivity] = useState<AssistantActivity>();
+  const [preview, setPreview] = useState<Preview>({ text: "" });
   const pendingId = useRef("");
-  const lastText = useRef("");
+  const latestPreview = useRef<Preview>({ text: "" });
   const composer = useRef<HTMLTextAreaElement>(null);
   const transcript = useRef<HTMLDivElement>(null);
   const latestTurn = useRef<HTMLDivElement>(null);
@@ -81,15 +101,33 @@ export function AssistantConversation({
     if (document.activeElement === document.getElementById("mail-assistant")) {
       composer.current?.focus();
     }
-    const unsubscribe = ipc.renderer.on("assistant.progress", (_event, id, text, step) => {
-      if (id === pendingId.current) {
-        lastText.current = text;
-        setActivity(step);
-        setPartial(text);
+    let frame: number | undefined;
+    const unsubscribe = ipc.renderer.on("assistant.progress", (_event, id, text, activity) => {
+      if (id !== pendingId.current || (!text && !activity)) {
+        return;
+      }
+      const previous = latestPreview.current;
+      // Text snapshots start afresh each provider round. Keep the previous one
+      // visible during mail actions and retain unpainted text when Stop arrives.
+      latestPreview.current = {
+        text: text || previous.text,
+        draft: activity?.kind === "draftReady" ? activity.draft : previous.draft,
+        activity,
+      };
+      if (frame === undefined) {
+        frame = requestAnimationFrame(() => {
+          frame = undefined;
+          if (pendingId.current) {
+            setPreview(latestPreview.current);
+          }
+        });
       }
     });
     return () => {
       unsubscribe();
+      if (frame !== undefined) {
+        cancelAnimationFrame(frame);
+      }
       if (pendingId.current) {
         ipc.main.send("assistant.stop", pendingId.current);
         pendingId.current = "";
@@ -110,7 +148,7 @@ export function AssistantConversation({
     }
     lastScrollTop.current = view.scrollTop;
     setShowJump(view.scrollHeight - view.scrollTop - view.clientHeight > 48);
-  }, [entries, partial]);
+  }, [entries, preview]);
 
   // Resizing the window or expanding sources can change what is below the
   // fold without a scroll event. Neither should move the reader's place.
@@ -136,13 +174,13 @@ export function AssistantConversation({
 
     const id = crypto.randomUUID();
     pendingId.current = id;
-    lastText.current = "";
+    const initial: Preview = { text: "", activity: { kind: "waiting" } };
+    latestPreview.current = initial;
+    setPreview(initial);
     setPending(id);
-    setActivity(undefined);
     setStopping(false);
-    setPartial("");
     scrollMode.current = "start";
-    const next = { id, prompt: input, origin };
+    const next = { id, prompt: input, origin, modelName: model.label };
     setEntries((previous) =>
       retry ? previous.map((entry) => (entry.id === retry ? next : entry)) : [...previous, next],
     );
@@ -156,7 +194,8 @@ export function AssistantConversation({
       const result = await ipc.main.invoke("assistant.send", {
         id,
         prompt: input,
-        model,
+        model: model.id,
+        provider,
         scopeKey: contextKey,
       });
       if (pendingId.current !== id) {
@@ -165,23 +204,24 @@ export function AssistantConversation({
       if (result.status === "complete") {
         finish({ reply: result.reply });
       } else if (result.status === "stopped") {
-        finish({ interrupted: lastText.current });
+        finish({ interrupted: latestPreview.current });
       } else {
-        finish({ error: result.message, interrupted: lastText.current });
+        finish({ error: result.message, interrupted: latestPreview.current });
         onReplyError();
       }
     } catch {
       if (pendingId.current === id) {
         finish({
           error: t`Couldn't reach the mail assistant. Try again.`,
-          interrupted: lastText.current,
+          interrupted: latestPreview.current,
         });
       }
     } finally {
       if (pendingId.current === id) {
         pendingId.current = "";
         setPending("");
-        setPartial("");
+        latestPreview.current = { text: "" };
+        setPreview(latestPreview.current);
         setStopping(false);
       }
     }
@@ -202,9 +242,15 @@ export function AssistantConversation({
     label: t`Draft an email`,
     prompt: t`Help me draft an email. Ask me for the details you need.`,
   };
+  const findEmail = { icon: MailSearchIcon, label: t`Find an email`, prompt: undefined };
+  const findTodos = {
+    icon: ClipboardListIcon,
+    label: t`Find to-dos`,
+    prompt: t`Find my to-dos in this mail scope. Include due dates when the email gives them.`,
+  };
   const starters =
     scope === "chat"
-      ? [draftStarter]
+      ? [findEmail, findTodos, draftStarter]
       : [
           scope === "thread"
             ? {
@@ -217,34 +263,23 @@ export function AssistantConversation({
                 label: t`Catch me up`,
                 prompt: t`Catch me up on recent emails in this view. What needs my attention?`,
               },
-          {
-            icon: ClipboardListIcon,
-            label: t`Find to-dos`,
-            prompt: t`Find my to-dos in this mail scope. Include due dates when the email gives them.`,
-          },
+          findTodos,
           scope === "thread"
             ? {
                 icon: FilePenLineIcon,
                 label: t`Draft a reply`,
                 prompt: t`Draft a reply to the open email.`,
               }
-            : scope === "allMail"
-              ? { icon: MailSearchIcon, label: t`Find an email`, prompt: undefined }
-              : draftStarter,
+            : findEmail,
+          ...(scope === "mailView" ? [draftStarter] : []),
         ];
-  const descriptions = {
-    thread: t`Use the expanded messages in this thread to summarize the exchange or prepare a reply.`,
-    allMail: t`Search this account for a message, a deadline, or a conversation you need to revisit.`,
-    mailView: t`Work with the email snippets visible in this Gmail view.`,
-    chat: t`Describe the email you want to write, or open a Gmail thread to work with its messages.`,
-  };
 
   return (
     <>
       <div className="relative min-h-0 flex-1">
         <div
           ref={transcript}
-          className="h-full overflow-y-auto overscroll-contain px-4 [overflow-anchor:none]"
+          className="h-full overflow-y-auto overscroll-contain px-5 [overflow-anchor:none]"
           onScroll={(event) => {
             const view = event.currentTarget;
             const below = view.scrollHeight - view.scrollTop - view.clientHeight;
@@ -256,19 +291,16 @@ export function AssistantConversation({
           }}
         >
           {entries.length === 0 ? (
-            <div className="px-1 pt-7 pb-5">
-              <h2 className="text-xl font-semibold tracking-tight">
+            <div className="mx-auto flex min-h-full w-full max-w-sm flex-col justify-center py-8">
+              <h2 className="text-2xl leading-tight font-semibold tracking-tight text-balance">
                 <Trans>What can I help you with?</Trans>
               </h2>
-              <p className="mt-2 mb-5 text-sm leading-relaxed text-muted-foreground">
-                {descriptions[scope]}
-              </p>
-              <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-xs">
+              <div className="mt-5 grid gap-2">
                 {starters.map(({ icon: Icon, label, prompt: value }) => (
                   <button
                     key={label}
                     type="button"
-                    className="group flex w-full items-center gap-3 px-3.5 py-3 text-left text-sm font-medium hover:bg-muted/70 focus-visible:bg-muted focus-visible:outline-offset-[-2px]"
+                    className="group flex min-h-12 w-full items-center gap-3 rounded-xl border bg-card px-3 py-2 text-left text-sm font-medium transition-colors hover:border-input hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     onClick={() => {
                       if (value) {
                         void send(value, "starter");
@@ -281,12 +313,20 @@ export function AssistantConversation({
                       }
                     }}
                   >
-                    <Icon className="size-4 text-teal-700 dark:text-teal-400" />
-                    {label}
+                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground group-hover:text-foreground">
+                      <Icon aria-hidden="true" className="size-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">{label}</span>
                     {value ? (
-                      <ChevronRightIcon className="ml-auto size-3.5 text-muted-foreground" />
+                      <ChevronRightIcon
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0 text-muted-foreground"
+                      />
                     ) : (
-                      <ArrowUpRightIcon className="ml-auto size-3.5 text-muted-foreground" />
+                      <ArrowUpRightIcon
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0 text-muted-foreground"
+                      />
                     )}
                   </button>
                 ))}
@@ -297,7 +337,7 @@ export function AssistantConversation({
               role="log"
               aria-label={t`Mail assistant conversation`}
               aria-live="polite"
-              className="space-y-6 py-5 text-sm"
+              className="space-y-6 py-6 text-sm"
             >
               {entries.map((entry, index) => (
                 <div
@@ -306,7 +346,7 @@ export function AssistantConversation({
                   className="min-w-0 space-y-3"
                 >
                   {entry.origin === "written" && (
-                    <div className="ml-auto w-fit max-w-[92%] rounded-2xl rounded-br-sm bg-teal-50 px-3.5 py-2.5 text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap text-teal-950 dark:bg-teal-950/65 dark:text-teal-50">
+                    <div className="ml-auto w-fit max-w-[92%] rounded-2xl rounded-br-md border border-border/60 bg-muted px-3.5 py-2.5 text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap text-foreground">
                       {entry.prompt}
                     </div>
                   )}
@@ -318,7 +358,7 @@ export function AssistantConversation({
                       onInserted={onInserted}
                     />
                   )}
-                  {entry.interrupted && <Answer text={entry.interrupted} />}
+                  {entry.interrupted && <ReplyPreview {...entry.interrupted} />}
                   {(entry.error || entry.interrupted !== undefined) && (
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       {entry.error ? (
@@ -342,24 +382,21 @@ export function AssistantConversation({
                       )}
                     </div>
                   )}
-                  {pending === entry.id &&
-                    (partial ? (
-                      <div aria-live="off">
-                        <Answer text={partial} />
-                      </div>
-                    ) : (
-                      <p
-                        role="status"
-                        className="flex items-center gap-2 text-xs text-muted-foreground"
-                      >
-                        <LoaderCircleIcon className="size-3.5 motion-safe:animate-spin" />
-                        {activity === "searching"
-                          ? t`Searching All Mail…`
-                          : activity === "drafting"
-                            ? t`Preparing your draft…`
-                            : t`Working on your request…`}
-                      </p>
-                    ))}
+                  {pending === entry.id && (
+                    <>
+                      {(preview.text || preview.draft) && (
+                        <div aria-live="off" className="min-w-0 space-y-3">
+                          <ReplyPreview text={preview.text} draft={preview.draft} />
+                        </div>
+                      )}
+                      {preview.activity && (
+                        <AssistantActivity
+                          activity={preview.activity}
+                          modelName={entry.modelName}
+                        />
+                      )}
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -391,15 +428,15 @@ export function AssistantConversation({
           event.preventDefault();
           submit();
         }}
-        className="shrink-0 border-t bg-sidebar p-3"
+        className="shrink-0 bg-background px-4 pt-2 pb-4"
       >
-        <div className="rounded-xl border border-input bg-background shadow-xs focus-within:border-teal-600/65 dark:focus-within:border-teal-400/65">
+        <div className="rounded-2xl border border-input bg-card shadow-xs transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/40">
           <Textarea
             ref={composer}
             aria-label={t`Message the mail assistant`}
-            className="max-h-[min(18vh,9rem)] min-h-12 resize-none border-0 bg-transparent px-3 py-2.5 text-sm shadow-none focus-visible:ring-0 dark:bg-transparent"
+            className="max-h-[min(18vh,9rem)] min-h-12 resize-none border-0 bg-transparent px-3.5 py-3 text-sm shadow-none focus-visible:ring-0 dark:bg-transparent"
             value={prompt}
-            placeholder={scope === "chat" ? t`Write a message…` : t`Ask about your mail…`}
+            placeholder={t`Ask about your mail…`}
             maxLength={ASSISTANT_PROMPT_LIMIT}
             onChange={(event) => {
               setPrompt(event.target.value);
@@ -416,24 +453,34 @@ export function AssistantConversation({
           <div className="flex min-w-0 items-center justify-between gap-2 px-2 pb-2">
             <Select
               items={models.map(({ id, label }) => ({ value: id, label }))}
-              value={model}
+              value={model.id}
               onValueChange={(value) => value && chooseModel(value)}
             >
               <SelectTrigger
                 size="sm"
-                className="max-w-[68%] min-w-0 border-0 px-1.5 text-xs text-muted-foreground hover:bg-muted dark:bg-transparent"
-                aria-label={t`ChatGPT model`}
+                className="max-w-[68%] min-w-0 border-transparent px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-transparent dark:hover:bg-muted"
+                title={providerNames[provider]}
+                aria-label={t`Assistant model`}
               >
-                <SelectValue className="block truncate" />
+                <ModelLogo provider={provider} model={model.id} className="size-3.5" />
+                <SelectValue className="min-w-0 truncate">{model.label}</SelectValue>
               </SelectTrigger>
-              <SelectContent align="start" side="top" className="max-w-64">
+              <SelectContent
+                align="start"
+                side="top"
+                alignItemWithTrigger={false}
+                className="w-max max-w-[min(20rem,var(--available-width))] min-w-48"
+              >
                 {models.map(({ id, label }) => (
                   <SelectItem
                     key={id}
                     value={id}
-                    className="**:data-[slot=select-item-text]:min-w-0"
+                    className="min-h-8 [&>span:first-child]:min-w-0 [&>span:first-child]:shrink"
                   >
-                    {label}
+                    <ModelLogo provider={provider} model={id} className="size-4 self-center" />
+                    <span className="truncate" title={label}>
+                      {label}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -446,7 +493,8 @@ export function AssistantConversation({
             {pending ? (
               <Button
                 type="button"
-                size="icon-sm"
+                size="icon"
+                className="rounded-full hover:bg-primary/85"
                 title={t`Stop reply`}
                 aria-label={t`Stop reply`}
                 disabled={stopping}
@@ -460,8 +508,8 @@ export function AssistantConversation({
             ) : (
               <Button
                 type="submit"
-                size="icon-sm"
-                className="rounded-lg bg-teal-800 text-white hover:bg-teal-900 disabled:bg-muted disabled:text-muted-foreground dark:bg-teal-300 dark:text-teal-950 dark:hover:bg-teal-200"
+                size="icon"
+                className="rounded-full hover:bg-primary/85 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
                 title={t`Send chat message`}
                 aria-label={t`Send chat message`}
                 disabled={!prompt.trim()}

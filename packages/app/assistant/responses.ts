@@ -1,11 +1,19 @@
-import { t } from "@lingui/core/macro";
-import type { AssistantModel } from "@ggmail/shared/assistant";
+import type { ApiProvider, AssistantModel } from "@ggmail/shared/assistant";
 import { ms } from "@ggmail/shared/ms";
+import { t } from "@lingui/core/macro";
 import { z } from "zod";
-import { openAIRequest, readJson } from "./http";
+import { providerRequest, readJson } from "./http";
 
 // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
 const api = "https://api.openai.com/v1/";
+const endpoints = {
+  openai: api,
+  // oxlint-disable-next-line lingui/no-unlocalized-strings -- Fixed API endpoint.
+  deepseek: "https://api.deepseek.com/",
+  // oxlint-disable-next-line lingui/no-unlocalized-strings -- Fixed API endpoint.
+  anthropic: "https://api.anthropic.com/v1/",
+};
+type ResponsesProvider = "openai" | "deepseek" | "chatgpt";
 
 export class AssistantError extends Error {}
 
@@ -15,7 +23,20 @@ export function isUnauthorized(error: unknown) {
   return error instanceof UnauthorizedError;
 }
 
-function providerError(status: number, code?: string | null) {
+function providerError(
+  status: number,
+  provider: ResponsesProvider | "anthropic",
+  code?: string | null,
+) {
+  if (provider !== "chatgpt") {
+    if (status === 401 || status === 403) {
+      return new UnauthorizedError(t`Check the API key and its permissions in AI settings.`);
+    }
+    if (status === 402 || status === 429) {
+      return new AssistantError(t`Check your provider's balance or usage limits and try again.`);
+    }
+    return new AssistantError(t`The AI provider couldn't complete the request. Try again.`);
+  }
   if (status === 401) {
     return new UnauthorizedError(t`Your ChatGPT session expired. Sign in again.`);
   }
@@ -30,7 +51,10 @@ function providerError(status: number, code?: string | null) {
   return new AssistantError(t`ChatGPT couldn't complete the request. Try again.`);
 }
 
-async function checkResponse(response: Response) {
+export async function checkResponse(
+  response: Response,
+  provider: ResponsesProvider | "anthropic" = "chatgpt",
+) {
   if (response.ok) {
     return;
   }
@@ -41,11 +65,11 @@ async function checkResponse(response: Response) {
     })
     .safeParse(await readJson(response, 65_536).catch(() => null));
 
-  throw providerError(response.status, parsed.data?.error?.code);
+  throw providerError(response.status, provider, parsed.data?.error?.code);
 }
 
 export async function listModels(token: string): Promise<AssistantModel[]> {
-  const response = await openAIRequest(new URL("models", api), {
+  const response = await providerRequest(new URL("models", api), {
     // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -102,7 +126,7 @@ const outputSchema = z.discriminatedUnion("type", [
 ]);
 
 type Output = z.infer<typeof outputSchema>;
-type FunctionCall = z.infer<typeof functionCallSchema>;
+export type FunctionCall = z.infer<typeof functionCallSchema>;
 
 export type ResponseInput =
   | { role: "user" | "assistant"; content: string }
@@ -116,7 +140,7 @@ export type AssistantTool = {
   strict: true;
   parameters: {
     type: "object";
-    properties: Record<string, { type: "string" }>;
+    properties: Record<string, { type: "string" | "integer" }>;
     required: string[];
     additionalProperties: false;
   };
@@ -136,7 +160,7 @@ const eventSchema = z.object({
     .optional(),
 });
 
-async function* responseEvents(body: ReadableStream<Uint8Array>) {
+export async function* jsonEventStream(body: ReadableStream<Uint8Array>) {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -151,7 +175,7 @@ async function* responseEvents(body: ReadableStream<Uint8Array>) {
 
       bytes += value.byteLength;
       if (bytes > 2_097_152) {
-        throw new AssistantError(t`ChatGPT returned a response that is too large.`);
+        throw new AssistantError(t`The AI provider returned a response that is too large.`);
       }
       buffer += decoder.decode(value, { stream: true });
 
@@ -170,7 +194,7 @@ async function* responseEvents(body: ReadableStream<Uint8Array>) {
           .join("\n");
 
         if (data && data !== "[DONE]") {
-          yield eventSchema.parse(JSON.parse(data));
+          yield JSON.parse(data) as unknown;
         }
       }
     }
@@ -182,31 +206,46 @@ async function* responseEvents(body: ReadableStream<Uint8Array>) {
 export async function readResponseStream(
   body: ReadableStream<Uint8Array>,
   onText: (text: string) => void,
+  provider: ResponsesProvider = "chatgpt",
 ) {
   const streamedItems: unknown[] = [];
   let text = "";
 
-  for await (const event of responseEvents(body)) {
+  for await (const frame of jsonEventStream(body)) {
+    const event = eventSchema.parse(frame);
     if (event.type === "response.output_text.delta" || event.type === "response.refusal.delta") {
       text += event.delta ?? "";
       if (text.length > 64_000) {
-        throw new AssistantError(t`ChatGPT returned a response that is too large.`);
+        throw new AssistantError(t`The AI provider returned a response that is too large.`);
       }
       onText(text);
     } else if (event.type === "response.output_item.done") {
       streamedItems.push(event.item);
     } else if (event.type === "response.failed" || event.type === "error") {
-      throw providerError(0, event.code ?? event.response?.error?.code);
+      throw providerError(0, provider, event.code ?? event.response?.error?.code);
     } else if (event.type === "response.incomplete") {
-      throw new AssistantError(
-        t`The ChatGPT reply was incomplete. Try again with a shorter request.`,
-      );
+      throw new AssistantError(t`The reply was incomplete. Try again with a shorter request.`);
     } else if (event.type === "response.completed" && event.response?.status === "completed") {
       const terminalItems = event.response.output;
+      const output = terminalItems?.length ? terminalItems : streamedItems;
       const items = z
         .array(outputSchema)
         .max(64)
-        .parse(terminalItems?.length ? terminalItems : streamedItems);
+        .parse(
+          output.map((item) => {
+            if (
+              provider !== "chatgpt" &&
+              item &&
+              typeof item === "object" &&
+              "type" in item &&
+              item.type === "function_call" &&
+              (!("namespace" in item) || item.namespace == null)
+            ) {
+              return { ...item, namespace: "ggmail" };
+            }
+            return item;
+          }),
+        );
       const calls: FunctionCall[] = [];
       const sections: string[] = [];
 
@@ -227,20 +266,24 @@ export async function readResponseStream(
     }
   }
 
-  throw new AssistantError(t`The connection to ChatGPT ended before the reply finished.`);
+  throw new AssistantError(t`The connection ended before the reply finished.`);
 }
 
-export async function respond(options: {
-  token: string;
+export type ResponseOptions = {
   model: string;
   instructions: string;
   input: ResponseInput[];
   tools: AssistantTool[];
   signal: AbortSignal;
   onText: (text: string) => void;
-}) {
-  const response = await openAIRequest(
-    new URL("responses", api),
+};
+
+export async function respond(
+  options: ResponseOptions & { token: string; provider?: ResponsesProvider },
+) {
+  const provider = options.provider ?? "chatgpt";
+  const response = await providerRequest(
+    new URL("responses", provider === "deepseek" ? endpoints.deepseek : api),
     {
       method: "POST",
       headers: {
@@ -252,32 +295,109 @@ export async function respond(options: {
       body: JSON.stringify({
         model: options.model,
         instructions: options.instructions,
-        input: options.input,
+        input:
+          provider === "chatgpt"
+            ? options.input
+            : options.input.map((item) => {
+                if ("type" in item && item.type === "function_call") {
+                  const { namespace: _, ...call } = item;
+                  return call;
+                }
+                return item;
+              }),
         // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
-        include: ["reasoning.encrypted_content"],
-        tools: [
-          {
-            type: "namespace",
-            name: "ggmail",
-            // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
-            description:
-              // oxlint-disable-next-line lingui/no-unlocalized-strings -- Request protocol text sent to the model.
-              "Search Gmail in the current scope and prepare editable draft suggestions.",
-            tools: options.tools,
-          },
-        ],
-        store: false,
+        ...(provider === "deepseek"
+          ? { reasoning: { effort: "none" } }
+          : // oxlint-disable-next-line lingui/no-unlocalized-strings -- Responses API include field.
+            { include: ["reasoning.encrypted_content"], store: false }),
+        tools:
+          provider === "chatgpt"
+            ? [
+                {
+                  type: "namespace",
+                  name: "ggmail",
+                  // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
+                  description:
+                    // oxlint-disable-next-line lingui/no-unlocalized-strings -- Request protocol text sent to the model.
+                    "Search signed-in Gmail accounts, read conversations and prepare draft suggestions.",
+                  tools: options.tools,
+                },
+              ]
+            : options.tools.map(({ strict, ...tool }) =>
+                provider === "deepseek" ? tool : { ...tool, strict },
+              ),
         stream: true,
       }),
       signal: options.signal,
     },
     ms("2 minutes"),
   );
-  await checkResponse(response);
+  await checkResponse(response, provider);
 
   if (!response.body) {
-    throw new AssistantError(t`ChatGPT returned an empty response.`);
+    throw new AssistantError(t`The AI provider returned an empty response.`);
   }
 
-  return readResponseStream(response.body, options.onText);
+  return readResponseStream(response.body, options.onText, provider);
+}
+
+export function apiHeaders(provider: ApiProvider, key: string): Record<string, string> {
+  return provider === "anthropic"
+    ? { "x-api-key": key, "anthropic-version": "2023-06-01" }
+    : // oxlint-disable-next-line lingui/no-unlocalized-strings -- HTTP authorization scheme.
+      { Authorization: `Bearer ${key}` };
+}
+
+export async function listApiModels(provider: ApiProvider, key: string): Promise<AssistantModel[]> {
+  const url = new URL("models", endpoints[provider]);
+  if (provider === "anthropic") {
+    url.searchParams.set("limit", "100");
+  }
+  const models: AssistantModel[] = [];
+  for (let page = 0; page < 10; page++) {
+    const response = await providerRequest(url, { headers: apiHeaders(provider, key) });
+    await checkResponse(response, provider);
+    const catalog = z
+      .object({
+        data: z
+          .array(
+            z.object({
+              id: z.string().min(1).max(128),
+              display_name: z.string().max(180).optional(),
+              lifecycle: z.string().optional(),
+            }),
+          )
+          .max(2000),
+        has_more: z.boolean().optional(),
+        last_id: z.string().max(128).nullish(),
+      })
+      .parse(await readJson(response, 2_097_152));
+    for (const entry of catalog.data) {
+      if (entry.lifecycle === "retired") {
+        continue;
+      }
+      if (
+        provider === "openai" &&
+        !/^(?:gpt-(?:4o|4\.1|[56](?:\.\d+)?)(?:-(?:mini|nano|sol|astra|luna))?|o[34](?:-mini)?)(?:-\d{4}-\d{2}-\d{2})?$/.test(
+          entry.id,
+        )
+      ) {
+        continue;
+      }
+      if (provider === "deepseek" && !["deepseek-flash", "deepseek-v4-pro"].includes(entry.id)) {
+        continue;
+      }
+      models.push({ id: entry.id, label: entry.display_name || entry.id });
+    }
+    if (provider !== "anthropic" || !catalog.has_more || !catalog.last_id) {
+      break;
+    }
+    url.searchParams.set("after_id", catalog.last_id);
+  }
+  if (!models.length) {
+    throw new AssistantError(
+      t`No compatible mail assistant models are available for this API key.`,
+    );
+  }
+  return models;
 }

@@ -1,38 +1,58 @@
 import { expect, mock, test } from "bun:test";
 import type { AssistantRequest } from "@ggmail/shared/assistant";
 import type { MailSource } from "./mail-context";
-import type { respond } from "./responses";
+import type { respond, ResponseOptions, FunctionCall } from "./responses";
 
-const respondMock = mock<typeof respond>();
-const navigate = mock((_hash: string) => {});
+const respondMock = mock<(options: ResponseOptions) => ReturnType<typeof respond>>();
+const navigate = mock((_source: MailSource) => {});
+const primary = {
+  accountId: "personal",
+  mailbox: "https://mail.google.com/mail/u/0/",
+  ownerEmail: "one@example.test",
+};
+const secondary = { ...primary, accountId: "work", ownerEmail: "two@example.test" };
+const available = [primary, secondary].map(({ accountId, ownerEmail }) => ({
+  accountId,
+  label: accountId,
+  email: ownerEmail,
+  available: true,
+}));
+const search = mock<typeof import("./mail-context").searchAllMail>();
+const read = mock<typeof import("./mail-context").readMailSource>();
+
 let key = "account/inbox";
 let sources: MailSource[] = [];
 
-mock.module("./connection", () => ({
-  ChatGPTConnection: class {
+mock.module("./providers", () => ({
+  AssistantProviders: class {
     allowsModel() {
       return true;
     }
-    accessToken() {
-      return Promise.resolve("fixture");
+    reply(_provider: string, options: ResponseOptions) {
+      return respondMock(options);
     }
     invalidate() {}
   },
 }));
 mock.module("./mail-context", () => ({
-  getMailScope: () => ({ kind: "mailView", key, gmail: { navigateToHash: navigate } }),
+  getMailScope: () => ({
+    kind: "mailView",
+    key,
+    accountId: primary.accountId,
+    unified: false,
+    gmail: {},
+  }),
+  getAssistantMailboxes: () => available,
+  openMailSource: (_scope: unknown, source: MailSource) => navigate(source),
+  readMailSource: read,
   ensureCurrentScope: (_scope: unknown, signal: AbortSignal) => signal.throwIfAborted(),
   readCurrentMail: () => Promise.resolve({ kind: "mailView", sources }),
-  searchAllMail: () => Promise.resolve({ rows: [] }),
-}));
-mock.module("./responses", () => ({
-  AssistantError: class extends Error {},
-  respond: respondMock,
+  searchAllMail: search,
 }));
 const { AssistantChat } = await import("./chat");
 
 function request(prompt: string): AssistantRequest {
-  return { prompt, model: "fixture", id: crypto.randomUUID(), scopeKey: key };
+  return { provider: "chatgpt", prompt, model: "fixture", id: crypto.randomUUID(), scopeKey: key };
 }
 const quiet = () => {};
 
@@ -48,7 +68,14 @@ test("a revision receives the actual subject and body even when ChatGPT also ret
   };
   respondMock.mockResolvedValueOnce({ text: "", items: [call], calls: [call] });
   respondMock.mockResolvedValueOnce({ text: "Draft prepared.", items: [], calls: [] });
-  expect((await chat.send(request("Draft an invitation"), quiet)).status).toBe("complete");
+  const progress = mock<Parameters<typeof chat.send>[1]>();
+  expect((await chat.send(request("Draft an invitation"), progress)).status).toBe("complete");
+  expect(progress.mock.calls.map(([, step]) => step)).toEqual([
+    { kind: "mailbox" },
+    { kind: "waiting" },
+    { kind: "draftReady", draft },
+    { kind: "finishing" },
+  ]);
   respondMock.mockImplementationOnce(async ({ input }) => {
     expect(input[1]).toEqual({
       role: "assistant",
@@ -61,8 +88,8 @@ test("a revision receives the actual subject and body even when ChatGPT also ret
 
 test("citations keep their numbers when rows reorder and can only open in their own conversation", async () => {
   const chat = new AssistantChat();
-  const first = { hash: "#all/aa", subject: "Agenda" };
-  const second = { hash: "#all/bb", subject: "Budget" };
+  const first = { ...primary, hash: "#all/aa", subject: "Agenda" };
+  const second = { ...primary, hash: "#all/bb", subject: "Budget" };
   sources = [first];
   respondMock.mockResolvedValueOnce({ text: "Read [1]", items: [], calls: [] });
   const answer = await chat.send(request("First message?"), quiet);
@@ -86,7 +113,7 @@ test("citations keep their numbers when rows reorder and can only open in their 
   }
   expect(followUp.reply.citations[0]?.id).toBe(citation.id);
   chat.openSource(citation.id);
-  expect(navigate).toHaveBeenLastCalledWith(first.hash);
+  expect(navigate).toHaveBeenLastCalledWith(expect.objectContaining(first));
   key = "other/inbox";
   expect(() => chat.openSource(citation.id)).toThrow();
   chat.context();
@@ -115,4 +142,132 @@ test("stopping a streamed reply leaves its partial answer out of the next reques
     return { text: "Complete", items: [], calls: [] };
   });
   expect((await chat.send(request("Retry"), quiet)).status).toBe("complete");
+});
+
+function callTool(name: string, args: Record<string, unknown>) {
+  const call: FunctionCall = {
+    type: "function_call",
+    namespace: "ggmail",
+    name,
+    call_id: crypto.randomUUID(),
+    arguments: JSON.stringify(args),
+  };
+  return { text: "", items: [call], calls: [call] };
+}
+
+test("an inbox question searches a second account and reads a deadline beyond the first body chunk", async () => {
+  const chat = new AssistantChat();
+  const thread = {
+    ...primary,
+    threadId: "193078998a370001",
+    hash: "#all/193078998a370001",
+    subject: "Review",
+  };
+  const workThread = { ...thread, ...secondary, rowSender: undefined, senders: [{ name: "Sam" }] };
+  sources = [thread];
+  try {
+    const query = "subject:Review";
+    search.mockResolvedValueOnce({
+      rows: [
+        {
+          subject: "Review",
+          sender: "Sam",
+          date: "",
+          snippet: "Please see below",
+          source: workThread,
+        },
+      ],
+      nextPage: null,
+      complete: true,
+    });
+    read.mockResolvedValueOnce({
+      text: "Background",
+      nextOffset: 10,
+      totalCharacters: 30,
+      messageCount: 2,
+    });
+    read.mockResolvedValueOnce({
+      text: "Send by November 30.",
+      nextOffset: null,
+      totalCharacters: 30,
+      messageCount: 2,
+    });
+    respondMock.mockImplementationOnce(async ({ input, tools }) => {
+      expect(tools.map((tool) => tool.name)).toContain("search_mail");
+      expect(tools.map((tool) => tool.name)).toContain("read_thread");
+      expect(input[0]).toMatchObject({ content: expect.stringContaining('"accountId":"work"') });
+      return callTool("search_mail", { accountId: "work", query, page: 1 });
+    });
+    respondMock.mockImplementationOnce(async ({ input }) => {
+      expect(input.at(-1)).toMatchObject({ output: expect.stringContaining('"sourceNumber":2') });
+      return callTool("read_thread", { sourceNumber: 2, offset: 0 });
+    });
+    respondMock.mockImplementationOnce(async ({ input }) => {
+      expect(input.at(-1)).toMatchObject({ output: expect.stringContaining('"nextOffset":10') });
+      return callTool("read_thread", { sourceNumber: 2, offset: 10 });
+    });
+    respondMock.mockImplementationOnce(async ({ input }) => {
+      expect(input.at(-1)).toMatchObject({
+        output: expect.stringContaining("Send by November 30."),
+      });
+      return { text: "Send by November 30 [2].", items: [], calls: [] };
+    });
+    const progress = mock<Parameters<typeof chat.send>[1]>();
+    const result = await chat.send(request("Find the deadline in my work mail"), progress);
+    expect(progress.mock.calls.map(([, step]) => step)).toEqual([
+      { kind: "mailbox" },
+      { kind: "waiting" },
+      { kind: "searching", account: "work", page: 1 },
+      { kind: "reviewing" },
+      { kind: "reading", subject: "Review" },
+      { kind: "reviewing" },
+      { kind: "reading", subject: "Review" },
+      { kind: "reviewing" },
+    ]);
+    if (result.status !== "complete") {
+      throw new Error("Expected completed deadline search");
+    }
+    expect(search).toHaveBeenLastCalledWith(
+      expect.anything(),
+      query,
+      expect.any(AbortSignal),
+      "work",
+      1,
+    );
+    expect(read).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining(workThread),
+      10,
+      expect.any(AbortSignal),
+    );
+    expect(result.reply.citations.map((citation) => citation.number)).toEqual([2]);
+    const citation = result.reply.citations[0];
+    if (!citation) {
+      throw new Error("Missing deadline citation");
+    }
+    chat.openSource(citation.id);
+    expect(navigate).toHaveBeenLastCalledWith(expect.objectContaining(workThread));
+  } finally {
+    sources = [];
+  }
+});
+
+test("unknown account and source references return tool errors without accessing Gmail", async () => {
+  const chat = new AssistantChat();
+  const searches = search.mock.calls.length;
+  const reads = read.mock.calls.length;
+  respondMock.mockResolvedValueOnce(
+    callTool("search_mail", { accountId: "not-an-account", query: "agenda", page: 1 }),
+  );
+  respondMock.mockImplementationOnce(async ({ input }) => {
+    expect(input.at(-1)).toMatchObject({ output: expect.stringContaining('"error"') });
+    return callTool("read_thread", { sourceNumber: 98765, offset: 0 });
+  });
+  respondMock.mockImplementationOnce(async ({ input }) => {
+    expect(input.at(-1)).toMatchObject({ output: expect.stringContaining('"error"') });
+    return { text: "That conversation was unavailable.", items: [], calls: [] };
+  });
+  expect((await chat.send(request("Read a conversation"), quiet)).status).toBe("complete");
+  expect(search.mock.calls).toHaveLength(searches);
+  expect(read.mock.calls).toHaveLength(reads);
 });
