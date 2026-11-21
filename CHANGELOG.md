@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.65.9 — 2026-11-21
+
+- The mail assistant shows the selected account’s profile photo beside its name in the current mail view and open email headers.
+
 ## 3.65.8 — 2026-11-21
 
 - The workspace sidebar now has Mail, Calendar, Google Tasks and Google Meet at the top. Bookmarks sits above the divider over Settings.

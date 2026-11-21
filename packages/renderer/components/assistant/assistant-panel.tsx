@@ -7,6 +7,7 @@ import {
 } from "@ggmail/shared/assistant";
 import { ms } from "@ggmail/shared/ms";
 import { ipc } from "@ggmail/shared/renderer/ipc";
+import type { AccountConfig } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -18,6 +19,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { AccountAvatar } from "@/components/account-avatar";
 import { MailAssistantIcon } from "@/components/mail-icons";
 import { useAccountsStore } from "@/lib/stores";
 import { useAssistantConnection } from "@/lib/use-assistant-connection";
@@ -40,9 +42,10 @@ type ClosePanel = (focusToggle?: boolean) => void;
 export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePanel }) {
   const width = useSyncExternalStore(watchWidth, getWidth);
   const clip = useRef<HTMLDivElement>(null);
-  const accountId = useAccountsStore(
-    (state) => state.accounts.find((account) => account.config.selected)?.config.id,
+  const account = useAccountsStore(
+    (state) => state.accounts.find((item) => item.config.selected)?.config,
   );
+  const accountId = account?.id;
   const [session, setSession] = useState<{
     accountId?: string;
     context: AssistantContext;
@@ -132,6 +135,7 @@ export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePa
         <AssistantPanel
           open={open}
           context={context}
+          account={account}
           showContext={!open || session?.checked === true}
           width={width}
           close={close}
@@ -142,6 +146,7 @@ export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePa
 }
 
 function AssistantPanel({
+  account,
   open,
   context,
   showContext,
@@ -150,6 +155,7 @@ function AssistantPanel({
 }: {
   open: boolean;
   context?: AssistantContext;
+  account?: AccountConfig;
   showContext: boolean;
   width: number;
   close: ClosePanel;
@@ -272,6 +278,7 @@ function AssistantPanel({
             {context.kind !== "chat" && (
               <>
                 <span aria-hidden="true">·</span>
+                {account && <AccountAvatar account={account} />}
                 <span className="truncate" title={getAccountLabel(context.accountLabel)}>
                   {getAccountLabel(context.accountLabel)}
                 </span>

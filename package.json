@@ -1,6 +1,6 @@
 {
   "name": "ggmail",
-  "version": "3.65.8",
+  "version": "3.65.9",
   "private": true,
   "description": "A desktop app for Gmail with multi-account mail, attachment search, and a mail assistant.",
   "author": "ggmail maintainers",

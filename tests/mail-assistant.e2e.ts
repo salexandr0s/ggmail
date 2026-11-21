@@ -601,6 +601,8 @@ test("the assistant drawer stays uncovered when switching between mail accounts"
   await toggle.click();
   await expectLayout(secondUrl, full);
   const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  const scopeAvatar = panel.locator('header [data-slot="account-avatar"]');
+  await expect(scopeAvatar).toHaveText("S");
   const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
   await composer.fill("Private note for the second mailbox");
 
@@ -629,11 +631,15 @@ test("the assistant drawer stays uncovered when switching between mail accounts"
     await expectLayout(firstUrl, full);
     await expect(panel.getByRole("status")).toHaveText("Waiting for the mail view…");
     await expect(composer).toBeHidden();
+    await expect(scopeAvatar).toHaveCount(0);
   } finally {
     await gate.evaluate((release) => release());
     await gate.dispose();
   }
   await expect(composer).toHaveValue("");
+  await expect(scopeAvatar).toHaveText(
+    await accounts.first().locator('[data-slot="account-avatar"]').innerText(),
+  );
   await toggle.click();
   await expectLayout(firstUrl, 0);
   // Switch again before the opening animation has settled.
