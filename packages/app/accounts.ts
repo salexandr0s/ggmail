@@ -206,6 +206,14 @@ class Accounts {
     }
   }
 
+  updateSelectedViewBounds() {
+    // Removal can tear down the selected instance before its successor is chosen.
+    const selected = this.getAccountConfigs().find((account) => account.selected);
+    if (selected) {
+      this.instances.get(selected.id)?.tabs.activeTab.updateViewBounds?.();
+    }
+  }
+
   refreshSelectedAccountView({ focus = true }: { focus?: boolean } = {}) {
     const activeTab = this.getSelectedAccount().instance.tabs.activeTab;
 

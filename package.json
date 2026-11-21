@@ -1,6 +1,6 @@
 {
   "name": "ggmail",
-  "version": "3.65.0-local.1",
+  "version": "3.65.0",
   "private": true,
   "description": "A desktop app for Gmail with multi-account mail, attachment search, and a mail assistant.",
   "author": "ggmail maintainers",
@@ -14,7 +14,7 @@
     "build:js": "bun run i18n:compile && NODE_ENV=production bun run scripts/build.ts",
     "build:linux": "bun run build:js && bun run build:clean-dist && electron-builder --linux",
     "build:mac": "bun run scripts/signing-env.ts mac && bun run build:js && bun run build:clean-dist && electron-builder --mac",
-    "build:mac:dmg": "bun run scripts/signing-env.ts mac && bun run build:js && bun run build:clean-dist && electron-builder --mac dmg --arm64 --config.mac.notarize=false --config.mac.timestamp=none --config.dmg.writeUpdateInfo=false",
+    "build:mac:dmg": "bun run scripts/signing-env.ts mac && bun run build:js && electron-builder --mac dmg --arm64 --publish never --config.forceCodeSigning=true --config.dmg.sign=true --config.dmg.writeUpdateInfo=false --config.dmg.artifactName=ggmail-mac-arm64.dmg",
     "build:mac:local": "bun run scripts/build-mac-local.ts",
     "build:win": "bun run build:js && bun run build:clean-dist && electron-builder --win",
     "dev": "bun run i18n:compile && bun run scripts/build.ts --dev",

@@ -1,5 +1,5 @@
 .assistant-answer {
-  --answer-accent: light-dark(#176c61, #8ed5c9);
+  --answer-accent: var(--foreground);
   color-scheme: light;
   color: var(--foreground);
   font-size: 0.875rem;

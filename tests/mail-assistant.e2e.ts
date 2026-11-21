@@ -3,6 +3,7 @@ import type {
   AssistantRequest,
   AssistantResult,
 } from "@ggmail/shared/assistant";
+import { assistantPanelWidth } from "@ggmail/shared/assistant";
 import type {} from "@ggmail/shared/electron-api";
 import { expect, test } from "@playwright/test";
 import type { Route } from "playwright";
@@ -17,8 +18,9 @@ for (const starter of [false, true]) {
   test(`stop and retry preserve a ${starter ? "starter" : "written"} prompt and the next message`, async () => {
     // Only the provider-facing operations are fixtures. The panel reads the
     // real account context, handles streamed IPC and uses its normal form.
-    await ggmail.app.evaluate(({ ipcMain }) => {
+    await ggmail.app.evaluate(({ ipcMain }, starter) => {
       const status: AssistantConnection = {
+        provider: "chatgpt",
         status: "connected",
         models: [{ id: "fixture", label: "Fixture model" }],
       };
@@ -32,6 +34,14 @@ for (const starter of [false, true]) {
           attempts++;
           if (attempts === 1) {
             event.sender.send("assistant.progress", request.id, "Partial response");
+            event.sender.send(
+              "assistant.progress",
+              request.id,
+              "",
+              starter
+                ? { kind: "reading", subject: "Planning review" }
+                : { kind: "searching", account: "Studio", page: 2 },
+            );
             return new Promise((resolve) => {
               ipcMain.once("assistant.stop", (_stopEvent, id) => {
                 resolve(
@@ -48,7 +58,7 @@ for (const starter of [false, true]) {
           };
         },
       );
-    });
+    }, starter);
 
     const page = ggmail.renderer;
     const toggle = page.getByRole("button", { name: "Mail assistant", exact: true });
@@ -65,6 +75,9 @@ for (const starter of [false, true]) {
       await composer.press("Enter");
     }
     const bubble = panel.getByText(first, { exact: true });
+    await expect(panel.getByRole("status")).toHaveText(
+      starter ? "Reading “Planning review”" : "Searching Studio · page 2",
+    );
     await expect(panel.getByText("Partial response")).toBeVisible();
     await expect(bubble).toHaveCount(starter ? 0 : 1);
     await composer.fill("Follow-up in progress");
@@ -215,6 +228,220 @@ async function openThread() {
   );
 }
 
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  test(`the assistant drawer tracks the Gmail view with ${reducedMotion} motion`, async () => {
+    const mail = await openThread();
+    const page = ggmail.renderer;
+    await page.emulateMedia({ reducedMotion });
+    // The test window stays behind other apps. Slow its CSS timeline so even an
+    // occluded renderer paints intermediate frames under load.
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Animation.enable");
+    await cdp.send("Animation.setPlaybackRate", { playbackRate: 0.2 });
+    const native = await ggmail.app.evaluateHandle(({ BrowserWindow, WebContentsView }, url) => {
+      const win = BrowserWindow.getAllWindows().find((w) =>
+        w.webContents.getURL().includes("main.html"),
+      );
+      const view = win?.contentView.children.find(
+        (child) => child instanceof WebContentsView && child.webContents.getURL() === url,
+      );
+      if (!win || !view) {
+        throw new Error("Missing native Gmail view");
+      }
+      const rightGap = () => {
+        const { x, width } = view.getBounds();
+        return win.getContentBounds().width - x - width;
+      };
+      const baseline = rightGap();
+      const inset = () => rightGap() - baseline;
+      const samples: number[] = [];
+      const record = () => samples.push(inset());
+      view.on("bounds-changed", record);
+      return {
+        inset,
+        samples,
+        resize: (width: number) => win.setContentSize(width, 720),
+        stop: () => view.off("bounds-changed", record),
+      };
+    }, mail.url());
+    const width = await page.evaluate(() => innerWidth);
+    const full = assistantPanelWidth(width);
+    // Sample in the renderer on paint and in Electron on bounds changes. Playwright
+    // polling alone can skip a full transition between two observations.
+    async function move(action: "open" | "close" | "reverse") {
+      await native.evaluate((tracker) => {
+        tracker.samples.length = 0;
+      });
+      const samples = await page.evaluate(
+        async ({ action, full }) => {
+          const toggle = document.querySelector<HTMLButtonElement>("#mail-assistant-toggle");
+          if (!toggle) {
+            throw new Error("Missing drawer toggle");
+          }
+          const insets: number[] = [];
+          const widths = new Set<number>();
+          let reversed = false;
+          toggle.click();
+          const start = performance.now();
+          while (performance.now() - start < 5000) {
+            await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+            const panel = document.querySelector("#mail-assistant");
+            const bounds = panel?.getBoundingClientRect();
+            const inset = bounds ? Math.max(0, Math.round(innerWidth - bounds.left)) : 0;
+            insets.push(inset);
+            if (bounds) {
+              widths.add(Math.round(bounds.width));
+            }
+            if (action === "reverse" && !reversed && inset > full / 4 && inset < full - 1) {
+              toggle.click();
+              reversed = true;
+            }
+            if (action === "open" ? inset === full : !panel && (reversed || action === "close")) {
+              return { insets, widths: [...widths] };
+            }
+          }
+          throw new Error(`Drawer did not finish ${action}; observed insets ${insets.join(",")}`);
+        },
+        { action, full },
+      );
+      await expect
+        .poll(() => native.evaluate((tracker) => tracker.inset()))
+        .toBe(action === "open" ? full : 0);
+      // Reduced-motion close may unmount before the next paint.
+      expect(samples.widths.every((width) => width === full)).toBe(true);
+      const nativeInsets = await native.evaluate((tracker) => tracker.samples);
+      for (const [source, values] of Object.entries({
+        renderer: samples.insets,
+        native: nativeInsets,
+      })) {
+        expect(
+          values.some((inset) => inset > 1 && inset < full - 1),
+          `${source} ${action} insets: ${values.join(", ")}`,
+        ).toBe(reducedMotion === "no-preference");
+        if (action === "reverse") {
+          expect(Math.max(...values)).toBeLessThan(full);
+        }
+      }
+    }
+    try {
+      await move("open");
+      await move("close");
+      if (reducedMotion === "no-preference") {
+        await move("reverse");
+      }
+      await move("open");
+      const resized = width > 1050 ? 960 : 1200;
+      await native.evaluate((tracker, width) => tracker.resize(width), resized);
+      await expect.poll(() => page.evaluate(() => innerWidth)).toBe(resized);
+      await expect
+        .poll(() => native.evaluate((tracker) => tracker.inset()))
+        .toBe(assistantPanelWidth(resized));
+      await expect
+        .poll(() =>
+          page
+            .locator("#mail-assistant")
+            .evaluate((el) => Math.round(el.getBoundingClientRect().width)),
+        )
+        .toBe(assistantPanelWidth(resized));
+    } finally {
+      await native.evaluate((tracker) => {
+        tracker.stop();
+      });
+      await native.dispose();
+      await cdp.detach();
+    }
+  });
+}
+
+test("streams answer text and shows a validated draft before the provider finishes", async () => {
+  await openThread();
+  await useDraftProvider(null);
+  // Release individual SSE frames after inspecting the UI. Keep the actual
+  // response parser, tool loop, draft validation and renderer IPC in the path.
+  const transport = await ggmail.app.evaluateHandle(() => {
+    let ready = Promise.withResolvers<ReadableStreamDefaultController<Uint8Array>>();
+    const fetch = globalThis.fetch;
+    globalThis.fetch = (async (url, options) => {
+      if (String(url) !== "https://api.openai.com/v1/responses") {
+        return fetch(url, options);
+      }
+      const stream = new ReadableStream<Uint8Array>({ start: ready.resolve });
+      return new Response(stream, { headers: { "Content-Type": "text/event-stream" } });
+    }) as typeof globalThis.fetch;
+    return async ({ frame, complete }: { frame: unknown; complete: boolean }) => {
+      const stream = await ready.promise;
+      stream.enqueue(new TextEncoder().encode("data: " + JSON.stringify(frame) + "\n\n"));
+      if (complete) {
+        ready = Promise.withResolvers<ReadableStreamDefaultController<Uint8Array>>();
+        stream.close();
+      }
+    };
+  });
+  const send = (frame: unknown, complete = false) =>
+    transport.evaluate((release, data) => release(data), { frame, complete });
+
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
+  await expect(panel.getByRole("status")).toHaveText("Waiting for Fixture model");
+  await send({ type: "response.output_text.delta", delta: "Friday" });
+  const partial = panel.locator(".assistant-answer");
+  await expect(partial).toHaveText("Friday");
+  await send({ type: "response.output_text.delta", delta: " works." });
+  await expect(partial).toHaveText("Friday works.");
+
+  const draft = { subject: "Friday plans", body: "Hi Sam, Friday works for me." };
+  await send(
+    {
+      type: "response.completed",
+      response: {
+        status: "completed",
+        output: [
+          {
+            type: "function_call",
+            name: "prepare_draft",
+            call_id: "draft",
+            namespace: "ggmail",
+            arguments: JSON.stringify(draft),
+          },
+        ],
+      },
+    },
+    true,
+  );
+  await expect(panel.getByText(draft.body, { exact: true })).toBeVisible();
+  await expect(panel.getByRole("status")).toHaveText("Finishing your reply");
+  await expect(partial).toHaveText("Friday works.");
+  const insert = panel.getByRole("button", { name: "Insert into reply", exact: true });
+  const open = panel.getByRole("button", { name: "Open in Gmail", exact: true });
+  await expect(insert).toHaveCount(0);
+  await expect(open).toHaveCount(0);
+
+  const final = "Please review the draft.";
+  await send({ type: "response.output_text.delta", delta: final });
+  await expect(partial).toHaveText(final);
+  await expect(panel.getByText(draft.body, { exact: true })).toBeVisible();
+  await expect(insert).toHaveCount(0);
+  await send(
+    {
+      type: "response.completed",
+      response: {
+        status: "completed",
+        output: [
+          { type: "message", role: "assistant", content: [{ type: "output_text", text: final }] },
+        ],
+      },
+    },
+    true,
+  );
+  await expect(insert).toBeEnabled();
+  await expect(open).toBeEnabled();
+  await expect(panel.getByText(draft.body, { exact: true })).toHaveCount(1);
+  await expect(panel.getByRole("status")).toHaveCount(0);
+  await transport.dispose();
+});
+
 for (const existing of [false, true]) {
   test(`a starter inserts a draft into ${existing ? "an existing" : "a closed"} Gmail reply`, async () => {
     const mail = await openThread();
@@ -336,6 +563,46 @@ for (const existing of [false, true]) {
   });
 }
 
+for (const mode of ["rich text", "plaintext-only"]) {
+  test(`inserts into an open inline reply beside the Gmail thread heading (${mode})`, async () => {
+    const mail = await openMailFixture(
+      "#inbox/" + threadId,
+      `<main role="main"><table><tr><td>Inbox</td></tr></table></main>
+      <main role="main"><div class="nH id">
+        <h2 class="hP" data-legacy-thread-id="${threadId}">Planning review</h2>
+        <div class="adn"><div class="gE"><span class="gD" email="sam@studio.example">Sam</span></div>
+          <div class="a3s">Please check the proof.
+            <div role="main"><h2 class="hP">Message content</h2>
+              <div class="ip"><div id="mail-content" contenteditable role="textbox">Original</div></div>
+            </div></div></div></div>
+        <div class="HM"><div class="I5"><div class="M9">
+          <div class="HQ"><div class="Un J-JN-M-I">Reply
+            <div role="menu" hidden><i class="mI"></i></div></div><span id="recipient">Sam</span></div>
+          <div class="Ap"><div id="reply" contenteditable="${mode === "rich text" ? "" : "plaintext-only"}" role="textbox" aria-multiline="true"><br><div class="gmail_signature" data-smartmail="gmail_signature"><b>Studio Team</b><br>Studio phone</div></div></div>
+        </div></div></div>
+        <div role="dialog"><div class="ip"><div contenteditable role="textbox">Separate draft</div></div></div>
+      </main>
+      <script>document.querySelector("#reply").oninput = () => document.body.dataset.saved = "yes";</script>`,
+    );
+    await useDraftProvider("Hi Sam,\n\nThe proof looks good.\n\nStudio Team\nStudio phone");
+    const page = ggmail.renderer;
+    await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+    const panel = page.getByRole("complementary", { name: "Mail assistant" });
+    await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
+    await panel.getByRole("button", { name: "Insert into reply", exact: true }).click();
+    const editor = mail.locator("#reply");
+    await expect(editor).toContainText("The proof looks good.");
+    expect(await editor.innerText()).toMatch(
+      /^Hi Sam,\n\nThe proof looks good\.\n+Studio Team\nStudio phone$/,
+    );
+    await expect(editor.locator(".gmail_signature b")).toHaveText("Studio Team");
+    await expect(mail.locator("body")).toHaveAttribute("data-saved", "yes");
+    await expect(mail.locator("#recipient")).toHaveText("Sam");
+    await expect(mail.getByRole("dialog")).toHaveText("Separate draft");
+    await expect(mail.locator("#mail-content")).toHaveText("Original");
+  });
+}
+
 test("a draft outside a thread opens in its own composer", async () => {
   await useDraftProvider("See you on Friday.");
   const panel = ggmail.renderer.getByRole("complementary", { name: "Mail assistant" });
@@ -349,6 +616,245 @@ test("a draft outside a thread opens in its own composer", async () => {
   const count = await countWindows();
   await open.click();
   await expect.poll(countWindows).toBe(count + 1);
+});
+
+test("the inbox assistant searches later result pages and reads a deadline from the full thread", async () => {
+  const server = ggmail.gmailStandIn;
+  const mail = () => ggmail.app.windows().find((page) => page.url() === server.signInUrl);
+  await expect.poll(mail).toBeDefined();
+  const inbox = mail();
+  if (!inbox) {
+    throw new Error("Gmail inbox unavailable");
+  }
+  const printRequests: string[] = [];
+  const deadline = "27 November at 16:30";
+  const workDeadline = "30 November at 09:15";
+  const subject = "Workshop approval";
+  const reset = server.serveGmailPages((url, request) => {
+    const work = request.headers.cookie?.includes("assistant=work") ?? false;
+    if (url.searchParams.get("view") === "pt") {
+      printRequests.push((work ? "work/" : "personal/") + url.searchParams.get("th"));
+      if (url.searchParams.get("th") !== threadId) {
+        return;
+      }
+      return [
+        ["Mira", "Please approve the layout by " + (work ? workDeadline : deadline) + "."],
+        ["Sam", "Thanks for the update."],
+      ]
+        .map(
+          ([
+            sender,
+            body,
+          ]) => `<table class="message"><tr><td>${sender}</td><td>20 November</td></tr>
+        <tr><td><table><tr><td><div>${body}</div></td></tr></table></td></tr></table>`,
+        )
+        .join("");
+    }
+    return `<main role="main"><div class="TC">Inbox</div></main><script>
+      const main = document.querySelector('main');
+      const page = location.hash === '#search/workshop/p2' ? 2 : location.hash === '#search/workshop' ? 1 : 0;
+      if (page) {
+        const id = page === 1 && !${work} ? '194a92f8c0000002' : '${threadId}';
+        const subject = page === 1 && !${work} ? 'Workshop notes' : '${subject}';
+        main.innerHTML = '<table><tr class="zA" data-legacy-thread-id="' + id + '"><td class="bog">' + subject +
+          '</td><td class="yW">Mira</td><td class="y2">Thanks for the update.</td></tr></table>' +
+          '<button aria-label="Older" aria-disabled="' + (page === 2 || ${work}) + '"></button>';
+      }
+    </script>`;
+  });
+
+  try {
+    await inbox.goto(server.gmailUrl + "#inbox");
+    const page = ggmail.renderer;
+    const personal = (await ggmail.readConfig()).accounts?.find((account) => account.selected);
+    if (!personal) {
+      throw new Error("First account unavailable");
+    }
+    await page.evaluate(() => {
+      window.electron.ipcRenderer.send("accounts.addAccount", {
+        label: "Work",
+        color: null,
+        notifications: false,
+        gmail: { unreadBadge: true, unifiedInbox: true },
+      });
+    });
+    const findWork = async () =>
+      (await ggmail.readConfig()).accounts?.find((account) => account.label === "Work");
+    await expect.poll(findWork).toBeDefined();
+    const work = await findWork();
+    if (!work) {
+      throw new Error("Second account unavailable");
+    }
+    await ggmail.app.evaluate(
+      async ({ session }, { id, base }) => {
+        await session
+          .fromPartition("persist:" + id)
+          .cookies.set({ url: base, path: "/", name: "assistant", value: "work" });
+      },
+      { id: work.id, base: server.gmailUrl },
+    );
+    await expect
+      .poll(() =>
+        ggmail.app.evaluate(
+          ({ webContents, session }, { id, base }) =>
+            webContents
+              .getAllWebContents()
+              .some(
+                (w) =>
+                  w.session === session.fromPartition("persist:" + id) &&
+                  w.getURL().startsWith(base),
+              ),
+          { id: work.id, base: server.gmailUrl },
+        ),
+      )
+      .toBe(true);
+    await page.evaluate(
+      (id) => window.electron.ipcRenderer.send("accounts.selectAccount", id),
+      personal.id,
+    );
+    await expect
+      .poll(
+        async () => (await ggmail.readConfig()).accounts?.find((account) => account.selected)?.id,
+      )
+      .toBe(personal.id);
+    await useDraftProvider(null);
+    await ggmail.app.evaluate(
+      (_electron, { deadline, workDeadline, subject }) => {
+        const original = globalThis.fetch;
+        let personalSource = 0;
+        let workSource = 0;
+        globalThis.fetch = (async (url, options) => {
+          if (String(url) !== "https://api.openai.com/v1/responses") {
+            return original(url, options);
+          }
+          const { input, tools } = JSON.parse(String(options?.body));
+          const action = (name: string, args: Record<string, string | number>, id: string) => {
+            if (!tools[0].tools.some((tool: { name: string }) => tool.name === name)) {
+              throw new Error("Missing assistant tool " + name);
+            }
+            return {
+              type: "function_call",
+              namespace: "ggmail",
+              name,
+              call_id: id,
+              arguments: JSON.stringify(args),
+            };
+          };
+          const context = JSON.parse(input[0].content).mail;
+          const last = input.at(-1);
+          const work = context.accounts.find(
+            (account: { label: string }) => account.label === "Work",
+          );
+          const search = (id: string, page: number, callId: string) =>
+            action(
+              "search_mail",
+              {
+                accountId: id,
+                query: "workshop",
+                page,
+              },
+              callId,
+            );
+          let item;
+          if (last.type !== "function_call_output") {
+            item = search(context.selectedAccountId, 1, "page1");
+          } else {
+            const result = JSON.parse(last.output);
+            if (last.call_id === "page1" && result.nextPage === 2) {
+              item = search(context.selectedAccountId, result.nextPage, "page2");
+            } else if (last.call_id === "page2") {
+              const match = result.rows.find((row: { subject: string }) => row.subject === subject);
+              personalSource = match.sourceNumber;
+              item = action(
+                "read_thread",
+                { sourceNumber: personalSource, offset: 0 },
+                "personal-thread",
+              );
+            } else if (last.call_id === "personal-thread" && result.text?.includes(deadline)) {
+              item = search(work.accountId, 1, "work-page");
+            } else if (last.call_id === "work-page") {
+              workSource = result.rows.find(
+                (row: { subject: string }) => row.subject === subject,
+              ).sourceNumber;
+              if (workSource === personalSource) {
+                throw new Error("Citations from different accounts must be distinct");
+              }
+              item = action("read_thread", { sourceNumber: workSource, offset: 0 }, "work-thread");
+            } else if (last.call_id === "work-thread" && result.text?.includes(workDeadline)) {
+              item = {
+                type: "message",
+                role: "assistant",
+                content: [
+                  {
+                    type: "output_text",
+                    text:
+                      "Personal: " +
+                      deadline +
+                      " [" +
+                      personalSource +
+                      "]. Work: " +
+                      workDeadline +
+                      " [" +
+                      workSource +
+                      "].",
+                  },
+                ],
+              };
+            } else {
+              throw new Error(
+                "The deadline must come from the printed thread on the second search page.",
+              );
+            }
+          }
+          return new Response(
+            "data: " +
+              JSON.stringify({
+                type: "response.completed",
+                response: { status: "completed", output: [item] },
+              }) +
+              "\n\n",
+          );
+        }) as typeof globalThis.fetch;
+      },
+      { deadline, workDeadline, subject },
+    );
+
+    await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+    const panel = page.getByRole("complementary", { name: "Mail assistant" });
+    const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+    await composer.fill(
+      "When do I need to approve the workshop layouts in my personal and work mailboxes?",
+    );
+    await composer.press("Enter");
+    const answer = panel.locator(".assistant-answer");
+    await expect(answer).toContainText(deadline, { timeout: 25_000 });
+    await expect(answer).toContainText(workDeadline);
+    const citations = answer.getByRole("button", { name: /Workshop approval/ });
+    await expect(citations).toHaveCount(2);
+    expect(printRequests).toEqual(["personal/" + threadId, "work/" + threadId]);
+    await expect(inbox).toHaveURL(server.gmailUrl + "#inbox");
+    await citations.last().click();
+    await expect
+      .poll(
+        async () => (await ggmail.readConfig()).accounts?.find((account) => account.selected)?.id,
+      )
+      .toBe(work.id);
+    await expect
+      .poll(() =>
+        ggmail.app.evaluate(
+          ({ webContents, session }, { id, threadId }) =>
+            webContents
+              .getAllWebContents()
+              .filter((w) => w.getURL().endsWith("#all/" + threadId))
+              .map((w) => w.session === session.fromPartition("persist:" + id)),
+          { id: work.id, threadId },
+        ),
+      )
+      .toEqual([true]);
+    await expect(inbox).toHaveURL(server.gmailUrl + "#inbox");
+  } finally {
+    reset();
+  }
 });
 
 test("inbox answers show sender identities, fit the panel, and open the cited thread", async () => {
@@ -431,4 +937,270 @@ test("inbox answers show sender identities, fit the panel, and open the cited th
   await expect(source.getByText("Design team")).toBeVisible();
   await source.click();
   await expect(mail).toHaveURL(new RegExp("#all/" + secondId + "$"));
+});
+
+test("model identity follows selection between Settings and chat in light and dark themes", async () => {
+  await openThread();
+  await ggmail.app.evaluate(({ BrowserWindow, ipcMain, nativeTheme }) => {
+    const status: AssistantConnection = {
+      provider: "claude-cli",
+      status: "connected",
+      models: [
+        { id: "sonnet", label: "Claude Sonnet" },
+        { id: "haiku", label: "Claude Haiku" },
+      ],
+    };
+    ipcMain.removeHandler("assistant.status");
+    ipcMain.handle("assistant.status", () => status);
+    nativeTheme.themeSource = "light";
+    BrowserWindow.getAllWindows()
+      .find((window) => window.webContents.getURL().includes("main.html"))
+      ?.setContentSize(480, 760);
+  });
+
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  const header = panel.locator("header");
+  const chatModel = panel.getByRole("combobox", { name: "Assistant model" });
+  await expect(header.locator('[data-brand="claude"]')).toBeVisible();
+  await expect(header).toContainText("Claude Sonnet");
+  await expect(chatModel.locator('[data-brand="claude"]')).toBeVisible();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await panel.screenshot({
+    path: test.info().outputPath("assistant-light.png"),
+    animations: "disabled",
+  });
+
+  const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await composer.fill("Check the planning email");
+  const loaded = ggmail.app.waitForEvent("window", {
+    predicate: (window) => window.url().includes("settings.html"),
+  });
+  await panel.getByRole("button", { name: "AI settings", exact: true }).click();
+  const settings = await loaded;
+  const provider = settings.getByRole("combobox", { name: "Mail assistant provider" });
+  const settingsModel = settings.getByRole("combobox", { name: "Assistant model" });
+  await expect(provider.locator('[data-brand="claude"]')).toBeVisible();
+  await expect(settingsModel.locator('[data-brand="claude"]')).toBeVisible();
+
+  await provider.click();
+  for (const [name, brand] of [
+    ["OpenAI Subscription (ChatGPT)", "openai"],
+    ["OpenAI API", "openai"],
+    ["Claude Code CLI (Subscription)", "claude"],
+    ["Claude API", "claude"],
+    ["DeepSeek AI", "deepseek"],
+  ]) {
+    await expect(
+      settings.getByRole("option", { name, exact: true }).locator(`[data-brand="${brand}"]`),
+    ).toBeVisible();
+  }
+  await settings.screenshot({
+    path: test.info().outputPath("assistant-settings.png"),
+    animations: "disabled",
+  });
+  await settings.keyboard.press("Escape");
+  await settingsModel.click();
+  const haiku = settings.getByRole("option", { name: "Claude Haiku", exact: true });
+  await expect(haiku.locator('[data-brand="claude"]')).toBeVisible();
+  await haiku.click();
+  await expect(chatModel).toContainText("Claude Haiku");
+  await expect(header).toContainText("Claude Haiku");
+  await expect(composer).toHaveValue("Check the planning email");
+
+  await chatModel.click();
+  const sonnet = page.getByRole("option", { name: "Claude Sonnet", exact: true });
+  await expect(sonnet.locator('[data-brand="claude"]')).toBeVisible();
+  await sonnet.click();
+  await expect(settingsModel).toContainText("Claude Sonnet");
+  await expect(header).toContainText("Claude Sonnet");
+  await ggmail.closeSettings();
+  await composer.fill("");
+  await composer.blur();
+
+  await ggmail.app.evaluate(({ nativeTheme }) => {
+    nativeTheme.themeSource = "dark";
+  });
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(header.locator('[data-brand="claude"]')).toBeVisible();
+  await panel.screenshot({
+    path: test.info().outputPath("assistant-dark.png"),
+    animations: "disabled",
+  });
+  await ggmail.app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()
+      .find((window) => window.webContents.getURL().includes("main.html"))
+      ?.setContentSize(360, 560),
+  );
+  await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(360);
+  expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await expect(panel.getByRole("textbox", { name: "Message the mail assistant" })).toBeInViewport();
+  await expect(panel.getByRole("button", { name: "Send chat message" })).toBeInViewport();
+});
+
+test("AI settings connect each API, route mail actions, and remember separate keys", async () => {
+  await ggmail.app.evaluate(() => {
+    const original = globalThis.fetch;
+    const services: Record<string, [string, string]> = {
+      "api.anthropic.com": ["claude-sonnet-4-6", "anthropic"],
+      "api.deepseek.com": ["deepseek-flash", "deepseek"],
+      "api.openai.com": ["gpt-4.1", "openai"],
+    };
+    globalThis.fetch = (async (input, init) => {
+      const url = new URL(String(input));
+      const service = services[url.hostname];
+      if (!service) {
+        return original(input, init);
+      }
+      const [model, provider] = service;
+      const headers = new Headers(init?.headers);
+      const key =
+        provider === "anthropic"
+          ? headers.get("x-api-key")
+          : headers.get("authorization")?.replace(/^Bearer /, "");
+      if (key !== "fixture-" + provider) {
+        return Response.json({}, { status: 401 });
+      }
+      if (url.pathname.endsWith("/models")) {
+        return Response.json({ data: [{ id: model }], has_more: false });
+      }
+      const body = JSON.parse(String(init?.body));
+      if (body.model !== model) {
+        throw new Error("Incorrect provider model");
+      }
+      const draft = { subject: "Schedule", body: "Friday works for " + provider };
+      if (provider === "anthropic" && url.pathname === "/v1/messages") {
+        if (!body.tools.some((tool: { name: string }) => tool.name === "prepare_draft")) {
+          throw new Error("Missing mail action");
+        }
+        const finished = body.messages
+          .at(-1)
+          .content.some((item: { type: string }) => item.type === "tool_result");
+        return Response.json({
+          stop_reason: finished ? "end_turn" : "tool_use",
+          content: [
+            finished
+              ? { type: "text", text: "Prepared with " + provider }
+              : { type: "tool_use", id: "tool1", name: "prepare_draft", input: draft },
+          ],
+        });
+      }
+      if (
+        !url.pathname.endsWith("/responses") ||
+        !body.tools.some((tool: { name: string }) => tool.name === "prepare_draft")
+      ) {
+        throw new Error("Incorrect Responses request");
+      }
+      if (
+        provider === "deepseek" &&
+        ("include" in body || "store" in body || "strict" in body.tools[0])
+      ) {
+        throw new Error("Unsupported DeepSeek parameter");
+      }
+      const finished = body.input.at(-1).type === "function_call_output";
+      const output = finished
+        ? {
+            type: "message",
+            role: "assistant",
+            content: [{ type: "output_text", text: "Prepared with " + provider }],
+          }
+        : {
+            type: "function_call",
+            name: "prepare_draft",
+            call_id: "tool1",
+            arguments: JSON.stringify(draft),
+          };
+      return new Response(
+        "data: " +
+          JSON.stringify({
+            type: "response.completed",
+            response: { status: "completed", output: [output] },
+          }) +
+          "\n\n",
+      );
+    }) as typeof globalThis.fetch;
+  });
+
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  await expect(panel.getByRole("button", { name: "Continue with ChatGPT" })).toHaveCount(0);
+  const loaded = ggmail.app.waitForEvent("window", {
+    predicate: (window) => window.url().includes("settings.html"),
+  });
+  await panel.getByRole("button", { name: "Open AI settings" }).click();
+  const settings = await loaded;
+  await expect(settings.getByTestId("settings-title")).toHaveText("AI");
+  const picker = settings.getByRole("combobox", { name: "Mail assistant provider" });
+  await picker.click();
+  await expect(settings.getByRole("option")).toHaveCount(5);
+  await settings
+    .getByRole("option", { name: "Claude Code CLI (Subscription)", exact: true })
+    .click();
+  await expect(settings.getByRole("button", { name: "Use Claude Code session" })).toBeVisible();
+
+  for (const [name, provider] of [
+    ["Claude API", "anthropic"],
+    ["DeepSeek AI", "deepseek"],
+    ["OpenAI API", "openai"],
+  ] as const) {
+    await picker.click();
+    await settings.getByRole("option", { name, exact: true }).click();
+    await settings.getByLabel("API key").fill("fixture-" + provider);
+    await settings.getByRole("button", { name: "Connect", exact: true }).click();
+    await expect(settings.getByRole("status").filter({ hasText: "Connected" })).toBeVisible();
+    const brand = provider === "anthropic" ? "claude" : provider;
+    await expect(panel.locator(`header [data-brand="${brand}"]`)).toBeVisible();
+    const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+    await expect(panel.locator(".assistant-answer")).toHaveCount(0);
+    await composer.fill("Draft a short reply");
+    await composer.press("Enter");
+    await expect(panel.getByText("Friday works for " + provider, { exact: true })).toBeVisible();
+    await expect(panel.getByText("Prepared with " + provider, { exact: true })).toBeVisible();
+  }
+  await picker.click();
+  await settings.getByRole("option", { name: "Claude API", exact: true }).click();
+  await expect(settings.getByRole("button", { name: "Disconnect", exact: true })).toBeVisible();
+  await settings.getByRole("button", { name: "Disconnect", exact: true }).click();
+  await expect(settings.getByLabel("API key")).toHaveValue("");
+  await expect(panel.getByRole("button", { name: "Open AI settings" })).toBeVisible();
+});
+
+test("the locally signed-in Claude Code session answers a synthetic prompt", async () => {
+  test.skip(
+    process.env.GGMAIL_TEST_CLAUDE_SUBSCRIPTION !== "1",
+    "Requires a signed-in local Claude Code subscription.",
+  );
+  test.setTimeout(150_000);
+  const settings = await ggmail.openSettings();
+  await settings
+    .getByTestId("settings-nav")
+    .getByRole("button", { name: "AI", exact: true })
+    .click();
+  await settings.getByRole("combobox", { name: "Mail assistant provider" }).click();
+  await settings
+    .getByRole("option", { name: "Claude Code CLI (Subscription)", exact: true })
+    .click();
+  await settings.getByRole("button", { name: "Use Claude Code session" }).click();
+  await expect(settings.getByRole("button", { name: "Disconnect", exact: true })).toBeVisible({
+    timeout: 20_000,
+  });
+  await ggmail.closeSettings();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  await panel.getByRole("combobox", { name: "Assistant model" }).click();
+  await page.getByRole("option", { name: "Claude Haiku", exact: true }).click();
+  const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await composer.fill(
+    "Draft a new email with subject Sample and body exactly: The sample meeting starts at noon.",
+  );
+  await composer.press("Enter");
+  await expect(panel.getByRole("button", { name: "Open in Gmail", exact: true })).toBeVisible({
+    timeout: 110_000,
+  });
+  await expect(
+    panel.getByText("The sample meeting starts at noon.", { exact: true }),
+  ).toBeVisible();
 });

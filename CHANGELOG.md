@@ -1,13 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## 3.65.0 — 2026-11-21
 
 ### Added
 
 - Browse attachments across your Gmail accounts, search by file or sender, and preview, download, or open the original email.
 
-- Open the mail assistant beside Gmail to summarize email, find to-dos and prepare drafts using your ChatGPT plan.
+- Use the mail assistant with ChatGPT, Claude Code, Claude API, OpenAI API or DeepSeek. It can search across signed-in accounts, read full conversations and insert a draft into an open reply.
 
 ### Changed
 
 - ggmail now has its own application identity, URL scheme and account profile.
+- The assistant sidebar slides alongside Gmail. Answers stream as they arrive, with progress updates showing which mailbox or conversation the assistant is reading.

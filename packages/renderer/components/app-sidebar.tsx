@@ -1,15 +1,16 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { useLingui } from "@lingui/react/macro";
 import { Button } from "@ggmail/ui/components/button";
 import { ScrollArea } from "@ggmail/ui/components/scroll-area";
 import { Separator } from "@ggmail/ui/components/separator";
 import { cn } from "@ggmail/ui/lib/utils";
+import type { MessageDescriptor } from "@lingui/core";
+import { useLingui } from "@lingui/react/macro";
 import { type RouteProps, useLocation } from "wouter";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { platform } from "@/lib/utils";
 import { AboutSettings } from "@/routes/settings/about";
 import { AccountsSettings } from "@/routes/settings/accounts";
 import { AdvancedSettings } from "@/routes/settings/advanced";
+import { AISettings } from "@/routes/settings/ai";
 import { AppearanceSettings } from "@/routes/settings/appearance";
 import { BlockerSettings } from "@/routes/settings/blocker";
 import { DownloadsSettings } from "@/routes/settings/downloads";
@@ -37,6 +38,7 @@ export const sidebarNavItems: SidebarNavItemProps[] = [
     path: "/settings/accounts",
     component: AccountsSettings,
   },
+  { label: settingsPageLabels.ai, path: "/settings/ai", component: AISettings },
   {
     label: settingsPageLabels.appearance,
     path: "/settings/appearance",

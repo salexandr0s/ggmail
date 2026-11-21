@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { t } from "@lingui/core/macro";
-import type { AssistantConnection, AssistantModel } from "@ggmail/shared/assistant";
+import type { ConnectionState, AssistantModel } from "@ggmail/shared/assistant";
 import { ms } from "@ggmail/shared/ms";
+import { t } from "@lingui/core/macro";
 import { app, safeStorage, shell } from "electron";
 import { z } from "zod";
 import {
@@ -38,7 +38,7 @@ function requireProtectedStorage() {
     !safeStorage.isEncryptionAvailable() ||
     (process.platform === "linux" && safeStorage.getSelectedStorageBackend() === "basic_text")
   ) {
-    throw new AssistantError(t`Unlock your system credential store to connect ChatGPT.`);
+    throw new AssistantError(t`Unlock your system credential store to connect the assistant.`);
   }
 }
 
@@ -50,23 +50,33 @@ function loadRecord(): Record {
     return { hostId: `urn:uuid:${randomUUID()}` };
   }
 
-  requireProtectedStorage();
   try {
-    return storageSchema.parse(JSON.parse(safeStorage.decryptString(fs.readFileSync(file))));
-  } catch {
+    return storageSchema.parse(JSON.parse(readSecret(file)));
+  } catch (error) {
+    if (error instanceof AssistantError) {
+      throw error;
+    }
     throw new AssistantError(
       t`Couldn't read the saved ChatGPT connection. Disconnect it and sign in again.`,
     );
   }
 }
 
-function storeRecord(record: Record) {
+export function readSecret(file: string) {
   requireProtectedStorage();
-  const file = credentialPath();
+  return safeStorage.decryptString(fs.readFileSync(file));
+}
+
+function storeRecord(record: Record) {
+  writeSecret(credentialPath(), JSON.stringify(record));
+}
+
+export function writeSecret(file: string, value: string) {
+  requireProtectedStorage();
   // oxlint-disable-next-line lingui/no-unlocalized-strings -- Local credential filename or host identifier.
   const temp = `${file}.${randomUUID()}.tmp`;
   try {
-    fs.writeFileSync(temp, safeStorage.encryptString(JSON.stringify(record)), {
+    fs.writeFileSync(temp, safeStorage.encryptString(value), {
       mode: 0o600,
       flag: "wx",
     });
@@ -95,7 +105,7 @@ export class ChatGPTConnection {
     this.record = record;
   }
 
-  private snapshot(error?: string): AssistantConnection {
+  private snapshot(error?: string): ConnectionState {
     const record = this.record;
     const connected =
       this.needsSignIn === false &&
@@ -109,7 +119,7 @@ export class ChatGPTConnection {
     };
   }
 
-  async status(): Promise<AssistantConnection> {
+  async status(): Promise<ConnectionState> {
     if (this.authorizing || this.disconnecting) {
       return this.snapshot();
     }
@@ -128,7 +138,7 @@ export class ChatGPTConnection {
     }
   }
 
-  async connect(): Promise<AssistantConnection> {
+  async connect(): Promise<ConnectionState> {
     if (this.authorizing || this.disconnecting) {
       return this.snapshot();
     }
@@ -193,7 +203,7 @@ export class ChatGPTConnection {
     this.authorizing?.abort();
   }
 
-  async disconnect(): Promise<AssistantConnection> {
+  async disconnect(): Promise<ConnectionState> {
     if (this.authorizing || this.disconnecting) {
       return this.snapshot();
     }

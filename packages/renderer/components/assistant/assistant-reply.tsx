@@ -1,4 +1,4 @@
-import type { AssistantReply as Reply } from "@ggmail/shared/assistant";
+import type { AssistantDraft, AssistantReply as Reply } from "@ggmail/shared/assistant";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -11,13 +11,52 @@ import {
   MailIcon,
   ReplyIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { memo, type ReactNode, useState } from "react";
 import { CopyButton } from "@/components/copy-button";
 import { useConfig } from "@/lib/react-query";
 import { Answer } from "./answer";
 import { SenderAvatar } from "./sender-avatar";
 
-export function AssistantReply({
+export function DraftCard({
+  draft,
+  copyButton,
+  children,
+}: {
+  draft: AssistantDraft;
+  copyButton?: ReactNode;
+  children?: ReactNode;
+}) {
+  const { t } = useLingui();
+  return (
+    <section
+      aria-label={t`Draft email`}
+      className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow-xs"
+    >
+      <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2 text-foreground">
+        <FilePenLineIcon className="size-3.5" />
+        <h3 className="flex-1 text-xs font-semibold">
+          <Trans comment="Label for a suggested email draft">Draft email</Trans>
+        </h3>
+        {copyButton}
+      </div>
+      <div className="space-y-2.5 px-4 pt-3.5 pb-4 select-text">
+        {draft.subject && (
+          <p className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
+            {draft.subject}
+          </p>
+        )}
+        <p className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">{draft.body}</p>
+      </div>
+      {children && (
+        <div className="flex flex-wrap items-center gap-1.5 border-t bg-muted/25 px-3 py-2.5">
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
+export const AssistantReply = memo(function AssistantReply({
   reply,
   contextKey,
   inThread,
@@ -74,15 +113,9 @@ export function AssistantReply({
         showSenderIcons={showSenderIcons}
       />
       {draft && (
-        <section
-          aria-label={t`Draft email`}
-          className="overflow-hidden rounded-xl border border-teal-900/20 bg-card shadow-xs dark:border-teal-200/20"
-        >
-          <div className="flex items-center gap-2 bg-teal-50/70 px-3.5 py-1.5 text-teal-900 dark:bg-teal-950/45 dark:text-teal-200">
-            <FilePenLineIcon className="size-3.5" />
-            <h3 className="flex-1 text-xs font-semibold">
-              <Trans comment="Label for a suggested email draft">Draft email</Trans>
-            </h3>
+        <DraftCard
+          draft={draft}
+          copyButton={
             <CopyButton
               value={draft.body}
               onCopyError={copyError}
@@ -91,50 +124,38 @@ export function AssistantReply({
               title={t`Copy draft body`}
               aria-label={t`Copy draft body`}
             />
-          </div>
-          <div className="space-y-2.5 px-4 pt-3.5 pb-4 select-text">
-            {draft.subject && (
-              <p className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
-                {draft.subject}
-              </p>
-            )}
-            <p className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">
-              {draft.body}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5 border-t bg-muted/25 px-3 py-2.5">
-            {inThread && (
-              <Button
-                size="sm"
-                className="bg-teal-800 text-white hover:bg-teal-900 dark:bg-teal-200 dark:text-teal-950 dark:hover:bg-teal-100"
-                disabled={insertion !== "ready"}
-                onClick={() => void insert(draft.body)}
-              >
-                {insertion === "inserted" ? (
-                  <CheckIcon />
-                ) : insertion === "pending" ? (
-                  <LoaderCircleIcon className="motion-safe:animate-spin" />
-                ) : (
-                  <ReplyIcon />
-                )}
-                {insertion === "inserted" ? t`Inserted into reply` : t`Insert into reply`}
-              </Button>
-            )}
+          }
+        >
+          {inThread && (
             <Button
-              variant={inThread ? "ghost" : "outline"}
               size="sm"
-              onClick={() => {
-                setError("");
-                void ipc.main
-                  .invoke("assistant.openDraft", draft, contextKey)
-                  .catch(() => setError(t`Couldn't open the draft in Gmail.`));
-              }}
+              disabled={insertion !== "ready"}
+              onClick={() => void insert(draft.body)}
             >
-              <Trans comment="Open a suggested email in the Gmail composer">Open in Gmail</Trans>
-              <ArrowUpRightIcon />
+              {insertion === "inserted" ? (
+                <CheckIcon />
+              ) : insertion === "pending" ? (
+                <LoaderCircleIcon className="motion-safe:animate-spin" />
+              ) : (
+                <ReplyIcon />
+              )}
+              {insertion === "inserted" ? t`Inserted into reply` : t`Insert into reply`}
             </Button>
-          </div>
-        </section>
+          )}
+          <Button
+            variant={inThread ? "ghost" : "outline"}
+            size="sm"
+            onClick={() => {
+              setError("");
+              void ipc.main
+                .invoke("assistant.openDraft", draft, contextKey)
+                .catch(() => setError(t`Couldn't open the draft in Gmail.`));
+            }}
+          >
+            <Trans comment="Open a suggested email in the Gmail composer">Open in Gmail</Trans>
+            <ArrowUpRightIcon />
+          </Button>
+        </DraftCard>
       )}
       {(reply.citations.length > 0 || reply.text) && (
         <div className="flex items-start gap-2 pt-1 text-muted-foreground">
@@ -189,7 +210,7 @@ export function AssistantReply({
                             </span>
                           )}
                         </span>
-                        <span className="self-start px-1 text-[11px] font-semibold text-teal-700 tabular-nums dark:text-teal-300">
+                        <span className="self-start rounded bg-muted px-1.5 text-[11px] font-semibold text-foreground tabular-nums">
                           {source.number}
                         </span>
                       </button>
@@ -219,4 +240,4 @@ export function AssistantReply({
       )}
     </div>
   );
-}
+});

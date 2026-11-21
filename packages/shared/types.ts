@@ -4,6 +4,7 @@ import type {
   AssistantConnection,
   AssistantContext,
   AssistantDraft,
+  AssistantProvider,
   AssistantRequest,
   AssistantResult,
 } from "./assistant";
@@ -230,6 +231,7 @@ export type IpcMainEvents =
       "unifiedSearch.cancel": [accountId: string, requestId: string];
       "gmail.search": [searchQuery: string];
       "assistant.setVisible": [visible: boolean];
+      "assistant.setInset": [inset: number];
       "assistant.clear": [];
       "assistant.cancelSignIn": [];
       "assistant.stop": [requestId: string];
@@ -308,8 +310,10 @@ export type IpcMainEvents =
         size: "thumbnail" | "full",
       ) => AttachmentPreview | null;
       "assistant.status": () => AssistantConnection;
-      "assistant.connect": () => AssistantConnection;
-      "assistant.disconnect": () => AssistantConnection;
+      "assistant.openSettings": () => void;
+      "assistant.selectProvider": (provider: AssistantProvider) => AssistantConnection;
+      "assistant.connect": (provider: AssistantProvider, apiKey?: string) => AssistantConnection;
+      "assistant.disconnect": (provider: AssistantProvider) => AssistantConnection;
       "assistant.context": () => AssistantContext;
       "assistant.send": (request: AssistantRequest) => AssistantResult;
       "assistant.openSource": (id: string) => void;

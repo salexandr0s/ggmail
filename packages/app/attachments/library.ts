@@ -2,6 +2,7 @@
 import type { AttachmentBatch } from "@ggmail/shared/attachments";
 import { ms } from "@ggmail/shared/ms";
 import type { Gmail } from "@/gmail";
+import { fetchPrintThread } from "@/gmail/print-thread";
 import { getSearchMailbox, listSearchThreads } from "@/gmail/search";
 import { readPrintAttachments, type AttachmentEntry } from "./metadata";
 import { readAttachmentPreview } from "./preview";
@@ -142,20 +143,12 @@ class AttachmentLibrary {
     const batch = this.pending.slice(0, 4);
     const results = await Promise.allSettled(
       batch.map(async (thread) => {
-        const url = new URL(this.mailbox);
-        url.search = new URLSearchParams({
-          ui: "2",
-          view: "pt",
-          search: "all",
-          th: thread.id,
-          mb: "0",
-          hl: "en",
-        }).toString();
-        const response = await this.gmail.session.fetch(url.href, {
-          credentials: "include",
-          redirect: "error",
-          signal: AbortSignal.any([signal, AbortSignal.timeout(ms("20s"))]),
-        });
+        const response = await fetchPrintThread(
+          this.gmail.session,
+          this.mailbox,
+          thread.id,
+          signal,
+        );
         if (response.status === 404 || response.status === 410) {
           return [];
         }

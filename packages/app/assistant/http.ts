@@ -1,9 +1,9 @@
-import { t } from "@lingui/core/macro";
 import { ms } from "@ggmail/shared/ms";
+import { t } from "@lingui/core/macro";
 
 export async function readJson(response: Response, limit: number): Promise<unknown> {
   if (!response.body) {
-    throw new Error(t`ChatGPT returned an empty response.`);
+    throw new Error(t`The AI provider returned an empty response.`);
   }
 
   let size = 0;
@@ -20,7 +20,7 @@ export async function readJson(response: Response, limit: number): Promise<unkno
 
       size += value.byteLength;
       if (size > limit) {
-        throw new Error(t`ChatGPT returned a response that is too large.`);
+        throw new Error(t`The AI provider returned a response that is too large.`);
       }
       chunks.push(value);
     }
@@ -29,7 +29,7 @@ export async function readJson(response: Response, limit: number): Promise<unkno
   }
 }
 
-export function openAIRequest(url: URL, options: RequestInit = {}, timeout = ms("30 seconds")) {
+export function providerRequest(url: URL, options: RequestInit = {}, timeout = ms("30 seconds")) {
   const deadline = AbortSignal.timeout(timeout);
 
   return fetch(url, {

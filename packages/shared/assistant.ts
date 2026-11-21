@@ -8,19 +8,46 @@ export function assistantPanelWidth(windowWidth: number) {
 }
 export const ASSISTANT_PROMPT_LIMIT = 4000;
 
+export const assistantProviderSchema = z.enum([
+  "chatgpt",
+  "claude-cli",
+  "anthropic",
+  "openai",
+  "deepseek",
+]);
+export type AssistantProvider = z.infer<typeof assistantProviderSchema>;
+export type ApiProvider = Exclude<AssistantProvider, "chatgpt" | "claude-cli">;
+
+export const providerNames: Record<AssistantProvider, string> = {
+  chatgpt: "OpenAI Subscription (ChatGPT)",
+  "claude-cli": "Claude Code CLI (Subscription)",
+  anthropic: "Claude API",
+  openai: "OpenAI API",
+  deepseek: "DeepSeek AI",
+};
+
 export type AssistantModel = { id: string; label: string };
 export type AssistantScope = "thread" | "allMail" | "mailView" | "chat";
 export type AssistantContext = { kind: AssistantScope; key: string; accountLabel: string };
-export type AssistantActivity = "searching" | "drafting";
+export type AssistantActivity =
+  | { kind: "thread" | "mailbox" | "waiting" | "reviewing" | "finishing" }
+  | { kind: "searching"; account: string; page: number }
+  | { kind: "reading"; subject: string }
+  | { kind: "draftReady"; draft: AssistantDraft };
 
-export type AssistantConnection = {
+export type ConnectionState = {
+  signingIn?: boolean;
+  configured?: boolean;
   status: "disconnected" | "connecting" | "connected";
   email?: string;
   models: AssistantModel[];
   error?: string;
 };
 
+export type AssistantConnection = ConnectionState & { provider: AssistantProvider };
+
 export const assistantRequestSchema = z.object({
+  provider: assistantProviderSchema,
   id: z.uuid(),
   scopeKey: z.string().min(1).max(2000),
   prompt: z.string().trim().min(1).max(ASSISTANT_PROMPT_LIMIT),

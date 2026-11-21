@@ -11,6 +11,8 @@ DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run build:mac:local
 
 The build writes `dist/mac-arm64/ggmail.app` and verifies its ad-hoc signature. It requires no signing credentials.
 
+To build the downloadable Apple Silicon disk image with a Developer ID Application certificate, run `bun run build:mac:dmg`. It writes `dist/ggmail-mac-arm64.dmg`. Set `APPLE_KEYCHAIN_PROFILE` to a configured notarytool profile to notarize the app during packaging.
+
 On macOS, a profile migrated from Meru Local can reuse its existing Keychain entry.
 For a profile that already uses that entry, quit the app and create an empty
 `.meru-local-keychain` file in the ggmail profile directory before launching the new
@@ -18,23 +20,25 @@ build. The marker belongs only in profiles whose cookies were encrypted by Meru 
 
 ## Mail assistant
 
-Select the sparkle button in the title bar and choose **Continue with ChatGPT**.
-Complete sign-in in your browser and allow ggmail to use your ChatGPT plan.
+Open **Settings → AI** and select a mail assistant provider.
+
+- **Claude Code CLI (Subscription)** uses the local Claude Code installation. Sign in with `claude auth login` if needed, then select **Use Claude Code session**. Disconnecting removes the link in ggmail and leaves the terminal session available.
+- **OpenAI Subscription (ChatGPT)** uses the existing browser sign-in. Select **Continue with ChatGPT** and allow plan access.
+- **Claude API**, **OpenAI API**, and **DeepSeek AI** each take their own provider's API key. ggmail verifies the key by loading the available models and encrypts the key on this device.
+
+Open the mail assistant using the sparkle button in the title bar.
 Choose a model below the message field. The panel remembers your choice and
 shows the active Gmail view and account in its header.
 
-With an email open, the assistant reads its expanded messages. In Gmail's **All Mail**
-view, it can search the selected account and use matching snippets. Open a source
-and ask there for a full-message summary. In other Gmail lists it can use the
-visible snippets. Switching views or accounts starts a fresh conversation.
+From the inbox, an open thread, or the unified inbox, ask the assistant to find a message or check a deadline. It can search signed-in accounts, read the messages in a conversation, and open a cited thread in its original mailbox. You can name a specific account or ask it to search all accounts. Switching Gmail views or accounts starts a fresh conversation.
 
 Ask for a draft, then ask for changes to its wording or length. In an open thread, **Insert into reply** places the draft above any existing reply text. Gmail handles recipients and threading. Review the reply and send it when ready. You can also copy the body or choose **Open in Gmail** for a separate message.
 **Stop reply** keeps the text received so far. **Try again** repeats the last
 interrupted request and preserves anything you have typed for your next message.
 
 When you ask a question, ggmail sends the chat and relevant mail context to
-OpenAI. The chat stays in memory and clears when you close the panel or start a
-new chat. Electron's protected storage keeps the ChatGPT connection on this device.
+the selected provider. The chat stays in memory and clears when you switch
+providers, close the panel, or start a new chat. Electron's protected storage keeps the ChatGPT connection on this device.
 
 ## Attachments
 
@@ -61,7 +65,7 @@ Use `bun run test:e2e --config=playwright.local.config.ts` for the packaged loca
 
 ## Signing and privacy
 
-The app is ad-hoc signed locally, not Apple-notarized or vendor-signed. Both main and helper
+The `build:mac:local` command signs the app ad hoc. Both main and helper
 processes carry the per-app disable-library-validation entitlement needed to load their
 ad-hoc-signed Electron framework and native addon. DYLD environment-variable access is not
 entitled. System-wide Gatekeeper and other macOS security settings are left unchanged.

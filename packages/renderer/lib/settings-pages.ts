@@ -7,6 +7,7 @@ import { msg } from "@lingui/core/macro";
  */
 // lingui-set comment="A page of Settings, named in the settings sidebar and as the page's title"
 export const settingsPageLabels = {
+  ai: msg`AI`,
   general: msg`General`,
   accounts: msg`Accounts`,
   appearance: msg`Appearance`,

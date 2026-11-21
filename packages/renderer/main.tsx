@@ -4,7 +4,7 @@ import { useHashLocation } from "wouter/use-hash-location";
 import { AppMain } from "@/components/app-main";
 import { AppTitlebar } from "@/components/app-titlebar";
 import { AppToaster } from "@/components/app-toaster";
-import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import { AssistantDrawer } from "@/components/assistant/assistant-panel";
 import { VerticalTabs } from "@/components/vertical-tabs";
 import { useMouseAccountSwitching } from "@/lib/hooks";
 import { renderApp } from "@/lib/react";
@@ -27,16 +27,15 @@ function Main() {
             <Route path="/">
               <VerticalTabs />
               <div className="min-w-0 flex-1" />
-              {showAssistant && (
-                <AssistantPanel
-                  close={(focusToggle = true) => {
-                    setShowAssistant(false);
-                    if (focusToggle) {
-                      document.getElementById("mail-assistant-toggle")?.focus();
-                    }
-                  }}
-                />
-              )}
+              <AssistantDrawer
+                open={showAssistant}
+                close={(focusToggle = true) => {
+                  setShowAssistant(false);
+                  if (focusToggle) {
+                    document.getElementById("mail-assistant-toggle")?.focus();
+                  }
+                }}
+              />
             </Route>
             <Route path="/unified-inbox">
               <AppMain />
