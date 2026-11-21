@@ -8,7 +8,7 @@ To find mail across accounts, enter a Gmail query such as `filename:pdf newer_th
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/unified-inbox-dark.png">
-  <img src="docs/screenshots/unified-inbox-light.png" alt="All Mail with ten unread messages. Teal Studio and violet Personal badges identify each message’s account.">
+  <img src="docs/screenshots/unified-inbox-light.png" alt="All Mail with ten unread messages. Teal Personal and amber Work badges identify each message’s account.">
 </picture>
 
 _The screenshots use fictional mailboxes and files. The assistant conversation is an example._

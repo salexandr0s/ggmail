@@ -9,7 +9,7 @@ import {
 } from "@ggmail/ui/components/dropdown-menu";
 import { useLingui } from "@lingui/react/macro";
 import { ChevronDownIcon, ClockIcon, InboxIcon, PaperclipIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { navigate } from "wouter/use-hash-location";
 import { useChromeMenu } from "@/lib/chrome-menu";
 import { useCloseOnWindowBlur } from "@/lib/hooks";
@@ -17,6 +17,11 @@ import { useCloseOnWindowBlur } from "@/lib/hooks";
 export function MailViewNavigation({ location, unified }: { location: string; unified: boolean }) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
+  const [compactMenuOpen, setCompactMenuOpen] = useState(false);
+  useEffect(
+    () => ipc.renderer.on("titleBar.mailViewsOpen", (_event, next) => setCompactMenuOpen(next)),
+    [],
+  );
   const menu = useChromeMenu(open, setOpen);
   useCloseOnWindowBlur(open, () => setOpen(false));
   const views = [
@@ -50,6 +55,7 @@ export function MailViewNavigation({ location, unified }: { location: string; un
         size="sm"
         variant="secondary"
         aria-haspopup="menu"
+        aria-expanded={compactMenuOpen}
         aria-label={t`Mail views`}
         aria-description={current?.label}
         className="max-w-32 gap-1 px-2 text-xs sm:hidden"

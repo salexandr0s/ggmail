@@ -386,6 +386,7 @@ export type IpcMainEvents =
 
 export type IpcRendererEvent = {
   navigate: [to: string];
+  "titleBar.mailViewsOpen": [open: boolean];
   "shell.historyChanged": [state: { canGoBack: boolean; canGoForward: boolean }];
   "downloads.activityChanged": [active: boolean];
   "gmail.mailboxChanged": [accountId: string];

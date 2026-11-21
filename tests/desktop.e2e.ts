@@ -174,6 +174,7 @@ test("the narrow Mail views menu opens above Gmail and supports keyboard selecti
   const trigger = page.getByRole("button", { name: "Mail views", exact: true });
   await trigger.click();
   const id = await findRendererPage(ggmail, "mail-views");
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
   const readOptions = () =>
     ggmail.app.evaluate(
       ({ webContents }, id) =>
@@ -195,6 +196,7 @@ test("the narrow Mail views menu opens above Gmail and supports keyboard selecti
     }
   }, id);
   await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await trigger.click();
   const next = await findRendererPage(ggmail, "mail-views");
   await expect

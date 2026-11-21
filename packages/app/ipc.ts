@@ -317,6 +317,13 @@ class Ipc {
           }),
         })
       ) {
+        const owner = event.sender;
+        ipc.renderer.send(owner, "titleBar.mailViewsOpen", true);
+        mailViewsPopup.webContents?.once("destroyed", () => {
+          if (!owner.isDestroyed() && !mailViewsPopup.webContents) {
+            ipc.renderer.send(owner, "titleBar.mailViewsOpen", false);
+          }
+        });
         mailViewsPopup.closeOnBlurEnabled = true;
         mailViewsPopup.webContents?.once("did-finish-load", () =>
           mailViewsPopup.webContents?.focus(),
