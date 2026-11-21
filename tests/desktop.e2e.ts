@@ -1,6 +1,7 @@
 import { realpath } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { useApp } from "./lib/app";
+import { findRendererPage } from "./lib/renderer-navigation";
 import { readSettingsPageLabels } from "./lib/settings";
 
 /** The shape `accounts` is stored in, with only the two labels differing. */
@@ -157,6 +158,54 @@ test("Back and Forward retrace libraries and account switches at both toolbar wi
   await expect(selector).toHaveText("Attachments");
   await expect(page.getByRole("button", { name: "Go forward" })).toBeDisabled();
   await page.screenshot({ path: info.outputPath("compact-shell.png") });
+});
+
+test("the narrow Mail views menu opens above Gmail and supports keyboard selection", async () => {
+  const page = ggmail.renderer;
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    window?.setMinimumSize(320, 360);
+    window?.setSize(480, 580);
+  });
+  const trigger = page.getByRole("button", { name: "Mail views", exact: true });
+  await trigger.click();
+  const id = await findRendererPage(ggmail, "mail-views");
+  const readOptions = () =>
+    ggmail.app.evaluate(
+      ({ webContents }, id) =>
+        webContents
+          .fromId(id)
+          ?.executeJavaScript(
+            `Array.from(document.querySelectorAll('[role="menuitemradio"]'), el => el.textContent)`,
+          ),
+      id,
+    );
+  await expect
+    .poll(readOptions)
+    .toEqual(["All Mail", "Attachments", "Waiting for reply", "Personal", "Work"]);
+  await ggmail.app.evaluate(({ webContents }, id) => {
+    const popup = webContents.fromId(id);
+    for (const keyCode of ["Home", "Down", "Return"]) {
+      popup?.sendInputEvent({ type: "keyDown", keyCode });
+      popup?.sendInputEvent({ type: "keyUp", keyCode });
+    }
+  }, id);
+  await expect(page.getByRole("main", { name: "Attachments" })).toBeVisible();
+  await trigger.click();
+  const next = await findRendererPage(ggmail, "mail-views");
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(
+        ({ webContents }, id) =>
+          webContents
+            .fromId(id)
+            ?.executeJavaScript(`document.querySelector('[aria-checked="true"]')?.textContent`),
+        next,
+      ),
+    )
+    .toBe("Attachments");
 });
 
 test("settings opens without an activation page and survives restart", async () => {

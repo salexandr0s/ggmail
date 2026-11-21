@@ -51,6 +51,7 @@ export function MailViewNavigation({ location, unified }: { location: string; un
         variant="secondary"
         aria-haspopup="menu"
         aria-label={t`Mail views`}
+        aria-description={current?.label}
         className="max-w-32 gap-1 px-2 text-xs sm:hidden"
         onClick={(event) => {
           const rect = event.currentTarget.getBoundingClientRect();
@@ -67,6 +68,7 @@ export function MailViewNavigation({ location, unified }: { location: string; un
       <DropdownMenu {...menu.rootProps} orientation="horizontal">
         <DropdownMenuTrigger
           aria-label={t`Mail views`}
+          aria-description={current?.label}
           render={
             <Button
               size="sm"

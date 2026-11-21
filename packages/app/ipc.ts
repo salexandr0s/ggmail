@@ -36,6 +36,7 @@ import { config } from "@/config";
 import { copyText } from "@/lib/clipboard";
 import { getExtensionWindowError } from "@/lib/extension-window";
 import { readFindRequest } from "@/lib/find-in-page";
+import { Popup } from "@/lib/popup";
 import { relaunchApp } from "@/lib/relaunch";
 import { main } from "@/main";
 import { appMenu } from "@/menu";
@@ -279,39 +280,78 @@ class Ipc {
       swipeNavigation.setPageScrollEdge(event.sender, pageScrollEdge);
     });
 
+    /* oxlint-disable lingui/no-unlocalized-strings -- Internal route and account identifiers for the mail-view popup. */
+    const mailViewsPopup = new Popup();
     this.main.on("titleBar.showMailViews", (event, anchor) => {
-      if (event.sender !== main.window.webContents || event.senderFrame !== event.sender.mainFrame)
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame
+      ) {
         return;
+      }
       const mailboxes = accounts.getAccounts();
       const views = [
         ...(config.get("unifiedInbox.enabled") && mailboxes.length > 1
-          ? [{ path: "/unified-inbox", label: t`All Mail` }]
+          ? [{ value: "/unified-inbox", label: t`All Mail` }]
           : []),
-        { path: "/attachments", label: t`Attachments` },
-        { path: "/waiting", label: t`Waiting for reply` },
+        { value: "/attachments", label: t`Attachments` },
+        { value: "/waiting", label: t`Waiting for reply` },
       ];
-      const items: MenuItemConstructorOptions[] = views.map(({ path, label }) => ({
-        label,
-        type: "checkbox",
-        checked: main.location === path,
-        click: () => main.navigate(path),
+      const accountItems = mailboxes.map(({ config: account }) => ({
+        value: "account/" + account.id,
+        label: getAccountLabel(account.label),
       }));
-      items.push(
-        { type: "separator" },
-        ...mailboxes.map(
-          ({ config: account }): MenuItemConstructorOptions => ({
-            label: getAccountLabel(account.label),
-            type: "checkbox",
-            checked: main.location === "/" && account.selected,
-            click: () => {
-              accounts.selectAccount(account.id);
-              main.navigate("/");
-            },
+      const selectedAccount = mailboxes.find(({ config: account }) => account.selected);
+      const selected =
+        main.location === "/" && selectedAccount
+          ? "account/" + selectedAccount.config.id
+          : main.location;
+      if (
+        mailViewsPopup.toggle(main.window, {
+          page: "mail-views",
+          anchor: { ...anchor, align: "start" },
+          width: 224,
+          height: 16 + 32 * (views.length + accountItems.length),
+          searchParams: new URLSearchParams({
+            choices: JSON.stringify({ views, accountItems, selected }),
           }),
-        ),
-      );
-      Menu.buildFromTemplate(items).popup({ window: main.window, x: anchor.x, y: anchor.y });
+        })
+      ) {
+        mailViewsPopup.closeOnBlurEnabled = true;
+        mailViewsPopup.webContents?.once("did-finish-load", () =>
+          mailViewsPopup.webContents?.focus(),
+        );
+      }
     });
+
+    this.main.on("titleBar.chooseMailView", (event, value) => {
+      if (
+        event.sender !== mailViewsPopup.webContents ||
+        event.senderFrame !== event.sender.mainFrame
+      ) {
+        return;
+      }
+      mailViewsPopup.close();
+      if (value?.startsWith("account/")) {
+        const id = value.slice("account/".length);
+        if (accounts.getAccounts().some((account) => account.config.id === id)) {
+          accounts.selectAccount(id);
+          main.navigate("/");
+        }
+      } else if (
+        value === "/attachments" ||
+        value === "/waiting" ||
+        (value === "/unified-inbox" &&
+          config.get("unifiedInbox.enabled") &&
+          accounts.getAccounts().length > 1)
+      ) {
+        main.navigate(value);
+      } else if (main.location === "/") {
+        accounts.focusActiveView();
+      }
+    });
+
+    /* oxlint-enable lingui/no-unlocalized-strings */
 
     this.main.on("titleBar.toggleAppMenu", (event, anchor) => {
       appMenu.togglePopup(anchor, settingsWindow.getAppMenuWindow(event.sender));
