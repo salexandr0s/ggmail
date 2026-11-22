@@ -11,6 +11,7 @@ export const settingsPageLabels = {
   general: msg`General`,
   accounts: msg`Accounts`,
   appearance: msg`Appearance`,
+  sidebar: msg`Sidebar`,
   blocker: msg`Blocker`,
   downloads: msg`Downloads`,
   workspaceApps: msg`Workspace apps`,

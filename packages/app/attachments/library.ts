@@ -1,7 +1,11 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail selectors, request parameters and IPC errors. The renderer localizes status messages. */
 import { createHash } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
-import type { AttachmentBatch, AttachmentCategory } from "@ggmail/shared/attachments";
+import type {
+  AttachmentBatch,
+  AttachmentCategory,
+  AttachmentPreview,
+} from "@ggmail/shared/attachments";
 import { ms } from "@ggmail/shared/ms";
 import type { Gmail } from "@/gmail";
 import { fetchPrintThread } from "@/gmail/print-thread";
@@ -78,7 +82,9 @@ class AttachmentLibrary {
   private search?: ReturnType<typeof createSearchView>;
   private thumbnails = new AttachmentThumbnails();
   private covers = new AttachmentThumbnails();
-  private coverQueue = Promise.resolve();
+  private activeCovers = new Set<Promise<AttachmentPreview | null>>();
+  private missingThumbnails = new WeakMap<AttachmentEntry, number>();
+  private previewRevision = 0;
   private lifetime = new AbortController();
 
   private disk?: AttachmentDiskIndex;
@@ -167,13 +173,20 @@ class AttachmentLibrary {
       kind: "thumbnail" | "full",
       signal: AbortSignal,
       maxBytes?: number,
+      onMissingThumbnail?: () => void,
     ) =>
-      readAttachmentPreview(this.gmail.session, this.mailbox, target, kind, signal, maxBytes).catch(
-        () => {
-          signal.throwIfAborted();
-          return null;
-        },
-      );
+      readAttachmentPreview(
+        this.gmail.session,
+        this.mailbox,
+        target,
+        kind,
+        signal,
+        maxBytes,
+        onMissingThumbnail,
+      ).catch(() => {
+        signal.throwIfAborted();
+        return null;
+      });
     const original = async (signal: AbortSignal, maxBytes?: number) => {
       const previousUrl = entry.downloadUrl;
       const result = await read(entry, "full", signal, maxBytes);
@@ -191,25 +204,54 @@ class AttachmentLibrary {
     if (cachedCover) {
       return cachedCover;
     }
-    const thumbnail = await this.thumbnails.get(entry, currentVisit, () =>
-      read(entry, "thumbnail", signalForRead()),
-    );
+    const save = (preview: AttachmentPreview | null) => {
+      if (preview && !currentVisit.aborted && this.entries.get(fileId) === entry) {
+        this.disk?.saveThumbnail(entry, preview);
+      }
+      return preview;
+    };
+    const thumbnail = await this.thumbnails.get(entry, currentVisit, async () => {
+      const saved = this.disk?.thumbnail(entry);
+      if (saved) {
+        return saved;
+      }
+      if ((this.missingThumbnails.get(entry) ?? 0) > Date.now()) {
+        return null;
+      }
+      const signal = signalForRead();
+      const markMissing = () => this.missingThumbnails.set(entry, Date.now() + ms("30s"));
+      const restoredView = !entry.downloadUrl && entry.thumbnailView;
+      const image = await read(entry, "thumbnail", signal, undefined, markMissing);
+      if (!image && restoredView) {
+        signal.throwIfAborted();
+        const live = await this.liveEntry(fileId);
+        if (live?.thumbnailUrl) {
+          return save(await read(live, "thumbnail", signal, undefined, markMissing));
+        }
+      }
+      return save(image);
+    });
     if (thumbnail || size === "thumbnail" || !canGenerateCover(entry)) {
       return thumbnail;
     }
-    return this.covers.get(entry, currentVisit, () => {
-      // Bound concurrent original downloads and native PDF renders per mailbox.
-      const cover = this.coverQueue.then(async () => {
+    return this.covers.get(entry, currentVisit, async () => {
+      // Two visible covers can make progress independently. Each original is capped at 12 MiB.
+      while (this.activeCovers.size >= 2) {
+        await Promise.race(this.activeCovers);
+      }
+      currentVisit.throwIfAborted();
+      const cover = (async () => {
         const signal = signalForRead();
         signal.throwIfAborted();
         const file = await original(signal, 12 * 1024 * 1024);
-        return file ? generateCover(file, signal) : null;
-      });
-      this.coverQueue = cover.then(
-        () => {},
-        () => {},
-      );
-      return cover;
+        return file ? save(await generateCover(file, signal)) : null;
+      })().catch(() => null);
+      this.activeCovers.add(cover);
+      try {
+        return await cover;
+      } finally {
+        this.activeCovers.delete(cover);
+      }
     });
   }
 
@@ -428,6 +470,7 @@ class AttachmentLibrary {
       saved.push({ id: thread.id, signature: thread.signature, entries: result.value });
       this.indexed.set(thread.id, { signature: thread.signature, ids });
       for (const entry of result.value) {
+        entry.file.previewRevision = ++this.previewRevision;
         entry.file.categoryOverride = this.categories.get(entry.file.id);
         added.push(entry.file);
         this.entries.set(entry.file.id, entry);

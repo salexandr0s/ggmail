@@ -8,7 +8,7 @@ import { expect, type Page, test } from "@playwright/test";
 import { seedAccount } from "./lib/accounts";
 import { type GgmailApp, useApp } from "./lib/app";
 import { setMinimumWindowWidth } from "./lib/page-fit";
-import { openSettingsPage } from "./lib/settings";
+import { openSettingsPage, showSettingsNavigation } from "./lib/settings";
 
 type Overflow = {
   text: string;
@@ -406,6 +406,7 @@ function formatOverflow(where: string, overflow: Overflow) {
  * instead of every case passing having checked nothing.
  */
 async function readSettingsPageLabels(settings: Page) {
+  await showSettingsNavigation(settings);
   const labels = await settings.getByTestId("settings-nav").getByRole("button").allInnerTexts();
 
   expect(labels.length).toBeGreaterThanOrEqual(5);

@@ -1,14 +1,17 @@
-import type { ComponentProps } from "react";
+import { ProductIcon, type ProductIconProps } from "./product-icon";
 
-export function BookmarksIcon(props: ComponentProps<"svg">) {
+export function BookmarksIcon(props: ProductIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <path fill="#669DF6" d="M8 2h10a2 2 0 0 1 2 2v14l-6-3.75L8 18V2Z" />
+    <ProductIcon {...props}>
+      <path
+        fill="#669DF6"
+        d="M8.1 1.1h11.3a1.9 1.9 0 0 1 1.9 1.9v14.6l-2.7-1.7V7.5a3.5 3.5 0 0 0-3.5-3.5H6.2V3a1.9 1.9 0 0 1 1.9-1.9Z"
+      />
       <path
         fill="#4285F4"
-        d="M4 6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v15.3a.6.6 0 0 1-.92.5L10.5 18.3l-5.58 3.5a.6.6 0 0 1-.92-.5V6Z"
+        d="M4.5 5.5h10.7a2 2 0 0 1 2 2v14.6c0 .6-.6.9-1.1.6l-6.2-4-6.3 4c-.5.3-1.1 0-1.1-.6V7.5a2 2 0 0 1 2-2Z"
       />
-      <path fill="#1967D2" d="m10.5 18.3 6.5-6.5v9.5a.6.6 0 0 1-.92.5l-5.58-3.5Z" />
-    </svg>
+      <path fill="#1967D2" d="m9.9 18.7 7.3-5.7v9.1c0 .6-.6.9-1.1.6Z" />
+    </ProductIcon>
   );
 }

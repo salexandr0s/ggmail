@@ -4,7 +4,7 @@ import { Button } from "@ggmail/ui/components/button";
 import { ScrollArea } from "@ggmail/ui/components/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ggmail/ui/components/tabs";
 import { Trans } from "@lingui/react/macro";
-import { CheckIcon } from "lucide-react";
+import { AppWindowIcon, CheckIcon, MonitorIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PopupWindow } from "@/components/popup-window";
 import { renderApp } from "@/lib/react";
@@ -27,13 +27,13 @@ function DesktopSources() {
         aria-label={source.name}
         aria-pressed={selectedDesktopSourceId === source.id}
         title={source.name}
-        className="relative grid min-w-0 content-start gap-2 rounded-xl border border-border bg-card p-2 text-start text-sm hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring aria-pressed:border-selected-foreground aria-pressed:bg-selected aria-pressed:text-selected-foreground"
+        className="relative grid min-w-0 content-start gap-2 rounded-2xl border border-border bg-card p-2.5 text-start text-sm hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring aria-pressed:border-selected-foreground aria-pressed:bg-selected aria-pressed:text-selected-foreground"
         onClick={() => setSelectedDesktopSourceId(source.id)}
       >
-        <span className="flex aspect-video items-center justify-center overflow-hidden rounded-md bg-canvas">
+        <span className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-canvas">
           <img src={source.thumbnail} alt="" className="size-full object-contain" />
         </span>
-        <span className="truncate px-1">{source.name}</span>
+        <span className="truncate px-1 py-0.5 font-medium">{source.name}</span>
         {selectedDesktopSourceId === source.id && (
           <span
             aria-hidden="true"
@@ -59,14 +59,16 @@ function DesktopSources() {
         onValueChange={() => setSelectedDesktopSourceId("")}
         className="flex-1 gap-0 overflow-hidden"
       >
-        <div className="border-b bg-toolbar px-4 py-2.5">
-          <TabsList variant="line" className="w-full">
-            <TabsTrigger value="windows">
+        <div className="border-b bg-toolbar px-5 py-3">
+          <TabsList className="min-h-10 w-full rounded-full">
+            <TabsTrigger value="windows" className="rounded-full">
+              <AppWindowIcon aria-hidden="true" />
               <Trans comment="Tab of the screen sharing picker listing the open application windows to share, never the Windows operating system">
                 Windows
               </Trans>
             </TabsTrigger>
-            <TabsTrigger value="screens">
+            <TabsTrigger value="screens" className="rounded-full">
+              <MonitorIcon aria-hidden="true" />
               <Trans comment="Tab of the screen sharing picker listing the displays to share">
                 Screens
               </Trans>
@@ -88,8 +90,9 @@ function DesktopSources() {
           </TabsContent>
         </ScrollArea>
       </Tabs>
-      <div className="flex justify-end gap-4 border-t px-4 py-3.5">
+      <div className="flex justify-end gap-2 border-t px-5 py-3.5">
         <Button
+          className="rounded-full px-5"
           variant="outline"
           onClick={() => {
             window.close();
@@ -98,6 +101,7 @@ function DesktopSources() {
           <Trans>Cancel</Trans>
         </Button>
         <Button
+          className="rounded-full px-5"
           disabled={!selectedDesktopSourceId}
           onClick={() => {
             const selectedDesktopSource = desktopSources.find(

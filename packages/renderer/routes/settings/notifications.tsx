@@ -1,6 +1,6 @@
+import { sampleMailNotification } from "@ggmail/shared/mail-notification";
+import type { NotificationTimeEdit } from "@ggmail/shared/notification-times";
 import { ipc } from "@ggmail/shared/renderer/ipc";
-import { minutesToTime, timeToMinutes } from "@ggmail/shared/time";
-import type { NotificationTime } from "@ggmail/shared/types";
 import { Button } from "@ggmail/ui/components/button";
 import {
   Field,
@@ -24,7 +24,8 @@ import {
 import { Slider } from "@ggmail/ui/components/slider";
 import { msg, select } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Plus, X } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { Mail, Plus, X } from "lucide-react";
 import { useId, useMemo } from "react";
 import { toast } from "sonner";
 import { ConfigSelectField } from "@/components/config-select-field";
@@ -59,52 +60,13 @@ const newEmailsItems = [
   },
 ];
 
-const FIRST_TIME_WINDOW = { start: "09:00", end: "17:00" };
-
 const MONDAY_FIRST_WEEKDAYS = [1, 2, 3, 4, 5, 6, 0] as const;
-
-function hasOverlap(times: NotificationTime[]) {
-  return times.some((timeA, index) =>
-    times.slice(index + 1).some((timeB) => {
-      const aStart = timeToMinutes(timeA.start);
-      const aEnd = timeToMinutes(timeA.end);
-      const bStart = timeToMinutes(timeB.start);
-      const bEnd = timeToMinutes(timeB.end);
-
-      return aStart < bEnd && bStart < aEnd;
-    }),
-  );
-}
-
-function findFreeSlot(existingTimes: NotificationTime[]) {
-  if (existingTimes.length === 0) {
-    return FIRST_TIME_WINDOW;
-  }
-
-  for (let hour = 0; hour < 24; hour++) {
-    const startMinutes = hour * 60;
-    const endMinutes = startMinutes + 60;
-
-    if (endMinutes > 24 * 60) {
-      break;
-    }
-
-    const start = minutesToTime(startMinutes);
-    const end = minutesToTime(endMinutes);
-    const candidate: NotificationTime = { id: "", start, end };
-
-    if (!hasOverlap([...existingTimes, candidate])) {
-      return { start, end };
-    }
-  }
-
-  return null;
-}
 
 export function NotificationsSettings() {
   const { config } = useConfig();
 
   const soundFieldId = useId();
+  const volumeLabelId = useId();
 
   const configMutation = useConfigMutation();
 
@@ -114,6 +76,24 @@ export function NotificationsSettings() {
     () => new Intl.DateTimeFormat(i18n.locale, { weekday: "short", timeZone: "UTC" }),
     [i18n.locale],
   );
+
+  const fullWeekdayFormat = useMemo(
+    () => new Intl.DateTimeFormat(i18n.locale, { weekday: "long", timeZone: "UTC" }),
+    [i18n.locale],
+  );
+  const unconfirmedMessage = t`ggmail couldn’t confirm delivery. Check your system notification settings.`;
+  const testNotification = useMutation({
+    mutationFn: () => ipc.main.invoke("notifications.showTestNotification"),
+    onSuccess: (result) => {
+      if (result === "muted") {
+        toast.error(t`Turn off Do Not Disturb to show a test notification.`);
+      }
+      if (result === "unconfirmed") {
+        toast.error(unconfirmedMessage);
+      }
+    },
+    onError: () => toast.error(unconfirmedMessage),
+  });
 
   const percentFormat = useMemo(
     () => new Intl.NumberFormat(i18n.locale, { style: "percent", maximumFractionDigits: 0 }),
@@ -125,6 +105,11 @@ export function NotificationsSettings() {
   }
 
   const times = config["notifications.times"];
+  const preview = sampleMailNotification(config, platform.isMacOS);
+  const systemSoundLabel = t({
+    message: "System",
+    comment: "Option of the Sound setting: the operating system's own notification sound",
+  });
 
   const percent = percentFormat.format(config["notifications.volume"]);
 
@@ -134,53 +119,13 @@ export function NotificationsSettings() {
   const getWeekdayLabel = (dayIndex: number) =>
     weekdayFormat.format(Date.UTC(1970, 0, 4 + dayIndex));
 
-  const addTime = () => {
-    const slot = findFreeSlot(times);
-
-    if (!slot) {
+  const editTime = async (edit: NotificationTimeEdit) => {
+    const result = await ipc.main.invoke("notifications.editTime", edit);
+    if (result === "full") {
       toast.error(t`No free time slot left for another window. Remove or shorten one first.`);
-
-      return;
-    }
-
-    const newEntry: NotificationTime = { id: crypto.randomUUID(), ...slot };
-
-    configMutation.mutate({ "notifications.times": [...times, newEntry] });
-  };
-
-  const updateTime = (id: string, field: "start" | "end", value: string) => {
-    const newTimes = times.map((time) => (time.id === id ? { ...time, [field]: value } : time));
-
-    if (hasOverlap(newTimes)) {
+    } else if (result === "overlap") {
       toast.error(t`Notification times overlap. Adjust the windows so that none of them do.`);
-
-      return;
     }
-
-    configMutation.mutate({ "notifications.times": newTimes });
-  };
-
-  const updateTimeDays = (id: string, dayIndex: number) => {
-    const newTimes = times.map((time) => {
-      if (time.id !== id) {
-        return time;
-      }
-
-      const currentDays = time.days ?? [];
-      const days = currentDays.includes(dayIndex)
-        ? currentDays.filter((day) => day !== dayIndex)
-        : [...currentDays, dayIndex];
-
-      return { ...time, days };
-    });
-
-    configMutation.mutate({ "notifications.times": newTimes });
-  };
-
-  const removeTime = (id: string) => {
-    configMutation.mutate({
-      "notifications.times": times.filter((time) => time.id !== id),
-    });
   };
 
   return (
@@ -237,6 +182,46 @@ export function NotificationsSettings() {
                 />
                 <Field>
                   <FieldTitle>
+                    <Trans>Test notification</Trans>
+                  </FieldTitle>
+                  <FieldDescription>
+                    <Trans>Show a test notification to see how notifications appear.</Trans>
+                  </FieldDescription>
+                  <div
+                    className="flex max-w-md items-start gap-3 rounded-lg border bg-muted/40 p-3"
+                    data-testid="notification-preview"
+                  >
+                    <Mail className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+                    <div className="min-w-0 text-sm">
+                      <div className="font-semibold break-words">{preview.title}</div>
+                      {preview.subtitle && (
+                        <div className="font-medium break-words">{preview.subtitle}</div>
+                      )}
+                      {preview.body && (
+                        <div className="whitespace-pre-line text-muted-foreground">
+                          {preview.body}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline"
+                      disabled={testNotification.isPending || config["doNotDisturb.enabled"]}
+                      onClick={() => testNotification.mutate()}
+                    >
+                      <Trans>Show test notification</Trans>
+                    </Button>
+                  </div>
+                  {config["doNotDisturb.enabled"] && (
+                    <p
+                      role="status"
+                      className="text-sm text-muted-foreground"
+                    >{t`Turn off Do Not Disturb to show a test notification.`}</p>
+                  )}
+                </Field>
+                <Field>
+                  <FieldTitle>
                     <Trans>Notification times</Trans>
                   </FieldTitle>
                   <FieldDescription>
@@ -252,8 +237,16 @@ export function NotificationsSettings() {
                         <div className="flex items-center gap-2">
                           <Input
                             type="time"
+                            aria-label={t`Start time`}
                             value={time.start}
-                            onChange={(event) => updateTime(time.id, "start", event.target.value)}
+                            onChange={(event) =>
+                              editTime({
+                                type: "clock",
+                                id: time.id,
+                                field: "start",
+                                value: event.target.value,
+                              })
+                            }
                           />
                           <span className="shrink-0 text-sm text-muted-foreground">
                             <Trans comment="Sits between a start time field and an end time field, as in 09:00 to 17:00">
@@ -262,22 +255,47 @@ export function NotificationsSettings() {
                           </span>
                           <Input
                             type="time"
-                            value={time.end}
-                            onChange={(event) => updateTime(time.id, "end", event.target.value)}
+                            aria-label={t`End time`}
+                            value={time.end === "24:00" ? "00:00" : time.end}
+                            onChange={(event) =>
+                              editTime({
+                                type: "clock",
+                                id: time.id,
+                                field: "end",
+                                value: event.target.value,
+                              })
+                            }
                           />
                         </div>
                         <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            aria-pressed={!time.days?.length || time.days.length === 7}
+                            className="aria-pressed:border-primary aria-pressed:bg-selected aria-pressed:text-selected-foreground"
+                            onClick={() => editTime({ type: "weekday", id: time.id, day: "all" })}
+                          >
+                            <Trans>Every day</Trans>
+                          </Button>
                           {MONDAY_FIRST_WEEKDAYS.map((dayIndex) => {
-                            const isActive = (time.days ?? []).includes(dayIndex);
+                            const days = time.days?.length === 7 ? [] : (time.days ?? []);
+                            const isActive = days.includes(dayIndex);
+                            const fullDay = fullWeekdayFormat.format(
+                              Date.UTC(1970, 0, 4 + dayIndex),
+                            );
 
                             return (
                               <Button
                                 key={dayIndex}
                                 variant="outline"
                                 aria-pressed={isActive}
+                                aria-label={fullDay}
+                                title={fullDay}
                                 size="sm"
                                 className="w-9 px-0 aria-pressed:border-primary aria-pressed:bg-selected aria-pressed:text-selected-foreground"
-                                onClick={() => updateTimeDays(time.id, dayIndex)}
+                                onClick={() =>
+                                  editTime({ type: "weekday", id: time.id, day: dayIndex })
+                                }
                               >
                                 {getWeekdayLabel(dayIndex)}
                               </Button>
@@ -289,7 +307,7 @@ export function NotificationsSettings() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => removeTime(time.id)}
+                          onClick={() => editTime({ type: "remove", id: time.id })}
                           title={t`Remove time window`}
                         >
                           <X />
@@ -298,32 +316,8 @@ export function NotificationsSettings() {
                     </Item>
                   ))}
                   <div>
-                    <Button variant="outline" onClick={addTime}>
+                    <Button variant="outline" onClick={() => editTime({ type: "add" })}>
                       <Plus /> <Trans>Add time window</Trans>
-                    </Button>
-                  </div>
-                </Field>
-                <Field>
-                  <FieldTitle>
-                    <Trans>Test notification</Trans>
-                  </FieldTitle>
-                  <FieldDescription>
-                    <Trans>Show a test notification to see how notifications appear.</Trans>
-                  </FieldDescription>
-                  <div>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        if (config["doNotDisturb.enabled"]) {
-                          toast.error(t`Turn off Do Not Disturb to show a test notification.`);
-
-                          return;
-                        }
-
-                        ipc.main.send("notifications.showTestNotification");
-                      }}
-                    >
-                      <Trans>Show test notification</Trans>
                     </Button>
                   </div>
                 </Field>
@@ -430,10 +424,13 @@ export function NotificationsSettings() {
                     </FieldDescription>
                   </FieldContent>
                   <Select
-                    items={Object.entries(NOTIFICATION_SOUNDS).map(([sound, { label }]) => ({
-                      value: sound,
-                      label: t(label),
-                    }))}
+                    items={[
+                      ...Object.entries(NOTIFICATION_SOUNDS).map(([sound, { label }]) => ({
+                        value: sound,
+                        label: t(label),
+                      })),
+                      { value: "system", label: systemSoundLabel },
+                    ]}
                     value={config["notifications.sound"]}
                     onValueChange={(value) => {
                       if (value) {
@@ -460,17 +457,13 @@ export function NotificationsSettings() {
                         </SelectItem>
                       ))}
                       <SelectSeparator />
-                      <SelectItem value="system">
-                        <Trans comment="Option of the Sound setting: the operating system's own notification sound">
-                          System
-                        </Trans>
-                      </SelectItem>
+                      <SelectItem value="system">{systemSoundLabel}</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
                 {config["notifications.sound"] !== "system" && (
                   <Field>
-                    <FieldTitle>
+                    <FieldTitle id={volumeLabelId}>
                       <Trans comment="Title of the notification sound's volume slider; percent is the volume, such as 50%">
                         Volume {percent}
                       </Trans>
@@ -485,7 +478,8 @@ export function NotificationsSettings() {
                       // sounds off instead.
                       min={5}
                       step={5}
-                      value={[config["notifications.volume"] * 100]}
+                      aria-labelledby={volumeLabelId}
+                      value={config["notifications.volume"] * 100}
                       onValueChange={(value) => {
                         if (typeof value !== "number") {
                           return;

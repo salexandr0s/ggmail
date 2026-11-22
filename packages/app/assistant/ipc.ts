@@ -1,17 +1,17 @@
 import {
-  assistantDraftSchema,
   assistantRequestSchema,
   assistantProviderSchema,
   type AssistantActivity,
   type AssistantConnection,
 } from "@ggmail/shared/assistant";
 import { t } from "@lingui/core/macro";
-import type { IpcMainEvent, IpcMainInvokeEvent } from "electron";
+import { app, type IpcMainEvent, type IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
 import type { ipc } from "@/ipc";
+import { CachedStore } from "@/lib/cached-store";
 import { main } from "@/main";
 import { settingsWindow } from "@/settings-window";
-import { assistantChat } from "./chat";
+import { AssistantChat, type SavedConversation } from "./chat";
 import { AssistantError } from "./responses";
 
 function isMainFrame(event: IpcMainEvent | IpcMainInvokeEvent) {
@@ -26,6 +26,16 @@ function authorize(event: IpcMainInvokeEvent) {
 }
 
 export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
+  const assistantChat = new AssistantChat(
+    new CachedStore<SavedConversation>({
+      name: "assistant-conversation",
+      defaults: { entries: [], sources: [] },
+      configFileMode: 0o600,
+    }),
+  );
+
+  app.on("before-quit", () => assistantChat.beforeQuit());
+
   function isSettingsFrame(event: IpcMainEvent | IpcMainInvokeEvent) {
     const view = settingsWindow.window?.webContents;
     return view && event.sender === view && event.senderFrame === view.mainFrame;
@@ -50,7 +60,7 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
       view.off("render-process-gone", closePanel);
     }
     main.setAssistantInset(0);
-    assistantChat.clear();
+    assistantChat.interrupt();
   }
   listener.handle("assistant.status", (event) => {
     if (!isSettingsFrame(event)) {
@@ -65,13 +75,13 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
   listener.handle("assistant.selectProvider", (event, value) => {
     authorizeSettings(event);
     const provider = assistantProviderSchema.parse(value);
-    assistantChat.clear();
+    assistantChat.interrupt();
     return assistantChat.connection.change(provider, "select", undefined, publishConnection);
   });
   listener.handle("assistant.connect", (event, value, key) => {
     authorizeSettings(event);
     const provider = assistantProviderSchema.parse(value);
-    assistantChat.clear();
+    assistantChat.interrupt();
     return assistantChat.connection.change(
       provider,
       "connect",
@@ -82,7 +92,7 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
   listener.handle("assistant.disconnect", (event, value) => {
     authorizeSettings(event);
     const provider = assistantProviderSchema.parse(value);
-    assistantChat.clear();
+    assistantChat.interrupt();
     return assistantChat.connection.change(provider, "disconnect", undefined, publishConnection);
   });
   listener.handle("assistant.context", (event) => {
@@ -105,10 +115,13 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
       main.setAssistantInset(inset);
     }
   });
-  listener.on("assistant.clear", (event) => {
-    if (isMainFrame(event)) {
-      assistantChat.clear();
-    }
+  listener.handle("assistant.transcript", (event) => {
+    authorize(event);
+    return assistantChat.transcript();
+  });
+  listener.handle("assistant.clear", (event) => {
+    authorize(event);
+    assistantChat.clear();
   });
   listener.on("assistant.cancelSignIn", (event) => {
     if (isSettingsFrame(event)) {
@@ -177,17 +190,15 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
     authorize(event);
     return assistantChat.openSource(z.uuid().parse(id));
   });
-  listener.handle("assistant.openDraft", (event, draft, key) => {
+  listener.handle("assistant.openDraft", (event, id) => {
     authorize(event);
-    const validated = assistantDraftSchema.parse(draft);
-    assistantChat.openDraft(validated, z.string().parse(key));
+    assistantChat.openDraft(z.uuid().parse(id));
   });
-  listener.handle("assistant.insertReply", async (event, body, key) => {
+  listener.handle("assistant.insertReply", async (event, id) => {
     authorize(event);
-    const text = assistantDraftSchema.shape.body.parse(body);
-    const scopeKey = z.string().parse(key);
+    const turnId = z.uuid().parse(id);
     try {
-      await assistantChat.insertReply(text, scopeKey);
+      await assistantChat.insertReply(turnId);
       return { ok: true };
     } catch (error) {
       return {

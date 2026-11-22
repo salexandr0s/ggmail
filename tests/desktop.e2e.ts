@@ -144,10 +144,20 @@ test("Calendar opens from the fixed sidebar and follows mailbox switches", async
   await expect(nav.getByRole("button", { name: "Calendar" })).toHaveCount(0);
   await nav.getByRole("button", { name: "Attachments" }).click();
   const buttons = sidebar.getByRole("button");
-  await expect(buttons).toHaveCount(6);
+  await expect(buttons).toHaveCount(9);
   expect(
     await buttons.evaluateAll((elements) => elements.map((el) => el.getAttribute("aria-label"))),
-  ).toEqual(["Mail", "Calendar", "Google Tasks", "Google Meet", "Bookmarks", "Settings"]);
+  ).toEqual([
+    "Mail",
+    "Calendar",
+    "Google Tasks",
+    "Google Meet",
+    "Docs",
+    "Drive",
+    "Sheets",
+    "Bookmarks",
+    "Settings",
+  ]);
   await button.click();
   await page.locator('[data-account-id="second-account"]').click();
 
@@ -259,13 +269,13 @@ test("sidebar shortcuts reuse Tasks and Meet and put Bookmarks above the Setting
       "background-color",
       theme === "dark" ? "rgb(19, 19, 19)" : "rgb(255, 255, 255)",
     );
+    await expect(sidebar).toHaveCSS("width", theme === "dark" ? "44px" : "52px");
     const bounds = await sidebar.boundingBox();
     const gear = await settings.boundingBox();
     const saved = await bookmarks.boundingBox();
     const divider = await sidebar.locator(".workspace-sidebar-divider").boundingBox();
     expect(saved && divider && saved.y + saved.height < divider.y).toBe(true);
     expect(divider && gear && divider.y + divider.height < gear.y).toBe(true);
-    expect(bounds?.width).toBe(52);
     await expect(tasks.locator("svg")).toHaveCSS("width", "20px");
     expect(bounds && gear && bounds.y + bounds.height - gear.y - gear.height).toBeLessThan(20);
     await sidebar.screenshot({ path: test.info().outputPath(`workspace-sidebar-${theme}.png`) });

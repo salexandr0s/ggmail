@@ -145,9 +145,39 @@ export type WorkspaceAppBookmarkState = {
   bookmarked: boolean;
 };
 
-export const sidebarWorkspaceApps = ["calendar", "tasks", "meet"] as const;
-export type SidebarWorkspaceApp = (typeof sidebarWorkspaceApps)[number];
+export type SidebarWorkspaceApp = Exclude<SupportedWorkspaceApp, "gmail">;
+export type SidebarShortcut = SupportedWorkspaceApp | "bookmarks";
 
-export function getAdditionalLauncherApps(apps: LauncherWorkspaceApp[]) {
-  return apps.filter((app) => !sidebarWorkspaceApps.some((shortcut) => shortcut === app));
+const defaultSidebarApps = [
+  "gmail",
+  "calendar",
+  "tasks",
+  "meet",
+  "docs",
+  "drive",
+  "sheets",
+] as const satisfies readonly SupportedWorkspaceApp[];
+export const defaultSidebarShortcuts: SidebarShortcut[] = [...defaultSidebarApps, "bookmarks"];
+
+const commonApps = new Set<SupportedWorkspaceApp>(defaultSidebarApps);
+const otherSidebarApps = (Object.keys(workspaceApps) as SupportedWorkspaceApp[]).filter(
+  (app) => !commonApps.has(app),
+);
+export const sidebarShortcuts: SidebarShortcut[] = [
+  ...defaultSidebarApps,
+  ...otherSidebarApps,
+  "bookmarks",
+];
+
+/** Preserve the saved order, ignoring unknown and duplicate shortcuts in older preferences. */
+export function visibleSidebarShortcuts(
+  saved: readonly SidebarShortcut[] | undefined,
+): SidebarShortcut[] {
+  return Array.isArray(saved)
+    ? [...new Set(saved)].filter((shortcut) => sidebarShortcuts.includes(shortcut))
+    : [...defaultSidebarShortcuts];
+}
+
+export function isSidebarApp(shortcut: SidebarShortcut): shortcut is SidebarWorkspaceApp {
+  return shortcut !== "gmail" && shortcut !== "bookmarks";
 }

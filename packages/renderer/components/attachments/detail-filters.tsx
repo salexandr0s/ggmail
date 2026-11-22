@@ -1,3 +1,4 @@
+import { Checkbox } from "@ggmail/ui/components/checkbox";
 import { Input } from "@ggmail/ui/components/input";
 import {
   Select,
@@ -44,6 +45,7 @@ export function DetailFilters({
   const dateError = useId();
   const extensionLabel = useId();
   const sizeLabel = useId();
+  const embeddedLabel = useId();
   const extensions = new Set(extensionCounts.values.keys());
   if (filters.extension !== null) {
     extensions.add(filters.extension);
@@ -154,6 +156,14 @@ export function DetailFilters({
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id={embeddedLabel}
+          checked={filters.includeEmbeddedImages}
+          onCheckedChange={(checked) => onChange({ includeEmbeddedImages: checked })}
+        />
+        <label htmlFor={embeddedLabel}>{t`Include embedded images`}</label>
       </div>
     </div>
   );

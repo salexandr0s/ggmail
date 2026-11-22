@@ -15,8 +15,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 2.15rem;
-  margin: 0.75rem 0.75rem 0;
+  min-height: 2.5rem;
+  margin: 1rem 0.75rem 0;
   padding-inline: 0.875rem 0.625rem;
   border-radius: 999px;
   background: var(--search-surface);
@@ -41,7 +41,7 @@
   padding-block: 0.38rem;
   outline: none;
   color: var(--foreground);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
 }
 
 .settings-nav-search input::placeholder {
@@ -72,8 +72,8 @@
 
 .settings-nav-groups {
   display: grid;
-  gap: 1.1rem;
-  padding: 1rem 0.75rem;
+  gap: 1.25rem;
+  padding: 0.75rem;
 }
 
 .settings-nav-empty {
@@ -83,6 +83,8 @@
 }
 
 .settings-nav-item {
+  min-height: 2.5rem;
+  padding-block: 0.5rem;
   white-space: normal;
   overflow-wrap: anywhere;
 }
@@ -92,6 +94,14 @@
   min-width: 0;
   flex: 1;
   background: var(--card);
+}
+
+@media (min-width: 50rem) {
+  .settings-main {
+    margin: 0.75rem 0.75rem 0.75rem 0;
+    overflow: hidden;
+    border-radius: 1.25rem;
+  }
 }
 
 .settings-page {
@@ -104,7 +114,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
   padding-block-end: 1rem;
   border-block-end: 1px solid var(--border);
 }
@@ -112,17 +122,19 @@
 .settings-page .settings-title {
   min-width: 0;
   flex-wrap: wrap;
+  font-size: clamp(1.5rem, 4.5cqi, 2rem);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
 }
 
 .settings-content {
   display: flex;
   flex-direction: column;
-  gap: 1.55rem;
+  gap: 2rem;
 }
 
 .settings-content > [data-slot="field-set"] > legend {
-  margin: 0 0 0.6rem;
-  padding-inline: 0.15rem;
+  margin: 0 0 0.625rem;
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.4;
@@ -132,8 +144,11 @@
   gap: 0;
 }
 
-.settings-content > [data-slot="field-set"] > legend + .settings-panel {
-  border-block-start: 1px solid var(--border);
+.settings-content .settings-panel:not(:empty),
+.settings-content [data-slot="item-group"]:not(:empty) {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding-inline: clamp(0.75rem, 2.5cqi, 1.25rem);
 }
 
 .settings-content [data-slot="item-group"] > [data-slot="item"] {
@@ -156,7 +171,7 @@
 
 .settings-panel [data-slot="field-content"] {
   min-width: 0;
-  gap: 0.2rem;
+  gap: 0.25rem;
 }
 
 .settings-panel [data-slot="field-description"] {
@@ -167,10 +182,10 @@
 
 .settings-panel [data-slot="field-label"] {
   flex-wrap: wrap;
-  font-weight: 600;
+  font-weight: 500;
 }
 
-.settings-panel [data-orientation="horizontal"] {
+.settings-panel [data-slot="field"][data-orientation="horizontal"] {
   align-items: center;
   gap: 1.25rem;
 }
@@ -203,6 +218,7 @@
 }
 
 .settings-window :is([data-slot="dialog-content"], [data-slot="alert-dialog-content"]) {
+  border-radius: 1.5rem;
   top: calc(50% + 1rem);
   max-inline-size: min(28rem, calc(100vw - 2rem));
   max-block-size: calc(100dvh - 4rem);
@@ -217,6 +233,12 @@
 
 .settings-window :is([data-slot="dialog-footer"], [data-slot="alert-dialog-footer"]) {
   flex-wrap: wrap;
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+}
+
+.settings-window :is([data-slot="dialog-footer"], [data-slot="alert-dialog-footer"]) button {
+  border-radius: 999px;
 }
 
 @container settings (min-width: 38rem) {
@@ -319,4 +341,126 @@
   min-height: 4.5rem;
   gap: 0.75rem;
   background: transparent;
+}
+
+.settings-nav-trigger {
+  min-height: 2rem;
+  padding-inline: 0.75rem;
+  background: var(--secondary);
+}
+.settings-main:focus,
+.settings-page .settings-title:focus {
+  outline: none;
+}
+.settings-window .settings-nav-dialog[data-slot="dialog-content"] {
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, calc(100vw - 1.5rem));
+  max-inline-size: none;
+  height: min(35rem, calc(100dvh - 4rem));
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  background: var(--sidebar);
+}
+.settings-nav-dialog > [data-slot="dialog-title"] {
+  padding: 0.95rem 3.25rem 0.5rem 1rem;
+}
+.settings-nav-dialog .settings-nav {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+.settings-nav-dialog .settings-nav-search {
+  margin-top: 0.25rem;
+}
+.settings-nav-dialog .settings-nav-groups {
+  gap: 0.75rem;
+}
+.settings-nav-dialog [data-slot="scroll-area-viewport"] {
+  overscroll-behavior: contain;
+}
+.settings-nav-dialog .settings-nav-item {
+  min-height: 2.5rem;
+}
+@media (max-width: 30rem) {
+  .settings-window .settings-nav-dialog[data-slot="dialog-content"] {
+    inset: auto 0 0;
+    translate: none;
+    width: 100%;
+    height: calc(100dvh - 3rem);
+    max-block-size: none;
+    border-radius: 1.25rem 1.25rem 0 0;
+  }
+}
+@container settings (max-width: 38rem) {
+  .settings-page {
+    padding: 0.875rem clamp(0.75rem, 3.2cqi, 1.25rem) 1.75rem;
+  }
+  .settings-page .settings-header {
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-block-end: 0.625rem;
+  }
+  .settings-page .settings-title {
+    font-size: 1.375rem;
+  }
+  .settings-content {
+    gap: 1.25rem;
+  }
+  .settings-panel > [data-slot="field"] {
+    padding-block: 0.75rem;
+  }
+  .settings-panel [data-slot="field"][data-orientation="horizontal"] {
+    gap: 0.75rem;
+  }
+}
+@media (max-height: 30rem) {
+  .settings-page {
+    padding-block-start: 0.875rem;
+  }
+  .settings-window :is([data-slot="dialog-footer"], [data-slot="alert-dialog-footer"]) {
+    padding-block: 0.625rem;
+  }
+}
+
+@media (max-width: 30rem), (max-height: 30rem) {
+  .settings-window
+    [data-slot="dialog-content"]:has(> form > [data-slot="field-group"]):has(
+      > form > [data-slot="dialog-footer"]
+    ) {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .settings-window
+    [data-slot="dialog-content"]
+    > form:has(> [data-slot="field-group"]):has(> [data-slot="dialog-footer"]) {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .settings-window
+    [data-slot="dialog-content"]
+    > form:has(> [data-slot="dialog-footer"])
+    > [data-slot="field-group"] {
+    min-height: 0;
+    margin: 0;
+    padding: 0.25rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .settings-window :is([data-slot="dialog-footer"], [data-slot="alert-dialog-footer"]) {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .settings-window :is([data-slot="dialog-footer"], [data-slot="alert-dialog-footer"]) button {
+    height: auto;
+    min-height: 2rem;
+    padding-block: 0.375rem;
+    white-space: normal;
+  }
 }

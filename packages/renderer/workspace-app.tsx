@@ -143,48 +143,23 @@ function PageTitle() {
   const [pageTitle, setPageTitle] = useState("");
 
   useEffect(() => {
-    return ipc.renderer.on("workspaceApp.pageTitleChanged", (_event, title) => {
+    let awaitingInitialTitle = true;
+    const unsubscribe = ipc.renderer.on("workspaceApp.pageTitleChanged", (_event, title) => {
+      awaitingInitialTitle = false;
       setPageTitle(title);
     });
+    void ipc.main.invoke("workspaceApp.getPageTitle").then((title) => {
+      if (awaitingInitialTitle) {
+        setPageTitle(title);
+      }
+    });
+    return () => {
+      awaitingInitialTitle = false;
+      unsubscribe();
+    };
   }, []);
 
   return <TitlebarPageTitle>{pageTitle}</TitlebarPageTitle>;
-}
-
-function FindInPageControls() {
-  const [findInPageState, setFindInPageState] = useState({
-    isActive: false,
-    activeMatch: 0,
-    totalMatches: 0,
-  });
-
-  useEffect(() => {
-    return ipc.renderer.on("findInPage.activate", () => {
-      setFindInPageState((state) => ({ ...state, isActive: true }));
-    });
-  }, []);
-
-  useEffect(() => {
-    return ipc.renderer.on("findInPage.result", (_event, { activeMatch, totalMatches }) => {
-      setFindInPageState((state) => ({ ...state, activeMatch, totalMatches }));
-    });
-  }, []);
-
-  return (
-    <FindInPage
-      isActive={findInPageState.isActive}
-      activeMatch={findInPageState.activeMatch}
-      totalMatches={findInPageState.totalMatches}
-      onFind={(text, options) => {
-        ipc.main.send("findInPage", text, options);
-      }}
-      onClose={() => {
-        ipc.main.send("findInPage", null);
-
-        setFindInPageState((state) => ({ ...state, isActive: false }));
-      }}
-    />
-  );
 }
 
 function WorkspaceApp() {
@@ -215,7 +190,7 @@ function WorkspaceApp() {
   }
 
   return (
-    <Titlebar>
+    <Titlebar className="workspace-app-titlebar">
       <TitlebarLeft>
         <TitlebarButtonGroup>
           <NavigationControls workspaceAppId={workspaceAppId} />
@@ -223,14 +198,14 @@ function WorkspaceApp() {
         {hasMultipleAccounts && account && (
           <AccountBadge label={getAccountLabel(account.label)} color={account.color} />
         )}
-        <div className="flex items-center gap-1">
-          {workspaceApp && <WorkspaceAppIcon app={workspaceApp} className="size-3.5" />}
+        <div className="flex min-w-0 items-center gap-2">
+          {workspaceApp && <WorkspaceAppIcon app={workspaceApp} className="size-4 shrink-0" />}
           <PageTitle />
         </div>
       </TitlebarLeft>
       <TitlebarRight>
-        <FindInPageControls />
-        <TitlebarButtonGroup>
+        <FindInPage />
+        <TitlebarButtonGroup className="workspace-app-actions">
           <BookmarkButton workspaceAppId={workspaceAppId} />
           <RecentDownloadHistoryButton />
           <TitlebarIconButton

@@ -1,4 +1,4 @@
-import { WORKSPACE_SIDEBAR_WIDTH } from "@ggmail/shared/constants";
+import { workspaceSidebarWidth } from "@ggmail/shared/constants";
 import { useState, type CSSProperties } from "react";
 import { Route, Router, Switch } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
@@ -10,13 +10,16 @@ import { FollowUps } from "@/components/follow-ups";
 import { WorkspaceSidebar } from "@/components/workspace-sidebar";
 import { useMouseAccountSwitching } from "@/lib/hooks";
 import { renderApp } from "@/lib/react";
+import { useWindowWidthValue } from "@/lib/use-window-width";
 import { Attachments } from "@/routes/attachments";
 import { DownloadHistory } from "@/routes/download-history";
 import { UnifiedInbox } from "@/routes/unified-inbox";
 import "@/lib/ipc";
 
 function Main() {
+  const sidebarWidth = useWindowWidthValue(workspaceSidebarWidth);
   useMouseAccountSwitching();
+  const [location] = useHashLocation();
   const [showAssistant, setShowAssistant] = useState(false);
 
   return (
@@ -28,21 +31,12 @@ function Main() {
         />
         <div
           className="relative flex flex-1 overflow-hidden"
-          style={{ "--workspace-sidebar-width": `${WORKSPACE_SIDEBAR_WIDTH}px` } as CSSProperties}
+          style={{ "--workspace-sidebar-width": `${sidebarWidth}px` } as CSSProperties}
         >
           <WorkspaceSidebar />
           <Switch>
             <Route path="/">
               <div className="min-w-0 flex-1" />
-              <AssistantDrawer
-                open={showAssistant}
-                close={(focusToggle = true) => {
-                  setShowAssistant(false);
-                  if (focusToggle) {
-                    document.getElementById("mail-assistant-toggle")?.focus();
-                  }
-                }}
-              />
             </Route>
             <Route path="/unified-inbox">
               <AppMain className="mail-workspace all-mail-page">
@@ -56,11 +50,20 @@ function Main() {
               </AppMain>
             </Route>
             <Route path="/download-history">
-              <AppMain className="max-w-2xl px-8">
+              <AppMain className="mail-workspace download-history">
                 <DownloadHistory />
               </AppMain>
             </Route>
           </Switch>
+          <AssistantDrawer
+            open={showAssistant && location === "/"}
+            close={(focusToggle = true) => {
+              setShowAssistant(false);
+              if (focusToggle) {
+                document.getElementById("mail-assistant-toggle")?.focus();
+              }
+            }}
+          />
         </div>
       </div>
       <AppToaster />

@@ -13,7 +13,7 @@ const ACCOUNT_ID = "5eeded00-0000-4000-8000-00000000ac01";
 
 const MEET_URL = "https://meet.google.com/e2e-picker";
 
-/** Titled apart from the app's label, so the tab reading it proves the page arrived. */
+/** The stand-in title confirms the document loaded before requesting capture. */
 const MEET_PAGE_TITLE = "Meet Stand-In";
 
 const ggmail = useApp({
@@ -69,9 +69,19 @@ async function openPicker(populated = false) {
     { partition: `persist:${ACCOUNT_ID}`, title: MEET_PAGE_TITLE, populated },
   );
 
-  await ggmail.renderer.getByRole("button", { name: "Meet" }).click();
-
-  await expect(ggmail.renderer.getByRole("button", { name: MEET_PAGE_TITLE })).toBeVisible();
+  await ggmail.renderer.getByRole("button", { name: "Google Meet", exact: true }).click();
+  await expect
+    .poll(() =>
+      ggmail.app.evaluate(
+        ({ webContents }, url) =>
+          webContents
+            .getAllWebContents()
+            .find((view) => view.getURL() === url)
+            ?.getTitle(),
+        MEET_URL,
+      ),
+    )
+    .toBe(MEET_PAGE_TITLE);
 
   // With a user gesture, which Chromium requires of a screen share request.
   await ggmail.app.evaluate(({ webContents }, meetUrl) => {

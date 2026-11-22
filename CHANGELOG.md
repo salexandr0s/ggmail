@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.65.10 — 2026-11-22
+
+- Docs, Drive and Sheets join the default sidebar. Add, remove and reorder shortcuts in **Settings → Sidebar**. Settings stays pinned at the bottom.
+- The sidebar and titlebar launcher share a drag-and-drop picker. Workspace and mail icons are easier to distinguish in compact windows.
+- All Mail, Attachments and Waiting for reply adapt to smaller windows. Attachment filters include sender, file extension, date and size.
+- The mail assistant keeps its conversation when you change mailboxes or mail views. Notification settings let you choose when mail alerts appear.
+
 ## 3.65.9 — 2026-11-21
 
 - The mail assistant shows the selected account’s profile photo beside its name in the current mail view and open email headers.

@@ -1,4 +1,5 @@
 import { ipc } from "@ggmail/shared/renderer/ipc";
+import type { MenuModifiers } from "@ggmail/shared/types";
 import {
   type LauncherWorkspaceApp,
   launcherWorkspaceApps,
@@ -6,13 +7,9 @@ import {
   type WorkspaceAppsLauncherDisplay,
 } from "@ggmail/shared/workspace-apps";
 import { useLingui } from "@lingui/react/macro";
-import { LayoutGridIcon } from "lucide-react";
 import { type MouseEvent, useState } from "react";
-import {
-  TitlebarDropdownMenu,
-  TitlebarDropdownMenuItem,
-  TitlebarIconButton,
-} from "@/components/titlebar";
+import { WorkspaceAppsIcon } from "@/components/mail-icons";
+import { TitlebarDropdownMenu, TitlebarIconButton } from "@/components/titlebar";
 import { WorkspaceAppIcon } from "@/components/workspace-app-icon";
 import { useCloseOnWindowBlur } from "@/lib/hooks";
 import { getModifierOpenBehavior } from "@/lib/workspace-apps";
@@ -26,7 +23,7 @@ function useLauncherApps() {
 
   const getLauncherAppProps = (app: LauncherWorkspaceApp) => ({
     title: launcherWorkspaceApps[app],
-    onClick: (event: MouseEvent) => {
+    onClick: (event: MenuModifiers) => {
       ipc.main.send("workspaceApps.openApp", app, getModifierOpenBehavior(event));
 
       setIsOpen(false);
@@ -70,17 +67,21 @@ export function WorkspaceAppsLauncher({
         message: "Open workspace app",
         comment: "Titlebar button that opens the launcher of Google Workspace apps",
       })}
-      icon={<LayoutGridIcon />}
+      icon={<WorkspaceAppsIcon />}
       side="left"
       disabled={disabled}
       isOpen={isOpen}
       onOpenChange={setIsOpen}
-    >
-      {launcherApps.map((app) => (
-        <TitlebarDropdownMenuItem key={app} {...getLauncherAppProps(app)}>
-          <WorkspaceAppIcon app={app} className="size-4" />
-        </TitlebarDropdownMenuItem>
-      ))}
-    </TitlebarDropdownMenu>
+      items={launcherApps.map((app) => {
+        const { title, onClick, onAuxClick } = getLauncherAppProps(app);
+        return {
+          key: app,
+          label: title,
+          icon: <WorkspaceAppIcon app={app} className="size-4" />,
+          onChoose: onClick,
+          onAuxClick,
+        };
+      })}
+    />
   );
 }

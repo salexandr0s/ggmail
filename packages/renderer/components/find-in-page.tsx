@@ -1,91 +1,98 @@
+import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
-import { Input } from "@ggmail/ui/components/input";
 import { useLingui } from "@lingui/react/macro";
-import { ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon, SearchIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { useFindInPageStore } from "@/lib/stores";
+import "./find-in-page.css";
 
-type FindInPageProps = {
-  isActive: boolean;
-  activeMatch: number;
-  totalMatches: number;
-  onFind: (text: string, options: { forward?: boolean; findNext: boolean }) => void;
-  onClose: () => void;
-};
+function startSearch(text: string) {
+  ipc.main.send("findInPage", text, { forward: true, findNext: true });
+}
 
-export function FindInPage({
-  isActive,
-  activeMatch,
-  totalMatches,
-  onFind,
-  onClose,
-}: FindInPageProps) {
+export function FindInPage() {
   const { t } = useLingui();
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
+  const { activation, activeMatch, totalMatches } = useFindInPageStore();
+  const input = useRef<HTMLInputElement>(null);
   const [text, setText] = useState("");
-
-  const debouncedOnFind = useDebouncedCallback((text: string) => {
-    onFind(text, { findNext: true });
-  }, 250);
+  const search = useDebouncedCallback(startSearch, 250);
 
   useEffect(() => {
-    if (isActive && text) {
-      onFind(text, { findNext: true });
-
-      if (inputRef.current) {
-        inputRef.current.select();
+    if (activation && input.current) {
+      input.current.focus();
+      input.current.select();
+      if (input.current.value) {
+        startSearch(input.current.value);
       }
     }
-    // biome-ignore lint/correctness/useExhaustiveDependencies: refire when reactivated
-  }, [isActive]);
+    return () => search.cancel();
+  }, [activation, search]);
 
-  if (!isActive) {
-    return;
+  if (!activation) {
+    return null;
+  }
+
+  function move(forward: boolean) {
+    if (!text || totalMatches === 0) {
+      return;
+    }
+    const newQuery = search.isPending();
+    search.cancel();
+    ipc.main.send("findInPage", text, { forward, findNext: newQuery });
+  }
+
+  function close() {
+    search.cancel();
+    useFindInPageStore.setState({ activation: 0, activeMatch: 0, totalMatches: null });
+    ipc.main.send("findInPage", null);
   }
 
   return (
-    <div className="titlebar-find flex min-w-0 items-center gap-1 draggable-none">
-      <div className="flex min-w-0 items-center rounded-full border border-transparent bg-(--search-surface) focus-within:border-ring focus-within:bg-card">
-        <Input
-          ref={inputRef}
-          aria-label={t`Find…`}
-          placeholder={t`Find…`}
-          className="h-6 rounded-full border-0 bg-transparent px-2.5 text-xs focus-visible:ring-0 md:text-xs"
-          autoFocus
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value);
-
-            debouncedOnFind(event.target.value);
-          }}
-          onKeyDown={(event) => {
-            switch (event.key) {
-              case "Enter": {
-                onFind(text, { forward: true, findNext: false });
-
-                break;
-              }
-              case "Escape": {
-                onClose();
-
-                break;
-              }
-            }
-          }}
-        />
-        <div className="shrink-0 pe-2 text-xs text-muted-foreground tabular-nums">
-          {activeMatch}/{totalMatches}
-        </div>
-      </div>
-      <div className="flex shrink-0 gap-0.5">
+    <div
+      role="search"
+      aria-label={t`Find…`}
+      className="titlebar-find draggable-none"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && !event.nativeEvent.isComposing) {
+          event.preventDefault();
+          close();
+        }
+      }}
+    >
+      <SearchIcon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
+      <input
+        ref={input}
+        aria-label={t`Find…`}
+        placeholder={t`Find…`}
+        value={text}
+        onChange={(event) => {
+          const value = event.target.value;
+          setText(value);
+          useFindInPageStore.setState({ activeMatch: 0, totalMatches: null });
+          if (value) {
+            search(value);
+          } else {
+            search.cancel();
+            startSearch("");
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+            event.preventDefault();
+            move(!event.shiftKey);
+          }
+        }}
+      />
+      <span role="status" aria-atomic="true" className="titlebar-find-count">
+        {text && totalMatches !== null && `${activeMatch}/${totalMatches}`}
+      </span>
+      <div className="titlebar-find-actions">
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={() => {
-            onFind(text, { forward: false, findNext: false });
-          }}
+          disabled={!text || totalMatches === 0}
+          onClick={() => move(false)}
           title={t`Find previous match`}
         >
           <ChevronUpIcon />
@@ -93,14 +100,13 @@ export function FindInPage({
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={() => {
-            onFind(text, { findNext: false });
-          }}
+          disabled={!text || totalMatches === 0}
+          onClick={() => move(true)}
           title={t`Find next match`}
         >
           <ChevronDownIcon />
         </Button>
-        <Button variant="ghost" size="icon-sm" onClick={onClose} title={t`Close find in page`}>
+        <Button variant="ghost" size="icon-sm" onClick={close} title={t`Close find in page`}>
           <XIcon />
         </Button>
       </div>

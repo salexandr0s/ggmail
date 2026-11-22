@@ -7,6 +7,8 @@ import { ipc } from "@ggmail/shared/renderer/ipc";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { indexAttachment } from "./attachment-filters";
 
+export const attachmentPageSize = 36;
+
 type IndexedFile = ReturnType<
   typeof indexAttachment<MailAttachment & { accountId: string; mailboxKey: string }>
 >;
@@ -66,7 +68,7 @@ export function useAttachmentFiles(scope: string, refresh: number) {
             index = { mailboxKey: data.mailboxKey, status: data.status, files: new Map() };
             indexes.set(id, index);
           }
-          const hadFiles = index.files.size > 0;
+          const previousCount = index.files.size;
           const changed =
             replace || data.files.length || data.removedIds?.length || index.status !== data.status;
           for (const fileId of data.removedIds ?? []) {
@@ -80,12 +82,12 @@ export function useAttachmentFiles(scope: string, refresh: number) {
           }
           index.status = data.status;
           if (changed) {
-            // Paint the cache, the first files and the final status immediately. During a
-            // fast scan, combine intermediate changes without delaying the next Gmail read.
-            if (replace || !hadFiles || data.status !== "loading") {
+            // Let newly discovered first-page files start their thumbnails on the next frame.
+            // Once the page is full, coalesce updates during the remaining mailbox scan.
+            if (replace || !previousCount || data.status !== "loading") {
               flush();
             } else {
-              timer ??= setTimeout(flush, 100);
+              timer ??= setTimeout(flush, previousCount < attachmentPageSize ? 16 : 100);
             }
           }
           if (data.status !== "loading") {

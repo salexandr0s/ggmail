@@ -2,6 +2,7 @@ import { accountColorsMap, getAccountLabel } from "@ggmail/shared/accounts";
 import {
   type AttachmentAction,
   type AttachmentCategory,
+  fileKind,
   type MailAttachment,
 } from "@ggmail/shared/attachments";
 import { ipc } from "@ggmail/shared/renderer/ipc";
@@ -14,7 +15,7 @@ import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SenderAvatar } from "@/components/assistant/sender-avatar";
 import { CategoryPicker } from "./categories";
-import { FileMark } from "./file-mark";
+import { FileMark, kindIcons } from "./file-mark";
 import { FilePreview, FileThumbnail } from "./preview";
 import "./files.css";
 
@@ -130,6 +131,7 @@ export function FileItem({
       </button>
       {open && (
         <FilePreview
+          key={item.previewRevision}
           item={item}
           onClose={() => setOpen(false)}
           returnFocus={button}
@@ -169,13 +171,18 @@ export function FileItem({
     </div>
   );
   if (grid) {
+    const kind = fileKind(item.name);
+    const KindIcon = kindIcons[kind];
     return (
       <li className="attachment-card">
-        <FileThumbnail item={item} large>
+        <div className="attachment-card-title" data-file-kind={kind}>
+          <KindIcon aria-hidden="true" />
+          {preview}
+        </div>
+        <FileThumbnail key={item.previewRevision} item={item} large>
           <FileMark name={item.name} large />
         </FileThumbnail>
         <div className="attachment-card-body" data-show-account={showAccount}>
-          {preview}
           {subject}
           <div className="attachment-card-category">{category}</div>
           <div className="attachment-card-sender">
@@ -205,7 +212,7 @@ export function FileItem({
   return (
     <li className="attachment-columns attachment-row">
       <div className="attachment-file flex min-w-0 items-center gap-3">
-        <FileThumbnail item={item}>
+        <FileThumbnail key={item.previewRevision} item={item}>
           <FileMark name={item.name} />
         </FileThumbnail>
         <div className="min-w-0">

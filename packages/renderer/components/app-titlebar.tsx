@@ -3,8 +3,8 @@ import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
 import { currentMailView } from "@ggmail/shared/mail-views";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { AccountInstances } from "@ggmail/shared/schemas";
-import { getAdditionalLauncherApps } from "@ggmail/shared/workspace-apps";
 import { Button } from "@ggmail/ui/components/button";
+import { useIsMobile } from "@ggmail/ui/hooks/use-mobile";
 import { cn } from "@ggmail/ui/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -13,6 +13,8 @@ import {
   ChevronRightIcon,
   CircleAlertIcon,
   DownloadIcon,
+  MoreHorizontalIcon,
+  ArrowLeftIcon,
   MailSearchIcon,
   MoonIcon,
 } from "lucide-react";
@@ -20,19 +22,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { AccountAvatar } from "@/components/account-avatar";
 import { AppMenuButton } from "@/components/app-menu-button";
-import { FindInPage as UiFindInPage } from "@/components/find-in-page";
+import { FindInPage } from "@/components/find-in-page";
 import { MailAssistantIcon } from "@/components/mail-icons";
 import {
   Titlebar,
   TitlebarButtonGroup,
   TitlebarDropdownMenu,
-  TitlebarDropdownMenuItem,
   TitlebarIconButton,
   TitlebarNavigationControls,
 } from "@/components/titlebar";
 import { UnreadCountBadge } from "@/components/unread-count-badge";
 import { WorkspaceAppsLauncher } from "@/components/workspace-apps-launcher";
 import { useSelectedAccountTabs } from "@/lib/hooks";
+import { moveToolbarFocus } from "@/lib/move-toolbar-focus";
 import { useConfig } from "@/lib/react-query";
 import { submitUnifiedSearch } from "@/lib/unified-search";
 import {
@@ -40,7 +42,6 @@ import {
   useDownloadActivity,
   useAccountsStore,
   useAppUpdaterStore,
-  useFindInPageStore,
 } from "../lib/stores";
 import { MailViewNavigation } from "./mail-view-navigation";
 import "./mail-titlebar.css";
@@ -68,25 +69,6 @@ function RecentDownloadHistoryButton() {
     >
       <DownloadIcon />
     </TitlebarIconButton>
-  );
-}
-
-function FindInPage() {
-  const isActive = useFindInPageStore((state) => state.isActive);
-  const activeMatch = useFindInPageStore((state) => state.activeMatch);
-  const totalMatches = useFindInPageStore((state) => state.totalMatches);
-  const deactivate = useFindInPageStore((state) => state.deactivate);
-
-  return (
-    <UiFindInPage
-      isActive={isActive}
-      activeMatch={activeMatch}
-      totalMatches={totalMatches}
-      onFind={(text, options) => {
-        ipc.main.send("findInPage", text, options);
-      }}
-      onClose={deactivate}
-    />
   );
 }
 
@@ -465,6 +447,7 @@ export function AppTitlebar({
   const accounts = useAccountsStore((state) => state.accounts);
 
   const accountRow = useAccountRow(accounts);
+  const [focusedAccount, setFocusedAccount] = useState<string>();
 
   const { tabs: selectedAccountTabs } = useSelectedAccountTabs();
 
@@ -477,6 +460,13 @@ export function AppTitlebar({
   const unverifiedAppUpdateVersion = useAppUpdaterStore((state) => state.unverifiedVersion);
 
   const { config } = useConfig();
+
+  const compact = useIsMobile();
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const toolsTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    setToolsOpen(false);
+  }, [compact, location]);
 
   const [isGmailSavedSearchesOpen, setIsGmailSavedSearchesOpen] = useState(false);
 
@@ -498,7 +488,7 @@ export function AppTitlebar({
   const isMailLibraryLocation =
     isUnifiedInboxLocation || isAttachmentsLocation || isWaitingLocation;
 
-  const launcherApps = getAdditionalLauncherApps(config["workspaceApps.launcherApps"]);
+  const launcherApps = config["workspaceApps.launcherApps"];
   const shouldShowUnifiedInboxButton = config["unifiedInbox.enabled"] && accounts.length > 1;
 
   const shouldShowSavedSearchesButton = config["gmail.savedSearches"].length > 0;
@@ -524,7 +514,8 @@ export function AppTitlebar({
         title={getAccountLabel(account.config.label)}
         aria-description={account.gmail.attentionRequired ? t`Sign in` : undefined}
         size="sm"
-        tabIndex={-1}
+        tabIndex={(focusedAccount ?? selectedAccount?.config.id) === account.config.id ? 0 : -1}
+        onFocus={() => setFocusedAccount(account.config.id)}
         className="mail-account-button draggable-none"
         onClick={() => {
           ipc.main.send("accounts.selectAccount", account.config.id, true);
@@ -700,6 +691,14 @@ export function AppTitlebar({
                    */}
                   <div
                     ref={accountRow.setRowElement}
+                    role="toolbar"
+                    aria-label={t`Accounts`}
+                    onKeyDown={moveToolbarFocus}
+                    onBlur={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setFocusedAccount(undefined);
+                      }
+                    }}
                     className="flex min-w-0 flex-1 scrollbar-none items-center gap-1 overflow-x-auto overflow-y-hidden draggable-none motion-safe:scroll-smooth"
                     style={{
                       height: APP_TITLEBAR_HEIGHT,
@@ -770,52 +769,86 @@ export function AppTitlebar({
           )}
         </div>
         <div data-slot="titlebar-utilities" className="mail-titlebar-utilities">
-          <div className="mail-utility-actions">
+          <div
+            role={compact && toolsOpen ? "toolbar" : undefined}
+            aria-label={compact && toolsOpen ? t`More options` : undefined}
+            className="mail-utility-actions"
+            onKeyDown={(event) => {
+              if (
+                !compact ||
+                !toolsOpen ||
+                !(event.target instanceof Element) ||
+                event.target.closest(".titlebar-find") ||
+                !event.currentTarget.contains(event.target)
+              ) {
+                return;
+              }
+              if (event.key === "Escape" && !event.defaultPrevented) {
+                event.preventDefault();
+                setToolsOpen(false);
+                toolsTrigger.current?.focus();
+              } else {
+                moveToolbarFocus(event);
+              }
+            }}
+          >
             <FindInPage />
-            {selectedAccount && (
-              <WorkspaceTabs
-                accountId={selectedAccount.config.id}
-                tabs={selectedAccountTabs}
-                config={config}
-                showActive={isAccountLocation}
-              />
-            )}
-            {launcherApps.length > 0 && (
-              <WorkspaceAppsLauncher
-                launcherApps={launcherApps}
-                display={config["workspaceApps.launcherDisplay"]}
-                disabled={isMailLibraryLocation}
-              />
-            )}
-            {shouldShowSavedSearchesButton && (
-              <TitlebarDropdownMenu
-                title={t`Show saved searches`}
-                icon={<MailSearchIcon />}
-                side="left"
-                disabled={
-                  isWaitingLocation ||
-                  isAttachmentsLocation ||
-                  (!isUnifiedInboxLocation && isWorkspaceAppTabActive)
-                }
-                isOpen={isGmailSavedSearchesOpen}
-                onOpenChange={setIsGmailSavedSearchesOpen}
-              >
-                {config["gmail.savedSearches"].map((savedSearch) => (
-                  <TitlebarDropdownMenuItem
-                    key={savedSearch.id}
-                    onClick={() => {
+            <TitlebarIconButton
+              ref={toolsTrigger}
+              className="mail-tools-toggle"
+              tabIndex={0}
+              title={toolsOpen ? t`Go back` : t`More options`}
+              aria-expanded={toolsOpen}
+              aria-controls="mail-extra-tools"
+              onClick={() => setToolsOpen(!toolsOpen)}
+            >
+              {toolsOpen ? <ArrowLeftIcon /> : <MoreHorizontalIcon />}
+            </TitlebarIconButton>
+            <div id="mail-extra-tools" className="mail-extra-tools">
+              {selectedAccount && (
+                <WorkspaceTabs
+                  accountId={selectedAccount.config.id}
+                  tabs={selectedAccountTabs}
+                  config={config}
+                  showActive={isAccountLocation}
+                />
+              )}
+              {launcherApps.length > 0 && (
+                <WorkspaceAppsLauncher
+                  launcherApps={launcherApps}
+                  display={config["workspaceApps.launcherDisplay"]}
+                  disabled={isMailLibraryLocation}
+                />
+              )}
+              {shouldShowSavedSearchesButton && (
+                <TitlebarDropdownMenu
+                  title={t`Show saved searches`}
+                  icon={<MailSearchIcon />}
+                  side="left"
+                  disabled={
+                    isWaitingLocation ||
+                    isAttachmentsLocation ||
+                    (!isUnifiedInboxLocation && isWorkspaceAppTabActive)
+                  }
+                  isOpen={isGmailSavedSearchesOpen}
+                  onOpenChange={setIsGmailSavedSearchesOpen}
+                  items={config["gmail.savedSearches"].map((savedSearch) => ({
+                    key: savedSearch.id,
+                    label: savedSearch.label,
+                    onChoose: () => {
+                      setToolsOpen(false);
                       if (isUnifiedInboxLocation) {
                         submitUnifiedSearch(savedSearch.query);
                       } else {
                         ipc.main.send("gmail.search", savedSearch.query);
                       }
-                    }}
-                  >
-                    {savedSearch.label}
-                  </TitlebarDropdownMenuItem>
-                ))}
-              </TitlebarDropdownMenu>
-            )}
+                    },
+                  }))}
+                />
+              )}
+              <RecentDownloadHistoryButton />
+              <DoNotDisturb />
+            </div>
             {isAccountLocation && (
               <TitlebarIconButton
                 id="mail-assistant-toggle"
@@ -830,8 +863,6 @@ export function AppTitlebar({
                 <MailAssistantIcon className="size-[18px]" />
               </TitlebarIconButton>
             )}
-            <RecentDownloadHistoryButton />
-            <DoNotDisturb />
           </div>
           {unverifiedAppUpdateVersion && (
             <Button
@@ -868,5 +899,9 @@ export function AppTitlebar({
     );
   };
 
-  return <Titlebar className="mail-titlebar">{renderContent()}</Titlebar>;
+  return (
+    <Titlebar className={cn("mail-titlebar", compact && toolsOpen && "mail-tools-open")}>
+      {renderContent()}
+    </Titlebar>
+  );
 }

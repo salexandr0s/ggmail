@@ -1,5 +1,6 @@
 import { DEFAULT_ACCOUNT_LABEL } from "./accounts";
 import type { Config } from "./types";
+import { defaultSidebarShortcuts } from "./workspace-apps";
 
 export const DEFAULT_WINDOW_STATE_BOUNDS = {
   width: 1280,
@@ -118,6 +119,7 @@ export function createDefaultConfig({
     "workspaceApps.openInApp": true,
     "workspaceApps.openInAppExcludedApps": [],
     "workspaceApps.mode": "tabs",
+    "sidebar.shortcuts": [...defaultSidebarShortcuts],
     "workspaceApps.launcherApps": [],
     "workspaceApps.launcherDisplay": "auto",
     "workspaceApps.persistZoom": true,

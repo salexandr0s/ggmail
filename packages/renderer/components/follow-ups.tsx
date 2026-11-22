@@ -26,20 +26,20 @@ import {
   CalendarDaysIcon,
   CalendarPlusIcon,
   ClockIcon,
-  InboxIcon,
   Loader2Icon,
   MailIcon,
   RefreshCwIcon,
   TriangleAlertIcon,
   XIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { type RefObject, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Route } from "wouter";
 import { navigate } from "wouter/use-hash-location";
 import { dayjs } from "@/lib/date";
 import { useAccountsStore, useMailboxRevisions } from "@/lib/stores";
-import { MailboxSection } from "./mail-page";
+import { WaitingIcon } from "./mail-icons";
+import { MailboxSection, MailPageTitle } from "./mail-page";
 import "./follow-ups.css";
 
 const statuses = {
@@ -370,10 +370,11 @@ function ScheduleFollowUp() {
 
 export function FollowUps() {
   const [filter, setFilter] = useState<Filter>("all");
+  const returnPosition = useRef<number | null>(null);
   return (
     <>
       <Route path="/">
-        <WaitingForReply filter={filter} onFilter={setFilter} />
+        <WaitingForReply filter={filter} onFilter={setFilter} returnPosition={returnPosition} />
       </Route>
       <Route path="/new" component={ScheduleFollowUp} />
     </>
@@ -383,11 +384,32 @@ export function FollowUps() {
 function WaitingForReply({
   filter,
   onFilter,
+  returnPosition,
 }: {
+  returnPosition: RefObject<number | null>;
   filter: Filter;
   onFilter: (next: Filter) => void;
 }) {
   const mailboxes = useFollowUpMailboxes(false);
+  const queue = useRef<HTMLDivElement>(null);
+  const compactSchedule = useRef<HTMLButtonElement>(null);
+  const railSchedule = useRef<HTMLButtonElement>(null);
+  const loading = mailboxes.some(({ list }) => list.isPending);
+  useLayoutEffect(() => {
+    if (returnPosition.current === null || loading || !queue.current) {
+      return;
+    }
+    queue.current.scrollTop = returnPosition.current;
+    returnPosition.current = null;
+    const opener = compactSchedule.current?.offsetWidth
+      ? compactSchedule.current
+      : railSchedule.current;
+    opener?.focus({ preventScroll: true });
+  }, [loading, returnPosition]);
+  const schedule = () => {
+    returnPosition.current = queue.current?.scrollTop ?? 0;
+    navigate(SCHEDULE_FOLLOW_UP_PATH);
+  };
   const checking = mailboxes.some(({ list }) => list.isFetching);
   const { t, i18n } = useLingui();
   const rows = mailboxes.flatMap((mailbox) => mailbox.rows);
@@ -407,13 +429,50 @@ function WaitingForReply({
       count: rows.filter((row) => row.status === "scheduled").length,
     },
   ] as const;
+  const activeFilter = filters.find(({ id }) => id === filter) ?? filters[0];
   const hasUnverified = rows.some((row) => row.status === "unverified");
   const hasVisibleRows = rows.some((row) => filter === "all" || row.status === filter);
   const empty = complete && !hasVisibleRows && (filter === "all" || !hasUnverified);
   return (
     <main className="waiting-page">
+      <header className="mail-page-header waiting-header">
+        <MailPageTitle icon={<WaitingIcon />}>
+          <Trans>Waiting for reply</Trans>
+        </MailPageTitle>
+        <Button
+          ref={compactSchedule}
+          className="follow-up-compose follow-up-compact-compose"
+          onClick={schedule}
+          title={t`Schedule follow-up`}
+          aria-label={t`Schedule follow-up`}
+        >
+          <CalendarPlusIcon aria-hidden="true" />
+          <span>{t`Schedule follow-up`}</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="follow-up-refresh"
+          aria-label={t`Check for replies`}
+          title={t`Check for replies`}
+          disabled={checking || !mailboxes.length}
+          onClick={() => {
+            for (const { list } of mailboxes) {
+              void list.refetch();
+            }
+          }}
+        >
+          <RefreshCwIcon
+            aria-hidden="true"
+            className={checking ? "motion-safe:animate-spin" : undefined}
+          />
+          <span>
+            <Trans>Check for replies</Trans>
+          </span>
+        </Button>
+      </header>
       <aside className="follow-up-rail">
-        <Button className="follow-up-compose" onClick={() => navigate(SCHEDULE_FOLLOW_UP_PATH)}>
+        <Button ref={railSchedule} className="follow-up-compose" onClick={schedule}>
           <CalendarPlusIcon aria-hidden="true" />
           <Trans>Schedule follow-up</Trans>
         </Button>
@@ -424,7 +483,12 @@ function WaitingForReply({
               variant="ghost"
               className="mail-nav-row"
               aria-pressed={id === filter}
-              onClick={() => onFilter(id)}
+              onClick={() => {
+                onFilter(id);
+                if (queue.current && filter !== id) {
+                  queue.current.scrollTop = 0;
+                }
+              }}
             >
               <Icon aria-hidden="true" />
               <span className="min-w-0 truncate" title={label}>
@@ -436,33 +500,14 @@ function WaitingForReply({
         </div>
       </aside>
       <div className="follow-up-queue">
-        <header className="follow-up-heading">
-          <h1 className="page-heading-title">
-            <Trans>Waiting for reply</Trans>
-          </h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="follow-up-refresh"
-            aria-label={t`Check for replies`}
-            title={t`Check for replies`}
-            disabled={checking || !mailboxes.length}
-            onClick={() => {
-              for (const { list } of mailboxes) {
-                void list.refetch();
-              }
-            }}
-          >
-            <RefreshCwIcon
-              aria-hidden="true"
-              className={checking ? "motion-safe:animate-spin" : undefined}
-            />
-            <span>
-              <Trans>Check for replies</Trans>
-            </span>
-          </Button>
-        </header>
-        <div className="follow-up-queue-body">
+        <div className="follow-up-heading">
+          <h2 className="mail-section-title">
+            <activeFilter.icon aria-hidden="true" />
+            {activeFilter.label}
+            {complete && <span className="mail-count">{i18n.number(activeFilter.count)}</span>}
+          </h2>
+        </div>
+        <div ref={queue} className="follow-up-queue-body">
           {hasVisibleRows && (
             <div className="follow-up-columns" aria-hidden="true">
               <span>
@@ -482,25 +527,12 @@ function WaitingForReply({
             if (!visible.length && !list.isPending && !unavailable && !unverified) {
               return null;
             }
-            const label = getAccountLabel(config.label);
             return (
-              <section className="follow-up-mailbox" key={config.id} aria-label={label}>
-                <header>
-                  <h2>
-                    {config.color ? (
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "size-2 shrink-0 rounded-full",
-                          accountColorsMap[config.color].className,
-                        )}
-                      />
-                    ) : (
-                      <InboxIcon aria-hidden="true" />
-                    )}
-                    {label}
-                  </h2>
-                  {(unavailable || unverified) && (
+              <MailboxSection
+                account={config}
+                key={config.id}
+                actions={
+                  (unavailable || unverified) && (
                     <Button
                       size="xs"
                       variant="outline"
@@ -510,8 +542,9 @@ function WaitingForReply({
                       <RefreshCwIcon aria-hidden="true" />
                       <Trans>Retry</Trans>
                     </Button>
-                  )}
-                </header>
+                  )
+                }
+              >
                 {list.isPending ? (
                   <p className="follow-up-notice" role="status">
                     <Loader2Icon aria-hidden="true" className="motion-safe:animate-spin" />
@@ -532,7 +565,7 @@ function WaitingForReply({
                   )
                 )}
                 {visible.length > 0 && <FollowUpRows accountId={config.id} rows={visible} />}
-              </section>
+              </MailboxSection>
             );
           })}
           {empty && (
@@ -571,8 +604,8 @@ function WaitingForReply({
 export function InboxFollowUps({ accountId }: { accountId?: string }) {
   const mailboxes = useFollowUpMailboxes(true);
   return (
-    <div className="mb-6 hidden space-y-2 has-[section]:block">
-      <Button size="sm" variant="ghost" className="-ms-2" onClick={() => navigate("/waiting")}>
+    <div className="inbox-follow-ups mb-3 hidden overflow-hidden rounded-[var(--mail-panel-radius)] bg-card has-[section]:block">
+      <Button size="sm" variant="ghost" className="my-2 ms-3" onClick={() => navigate("/waiting")}>
         <ClockIcon aria-hidden="true" />
         <Trans>Waiting for reply</Trans>
         <ArrowRightIcon aria-hidden="true" />
@@ -585,11 +618,7 @@ export function InboxFollowUps({ accountId }: { accountId?: string }) {
           const due = rows.filter((row) => row.status === "due");
           return (
             due.length > 0 && (
-              <MailboxSection
-                key={config.id}
-                label={getAccountLabel(config.label)}
-                color={config.color}
-              >
+              <MailboxSection key={config.id} account={config}>
                 <FollowUpRows accountId={config.id} rows={due} compact />
               </MailboxSection>
             )

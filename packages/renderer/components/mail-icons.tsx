@@ -1,114 +1,136 @@
-import { type ComponentProps, useId } from "react";
+import { useId } from "react";
+import { ProductIcon, type ProductIconProps } from "./product-icon";
 import { WorkspaceAppIcon } from "./workspace-app-icon";
 
-type IconProps = ComponentProps<"svg">;
-
-export function MailIcon(props: IconProps) {
-  return <WorkspaceAppIcon app="gmail" aria-hidden="true" {...props} />;
+export function MailIcon(props: ProductIconProps) {
+  return <WorkspaceAppIcon app="gmail" {...props} />;
 }
 
-export function AllMailIcon(props: IconProps) {
+export function AllMailIcon(props: ProductIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <rect x="4.5" y="2.5" width="18.5" height="14.5" rx="2.75" fill="#34A853" />
-      <rect x="1" y="6.5" width="19" height="15" rx="2.5" fill="#4285F4" />
+    <ProductIcon {...props}>
+      <path
+        fill="#34A853"
+        d="M7.2 2.1h13.5A2.3 2.3 0 0 1 23 4.4v10.1a2.3 2.3 0 0 1-2.3 2.3h-.5V8.6a3 3 0 0 0-3-3H4.9V4.4a2.3 2.3 0 0 1 2.3-2.3Z"
+      />
+      <rect x="1" y="7" width="18.8" height="14.9" rx="2.6" fill="#4285F4" />
       <path
         fill="#1967D2"
-        d="m20 9.25-8.3 7a1.9 1.9 0 0 1-2.4 0L1 9.25V9a2.5 2.5 0 0 1 2.5-2.5h14A2.5 2.5 0 0 1 20 9z"
+        d="m1 9.1 8.4 5.8a1.8 1.8 0 0 0 2 0l8.4-5.8v2.6l-8.4 5.8a1.8 1.8 0 0 1-2 0L1 11.7Z"
       />
       <path
         fill="#A8C7FA"
-        d="M1.2 8a2.5 2.5 0 0 1 2.3-1.5h14A2.5 2.5 0 0 1 19.8 8l-8.5 6.2a1.4 1.4 0 0 1-1.6 0z"
+        d="M3.6 7h13.6a2.6 2.6 0 0 1 2.5 1.9l-8.3 5.7a1.8 1.8 0 0 1-2 0L1.1 8.9A2.6 2.6 0 0 1 3.6 7Z"
       />
-    </svg>
+    </ProductIcon>
   );
 }
 
-export function AttachmentIcon(props: IconProps) {
-  const enamel = useId();
+export function AttachmentIcon(props: ProductIconProps) {
+  const id = useId();
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <ProductIcon {...props}>
       <defs>
-        <linearGradient id={enamel} x1="0%" y1="100%" x2="0%" y2="0%">
+        <linearGradient id={id} x1="15%" y1="92%" x2="86%" y2="8%">
           <stop stopColor="#1967D2" />
           <stop offset=".45" stopColor="#4285F4" />
-          <stop offset=".8" stopColor="#00A88A" />
+          <stop offset=".7" stopColor="#00A88A" />
           <stop offset="1" stopColor="#34A853" />
         </linearGradient>
       </defs>
       <path
-        transform="rotate(40 12 12)"
-        d="M5.75 9.25v6.5a6.25 6.25 0 0 0 12.5 0V6a4 4 0 0 0-8 0v10a1.75 1.75 0 0 0 3.5 0V7.5"
-        stroke={`url(#${enamel})`}
-        strokeWidth="2.4"
+        d="m8.5 6.9-5 5a5.75 5.75 0 0 0 8.1 8.15l8-8a4.1 4.1 0 0 0-5.8-5.8l-7.5 7.5a2.1 2.1 0 0 0 3 3l6.65-6.65"
+        stroke={`url(#${id})`}
+        strokeWidth="2.5"
         strokeLinecap="round"
+        transform="translate(.6 -1.1)"
       />
-    </svg>
+    </ProductIcon>
   );
 }
 
-export function WaitingIcon(props: IconProps) {
+export function WaitingIcon(props: ProductIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <circle cx="12" cy="12" r="10.5" fill="#E99500" />
-      <path fill="#FBBC04" d="M12 1.5a10.5 10.5 0 0 1 7.42 17.92L12 12Z" />
-      <circle cx="12" cy="12" r="7.6" fill="#FFF1CB" />
+    <ProductIcon {...props}>
+      <circle cx="12" cy="12" r="10.9" fill="#E99500" />
+      <path fill="#FBBC04" d="M12 1.1A10.9 10.9 0 0 1 21.4 17.5L12 12Z" />
+      <circle cx="12" cy="12" r="7.55" fill="#FFF1CB" />
       <path
-        d="M12 6.8V12l4.25 2.7"
+        d="M12 6.8v5.4l3.9 2.5"
         stroke="#80501B"
-        strokeWidth="2.2"
+        strokeWidth="2.35"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
+    </ProductIcon>
   );
 }
 
-export function MailAssistantIcon(props: IconProps) {
-  const sparkle = useId();
+export function MailAssistantIcon(props: ProductIconProps) {
+  const id = useId();
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <ProductIcon {...props}>
       <defs>
-        <linearGradient id={sparkle} x1="10%" y1="92%" x2="84%" y2="2%">
+        <linearGradient id={id} x1="10%" y1="95%" x2="78%" y2="5%">
           <stop stopColor="#185ABC" />
-          <stop offset=".36" stopColor="#4285F4" />
-          <stop offset=".68" stopColor="#7467E8" />
+          <stop offset=".38" stopColor="#4285F4" />
+          <stop offset=".74" stopColor="#7467E8" />
           <stop offset="1" stopColor="#D77DC8" />
         </linearGradient>
       </defs>
       <path
-        fill={`url(#${sparkle})`}
-        d="M12 .75c.4 0 .63.28.74.7 1.43 5.6 4.2 8.38 9.81 9.81.42.11.7.34.7.74s-.28.63-.7.74c-5.6 1.43-8.38 4.2-9.81 9.81-.11.42-.34.7-.74.7s-.63-.28-.74-.7c-1.43-5.6-4.2-8.38-9.81-9.81-.42-.11-.7-.34-.7-.74s.28-.63.7-.74c5.6-1.43 8.38-4.2 9.81-9.81.11-.42.34-.7.74-.7Z"
+        fill={`url(#${id})`}
+        d="M10.1 4c.15-.6.9-.6 1.05 0 1.4 4.7 3.7 7 8.35 8.35.6.2.6.9 0 1.1-4.65 1.35-6.95 3.7-8.35 8.35-.15.6-.9.6-1.05 0-1.4-4.65-3.7-7-8.35-8.35-.6-.2-.6-.9 0-1.1C6.4 11 8.7 8.7 10.1 4Z"
       />
       <path
         fill="#8DE0FF"
-        d="M.75 12c0-.4.28-.63.7-.74 5.6-1.43 8.38-4.2 9.81-9.81.11-.42.34-.7.74-.7.15 4.53-.72 8.27-3.24 10.22C6.82 12.48 3.88 12.58.75 12Z"
+        d="M10.6 3.6c.1 4.7-.8 7.1-3 8.5-1.5 1-3.6 1.2-6.3.8 0-.25.15-.45.45-.55C6.4 11 8.7 8.7 10.1 4c.1-.25.25-.4.5-.4Z"
       />
-    </svg>
+      <path
+        fill="#D77DC8"
+        d="M19.3 1.1c.65 2.4 1.8 3.55 4.1 4.15-2.3.7-3.45 1.85-4.1 4.15-.65-2.3-1.85-3.45-4.15-4.15 2.3-.6 3.5-1.75 4.15-4.15Z"
+      />
+    </ProductIcon>
   );
 }
 
-export function WorkspaceSettingsIcon(props: IconProps) {
-  const gear = useId();
+export function WorkspaceSettingsIcon(props: ProductIconProps) {
+  const id = useId();
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <ProductIcon {...props}>
       <defs>
-        <linearGradient id={gear} x1="12%" y1="95%" x2="84%" y2="2%">
+        <linearGradient id={id} x1="12%" y1="90%" x2="84%" y2="8%">
           <stop stopColor="#0022CF" />
-          <stop offset=".22" stopColor="#0499FC" />
-          <stop offset=".45" stopColor="#2831F7" />
-          <stop offset=".72" stopColor="#854DFB" />
+          <stop offset=".27" stopColor="#0499FC" />
+          <stop offset=".54" stopColor="#2831F7" />
+          <stop offset=".8" stopColor="#854DFB" />
           <stop offset="1" stopColor="#DEA7FB" />
         </linearGradient>
       </defs>
       <path
-        fill={`url(#${gear})`}
+        fill={`url(#${id})`}
         fillRule="evenodd"
-        stroke={`url(#${gear})`}
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        d="M10.5 2h3l.6 2.3 1.8.75 2.1-1.2L20.15 6l-1.2 2.1.75 1.8 2.3.6v3l-2.3.6-.75 1.8 1.2 2.1L18 20.15l-2.1-1.2-1.8.75-.6 2.3h-3l-.6-2.3-1.8-.75-2.1 1.2L3.85 18l1.2-2.1-.75-1.8L2 13.5v-3l2.3-.6.75-1.8L3.85 6 6 3.85l2.1 1.2 1.8-.75ZM12 7.25a4.75 4.75 0 1 0 0 9.5 4.75 4.75 0 0 0 0-9.5Z"
+        d="M10.1 1h3.8l.6 2.6 1.55.65 2.3-1.4 2.7 2.7-1.4 2.3.65 1.55 2.6.6v3.8l-2.6.6-.65 1.55 1.4 2.3-2.7 2.7-2.3-1.4-1.55.65-.6 2.6h-3.8l-.6-2.6-1.55-.65-2.3 1.4-2.7-2.7 1.4-2.3-.65-1.55-2.6-.6v-3.8l2.6-.6.65-1.55-1.4-2.3 2.7-2.7 2.3 1.4 1.55-.65Z
+        M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Z"
       />
-    </svg>
+    </ProductIcon>
+  );
+}
+
+export function WorkspaceAppsIcon(props: ProductIconProps) {
+  return (
+    <ProductIcon {...props}>
+      <g fill="currentColor">
+        <circle cx="5" cy="5" r="2.15" />
+        <circle cx="12" cy="5" r="2.15" />
+        <circle cx="19" cy="5" r="2.15" />
+        <circle cx="5" cy="12" r="2.15" />
+        <circle cx="12" cy="12" r="2.15" />
+        <circle cx="19" cy="12" r="2.15" />
+        <circle cx="5" cy="19" r="2.15" />
+        <circle cx="12" cy="19" r="2.15" />
+        <circle cx="19" cy="19" r="2.15" />
+      </g>
+    </ProductIcon>
   );
 }

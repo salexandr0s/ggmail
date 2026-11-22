@@ -518,7 +518,7 @@ test("scrolling a long follow-up queue keeps its filter and toolbar in place", a
               subject: "Conversation " + i,
               recipient: "Reader",
               due: "2030-01-02",
-              lastSent: "2026-11-19T12:00:00Z",
+              lastSent: "Nov 19",
               status: "scheduled",
             }))
           : [],
@@ -541,4 +541,44 @@ test("scrolling a long follow-up queue keeps its filter and toolbar in place", a
   await expect(
     page.getByRole("button", { name: "Schedule follow-up", exact: true }),
   ).toBeInViewport();
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const win = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    win?.setMinimumSize(320, 320);
+    win?.setContentSize(360, 440);
+  });
+  const scheduled = page
+    .getByRole("group", { name: "All follow-ups" })
+    .getByRole("button", { name: /Scheduled/ });
+  await scheduled.click();
+  await queue.evaluate((el) => {
+    el.scrollTop = 350;
+  });
+  await expect.poll(() => queue.evaluate((el) => el.scrollTop)).toBe(350);
+  await expect(scheduled).toBeInViewport();
+  await openScheduler();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Schedule follow-up", exact: true })).toBeFocused();
+  await expect.poll(() => queue.evaluate((el) => el.scrollTop)).toBe(350);
+  await expect(scheduled).toHaveAttribute("aria-pressed", "true");
+  await queue.evaluate((el) => {
+    el.scrollTop = 0;
+  });
+  test
+    .info()
+    .annotations.push({
+      type: "Queue top",
+      description: String(await queue.evaluate((el) => el.getBoundingClientRect().top)),
+    });
+  await page.screenshot({
+    animations: "disabled",
+    path: test.info().outputPath("waiting-compact.png"),
+  });
+  await page
+    .getByRole("group", { name: "All follow-ups" })
+    .getByRole("button", { name: /^Due/ })
+    .click();
+  await expect(page.getByRole("heading", { name: "No follow-ups due" })).toBeVisible();
+  expect(await queue.evaluate((el) => el.scrollTop)).toBe(0);
 });

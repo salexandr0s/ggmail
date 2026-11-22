@@ -282,8 +282,8 @@ msgstr "8時間"
 
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
-msgid "A notification shows the code either way. Press its Copy button to copy the code yourself."
-msgstr "どちらの場合も、通知にコードが表示されます。自分でコピーするには、通知の“コピー”ボタンを押してください。"
+msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
+msgstr "コードの通知にはメールの通知設定が適用されます。「概要を表示」をオフにするとコードが非表示になります。「コピー」ボタンは引き続き使えます。"
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -325,6 +325,7 @@ msgstr "アカウントの操作"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Appearance section for how accounts look
 #: packages/app/menu.ts
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/mail-views.tsx
@@ -351,9 +352,13 @@ msgid "Add"
 msgstr "追加"
 
 #. Screen reader label of the button that puts a Workspace app in the launcher; label is the app's name
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Add {label} to launcher"
 msgstr "{label}をランチャーに追加"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Add {label} to sidebar"
+msgstr "{label} をサイドバーに追加"
 
 #. allowlistEntry is the line to add to 1Password's list of allowed browsers, which stays as it is
 #: packages/renderer/routes/settings/extensions.tsx
@@ -589,7 +594,7 @@ msgid "Automatically select the first account with unread emails when clicking t
 msgstr "通知領域のアイコンをクリックしたときに、未読メールがある最初のアカウントを自動的に選択します。"
 
 #. Heading of the Workspace apps that can be added to the launcher
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Available"
 msgstr "利用可能"
 
@@ -659,8 +664,10 @@ msgstr "ブックマークに追加"
 
 #. Heading of the bookmarks popup
 #. Heading of the bookmarks popup
+#. Heading of the bookmarks popup
 #: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/routes/settings/sidebar.tsx
 msgid "Bookmarks"
 msgstr "ブックマーク"
 
@@ -904,6 +911,7 @@ msgstr "色をクリア"
 msgid "Clear filters"
 msgstr "フィルタをクリア"
 
+#: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -916,6 +924,7 @@ msgstr "検索をクリア"
 #: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/popup.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
+#: packages/renderer/settings.tsx
 msgid "Close"
 msgstr "閉じる"
 
@@ -1165,6 +1174,10 @@ msgstr "{unavailableAccounts} の添付ファイルを確認できませんで�
 msgid "Couldn’t check this mailbox."
 msgstr "このメールボックスを確認できませんでした。"
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't clear the saved chat."
+msgstr "保存済みのチャットを消去できませんでした。"
+
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
 msgstr "ChatGPT に接続できませんでした。もう一度お試しください。"
@@ -1193,6 +1206,10 @@ msgstr "{extensionName}をインストールできませんでした"
 #: packages/app/lib/extension-swap.ts
 msgid "Couldn't install the extension: {errorMessage}"
 msgstr "拡張機能をインストールできませんでした: {errorMessage}"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't load the saved chat."
+msgstr "保存済みのチャットを読み込めませんでした。"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't open {extensionName}"
@@ -1513,11 +1530,15 @@ msgstr "メールの下書きを作成"
 msgid "Draft email"
 msgstr "メールの下書き"
 
+#: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
-#: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Drag {label} to reorder"
 msgstr "{label}をドラッグして並べ替え"
+
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Drag shortcuts into the order you want. Settings stays pinned at the bottom for all accounts."
+msgstr "ショートカットをドラッグして並べ替えます。設定はすべてのアカウントで最下部に固定されます。"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
@@ -1632,6 +1653,10 @@ msgctxt "Windows"
 msgid "Enable system tray icon"
 msgstr "通知領域アイコンを有効にする"
 
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "End time"
+msgstr "終了時刻"
+
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a color"
 msgstr "色を入力してください"
@@ -1667,6 +1692,10 @@ msgstr "有効なhex、rgb、rgbaの色を入力してください"
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Enter a website address, like {exampleSite}."
 msgstr "{exampleSite}のようなウェブサイトのアドレスを入力してください。"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Every day"
+msgstr "毎日"
 
 #. Setting that picks the Workspace apps that open in the external browser
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -1806,6 +1835,7 @@ msgid "Filter by account"
 msgstr "アカウントで絞り込む"
 
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/settings.tsx
 msgid "Filter pages"
 msgstr "ページを絞り込む"
 
@@ -1931,6 +1961,10 @@ msgstr "ggmailはこのリンクをブラウザで開けません。"
 msgid "ggmail couldn't check for updates."
 msgstr "ggmailはアップデートを確認できませんでした。"
 
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "ggmail couldn’t confirm delivery. Check your system notification settings."
+msgstr "ggmail は通知の配信を確認できませんでした。システムの通知設定を確認してください。"
+
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail couldn't delete this account's browsing data. Try again."
 msgstr "ggmailはこのアカウントの閲覧履歴データを削除できませんでした。もう一度お試しください。"
@@ -1971,10 +2005,6 @@ msgstr "ggmailはこのアカウントのログイン状態を保持しますが
 msgid "ggmail needs at least one account turned on."
 msgstr "少なくとも1つのアカウントをオンにする必要があります。"
 
-#: packages/renderer/routes/settings/ai.tsx
-msgid "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
-msgstr "質問すると、その内容と関連するメールがこのプロバイダーに送信されます。プロバイダーを切り替えると、新しいチャットが始まります。"
-
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
 msgstr "ggmailはこのアカウントからログアウトし、保存したタブやブックマークを含むデータをこのコンピュータから消去します。Gmailアカウント自体には影響しません。"
@@ -1993,6 +2023,7 @@ msgstr "Gmailのキーボードショートカット"
 msgid "Gmail Settings"
 msgstr "Gmailの設定"
 
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/titlebar.tsx
 msgid "Go back"
 msgstr "戻る"
@@ -2174,9 +2205,13 @@ msgid "Important only"
 msgstr "重要のみ"
 
 #. Heading of the Workspace apps already in the launcher
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "In launcher"
 msgstr "ランチャー内"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "In sidebar"
+msgstr "サイドバーに表示中"
 
 #. Heading of the Gmail page's section about Gmail's inbox; Inbox follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -2187,6 +2222,11 @@ msgstr "受信トレイ"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Inbox only"
 msgstr "受信トレイのみ"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+#: packages/renderer/routes/attachments.tsx
+msgid "Include embedded images"
+msgstr "埋め込み画像を含める"
 
 #. How long Do Not Disturb keeps notifications silenced, in its menu
 #: packages/app/do-not-disturb.ts
@@ -2498,6 +2538,8 @@ msgid "More filters"
 msgstr "その他のフィルター"
 
 #. Button in a Google Workspace app window's titlebar that opens its menu
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "More options"
 msgstr "その他のオプション"
@@ -2585,7 +2627,7 @@ msgid "No additional languages selected"
 msgstr "追加の言語は選択されていません"
 
 #. Available quotes the heading of the apps that can be added, so it matches that heading's wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "No apps in the launcher yet. Add one from Available."
 msgstr "ランチャーにはまだアプリがありません。“利用可能”から追加してください。"
 
@@ -2634,6 +2676,10 @@ msgstr "時間帯を追加する空き時間がありません。先にいずれ
 #: packages/app/context-menu.ts
 msgid "No Guesses Found"
 msgstr "候補が見つかりません"
+
+#: packages/renderer/bookmarks.tsx
+msgid "No matching bookmarks"
+msgstr "一致するブックマークはありません"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "No matching conversations"
@@ -2745,6 +2791,10 @@ msgstr "一度にオンにできるパスワードマネージャーは1つだ�
 #: packages/app/workspace-app.ts
 msgid "Only passkeys created in ggmail work here."
 msgstr "ここではggmailで作成したパスキーのみ使用できます。"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Only Settings is pinned. Add a shortcut from Available."
+msgstr "設定のみが固定されています。利用可能なアプリからショートカットを追加してください。"
 
 #. Option of the When to copy setting: when a detected verification code is copied to the clipboard
 #: packages/shared/verification-codes.ts
@@ -3012,6 +3062,10 @@ msgstr "通知を表示するときにサウンドを再生します。"
 msgid "Play sound"
 msgstr "サウンドを再生"
 
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Preview"
+msgstr "プレビュー"
+
 #: packages/renderer/components/attachments/files.tsx
 msgid "Preview attachment"
 msgstr "添付ファイルをプレビュー"
@@ -3182,9 +3236,13 @@ msgid "Remove"
 msgstr "削除"
 
 #. Screen reader label of the button that takes a Workspace app out of the launcher; label is the app's name
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Remove {label} from launcher"
 msgstr "{label}をランチャーから削除"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Remove {label} from sidebar"
+msgstr "{label} をサイドバーから削除"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove {label}?"
@@ -3307,6 +3365,10 @@ msgstr "ggmailを再起動してください。"
 msgid "Restart now"
 msgstr "今すぐ再起動"
 
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Restore defaults"
+msgstr "初期設定に戻す"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Restrict minimum window size"
 msgstr "ウィンドウの最小サイズを制限"
@@ -3408,6 +3470,10 @@ msgstr "すべてのアカウントを検索"
 #: packages/renderer/routes/attachments.tsx
 msgid "Search attachments"
 msgstr "添付ファイルを検索"
+
+#: packages/renderer/bookmarks.tsx
+msgid "Search bookmarks"
+msgstr "ブックマークを検索"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Search files, senders, or subjects"
@@ -3558,6 +3624,7 @@ msgstr "メールアシスタントを設定"
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/routes/settings/sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "設定"
@@ -3842,6 +3909,15 @@ msgstr "各アカウントの未読メールをまとめて表示します。"
 msgid "Show windows"
 msgstr "ウィンドウを表示"
 
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Sidebar"
+msgstr "サイドバー"
+
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Sidebar shortcuts"
+msgstr "サイドバーのショートカット"
+
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
@@ -3969,6 +4045,10 @@ msgstr "コンピュータにログインしたときに、アプリケーショ
 #: packages/renderer/routes/settings/general.tsx
 msgid "Start the application minimized."
 msgstr "アプリケーションを最小化した状態で起動します。"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Start time"
+msgstr "開始時刻"
 
 #. Heading of the Settings section about how ggmail starts
 #: packages/renderer/routes/settings/general.tsx
@@ -4171,7 +4251,7 @@ msgstr "保存した検索が削除されます。検索で見つかったメー
 msgid "This is the last version of ggmail for this Mac."
 msgstr "このMac向けのggmailの最終バージョンです。"
 
-#: packages/app/ipc.ts
+#: packages/shared/mail-notification.ts
 msgid "This is what a new email notification looks like."
 msgstr "新着メールの通知はこのように表示されます。"
 
@@ -4368,6 +4448,10 @@ msgid "User styles"
 msgstr "ユーザースタイル"
 
 #: packages/app/gmail/index.ts
+msgid "Verification code"
+msgstr "確認コード"
+
+#: packages/app/gmail/index.ts
 msgid "Verification code {verificationCode}"
 msgstr "確認コード{verificationCode}"
 
@@ -4458,6 +4542,10 @@ msgstr "別のタブがアクティブなとき"
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "When to copy"
 msgstr "コピーするタイミング"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "When you ask a question, ggmail sends recent chat history and relevant mail to the selected provider."
+msgstr "質問すると、ggmail は最近のチャット履歴と関連するメールを選択したプロバイダーに送信します。"
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Where downloaded files are saved."
@@ -4553,7 +4641,7 @@ msgid "Your ChatGPT usage limit was reached. Try again later."
 msgstr "ChatGPT の利用上限に達しました。後でもう一度お試しください。"
 
 #. Subject of the sample email in the test notification
-#: packages/app/ipc.ts
+#: packages/shared/mail-notification.ts
 msgid "Your test notification request"
 msgstr "テスト通知のリクエスト"
 

@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, realpath } from "node:fs/promises";
+import { mkdir, readdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { ms } from "@ggmail/shared/ms";
 import { expect, test } from "@playwright/test";
@@ -113,6 +113,45 @@ async function savedFiles() {
 function readSavedFile(name: string) {
   return readFile(path.join(downloadsLocation(), name), "utf8");
 }
+
+test("download history groups files by local date and removes empty date groups", async () => {
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const items = [
+    { fileName: "notes.txt", day: today },
+    { fileName: "invoice.pdf", day: today },
+    { fileName: "schedule.txt", day: yesterday },
+  ].map(({ fileName, day }) => ({
+    id: fileName,
+    fileName,
+    filePath: path.join(downloadsLocation(), fileName),
+    createdAt: day.getTime() / 1000,
+    exists: true,
+  }));
+  await Promise.all(items.map((item) => writeFile(item.filePath, "sample")));
+  const page = ggmail.renderer;
+  await page.evaluate(
+    (history) =>
+      window.electron.ipcRenderer.invoke("config.setConfig", { "downloads.history": history }),
+    items,
+  );
+  expect(await ggmail.runMenuCommand("Downloads")).toBe(true);
+  const groups = page.getByRole("main").getByRole("list");
+  await expect(groups).toHaveCount(2);
+  await expect(groups.first().getByRole("listitem")).toHaveCount(2);
+  await expect(groups.first().locator("time").first()).toHaveAttribute(
+    "datetime",
+    today.toISOString(),
+  );
+  await expect(groups.last().getByRole("button", { name: "schedule.txt" })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("download-history.png") });
+  await groups.last().getByRole("button", { name: "Remove from history" }).click();
+  await expect(groups).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 2 })).toHaveCount(1);
+  await expect.poll(historyNames).toEqual(["notes.txt", "invoice.pdf"]);
+});
 
 test("an ordinary download lands in the configured folder and the history, with its extension added", async () => {
   await watchDownloads();

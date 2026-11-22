@@ -282,8 +282,8 @@ msgstr "8 ώρες"
 
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
-msgid "A notification shows the code either way. Press its Copy button to copy the code yourself."
-msgstr "Ο κωδικός εμφανίζεται πάντα σε ειδοποίηση. Πατήστε «Αντιγραφή» για να τον αντιγράψετε."
+msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
+msgstr "Οι ειδοποιήσεις κωδικών ακολουθούν τις ρυθμίσεις ειδοποιήσεων email. Απενεργοποιήστε την «Εμφάνιση σύνοψης» για να αποκρύψετε τον κωδικό. Μπορείτε ακόμα να χρησιμοποιήσετε το κουμπί «Αντιγραφή»."
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -325,6 +325,7 @@ msgstr "Ενέργειες λογαριασμού"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Appearance section for how accounts look
 #: packages/app/menu.ts
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/mail-views.tsx
@@ -351,9 +352,13 @@ msgid "Add"
 msgstr "Προσθήκη"
 
 #. Screen reader label of the button that puts a Workspace app in the launcher; label is the app's name
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Add {label} to launcher"
 msgstr "Προσθήκη του {label} στην εκκίνηση εφαρμογών"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Add {label} to sidebar"
+msgstr "Προσθήκη {label} στην πλαϊνή γραμμή"
 
 #. allowlistEntry is the line to add to 1Password's list of allowed browsers, which stays as it is
 #: packages/renderer/routes/settings/extensions.tsx
@@ -589,7 +594,7 @@ msgid "Automatically select the first account with unread emails when clicking t
 msgstr "Αυτόματη επιλογή του πρώτου λογαριασμού με μη αναγνωσμένα μηνύματα όταν κάνετε κλικ στο εικονίδιο της περιοχής ειδοποιήσεων."
 
 #. Heading of the Workspace apps that can be added to the launcher
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Available"
 msgstr "Διαθέσιμο"
 
@@ -659,8 +664,10 @@ msgstr "Σελιδοδείκτης"
 
 #. Heading of the bookmarks popup
 #. Heading of the bookmarks popup
+#. Heading of the bookmarks popup
 #: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/routes/settings/sidebar.tsx
 msgid "Bookmarks"
 msgstr "Σελιδοδείκτες"
 
@@ -904,6 +911,7 @@ msgstr "Κατάργηση χρώματος"
 msgid "Clear filters"
 msgstr "Εκκαθάριση φίλτρων"
 
+#: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -916,6 +924,7 @@ msgstr "Εκκαθάριση αναζήτησης"
 #: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/popup.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
+#: packages/renderer/settings.tsx
 msgid "Close"
 msgstr "Κλείσιμο"
 
@@ -1165,6 +1174,10 @@ msgstr "Δεν ήταν δυνατός ο έλεγχος για συνημμέν
 msgid "Couldn’t check this mailbox."
 msgstr "Δεν ήταν δυνατός ο έλεγχος αυτού του γραμματοκιβωτίου."
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't clear the saved chat."
+msgstr "Δεν ήταν δυνατή η διαγραφή της αποθηκευμένης συνομιλίας."
+
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
 msgstr "Η σύνδεση στο ChatGPT απέτυχε. Δοκιμάστε ξανά."
@@ -1193,6 +1206,10 @@ msgstr "Αποτυχία εγκατάστασης του {extensionName}"
 #: packages/app/lib/extension-swap.ts
 msgid "Couldn't install the extension: {errorMessage}"
 msgstr "Αποτυχία εγκατάστασης επέκτασης: {errorMessage}"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't load the saved chat."
+msgstr "Δεν ήταν δυνατή η φόρτωση της αποθηκευμένης συνομιλίας."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't open {extensionName}"
@@ -1513,11 +1530,15 @@ msgstr "Σύνταξη μηνύματος"
 msgid "Draft email"
 msgstr "Πρόχειρο μήνυμα"
 
+#: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
-#: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Drag {label} to reorder"
 msgstr "Σύρετε το {label} για αλλαγή σειράς"
+
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Drag shortcuts into the order you want. Settings stays pinned at the bottom for all accounts."
+msgstr "Σύρετε τις συντομεύσεις στη σειρά που θέλετε. Οι Ρυθμίσεις παραμένουν καρφιτσωμένες στο κάτω μέρος για όλους τους λογαριασμούς."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
@@ -1632,6 +1653,10 @@ msgctxt "Windows"
 msgid "Enable system tray icon"
 msgstr "Ενεργοποίηση εικονιδίου περιοχής ειδοποιήσεων"
 
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "End time"
+msgstr "Ώρα λήξης"
+
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a color"
 msgstr "Εισαγάγετε ένα χρώμα"
@@ -1667,6 +1692,10 @@ msgstr "Εισαγάγετε έγκυρο χρώμα hex, rgb ή rgba"
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Enter a website address, like {exampleSite}."
 msgstr "Εισαγάγετε διεύθυνση ιστοτόπου, όπως {exampleSite}."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Every day"
+msgstr "Κάθε μέρα"
 
 #. Setting that picks the Workspace apps that open in the external browser
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -1806,6 +1835,7 @@ msgid "Filter by account"
 msgstr "Φιλτράρισμα ανά λογαριασμό"
 
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/settings.tsx
 msgid "Filter pages"
 msgstr "Φίλτρο σελίδων"
 
@@ -1931,6 +1961,10 @@ msgstr "Το ggmail δεν μπορεί να ανοίξει αυτόν τον σ
 msgid "ggmail couldn't check for updates."
 msgstr "Ο έλεγχος του ggmail για ενημερώσεις απέτυχε."
 
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "ggmail couldn’t confirm delivery. Check your system notification settings."
+msgstr "Το ggmail δεν μπόρεσε να επιβεβαιώσει την παράδοση. Ελέγξτε τις ρυθμίσεις ειδοποιήσεων του συστήματός σας."
+
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail couldn't delete this account's browsing data. Try again."
 msgstr "Το ggmail δεν μπόρεσε να διαγράψει τα δεδομένα περιήγησης του λογαριασμού. Δοκιμάστε ξανά."
@@ -1971,10 +2005,6 @@ msgstr "Ο λογαριασμός παραμένει συνδεδεμένος σ
 msgid "ggmail needs at least one account turned on."
 msgstr "Το ggmail χρειάζεται τουλάχιστον έναν ενεργό λογαριασμό."
 
-#: packages/renderer/routes/settings/ai.tsx
-msgid "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
-msgstr "Όταν κάνετε μια ερώτηση, το ggmail στέλνει το αίτημά σας και τα σχετικά μηνύματα σε αυτόν τον πάροχο. Η αλλαγή παρόχου ξεκινά νέα συνομιλία."
-
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
 msgstr "Το ggmail αποσυνδέεται από τον λογαριασμό και διαγράφει τα δεδομένα του από αυτόν τον υπολογιστή, μαζί με αποθηκευμένες καρτέλες και σελιδοδείκτες. Ο λογαριασμός σας στο Gmail δεν επηρεάζεται."
@@ -1993,6 +2023,7 @@ msgstr "Συντομεύσεις πληκτρολογίου Gmail"
 msgid "Gmail Settings"
 msgstr "Ρυθμίσεις Gmail"
 
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/titlebar.tsx
 msgid "Go back"
 msgstr "Μετάβαση πίσω"
@@ -2174,9 +2205,13 @@ msgid "Important only"
 msgstr "Μόνο σημαντικά"
 
 #. Heading of the Workspace apps already in the launcher
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "In launcher"
 msgstr "Στην εκκίνηση εφαρμογών"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "In sidebar"
+msgstr "Στην πλαϊνή γραμμή"
 
 #. Heading of the Gmail page's section about Gmail's inbox; Inbox follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -2187,6 +2222,11 @@ msgstr "Εισερχόμενα"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Inbox only"
 msgstr "Μόνο εισερχόμενα"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+#: packages/renderer/routes/attachments.tsx
+msgid "Include embedded images"
+msgstr "Συμπερίληψη ενσωματωμένων εικόνων"
 
 #. How long Do Not Disturb keeps notifications silenced, in its menu
 #: packages/app/do-not-disturb.ts
@@ -2498,6 +2538,8 @@ msgid "More filters"
 msgstr "Περισσότερα φίλτρα"
 
 #. Button in a Google Workspace app window's titlebar that opens its menu
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "More options"
 msgstr "Περισσότερες επιλογές"
@@ -2585,7 +2627,7 @@ msgid "No additional languages selected"
 msgstr "Δεν έχουν επιλεγεί επιπλέον γλώσσες"
 
 #. Available quotes the heading of the apps that can be added, so it matches that heading's wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "No apps in the launcher yet. Add one from Available."
 msgstr "Δεν υπάρχουν ακόμη εφαρμογές στην εκκίνηση εφαρμογών. Προσθέστε μία από τις διαθέσιμες."
 
@@ -2634,6 +2676,10 @@ msgstr "Δεν υπάρχει διαθέσιμος χρόνος για άλλο 
 #: packages/app/context-menu.ts
 msgid "No Guesses Found"
 msgstr "Δεν βρέθηκαν προτάσεις"
+
+#: packages/renderer/bookmarks.tsx
+msgid "No matching bookmarks"
+msgstr "Δεν βρέθηκαν σελιδοδείκτες"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "No matching conversations"
@@ -2745,6 +2791,10 @@ msgstr "Μόνο ένας διαχειριστής κωδικών μπορεί �
 #: packages/app/workspace-app.ts
 msgid "Only passkeys created in ggmail work here."
 msgstr "Εδώ λειτουργούν μόνο κλειδιά πρόσβασης που έχουν δημιουργηθεί στο ggmail."
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Only Settings is pinned. Add a shortcut from Available."
+msgstr "Μόνο οι Ρυθμίσεις είναι καρφιτσωμένες. Προσθέστε μια συντόμευση από τις διαθέσιμες επιλογές."
 
 #. Option of the When to copy setting: when a detected verification code is copied to the clipboard
 #: packages/shared/verification-codes.ts
@@ -3012,6 +3062,10 @@ msgstr "Αναπαραγωγή ήχου κατά την εμφάνιση ειδ�
 msgid "Play sound"
 msgstr "Αναπαραγωγή ήχου"
 
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Preview"
+msgstr "Προεπισκόπηση"
+
 #: packages/renderer/components/attachments/files.tsx
 msgid "Preview attachment"
 msgstr "Προεπισκόπηση συνημμένου"
@@ -3182,9 +3236,13 @@ msgid "Remove"
 msgstr "Κατάργηση"
 
 #. Screen reader label of the button that takes a Workspace app out of the launcher; label is the app's name
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Remove {label} from launcher"
 msgstr "Κατάργηση του {label} από την εκκίνηση εφαρμογών"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Remove {label} from sidebar"
+msgstr "Κατάργηση {label} από την πλαϊνή γραμμή"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove {label}?"
@@ -3307,6 +3365,10 @@ msgstr "Επανεκκινήστε το ggmail."
 msgid "Restart now"
 msgstr "Επανεκκίνηση τώρα"
 
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Restore defaults"
+msgstr "Επαναφορά προεπιλογών"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Restrict minimum window size"
 msgstr "Περιορισμός ελάχιστου μεγέθους παραθύρου"
@@ -3408,6 +3470,10 @@ msgstr "Αναζήτηση σε όλους τους λογαριασμούς"
 #: packages/renderer/routes/attachments.tsx
 msgid "Search attachments"
 msgstr "Αναζήτηση συνημμένων"
+
+#: packages/renderer/bookmarks.tsx
+msgid "Search bookmarks"
+msgstr "Αναζήτηση στους σελιδοδείκτες"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Search files, senders, or subjects"
@@ -3558,6 +3624,7 @@ msgstr "Ρύθμιση βοηθού αλληλογραφίας"
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/routes/settings/sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "Ρυθμίσεις"
@@ -3842,6 +3909,15 @@ msgstr "Δείτε τα μη αναγνωσμένα μηνύματα των λο
 msgid "Show windows"
 msgstr "Εμφάνιση παραθύρων"
 
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Sidebar"
+msgstr "Πλαϊνή γραμμή"
+
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Sidebar shortcuts"
+msgstr "Συντομεύσεις πλαϊνής γραμμής"
+
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
@@ -3969,6 +4045,10 @@ msgstr "Αυτόματη εκκίνηση της εφαρμογής όταν σ�
 #: packages/renderer/routes/settings/general.tsx
 msgid "Start the application minimized."
 msgstr "Εκκίνηση της εφαρμογής σε ελαχιστοποίηση."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Start time"
+msgstr "Ώρα έναρξης"
 
 #. Heading of the Settings section about how ggmail starts
 #: packages/renderer/routes/settings/general.tsx
@@ -4171,7 +4251,7 @@ msgstr "Διαγράφεται η αποθηκευμένη αναζήτηση. �
 msgid "This is the last version of ggmail for this Mac."
 msgstr "Αυτή είναι η τελευταία έκδοση του ggmail για αυτό το Mac."
 
-#: packages/app/ipc.ts
+#: packages/shared/mail-notification.ts
 msgid "This is what a new email notification looks like."
 msgstr "Έτσι εμφανίζεται μια ειδοποίηση νέου μηνύματος."
 
@@ -4368,6 +4448,10 @@ msgid "User styles"
 msgstr "Προσαρμοσμένα στιλ"
 
 #: packages/app/gmail/index.ts
+msgid "Verification code"
+msgstr "Κωδικός επαλήθευσης"
+
+#: packages/app/gmail/index.ts
 msgid "Verification code {verificationCode}"
 msgstr "Κωδικός επαλήθευσης {verificationCode}"
 
@@ -4458,6 +4542,10 @@ msgstr "Όταν είναι ενεργή άλλη καρτέλα"
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "When to copy"
 msgstr "Πότε να γίνεται αντιγραφή"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "When you ask a question, ggmail sends recent chat history and relevant mail to the selected provider."
+msgstr "Όταν κάνετε μια ερώτηση, το ggmail στέλνει το πρόσφατο ιστορικό συνομιλίας και τα σχετικά email στον επιλεγμένο πάροχο."
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Where downloaded files are saved."
@@ -4553,7 +4641,7 @@ msgid "Your ChatGPT usage limit was reached. Try again later."
 msgstr "Εξαντλήθηκε το όριο χρήσης του ChatGPT. Δοκιμάστε ξανά αργότερα."
 
 #. Subject of the sample email in the test notification
-#: packages/app/ipc.ts
+#: packages/shared/mail-notification.ts
 msgid "Your test notification request"
 msgstr "Το αίτημά σας για δοκιμαστική ειδοποίηση"
 

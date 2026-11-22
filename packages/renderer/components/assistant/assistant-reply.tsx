@@ -50,14 +50,16 @@ export function DraftCard({
 
 export const AssistantReply = memo(function AssistantReply({
   reply,
-  contextKey,
+  turnId,
   inThread,
+  currentView,
   onSource,
   onInserted,
 }: {
   reply: Reply;
-  contextKey: string;
+  turnId: string;
   inThread: boolean;
+  currentView: boolean;
   onSource: (
     source: Reply["citations"][number],
     citations: Reply["citations"],
@@ -84,11 +86,11 @@ export const AssistantReply = memo(function AssistantReply({
     }
   }
 
-  async function insert(body: string) {
+  async function insert() {
     setError("");
     setInsertion("pending");
     try {
-      const result = await ipc.main.invoke("assistant.insertReply", body, contextKey);
+      const result = await ipc.main.invoke("assistant.insertReply", turnId);
       if (!result.ok) {
         setInsertion("ready");
         setError(result.message);
@@ -125,11 +127,7 @@ export const AssistantReply = memo(function AssistantReply({
           }
         >
           {inThread && (
-            <Button
-              size="sm"
-              disabled={insertion !== "ready"}
-              onClick={() => void insert(draft.body)}
-            >
+            <Button size="sm" disabled={insertion !== "ready"} onClick={() => void insert()}>
               {insertion === "inserted" ? (
                 <CheckIcon />
               ) : insertion === "pending" ? (
@@ -140,19 +138,21 @@ export const AssistantReply = memo(function AssistantReply({
               {insertion === "inserted" ? t`Inserted into reply` : t`Insert into reply`}
             </Button>
           )}
-          <Button
-            variant={inThread ? "ghost" : "outline"}
-            size="sm"
-            onClick={() => {
-              setError("");
-              void ipc.main
-                .invoke("assistant.openDraft", draft, contextKey)
-                .catch(() => setError(t`Couldn't open the draft in Gmail.`));
-            }}
-          >
-            <Trans comment="Open a suggested email in the Gmail composer">Open in Gmail</Trans>
-            <ArrowUpRightIcon />
-          </Button>
+          {currentView && (
+            <Button
+              variant={inThread ? "ghost" : "outline"}
+              size="sm"
+              onClick={() => {
+                setError("");
+                void ipc.main
+                  .invoke("assistant.openDraft", turnId)
+                  .catch(() => setError(t`Couldn't open the draft in Gmail.`));
+              }}
+            >
+              <Trans comment="Open a suggested email in the Gmail composer">Open in Gmail</Trans>
+              <ArrowUpRightIcon />
+            </Button>
+          )}
         </DraftCard>
       )}
       {(reply.citations.length > 0 || reply.text) && (

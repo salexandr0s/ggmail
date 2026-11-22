@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { WORKSPACE_SIDEBAR_WIDTH } from "./constants";
+import { workspaceSidebarWidth } from "./constants";
 
 export function assistantCoversMail(windowWidth: number) {
   return windowWidth <= 640;
@@ -7,7 +7,7 @@ export function assistantCoversMail(windowWidth: number) {
 
 export function assistantPanelWidth(windowWidth: number) {
   if (assistantCoversMail(windowWidth)) {
-    return Math.max(0, windowWidth - WORKSPACE_SIDEBAR_WIDTH);
+    return Math.max(0, windowWidth - workspaceSidebarWidth(windowWidth));
   }
   return Math.min(480, Math.max(380, Math.round(windowWidth / 3)));
 }
@@ -70,7 +70,9 @@ export type AssistantConnection = ConnectionState & { provider: AssistantProvide
 export const assistantRequestSchema = z.object({
   provider: assistantProviderSchema,
   id: z.uuid(),
-  scopeKey: z.string().min(1).max(2000),
+  origin: z.enum(["starter", "written"]).optional(),
+  retry: z.uuid().optional(),
+  scopeKey: z.string().min(1).max(2000).optional(),
   prompt: z.string().trim().min(1).max(ASSISTANT_PROMPT_LIMIT),
   model: z.string().min(1).max(128),
   effort: assistantEffortSchema.optional(),
@@ -133,6 +135,16 @@ export type AssistantReply = {
 };
 
 export type AssistantResult =
-  | { status: "complete"; reply: AssistantReply }
+  | { status: "complete"; reply: AssistantReply; scopeKey: string }
   | { status: "stopped" }
   | { status: "error"; message: string };
+
+export type AssistantTurn = {
+  id: string;
+  prompt: string;
+  origin: "starter" | "written";
+  scopeKey: string;
+  reply?: AssistantReply;
+  error?: string;
+  interrupted?: { text: string; draft?: AssistantDraft };
+};

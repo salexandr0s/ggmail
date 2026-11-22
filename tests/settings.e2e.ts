@@ -7,7 +7,12 @@ import { expect, type Locator, test } from "@playwright/test";
 import { seedAccount, seedSavedTab } from "./lib/accounts";
 import { useApp } from "./lib/app";
 import { setMinimumWindowWidth } from "./lib/page-fit";
-import { configSwitch, openSettingsPage, readSettingsPageLabels } from "./lib/settings";
+import {
+  configSwitch,
+  openSettingsPage,
+  readSettingsPageLabels,
+  showSettingsNavigation,
+} from "./lib/settings";
 
 const ggmail = useApp({
   accounts: [
@@ -207,13 +212,18 @@ test("picker chevrons stay at the right edge of the control", async () => {
     await checkChevron(mode);
     await mode.press("Enter");
     const selected = settings.getByRole("option", { selected: true });
-    const activePage = settings.getByTestId("settings-nav").locator('[aria-current="page"]');
+
     await expect(selected).toBeVisible();
-    await expect(activePage).toHaveCSS(
-      "background-color",
-      await selected.evaluate((item) => getComputedStyle(item).backgroundColor),
-    );
+    const selectedColor = await selected.evaluate((item) => getComputedStyle(item).backgroundColor);
     await settings.keyboard.press("Escape");
+    await showSettingsNavigation(settings);
+    await expect(settings.getByTestId("settings-nav").locator('[aria-current="page"]')).toHaveCSS(
+      "background-color",
+      selectedColor,
+    );
+    if (await settings.locator(".settings-nav-trigger").isVisible()) {
+      await settings.keyboard.press("Escape");
+    }
     await checkChevron(settings.getByLabel("Excluded apps", { exact: true }));
     await openSettingsPage(settings, "AI");
     await checkChevron(settings.getByRole("combobox", { name: "Mail assistant provider" }));
@@ -226,4 +236,312 @@ test("picker chevrons stay at the right edge of the control", async () => {
   await openSettingsPage(settings, "Accounts");
   await settings.getByRole("button", { name: "Add", exact: true }).click();
   await checkChevron(settings.getByRole("dialog").getByRole("combobox", { name: "Color" }));
+});
+
+test("compact Settings keeps the page, its filter and keyboard focus in reach", async () => {
+  const page = await ggmail.openSettings();
+  const resize = (width: number, height: number) =>
+    ggmail.app.evaluate(
+      ({ BrowserWindow }, size) => {
+        BrowserWindow.getAllWindows()
+          .find((win) => win.webContents.getURL().includes("settings.html"))
+          ?.setContentSize(size.width, size.height);
+      },
+      { width, height },
+    );
+  await ggmail.app.evaluate(({ nativeTheme }) => {
+    nativeTheme.themeSource = "light";
+  });
+  await resize(360, 440);
+  const opener = page.locator(".settings-nav-trigger");
+  await expect(opener).toBeInViewport();
+  const main = page.getByRole("main");
+  await expect(main).toHaveCSS("width", "360px");
+  await page.keyboard.press("/");
+  const sheet = page.getByRole("dialog");
+  const search = sheet.getByRole("searchbox");
+  await expect(search).toBeFocused();
+  await search.fill("xyzzy");
+  await expect(sheet.getByRole("status")).toHaveText("No matching pages");
+  await search.press("Escape");
+  await expect(search).toHaveValue("");
+  await search.press("ArrowDown");
+  await page.keyboard.press("End");
+  await expect(sheet.getByRole("button", { name: "About ggmail" })).toBeFocused();
+  await expect(search).toBeInViewport();
+  await page.keyboard.press("Escape");
+  await expect(opener).toBeFocused();
+  await opener.press("Enter");
+  await search.fill("appear");
+  await search.press("Enter");
+  await expect(page.getByTestId("settings-title")).toHaveText("Appearance");
+  await expect(page.getByRole("heading", { name: "Appearance", exact: true })).toBeFocused();
+  await page.screenshot({
+    path: test.info().outputPath("settings-compact.png"),
+    animations: "disabled",
+  });
+  await opener.click();
+  await page.screenshot({
+    path: test.info().outputPath("settings-navigation-compact.png"),
+    animations: "disabled",
+  });
+  await resize(1000, 600);
+  await expect(sheet).toBeHidden();
+  await expect(
+    page.getByTestId("settings-nav").getByRole("button", { name: "Appearance" }),
+  ).toHaveAttribute("aria-current", "page");
+  await resize(360, 360);
+  await expect(opener).toBeInViewport();
+  await expect(sheet).toBeHidden();
+  await openSettingsPage(page, "Accounts");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  const accountDialog = page.getByRole("dialog");
+  const fields = accountDialog.locator("form > [data-slot=field-group]");
+  await expect(accountDialog.getByRole("button", { name: "Add", exact: true })).toBeInViewport();
+  await fields.evaluate((el) => {
+    el.scrollTop = el.scrollHeight;
+  });
+  expect(await fields.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+  await accountDialog.getByRole("button", { name: "Cancel" }).click();
+  await openSettingsPage(page, "Downloads");
+  const control = configSwitch(page, "downloads.saveAs");
+  await control.click();
+  await expect.poll(async () => (await ggmail.readConfig())["downloads.saveAs"]).toBe(true);
+});
+
+test("sidebar shortcuts apply live, preserve open apps and leave Settings pinned after restart", async () => {
+  const rail = () => ggmail.renderer.getByRole("navigation", { name: "Workspace apps" });
+  const button = (name: string) => rail().getByRole("button", { name, exact: true });
+  const defaults = [
+    "Mail",
+    "Calendar",
+    "Google Tasks",
+    "Google Meet",
+    "Docs",
+    "Drive",
+    "Sheets",
+    "Bookmarks",
+    "Settings",
+  ];
+  await expect
+    .poll(() =>
+      rail()
+        .getByRole("button")
+        .evaluateAll((items) => items.map((item) => item.getAttribute("title"))),
+    )
+    .toEqual(defaults);
+  await ggmail.app.evaluate(({ session }) =>
+    session.fromPartition("persist:settings").protocol.handle("https", (request) => {
+      const host = new URL(request.url).hostname.split(".")[0];
+      return new Response("<title>" + host + " fixture</title>", {
+        headers: { "content-type": "text/html" },
+      });
+    }),
+  );
+  for (const name of ["Docs", "Drive", "Sheets"]) {
+    await button(name).click();
+    await expect(button(name)).toHaveAttribute("aria-current", "page");
+  }
+  let settings = await ggmail.openSettings();
+  await openSettingsPage(settings, "Sidebar");
+  const add = (name: string) =>
+    settings.getByRole("button", { name: "Add " + name + " to sidebar", exact: true });
+  const remove = (name: string) =>
+    settings.getByRole("button", { name: "Remove " + name + " from sidebar", exact: true });
+  await expect(remove("Settings")).toHaveCount(0);
+  await expect(
+    settings.locator('.sidebar-preview-footer [title="Bookmarks"] + hr + [title="Settings"]'),
+  ).toHaveCount(1);
+  await settings.screenshot({
+    path: test.info().outputPath("sidebar-settings.png"),
+    animations: "disabled",
+  });
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const win = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("settings.html"),
+    );
+    win?.setContentSize(360, 680);
+  });
+  await expect.poll(() => settings.evaluate(() => innerWidth)).toBe(360);
+  await expect(settings.locator(".sidebar-preview-footer [title='Settings']")).toBeInViewport();
+  const bookmarkLabel = settings
+    .getByRole("button", { name: "Drag Bookmarks to reorder" })
+    .locator("span");
+  expect(
+    await bookmarkLabel.evaluate(
+      (el) =>
+        el.getBoundingClientRect().height / Number.parseFloat(getComputedStyle(el).lineHeight),
+    ),
+  ).toBeLessThan(1.1);
+  await settings.screenshot({
+    path: test.info().outputPath("sidebar-settings-compact.png"),
+    animations: "disabled",
+  });
+  await remove("Sheets").click();
+  await expect(button("Sheets")).toHaveCount(0);
+  await expect(
+    ggmail.renderer
+      .getByRole("group", { name: "Tabs", exact: true })
+      .getByRole("button", { name: "sheets fixture", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await add("Sheets").click();
+  await expect(button("Sheets")).toHaveAttribute("aria-current", "page");
+  await add("Chat").click();
+  await expect(button("Chat")).toBeVisible();
+  await remove("Chat").click();
+  for (const name of [
+    "Gmail",
+    "Calendar",
+    "Tasks",
+    "Meet",
+    "Docs",
+    "Drive",
+    "Sheets",
+    "Bookmarks",
+  ]) {
+    await remove(name).click();
+  }
+  await expect(settings.locator(".sidebar-preview-footer hr")).toHaveCount(0);
+  await expect(rail().getByRole("button")).toHaveCount(1);
+  await expect(button("Settings")).toBeInViewport();
+  await ggmail.relaunch();
+  await expect(rail().getByRole("button")).toHaveCount(1);
+  const opened = ggmail.app.waitForEvent("window");
+  await button("Settings").click();
+  settings = await opened;
+  await settings.waitForURL((url) => url.pathname.endsWith("/settings.html"));
+  await openSettingsPage(settings, "Sidebar");
+  await settings.getByRole("button", { name: "Restore defaults" }).click();
+  await expect(rail().getByRole("button")).toHaveCount(defaults.length);
+  await expect(remove("Docs")).toBeVisible();
+});
+
+test("launcher app controls stay joined at full and compact widths", async () => {
+  const settings = await ggmail.openSettings();
+  await openSettingsPage(settings, "Workspace apps");
+  await settings.getByRole("button", { name: "Add Sheets to launcher" }).click();
+  await settings.getByRole("button", { name: "Add Apps Script to launcher" }).click();
+  const chip = settings.locator(".app-picker-chip").filter({ hasText: "Sheets" });
+  for (const width of [980, 360]) {
+    await ggmail.app.evaluate(
+      ({ BrowserWindow }, width) =>
+        BrowserWindow.getAllWindows()
+          .find((w) => w.webContents.getURL().includes("settings.html"))
+          ?.setContentSize(width, 680),
+      width,
+    );
+    await expect.poll(() => settings.evaluate(() => innerWidth)).toBe(width);
+    await settings
+      .getByText("Launcher apps", { exact: true })
+      .evaluate((legend) => legend.scrollIntoView({ block: "start" }));
+    await chip.scrollIntoViewIfNeeded();
+    const gap = await chip.evaluate((el) => {
+      const [handle, remove] = el.querySelectorAll("button");
+      if (!handle || !remove) {
+        throw new Error("Missing launcher chip control");
+      }
+      return remove.getBoundingClientRect().left - handle.getBoundingClientRect().right;
+    });
+    expect(Math.abs(gap)).toBeLessThanOrEqual(1);
+    await expect(
+      settings.getByRole("button", { name: "Remove Sheets from launcher" }),
+    ).toBeInViewport();
+    await settings.screenshot({
+      path: test.info().outputPath("launcher-" + width + ".png"),
+      animations: "disabled",
+    });
+  }
+  const drag = settings.getByRole("button", { name: "Drag Apps Script to reorder" });
+  await drag.focus();
+  await settings.keyboard.press("Space");
+  await settings.keyboard.press("ArrowLeft");
+  await settings.keyboard.press("Space");
+  await expect
+    .poll(async () => (await ggmail.readConfig())["workspaceApps.launcherApps"], { timeout: 4500 })
+    .toEqual(["appsScript", "sheets"]);
+  await settings.getByRole("button", { name: "Remove Sheets from launcher" }).click();
+  await expect(settings.getByRole("button", { name: "Add Sheets to launcher" })).toBeVisible();
+  await expect
+    .poll(async () => (await ggmail.readConfig())["workspaceApps.launcherApps"])
+    .toEqual(["appsScript"]);
+  await expect(
+    ggmail.renderer
+      .getByRole("navigation", { name: "Workspace apps" })
+      .getByRole("button", { name: "Sheets", exact: true }),
+  ).toBeVisible();
+});
+
+test("password manager rows share the panel surface in both themes", async () => {
+  const settings = await ggmail.openSettings();
+  await openSettingsPage(settings, "Extensions");
+  const rows = settings
+    .getByRole("list")
+    .filter({ has: settings.getByRole("switch", { name: "Install Bitwarden" }) });
+  for (const theme of ["light", "dark"] as const) {
+    await ggmail.app.evaluate(({ nativeTheme }, theme) => {
+      nativeTheme.themeSource = theme;
+    }, theme);
+    await expect
+      .poll(() => settings.evaluate(() => document.documentElement.classList.contains("dark")))
+      .toBe(theme === "dark");
+    await expect(rows.getByRole("listitem")).toHaveCount(2);
+    for (const row of await rows.getByRole("listitem").all()) {
+      await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    }
+    await expect(rows.getByRole("switch", { name: "Install Bitwarden" })).toBeDisabled();
+    await rows.screenshot({
+      path: test.info().outputPath("password-managers-" + theme + ".png"),
+      animations: "disabled",
+    });
+  }
+});
+
+test("dragging sidebar shortcuts changes their order across restarts and moves the bookmark popup", async () => {
+  let settings = await ggmail.openSettings();
+  await openSettingsPage(settings, "Sidebar");
+  const handle = (name: string) =>
+    settings.getByRole("button", { name: "Drag " + name + " to reorder", exact: true });
+  const source = handle("Bookmarks");
+  const target = handle("Gmail");
+  await source.scrollIntoViewIfNeeded();
+  const from = await source.boundingBox();
+  const to = await target.boundingBox();
+  if (!from || !to) {
+    throw new Error("Missing sidebar drag handles");
+  }
+  await source.hover();
+  await settings.mouse.down();
+  await settings.mouse.move(from.x + from.width / 2 - 10, from.y + from.height / 2, { steps: 4 });
+  await expect(source.locator("..")).toHaveCSS("opacity", "0.55");
+  await settings.mouse.move(to.x + 8, to.y + to.height / 2, { steps: 24 });
+  await settings.mouse.up();
+  const rail = () => ggmail.renderer.getByRole("navigation", { name: "Workspace apps" });
+  const first = () => rail().getByRole("button").first();
+  await expect(first()).toHaveAccessibleName("Bookmarks");
+  await expect(settings.getByRole("button", { name: "Restore defaults" })).toBeEnabled();
+  await ggmail.relaunch();
+  await expect(first()).toHaveAccessibleName("Bookmarks");
+  const opening = ggmail.renderer.context().waitForEvent("page");
+  await first().click();
+  const popup = await opening;
+  await expect(popup.getByRole("heading", { name: "Bookmarks", exact: true })).toBeVisible();
+  const top = await first().evaluate((el) => el.getBoundingClientRect().top);
+  const popupY = await ggmail.app.evaluate(({ BrowserWindow, WebContentsView }) => {
+    const main = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    const view = main?.contentView.children.find(
+      (v) => v instanceof WebContentsView && v.webContents.getURL().includes("bookmarks.html"),
+    );
+    return view?.getBounds().y;
+  });
+  expect(Math.abs((popupY ?? -100) - top)).toBeLessThanOrEqual(8);
+  await popup.getByRole("button", { name: "Close", exact: true }).click();
+  settings = await ggmail.openSettings();
+  await openSettingsPage(settings, "Sidebar");
+  await handle("Gmail").focus();
+  await settings.keyboard.press("Space");
+  await settings.keyboard.press("ArrowLeft");
+  await settings.keyboard.press("Space");
+  await expect(first()).toHaveAccessibleName("Mail");
 });
