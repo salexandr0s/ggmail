@@ -3,10 +3,10 @@ import type {
   AssistantActivity,
   AssistantConnection,
   AssistantContext,
-  AssistantDraft,
   AssistantProvider,
   AssistantRequest,
   AssistantResult,
+  AssistantTurn,
   SourcePreviewPage,
 } from "./assistant";
 import type {
@@ -19,6 +19,7 @@ import type { FollowUpRow } from "./follow-ups";
 import type { GmailAction, InboxUpdate, GmailSearchPage } from "./gmail";
 import type { CatalogTag } from "./i18n";
 import type { MailViewId } from "./mail-views";
+import type { NotificationTimeEdit } from "./notification-times";
 import type {
   AccountConfig,
   AccountConfigInput,
@@ -34,6 +35,7 @@ import type { AccountTabsState, VerticalTabsGmailUnreadBadge, SidebarWorkspaceAp
 import type { VerificationCodeCopyMode } from "./verification-codes";
 import type {
   LauncherWorkspaceApp,
+  SidebarShortcut,
   SupportedWorkspaceApp,
   WorkspaceAppBookmarkState,
   WorkspaceAppOpenBehavior,
@@ -176,6 +178,7 @@ export type Config = {
   "workspaceApps.openInApp": boolean;
   "workspaceApps.openInAppExcludedApps": SupportedWorkspaceApp[];
   "workspaceApps.mode": WorkspaceAppsMode;
+  "sidebar.shortcuts": SidebarShortcut[];
   "workspaceApps.launcherApps": LauncherWorkspaceApp[];
   "workspaceApps.launcherDisplay": WorkspaceAppsLauncherDisplay;
   "workspaceApps.persistZoom": boolean;
@@ -209,6 +212,8 @@ export type Config = {
   "extensions.additionalSites": Record<string, string[]>;
 };
 
+export type MenuModifiers = { ctrlKey: boolean; metaKey: boolean; shiftKey: boolean };
+
 export type IpcMainEvents =
   | {
       "accounts.selectAccount": [accountId: AccountConfig["id"], showMailbox?: boolean];
@@ -228,7 +233,6 @@ export type IpcMainEvents =
       "gmail.search": [searchQuery: string];
       "assistant.setMounted": [mounted: boolean];
       "assistant.setInset": [inset: number];
-      "assistant.clear": [];
       "assistant.closePreview": [id: string];
       "assistant.cancelSignIn": [];
       "assistant.stop": [requestId: string];
@@ -259,7 +263,6 @@ export type IpcMainEvents =
       "app.relaunch": [];
       "app.openDefaultAppsSettings": [];
       "theme.setTheme": [theme: "system" | "light" | "dark"];
-      "notifications.showTestNotification": [];
       "tabs.selectTab": [accountId: AccountConfig["id"], tabId: string];
       "tabs.closeTab": [accountId: AccountConfig["id"], tabId: string];
       "tabs.moveTab": [accountId: AccountConfig["id"], tabId: string, targetSectionIndex: number];
@@ -269,7 +272,7 @@ export type IpcMainEvents =
         app: SupportedWorkspaceApp,
         openBehavior?: WorkspaceAppOpenBehavior,
       ];
-      "bookmarks.togglePopup": [];
+      "bookmarks.togglePopup": [sidebarTop?: number];
       "bookmarks.closePopup": [];
       "bookmarks.setPopupCloseOnBlurEnabled": [enabled: boolean];
       "bookmarks.openBookmark": [accountId: AccountConfig["id"], bookmarkId: Bookmark["id"]];
@@ -291,6 +294,10 @@ export type IpcMainEvents =
       "swipeNavigation.setPageScrollEdge": [pageScrollEdge: PageScrollEdge];
     }
   | {
+      "titleBar.pickTool": (
+        labels: string[],
+        anchor: { x: number; y: number },
+      ) => ({ index: number } & MenuModifiers) | null;
       "followUps.current": () => { accountId: string; threadId: string; subject: string } | null;
       "followUps.schedule": (accountId: string, threadId: string, due: string) => boolean;
       "followUps.list": (accountId: string) => { rows: FollowUpRow[]; unavailable: boolean };
@@ -329,15 +336,14 @@ export type IpcMainEvents =
       "assistant.selectProvider": (provider: AssistantProvider) => AssistantConnection;
       "assistant.connect": (provider: AssistantProvider, apiKey?: string) => AssistantConnection;
       "assistant.disconnect": (provider: AssistantProvider) => AssistantConnection;
+      "assistant.transcript": () => AssistantTurn[];
+      "assistant.clear": () => void;
       "assistant.context": () => AssistantContext;
       "assistant.send": (request: AssistantRequest) => AssistantResult;
       "assistant.previewSource": (id: string, offset: number) => SourcePreviewPage;
       "assistant.openSource": (id: string) => void;
-      "assistant.openDraft": (draft: AssistantDraft, key: string) => void;
-      "assistant.insertReply": (
-        body: string,
-        key: string,
-      ) => { ok: true } | { ok: false; message: string };
+      "assistant.openDraft": (turnId: string) => void;
+      "assistant.insertReply": (turnId: string) => { ok: true } | { ok: false; message: string };
       "gmail.handleMessage": (
         accountId: AccountConfig["id"],
         messageId: string,
@@ -348,6 +354,10 @@ export type IpcMainEvents =
         dataTypes: BrowsingDataTypes,
       ) => void;
       "desktopSources.getSources": () => DesktopSources;
+      "notifications.editTime": (
+        edit: NotificationTimeEdit,
+      ) => "saved" | "unchanged" | "overlap" | "full";
+      "notifications.showTestNotification": () => "shown" | "muted" | "unconfirmed";
       "config.getConfig": () => Config;
       "config.setConfig": (config: Partial<Config>) => void;
       "spellchecker.getAvailableLanguages": () => string[];
@@ -363,6 +373,7 @@ export type IpcMainEvents =
       "updates.isBelowMinimumMacOSVersion": () => boolean;
       "about.exportLogs": () => { canceled: boolean };
       "workspaceApp.getLoadingState": (workspaceAppId?: string) => boolean;
+      "workspaceApp.getPageTitle": () => string;
       "workspaceApp.getBookmarkState": (workspaceAppId: string) => WorkspaceAppBookmarkState;
       "bookmarks.getBookmarks": () => BookmarkState[];
       "extensions.getInstalled": () => InstalledExtensionState[];

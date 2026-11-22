@@ -47,7 +47,9 @@ mock.module("./mail-context", () => ({
   openMailSource: (_scope: unknown, source: MailSource) => navigate(source),
   readMailSource: read,
   readMailPreview: preview,
+  resolveMailbox: () => primary,
   ensureCurrentScope: (_scope: unknown, signal: AbortSignal) => signal.throwIfAborted(),
+  ensureMailboxes: (_scope: unknown, signal: AbortSignal) => signal.throwIfAborted(),
   readCurrentMail: () => Promise.resolve({ kind: "mailView", sources }),
   searchAllMail: search,
 }));
@@ -101,6 +103,8 @@ test("citations keep their numbers when rows reorder and can only open in their 
   respondMock.mockResolvedValueOnce({ text: "Read [1]", items: [], calls: [] });
   const answer = await chat.send(request("First message?"), quiet);
   expect(answer.status).toBe("complete");
+  key = "other/inbox";
+  chat.context();
   sources = [second, first];
   respondMock.mockImplementationOnce(async ({ input }) => {
     expect(input.at(-1)).toMatchObject({
@@ -132,11 +136,9 @@ test("citations keep their numbers when rows reorder and can only open in their 
   expect(navigate).not.toHaveBeenCalled();
   chat.openSource(citation.id);
   expect(navigate).toHaveBeenLastCalledWith(expect.objectContaining(first));
-  key = "other/inbox";
-  await expect(chat.previewSource(citation.id, 0)).rejects.toThrow();
-  expect(() => chat.openSource(citation.id)).toThrow();
-  chat.context();
   key = "account/inbox";
+  chat.clear();
+  await expect(chat.previewSource(citation.id, 0)).rejects.toThrow();
   expect(() => chat.openSource(citation.id)).toThrow();
   sources = [];
 });
@@ -161,6 +163,25 @@ test("stopping a streamed reply leaves its partial answer out of the next reques
     return { text: "Complete", items: [], calls: [] };
   });
   expect((await chat.send(request("Retry"), quiet)).status).toBe("complete");
+});
+
+test("New chat discards a pending turn even when its provider responds late", async () => {
+  const chat = new AssistantChat();
+  const started = Promise.withResolvers<void>();
+  const finished = Promise.withResolvers<void>();
+  respondMock.mockImplementationOnce(async () => {
+    started.resolve();
+    await finished.promise;
+    return { text: "Old answer", items: [], calls: [] };
+  });
+  const pending = chat.send(request("Old question"), quiet);
+  await started.promise;
+  chat.clear();
+  respondMock.mockResolvedValueOnce({ text: "New answer", calls: [], items: [] });
+  await chat.send(request("New question"), quiet);
+  finished.resolve();
+  expect(await pending).toEqual({ status: "stopped" });
+  expect(chat.transcript().map(({ prompt }) => prompt)).toEqual(["New question"]);
 });
 
 function callTool(name: string, args: Record<string, unknown>) {

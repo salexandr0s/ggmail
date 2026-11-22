@@ -56,7 +56,7 @@ const ggmail = useApp(async ({ userDataDir }) => {
 
   return {
     "downloads.location": downloadsLocation,
-    // Exercise the titlebar launcher with apps distinct from the permanent shortcuts.
+    // Keep these apps in the titlebar launcher as well as in the sidebar.
     "workspaceApps.launcherApps": ["docs", "drive"],
     "workspaceApps.launcherDisplay": "collapsed",
     accounts: [
@@ -300,6 +300,42 @@ test("the launcher opens a workspace app that was never a saved tab", async () =
   await expect
     .poll(async () => (await readViews(ggmail)).at(-1)?.storagePath)
     .toContain(FIRST_ACCOUNT_ID);
+});
+
+test("the compact launcher keeps its app choices and dismisses without opening a tab", async () => {
+  await waitForRestoredViews();
+  const count = (await readViews(ggmail)).length;
+  await ggmail.app.evaluate(({ BrowserWindow, Menu }) => {
+    const win = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    win?.setMinimumSize(320, 320);
+    win?.setContentSize(360, 440);
+    let pick = false;
+    Menu.prototype.popup = function (options) {
+      Reflect.set(
+        globalThis,
+        "compactLauncherLabels",
+        this.items.map((item) => item.label),
+      );
+      if (pick) {
+        this.items.find((item) => item.label === "Drive")?.click();
+      }
+      pick = true;
+      options?.callback?.();
+    };
+  });
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "More options" }).click();
+  const launcher = page.getByRole("button", { name: "Open workspace app" });
+  await launcher.press("ArrowDown");
+  await expect
+    .poll(() => ggmail.app.evaluate(() => Reflect.get(globalThis, "compactLauncherLabels")))
+    .toEqual(["Docs", "Drive"]);
+  await expect(launcher).toHaveAttribute("aria-expanded", "false");
+  expect((await readViews(ggmail)).length).toBe(count);
+  await launcher.click();
+  await expect.poll(async () => (await readViews(ggmail)).length).toBe(count + 1);
 });
 
 test("a download from a workspace app lands on disk and in the history", async () => {

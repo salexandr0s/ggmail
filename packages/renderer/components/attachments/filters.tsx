@@ -5,6 +5,7 @@ import {
 } from "@ggmail/shared/attachments";
 import type { AccountConfig } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@ggmail/ui/components/dialog";
 import {
   Popover,
   PopoverContent,
@@ -12,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@ggmail/ui/components/popover";
 import { Plural, useLingui } from "@lingui/react/macro";
-import { FilesIcon, LayersIcon, SlidersHorizontalIcon } from "lucide-react";
+import { CheckIcon, FilesIcon, LayersIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
 import { AccountFilters, FilterButton } from "@/components/account-filters";
 import type { FacetCounts } from "@/lib/attachment-filters";
@@ -38,7 +39,8 @@ export function FormatFilters({
   return (
     <div role="group" aria-label={t`File type`} className="attachment-formats">
       {kinds.map(({ value, label }) => {
-        const Icon = value === "all" ? FilesIcon : kindIcons[value];
+        const pressed = value === "all" ? !selected.length : selected.includes(value);
+        const Icon = pressed ? CheckIcon : value === "all" ? FilesIcon : kindIcons[value];
         const countId = groupId + value;
         return (
           <button
@@ -48,7 +50,7 @@ export function FormatFilters({
             data-file-kind={value}
             aria-label={label}
             aria-describedby={countId}
-            aria-pressed={value === "all" ? !selected.length : selected.includes(value)}
+            aria-pressed={pressed}
             title={label}
             onClick={() => onKind(value)}
           >
@@ -128,44 +130,65 @@ export function FilterMenu({
   applied,
   count,
   onClear,
+  sheet = false,
   children,
 }: {
   title: string;
   applied: number;
   count: number;
   onClear?: () => void;
+  sheet?: boolean;
   children: ReactNode;
 }) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
+  const trigger = (
+    <Button variant={applied ? "secondary" : "outline"} size="sm" aria-label={title}>
+      <SlidersHorizontalIcon />
+      <span>{title}</span>
+      {applied > 0 && <span className="tabular-nums">{applied}</span>}
+    </Button>
+  );
+  const Title = sheet ? DialogTitle : PopoverTitle;
+  const content = (
+    <>
+      <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-x-3 border-b px-4 py-3">
+        <Title>{title}</Title>
+        <span
+          aria-live="polite"
+          aria-atomic="true"
+          className="text-xs text-muted-foreground tabular-nums"
+        >
+          <Plural value={count} one="# file" other="# files" />
+        </span>
+      </header>
+      <div className="attachment-filter-scroll">{children}</div>
+      <footer className="flex shrink-0 items-center justify-between gap-2 border-t px-4 py-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={!onClear}
+          onClick={onClear}
+        >{t`Clear filters`}</Button>
+        <Button size="sm" variant="secondary" onClick={() => setOpen(false)}>{t`Done`}</Button>
+      </footer>
+    </>
+  );
+  if (sheet) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger render={trigger} />
+        <DialogContent showCloseButton={false} className="attachment-filter-sheet">
+          {content}
+        </DialogContent>
+      </Dialog>
+    );
+  }
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        render={<Button variant={applied ? "secondary" : "outline"} size="sm" aria-label={title} />}
-      >
-        <SlidersHorizontalIcon />
-        <span>{title}</span>
-        {applied > 0 && <span className="tabular-nums">{applied}</span>}
-      </PopoverTrigger>
+      <PopoverTrigger render={trigger} />
       <PopoverContent align="start" className="attachment-filter-popover">
-        <div className="flex shrink-0 items-center justify-between gap-4 border-b px-3 py-2">
-          <div>
-            <PopoverTitle>{title}</PopoverTitle>
-            <span className="text-xs text-muted-foreground tabular-nums">
-              <Plural value={count} one="# file" other="# files" />
-            </span>
-          </div>
-        </div>
-        <div className="attachment-filter-scroll">{children}</div>
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t px-3 py-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={!onClear}
-            onClick={onClear}
-          >{t`Clear filters`}</Button>
-          <Button size="sm" variant="secondary" onClick={() => setOpen(false)}>{t`Done`}</Button>
-        </div>
+        {content}
       </PopoverContent>
     </Popover>
   );

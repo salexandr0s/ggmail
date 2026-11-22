@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { platform } from "@electron-toolkit/utils";
 import { getAccountLabel } from "@ggmail/shared/accounts";
-import { WORKSPACE_SIDEBAR_WIDTH, APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
+import { workspaceSidebarWidth, APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
 import {
   createGmailDelegatedAccountUrl,
   GMAIL_DELEGATED_ACCOUNT_URL_REGEXP,
@@ -21,6 +21,7 @@ import {
 } from "@ggmail/shared/gmail";
 import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { i18n } from "@ggmail/shared/i18n";
+import { mailNotificationContent } from "@ggmail/shared/mail-notification";
 import { ms } from "@ggmail/shared/ms";
 import { clamp, wait } from "@ggmail/shared/utils";
 import type { SupportedWorkspaceApp } from "@ggmail/shared/workspace-apps";
@@ -54,11 +55,7 @@ import {
   type ZoomDirection,
 } from "@/lib/zoom";
 import { main } from "@/main";
-import {
-  createNewEmailNotification,
-  createNotification,
-  isWithinNotificationTimes,
-} from "@/notifications";
+import { areMailNotificationsAllowed, createNotification } from "@/notifications";
 import { registerTabBroadcasts } from "@/tabs";
 import { appTray } from "@/tray";
 import { WorkspaceApp } from "@/workspace-app";
@@ -609,7 +606,7 @@ export class Gmail {
       return;
     }
 
-    const sidebarWidth = WORKSPACE_SIDEBAR_WIDTH;
+    const sidebarWidth = workspaceSidebarWidth(width);
 
     this.view.setBounds({
       x: sidebarWidth,
@@ -1075,119 +1072,82 @@ export class Gmail {
       // caught up by the time one is on screen.
       this.refreshInboxView();
 
-      const account = accounts.getAccount(this.accountId);
-
-      const hasMultipleAccounts = accounts.getAccountConfigs().length > 1;
-
-      // Fetched here rather than alongside the inbox feed so that a poll that
-      // brought nothing new, or one whose notifications the gates below drop
-      // anyway, costs no second request.
-      const notifiesNewMail =
+      const mailboxIsCurrent = () => !this.isDestroyed && generation === this.mailboxGeneration;
+      const checkImportance =
         newMailIndexes.length > 0 &&
-        config.get("notifications.enabled") &&
-        account.config.notifications &&
-        !config.get("doNotDisturb.enabled") &&
-        isWithinNotificationTimes();
-
-      const newEmailsToNotifyFor = notifiesNewMail ? config.get("notifications.newEmails") : "all";
-
-      const notifiableFeedEntryIds = filterNewMailIdsByImportance(
-        newIds,
-        newEmailsToNotifyFor,
-        newEmailsToNotifyFor === "important" ? await this.fetchImportantFeedEntryIds() : null,
-      );
+        areMailNotificationsAllowed(this.accountId) &&
+        config.get("notifications.newEmails") === "important";
+      const importantIds = checkImportance ? await this.fetchImportantFeedEntryIds() : null;
+      const notifiableIds = filterNewMailIdsByImportance(newIds, "important", importantIds);
 
       for (const newMailIndex of newMailIndexes.reverse()) {
-        const newMail = messages[newMailIndex];
-        const newMailFeedEntry = feedEntries[newMailIndex];
-
-        if (!newMail || !newMailFeedEntry) {
-          throw new Error("New mail not found");
+        if (!mailboxIsCurrent()) {
+          break;
+        }
+        const mail = messages[newMailIndex];
+        const entry = feedEntries[newMailIndex];
+        if (!mail || !entry || !this.inboxFeedBaseline?.ids.has(entry.id)) {
+          continue;
         }
 
-        let notificationTitle: string;
+        const canNotify = () =>
+          mailboxIsCurrent() &&
+          areMailNotificationsAllowed(this.accountId) &&
+          (config.get("notifications.newEmails") === "all" ||
+            (checkImportance && notifiableIds.has(entry.id)));
 
-        if (config.get("notifications.showSender")) {
-          notificationTitle = hasMultipleAccounts
-            ? `[${getAccountLabel(account.config.label)}] ${newMail.author.name}`
-            : newMail.author.name;
-        } else {
-          notificationTitle = getAccountLabel(account.config.label);
+        const code =
+          config.get("verificationCodes.autoCopy") &&
+          extractVerificationCode([mail.subject, mail.summary]);
+        const copyCode = async () => {
+          if (!code || !mailboxIsCurrent() || !(await copyText(code))) {
+            return false;
+          }
+
+          if (mailboxIsCurrent()) {
+            void this.handleCopiedCode(mail.id, mailboxIsCurrent);
+          }
+          return true;
+        };
+        // Automatic clipboard copying is independent of the desktop alert.
+        const copied =
+          code && config.get("verificationCodes.copyMode") !== "notificationClick"
+            ? await copyCode()
+            : false;
+        if (!canNotify()) {
+          continue;
         }
 
-        let subtitle: string | undefined;
+        const account = accounts.getAccount(this.accountId);
+        const preferences = config.store;
+        const content = mailNotificationContent(
+          {
+            sender: mail.author.name || mail.author.email,
+            subject: mail.subject,
+            summary: mail.summary,
+          },
+          preferences,
+          getAccountLabel(account.config.label),
+          accounts.getAccountConfigs().length > 1,
+          platform.isMacOS,
+        );
 
-        if (platform.isMacOS && config.get("notifications.showSubject")) {
-          subtitle = newMail.subject;
-        }
-
-        let body: string | undefined;
-
-        if (platform.isMacOS) {
-          if (config.get("notifications.showSummary")) {
-            body = newMail.summary;
-          }
-        } else {
-          const bodyLines: string[] = [];
-
-          if (config.get("notifications.showSubject")) {
-            bodyLines.push(newMail.subject);
-          }
-
-          if (config.get("notifications.showSummary")) {
-            bodyLines.push(newMail.summary);
-          }
-
-          if (bodyLines.length) {
-            body = bodyLines.join("\n");
-          }
-        }
-
-        if (config.get("verificationCodes.autoCopy")) {
-          const verificationCode = extractVerificationCode([newMail.subject, newMail.summary]);
-
-          if (verificationCode) {
-            const copyVerificationCode = async () => {
-              // Nothing touches the email until the code is actually on the
-              // clipboard: Electron 44's `writeText` resolves when the write
-              // lands, and marking read or deleting ahead of a write that then
-              // failed would lose the code outright.
-              if (!(await copyText(verificationCode))) {
-                return;
-              }
-
-              if (config.get("verificationCodes.autoMarkAsRead")) {
-                this.handleMessage(newMail.id, "markAsRead");
-              }
-
-              if (config.get("verificationCodes.autoDelete")) {
-                this.handleMessage(newMail.id, "delete");
-              }
-            };
-
-            // Marking as read and deleting ride along with the copy rather than
-            // with the detection, so that nothing touches an email the user has
-            // not yet acted on.
-            const copiesOnNotificationClick =
-              config.get("verificationCodes.copyMode") === "notificationClick";
-
-            if (!copiesOnNotificationClick) {
-              copyVerificationCode();
-            }
-
-            // Clicking a notification's body always activates the app on
-            // macOS, and Electron cannot opt out. An action button does not:
-            // Electron registers actions without the foreground option, so
-            // macOS delivers the press and leaves the user in the app they
-            // were signing in to. The body click stays as a fallback that
-            // copies too.
-            createNotification({
-              title: notificationTitle,
-              body: copiesOnNotificationClick
-                ? t`Verification code ${verificationCode}`
-                : t`Copied verification code ${verificationCode}`,
-              actions: copiesOnNotificationClick
-                ? [
+        if (code) {
+          const verificationCode = code;
+          const body = !preferences["notifications.showSummary"]
+            ? t`Verification code`
+            : copied
+              ? t`Copied verification code ${verificationCode}`
+              : t`Verification code ${verificationCode}`;
+          // Also offer Copy if the automatic clipboard write failed.
+          createNotification(
+            {
+              groupId: this.accountId,
+              title: content.title,
+              body,
+              actions: copied
+                ? undefined
+                : [
                     {
                       text: t({
                         message: "Copy",
@@ -1195,47 +1155,39 @@ export class Gmail {
                       }),
                       type: "button",
                     },
-                  ]
-                : undefined,
-              action: copiesOnNotificationClick ? copyVerificationCode : undefined,
-              click: copiesOnNotificationClick ? copyVerificationCode : undefined,
-            });
-
-            continue;
-          }
-        }
-
-        if (
-          !config.get("notifications.enabled") ||
-          !account.config.notifications ||
-          config.get("doNotDisturb.enabled") ||
-          !isWithinNotificationTimes() ||
-          !notifiableFeedEntryIds.has(newMailFeedEntry.id)
-        ) {
+                  ],
+              action: copied ? undefined : copyCode,
+              click: copied ? undefined : copyCode,
+            },
+            "newEmail",
+          );
           continue;
         }
 
-        createNewEmailNotification({
-          title: notificationTitle,
-          subtitle,
-          body,
-          actions: NEW_EMAIL_NOTIFICATION_ACTIONS.map(({ text }) => ({
-            text: i18n.t(text),
-            type: "button" as const,
-          })),
-          click: () => {
-            main.show();
-
-            accounts.openMessage(this.accountId, newMail.id);
+        createNotification(
+          {
+            ...content,
+            groupId: this.accountId,
+            actions: NEW_EMAIL_NOTIFICATION_ACTIONS.map(({ text }) => ({
+              text: i18n.t(text),
+              type: "button" as const,
+            })),
+            click: () => {
+              if (!mailboxIsCurrent()) {
+                return;
+              }
+              main.navigate("/");
+              accounts.openMessage(this.accountId, mail.id);
+            },
+            action: (index) => {
+              const notificationAction = NEW_EMAIL_NOTIFICATION_ACTIONS[index];
+              if (notificationAction && mailboxIsCurrent()) {
+                void this.handleMessage(mail.id, notificationAction.action);
+              }
+            },
           },
-          action: (index) => {
-            const notificationAction = NEW_EMAIL_NOTIFICATION_ACTIONS[index];
-
-            if (notificationAction) {
-              this.handleMessage(newMail.id, notificationAction.action);
-            }
-          },
-        });
+          "newEmail",
+        );
       }
     } catch (error) {
       if (superseded()) {
@@ -1251,6 +1203,15 @@ export class Gmail {
     }
 
     return "ok";
+  }
+
+  private async handleCopiedCode(messageId: string, mailboxIsCurrent: () => boolean) {
+    if (config.get("verificationCodes.autoMarkAsRead")) {
+      await this.handleMessage(messageId, "markAsRead");
+    }
+    if (config.get("verificationCodes.autoDelete") && mailboxIsCurrent()) {
+      await this.handleMessage(messageId, "delete");
+    }
   }
 
   /**

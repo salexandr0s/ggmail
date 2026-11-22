@@ -1,11 +1,7 @@
-import { move } from "@dnd-kit/helpers";
-import { DragDropProvider } from "@dnd-kit/react";
-import { useSortable } from "@dnd-kit/react/sortable";
 import { byPlatform } from "@ggmail/shared/platform";
 import { GMAIL_TAB_ID, verticalTabsGmailUnreadBadges } from "@ggmail/shared/tabs";
 import {
   DEV_WORKSPACE_APPS_HIBERNATION_TIMEOUT,
-  getAdditionalLauncherApps,
   type LauncherWorkspaceApp,
   launcherWorkspaceApps,
   type SupportedWorkspaceApp,
@@ -16,7 +12,6 @@ import {
   workspaceAppsModes,
 } from "@ggmail/shared/workspace-apps";
 import { Button } from "@ggmail/ui/components/button";
-import { ButtonGroup } from "@ggmail/ui/components/button-group";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -34,9 +29,10 @@ import {
 import { Kbd } from "@ggmail/ui/components/kbd";
 import { plural, select } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ChevronDownIcon, GripVerticalIcon, PlusIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 import { useId, useMemo } from "react";
 import type { Entries } from "type-fest";
+import { AppPicker } from "@/components/app-picker";
 import { ConfigSelectField } from "@/components/config-select-field";
 import { ConfigSwitchField } from "@/components/config-switch-field";
 import {
@@ -46,56 +42,10 @@ import {
   SettingsPanel,
   SettingsTitle,
 } from "@/components/settings";
-import { WorkspaceAppIcon } from "@/components/workspace-app-icon";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { useTabsStore } from "@/lib/stores";
 import { platform } from "@/lib/utils";
-
-function SortableLauncherAppItem({
-  app,
-  index,
-  onRemove,
-}: {
-  app: LauncherWorkspaceApp;
-  index: number;
-  onRemove: () => void;
-}) {
-  const { ref, handleRef, isDragging } = useSortable({ id: app, index });
-
-  const { t } = useLingui();
-
-  const label = launcherWorkspaceApps[app];
-
-  return (
-    <ButtonGroup ref={ref} className={isDragging ? "opacity-50" : undefined}>
-      <Button
-        ref={handleRef}
-        variant="outline"
-        size="xs"
-        className="cursor-grab touch-none"
-        aria-label={t`Drag ${label} to reorder`}
-      >
-        <GripVerticalIcon />
-        <WorkspaceAppIcon app={app} className="size-3.5" />
-        {label}
-      </Button>
-      <Button
-        variant="outline"
-        size="icon-xs"
-        onClick={onRemove}
-        aria-label={t({
-          message: `Remove ${label} from launcher`,
-          comment:
-            "Screen reader label of the button that takes a Workspace app out of the launcher; label is the app's name",
-        })}
-      >
-        <XIcon />
-      </Button>
-    </ButtonGroup>
-  );
-}
-
 export function WorkspaceAppsSettings() {
   const { config } = useConfig();
 
@@ -126,11 +76,7 @@ export function WorkspaceAppsSettings() {
     return;
   }
 
-  const launcherApps = getAdditionalLauncherApps(config["workspaceApps.launcherApps"]);
-
-  const availableApps = getAdditionalLauncherApps(
-    Object.keys(launcherWorkspaceApps) as LauncherWorkspaceApp[],
-  ).filter((app) => !launcherApps.includes(app));
+  const launcherApps = config["workspaceApps.launcherApps"];
 
   const excludedApps = config["workspaceApps.openInAppExcludedApps"];
 
@@ -397,87 +343,13 @@ export function WorkspaceAppsSettings() {
                   <Trans>Add Workspace apps to the launcher on the right of the titlebar.</Trans>
                 </FieldDescription>
               </FieldContent>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-medium text-muted-foreground">
-                    <Trans comment="Heading of the Workspace apps already in the launcher">
-                      In launcher
-                    </Trans>
-                  </div>
-                  {launcherApps.length === 0 ? (
-                    <p className="rounded-lg border border-dashed px-3 py-4 text-center text-sm text-muted-foreground">
-                      <Trans comment="Available quotes the heading of the apps that can be added, so it matches that heading's wording">
-                        No apps in the launcher yet. Add one from Available.
-                      </Trans>
-                    </p>
-                  ) : (
-                    <DragDropProvider
-                      onDragEnd={(event) => {
-                        if (event.canceled) {
-                          return;
-                        }
-
-                        configMutation.mutate({
-                          "workspaceApps.launcherApps": move(launcherApps, event),
-                        });
-                      }}
-                    >
-                      <div className="flex flex-row flex-wrap gap-2">
-                        {launcherApps.map((app, index) => (
-                          <SortableLauncherAppItem
-                            key={app}
-                            app={app}
-                            index={index}
-                            onRemove={() => {
-                              configMutation.mutate({
-                                "workspaceApps.launcherApps": launcherApps.filter(
-                                  (value) => value !== app,
-                                ),
-                              });
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </DragDropProvider>
-                  )}
-                </div>
-                {availableApps.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <div className="text-xs font-medium text-muted-foreground">
-                      <Trans comment="Heading of the Workspace apps that can be added to the launcher">
-                        Available
-                      </Trans>
-                    </div>
-                    <div className="flex flex-row flex-wrap gap-2">
-                      {availableApps.map((app) => {
-                        const label = launcherWorkspaceApps[app];
-
-                        return (
-                          <Button
-                            key={app}
-                            variant="outline"
-                            size="xs"
-                            onClick={() => {
-                              configMutation.mutate({
-                                "workspaceApps.launcherApps": [...launcherApps, app],
-                              });
-                            }}
-                            aria-label={t({
-                              message: `Add ${label} to launcher`,
-                              comment:
-                                "Screen reader label of the button that puts a Workspace app in the launcher; label is the app's name",
-                            })}
-                          >
-                            <WorkspaceAppIcon app={app} className="size-3.5" />
-                            {label}
-                            <PlusIcon />
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <AppPicker
+                destination="launcher"
+                choices={Object.keys(launcherWorkspaceApps) as LauncherWorkspaceApp[]}
+                selected={launcherApps}
+                labelFor={(app) => launcherWorkspaceApps[app]}
+                onChange={(next) => configMutation.mutate({ "workspaceApps.launcherApps": next })}
+              />
             </Field>
             <ConfigSelectField
               label={t`Launcher display`}

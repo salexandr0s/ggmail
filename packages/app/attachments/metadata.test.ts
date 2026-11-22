@@ -76,6 +76,63 @@ describe("Gmail attachment metadata", () => {
     ).toBe("invoice");
   });
 
+  test("matches body images by message part or content ID and keeps ordinary image attachments", () => {
+    const link = (part: number) => `?view=att&th=${message}&attid=0.${part}`;
+    const tiles = [
+      tile(link(1), "award.png"),
+      tile(link(2) + "&realattid=sig%40mail", "signature.jpg"),
+      tile(link(3) + "&disp=inline", "small.png").replace("<img>", `<img src="${link(3)}">`),
+      tile(link(4), "notes.pdf"),
+      tile(link(5), "image001.png"),
+      tile(link(6), "image001.png"),
+      tile(link(7) + "&realattid=banner", "banner.png"),
+      tile(link(8) + "&disp=emb", "badge.gif"),
+    ].join("");
+    const body = [
+      link(1).replace("view=att", "view=fimg"),
+      "cid:sig%40mail",
+      link(3).replace(message, thread),
+      "https://external.test/" + link(3),
+      link(4),
+      "cid:image001.png@sender",
+      `?view=fimg&th=${message}&realattid=banner`,
+      "cid:%",
+    ]
+      .map((src) => `<img src="${src}">`)
+      .join("");
+    const entries = readPrintAttachments(printDocument(tiles, body), mailbox, thread, "");
+    expect(entries.map(({ file }) => file.isEmbeddedImage)).toEqual([
+      true,
+      true,
+      false,
+      undefined,
+      false,
+      false,
+      true,
+      true,
+    ]);
+  });
+
+  test("recognizes a template graphics branch while keeping standalone and mixed files visible", () => {
+    const tiles = (parent: string, names: string[]) =>
+      names
+        .map((name, i) => tile(`?view=att&th=${message}&attid=${parent}.${i + 1}`, name))
+        .join("");
+    const names = ["a", "b", "c", "d"].map((s) => s.repeat(32) + ".png");
+    const attachments =
+      tiles("0.1", names) +
+      tiles("0", names) +
+      tiles("0.2", [...names, "photo.jpg"]) +
+      tiles("0.3", names.slice(0, 1));
+    const entries = readPrintAttachments(printDocument(attachments), mailbox, thread, "");
+    expect(entries.filter(({ file }) => file.isEmbeddedImage).map(({ part }) => part)).toEqual([
+      "0.1.1",
+      "0.1.2",
+      "0.1.3",
+      "0.1.4",
+    ]);
+  });
+
   test("keeps quoted replies and signatures out of enclosure hints", () => {
     const parse = (body: string) =>
       readPrintAttachments(

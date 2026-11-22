@@ -29,6 +29,20 @@ function activeMailboxes() {
   });
 }
 
+function mailboxIdentities(ready: ReturnType<typeof activeMailboxes>) {
+  return new Set(
+    ready.map(({ accountId, mailbox, ownerEmail, gmail }) =>
+      JSON.stringify([
+        accountId,
+        mailbox,
+        ownerEmail,
+        gmail.mailboxGeneration,
+        gmail.view.webContents.id,
+      ]),
+    ),
+  );
+}
+
 export function getAssistantMailboxes() {
   const ready = new Map(activeMailboxes().map((account) => [account.accountId, account]));
   return accounts.getAccountConfigs().map(({ id, label }) => ({
@@ -42,6 +56,7 @@ export function getAssistantMailboxes() {
 type Scope = {
   kind: AssistantScope;
   unified: boolean;
+  identities: Set<string>;
   key: string;
   accountId: string;
   accountLabel: string;
@@ -57,28 +72,24 @@ export function getMailScope(): Scope {
   const accountLabel = account.config.label;
   const unified = main.location === "/unified-inbox";
   const ready = activeMailboxes();
-  // A sign-in or delegation change invalidates earlier cross-account results and citations.
-  const identity = ready.map(({ accountId, mailbox, ownerEmail, gmail }) => [
-    gmail.mailboxGeneration,
-    gmail.view.webContents.id,
-    accountId,
-    mailbox,
-    ownerEmail,
-  ]);
+  const selected = ready.find((item) => item.accountId === accountId);
+  const mailbox = selected?.mailbox;
+  // Drafts can return to their original thread after a restart. Live reads
+  // separately check mailbox generations to detect sign-in and delegation changes.
   const contextKey = (view: string) =>
     // oxlint-disable-next-line lingui/no-unlocalized-strings -- Node hash algorithm.
     createHash("sha256")
-      .update(JSON.stringify([accountId, identity, main.location, view]))
+      .update(JSON.stringify([accountId, mailbox, selected?.ownerEmail, main.location, view]))
       .digest("hex");
   const chat: Scope = {
     kind: "chat",
     key: contextKey("chat"),
+    identities: mailboxIdentities(ready),
     unified,
     accountId,
     accountLabel,
     gmail,
   };
-  const mailbox = ready.find((item) => item.accountId === accountId)?.mailbox;
   if (main.location !== "/" || !mailbox || tabs.activeTab.id !== GMAIL_TAB_ID) {
     return chat;
   }
@@ -88,7 +99,7 @@ export function getMailScope(): Scope {
   const kind = threadId ? "thread" : hash === "#all" ? "allMail" : "mailView";
   const key = contextKey(threadId ?? hash);
 
-  return { kind, key, unified, accountId, accountLabel, gmail, mailbox, hash };
+  return { ...chat, kind, key, mailbox, hash };
 }
 
 // Photos are UI metadata from Gmail's message header. Never load an inline
@@ -228,19 +239,41 @@ async function readDom(view: WebContents, code: string): Promise<unknown> {
   return view.executeJavaScriptInIsolatedWorld(1243, [{ code }]);
 }
 
+function hasOriginalMailboxes(scope: Scope, current = mailboxIdentities(activeMailboxes())) {
+  return Array.from(scope.identities).every((identity) => current.has(identity));
+}
+
+export function ensureMailboxes(scope: Scope, signal: AbortSignal) {
+  signal.throwIfAborted();
+  if (!hasOriginalMailboxes(scope)) {
+    throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
+  }
+}
+
 export function ensureCurrentScope(scope: Scope, signal: AbortSignal) {
   signal.throwIfAborted();
-  if (getMailScope().key !== scope.key) {
+  const current = getMailScope();
+  if (current.key !== scope.key || !hasOriginalMailboxes(scope, current.identities)) {
     throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
   }
 }
 
 export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
-  ensureCurrentScope(scope, signal);
+  ensureMailboxes(scope, signal);
   if (scope.kind === "chat" || !scope.hash || !scope.mailbox) {
     return { kind: scope.kind, sources: [] };
   }
 
+  // The selected profile can change while the original Gmail view is being read.
+  // Check the original document itself before accepting its DOM snapshot.
+  function checkDocument() {
+    ensureMailboxes(scope, signal);
+    const url = new URL(scope.gmail.view.webContents.getURL());
+    if ((url.hash.split("?")[0] || "#inbox") !== scope.hash) {
+      throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
+    }
+  }
+  checkDocument();
   const identity = {
     accountId: scope.accountId,
     mailbox: scope.mailbox,
@@ -249,7 +282,7 @@ export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
   const view = scope.gmail.view.webContents;
   if (scope.kind === "thread") {
     const parsed = threadSchema.safeParse(await readDom(view, readThread));
-    ensureCurrentScope(scope, signal);
+    checkDocument();
     const thread = parsed.success ? parsed.data : undefined;
     const route = parseGmailMessageId(scope.hash);
     const routeId = route && legacyThreadId.test(route) ? route : undefined;
@@ -291,7 +324,7 @@ export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
     .array(snippetSchema)
     .max(16)
     .safeParse(await readDom(view, readRows));
-  ensureCurrentScope(scope, signal);
+  checkDocument();
   const rows = snippetsToSources(parsed.data ?? [], scope.hash, identity);
   return {
     kind: scope.kind,
@@ -302,7 +335,7 @@ export async function readCurrentMail(scope: Scope, signal: AbortSignal) {
   };
 }
 
-function resolveMailbox(source: MailboxIdentity) {
+export function resolveMailbox(source: MailboxIdentity) {
   return activeMailboxes().find(
     (entry) =>
       entry.accountId === source.accountId &&
@@ -318,7 +351,7 @@ export async function searchAllMail(
   accountId: string,
   page: number,
 ) {
-  ensureCurrentScope(scope, signal);
+  ensureMailboxes(scope, signal);
   const account = activeMailboxes().find((mailbox) => mailbox.accountId === accountId);
   const unavailable = {
     // oxlint-disable-next-line lingui/no-unlocalized-strings -- Model tool error.
@@ -341,7 +374,7 @@ export async function searchAllMail(
       signal,
       true,
     );
-    ensureCurrentScope(scope, signal);
+    ensureMailboxes(scope, signal);
     if (!resolveMailbox(account)) {
       return unavailable;
     }
@@ -359,7 +392,7 @@ export async function searchAllMail(
       complete: !more,
     };
   } catch {
-    ensureCurrentScope(scope, signal);
+    ensureMailboxes(scope, signal);
     return unavailable;
   }
 }
@@ -370,7 +403,7 @@ async function readSource<T>(
   signal: AbortSignal,
   parse: (html: string) => T,
 ) {
-  ensureCurrentScope(scope, signal);
+  ensureMailboxes(scope, signal);
   const mailbox = resolveMailbox(source);
   if (!mailbox || !source.threadId || !legacyThreadId.test(source.threadId)) {
     // oxlint-disable-next-line lingui/no-unlocalized-strings -- Model tool error.
@@ -387,13 +420,13 @@ async function readSource<T>(
       throw new Error();
     }
     const html = await response.text();
-    ensureCurrentScope(scope, signal);
+    ensureMailboxes(scope, signal);
     if (!resolveMailbox(source)) {
       throw new Error();
     }
     return parse(html);
   } catch {
-    ensureCurrentScope(scope, signal);
+    ensureMailboxes(scope, signal);
     return {
       // oxlint-disable-next-line lingui/no-unlocalized-strings -- Model tool error.
       error: "Gmail could not read this conversation at that offset. Its contents are unverified.",
@@ -416,7 +449,7 @@ export function readMailPreview(scope: Scope, source: MailSource, signal: AbortS
 
 export function openMailSource(scope: Scope, source: MailSource) {
   const mailbox = resolveMailbox(source);
-  if (getMailScope().key !== scope.key || !mailbox) {
+  if (!hasOriginalMailboxes(scope) || !mailbox) {
     throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
   }
   accounts.getAccount(source.accountId).instance.tabs.activateTab(GMAIL_TAB_ID);

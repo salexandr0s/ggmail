@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { setTimeout as delay } from "node:timers/promises";
 import { expect, test, type Locator } from "@playwright/test";
 import { useApp } from "./lib/app";
 
@@ -33,6 +34,7 @@ const mail = {
       files: [
         ["Identity overview.pdf", "2.4 MB"],
         ["Wordmark studies.png", "840 KB"],
+        ["Studio signature.png", "12 KB"],
       ],
     },
     [older]: {
@@ -102,6 +104,9 @@ let handoverThumbnails = 0;
 let searchImageRequests = 0;
 let fileRequests = 0;
 let missingSnapshots = false;
+let thumbnailDelay = 0;
+let wordmarkThumbnails = 0;
+let holdOriginal: Promise<void> | undefined;
 
 test.beforeEach(() => {
   useMixedDocuments = false;
@@ -122,6 +127,9 @@ test.beforeEach(() => {
   searchImageRequests = 0;
   fileRequests = 0;
   missingSnapshots = false;
+  thumbnailDelay = 0;
+  wordmarkThumbnails = 0;
+  holdOriginal = undefined;
 });
 
 const server = createServer(async (request, response) => {
@@ -130,8 +138,12 @@ const server = createServer(async (request, response) => {
   const label = work ? "Work" : "Personal";
   const threads = mail[label];
   if (url.searchParams.get("disp") === "thd") {
+    response.setHeader("Cache-Control", "private, max-age=0");
     const id = url.searchParams.get("th") as ThreadId;
     const part = url.searchParams.get("attid");
+    if (work && id === second && part === "0.2") {
+      wordmarkThumbnails++;
+    }
     const index = Number(part?.split(".").at(-1)) - 1;
     const name =
       useMixedDocuments && work && id === first
@@ -139,6 +151,9 @@ const server = createServer(async (request, response) => {
         : threads[id]?.files[index]?.[0];
     if (work && id === older && part === "0.1") {
       handoverThumbnails++;
+    }
+    if (thumbnailDelay) {
+      await delay(thumbnailDelay);
     }
     if (missingSnapshots && work && id === second && part === "0.2") {
       response.setHeader("Content-Type", "image/png");
@@ -153,6 +168,9 @@ const server = createServer(async (request, response) => {
   }
   if (url.searchParams.get("view") === "att") {
     fileRequests++;
+    if (work && url.searchParams.get("th") === second && url.searchParams.get("attid") === "0.1") {
+      await holdOriginal;
+    }
     if (work && url.searchParams.get("th") === second && url.searchParams.get("attid") === "0.2") {
       response.setHeader("Content-Type", "image/png");
       response.end(await readFile(picture));
@@ -199,14 +217,18 @@ const server = createServer(async (request, response) => {
       return;
     }
     const mixed = useMixedDocuments && work && id === first;
-    const body = mixed ? "<div>Facture : 01.pdf et reçu pour la facture : 02.pdf.</div>" : "";
+    const body = mixed
+      ? "<div>Facture : 01.pdf et reçu pour la facture : 02.pdf.</div>"
+      : work && id === second
+        ? `<div><img src="?view=att&amp;th=${id}&amp;attid=0.3&amp;disp=emb"></div>`
+        : "";
     const files = mixed ? mixedDocuments.map(([name]) => [name, "12 KB"]) : thread.files;
     const currentFiles =
       changedWork && work && id === first ? [["New invoice.pdf", "11 KB"]] : files;
     const tiles = currentFiles
       .map(
         ([name, size], index) =>
-          `<table class="att"><tr><td><table><tr><td><a href="?view=att&amp;th=${id}&amp;attid=0.${index + 1}"><img></a></td><td><b>${name}</b><br>${size}</td></tr></table></td></tr></table>`,
+          `<table class="att"><tr><td><table><tr><td><a href="?view=att&amp;th=${id}&amp;attid=0.${index + 1}"><img></a></td><td><b>${holdOriginal && name === "Identity overview.pdf" ? "Slow image.png" : name}</b><br>${size}</td></tr></table></td></tr></table>`,
       )
       .join("");
     response.end(
@@ -627,6 +649,15 @@ test("filters by exact extension, sender, size and received dates, and recovers 
   const size = menu.getByLabel("Size", { exact: true });
   const from = menu.getByLabel("Received from");
   const through = menu.getByLabel("Received through");
+  const embedded = menu.getByRole("checkbox", { name: "Include embedded images" });
+  await expect(embedded).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Studio signature.png" })).toHaveCount(0);
+  await embedded.press("Space");
+  await expect(menu.getByText("11 files", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Studio signature.png" })).toHaveCount(1);
+  await menu.getByRole("button", { name: "Clear filters" }).click();
+  await expect(embedded).not.toBeChecked();
+  await expect(menu.getByText("10 files", { exact: true })).toBeVisible();
   await sender.fill("chen mira");
   await ext.press("Enter");
   await expect(page.getByRole("listbox")).toBeVisible();
@@ -898,9 +929,109 @@ test("reuses the Gmail search document and loaded thumbnails across layouts", as
   expect(fileRequests).toBe(0);
 });
 
-test("renders image and PDF covers when a Gmail thumbnail is a placeholder or missing", async () => {
+test("loads a nearby row before it scrolls into view", async () => {
+  useMixedDocuments = true;
+  await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  await ggmail.app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("main.html"))
+      ?.setSize(1200, 540),
+  );
+  await page.getByRole("button", { name: "Attachments", exact: true }).click();
+  await expect(page.getByText("18 files", { exact: true })).toBeVisible();
+  const row = page.getByRole("listitem").filter({ hasText: "Project handover.pdf" });
+  expect(handoverThumbnails).toBe(0);
+  await row.evaluate((el) => {
+    const viewport = el.closest("[data-attachment-viewport]");
+    if (!viewport) {
+      throw new Error("Missing attachment viewport");
+    }
+    viewport.scrollTop +=
+      el.getBoundingClientRect().top - viewport.getBoundingClientRect().bottom - 80;
+  });
+  await expect(row).not.toBeInViewport();
+  const image = row.locator(".attachment-miniature img");
+  await image.waitFor({ state: "attached" });
+  await image.evaluate((img: HTMLImageElement) => img.decode());
+  await row.scrollIntoViewIfNeeded();
+  await expect(image).toBeInViewport();
+  expect(handoverThumbnails).toBe(1);
+  expect(fileRequests).toBe(0);
+});
+
+test("paints a saved thumbnail after restart without waiting for Gmail", async () => {
+  thumbnailDelay = 350;
+  async function timeToImage() {
+    const page = ggmail.renderer;
+    await page.evaluate(() => {
+      document.addEventListener(
+        "click",
+        () => {
+          performance.mark("open-library");
+          function frame() {
+            const row = [...document.querySelectorAll(".attachment-row")].find((el) =>
+              el.textContent.includes("Wordmark studies.png"),
+            );
+            const img = row?.querySelector<HTMLImageElement>(".attachment-miniature img");
+            if (img?.complete && img.naturalWidth && img.getBoundingClientRect().height) {
+              performance.measure("thumbnail-ready", "open-library");
+            } else {
+              requestAnimationFrame(frame);
+            }
+          }
+          requestAnimationFrame(frame);
+        },
+        { capture: true, once: true },
+      );
+    });
+    await page.getByRole("button", { name: "Attachments", exact: true }).click();
+    const timing = await page.waitForFunction(
+      () => performance.getEntriesByName("thumbnail-ready")[0]?.duration,
+    );
+    return Math.round(Number(await timing.jsonValue()));
+  }
+  await identifyProfiles();
+  const cold = await timeToImage();
+  expect(wordmarkThumbnails).toBe(1);
+  holdListing = true;
+  try {
+    await ggmail.relaunch();
+    await identifyProfiles();
+    const restored = await timeToImage();
+    await test.info().attach("thumbnail-latency", {
+      body: JSON.stringify({ cold, restored, wordmarkThumbnails }),
+      contentType: "application/json",
+    });
+    expect(wordmarkThumbnails, JSON.stringify({ cold, restored })).toBe(1);
+  } finally {
+    holdListing = false;
+  }
+});
+
+test("a slow original leaves capacity for another visible grid cover", async () => {
   missingSnapshots = true;
   await identifyWorkMailbox();
+  const page = ggmail.renderer;
+  const gate = Promise.withResolvers<void>();
+  holdOriginal = gate.promise;
+  try {
+    await page.getByRole("button", { name: "Attachments", exact: true }).click();
+    const search = page.getByRole("searchbox");
+    await search.fill("Slow image.png");
+    await page.getByRole("button", { name: "Grid view" }).click();
+    await expect.poll(() => fileRequests).toBe(1);
+    await search.fill("Autumn identity review");
+    const sibling = page.getByRole("listitem").filter({ hasText: "Wordmark studies.png" });
+    await expect(sibling.locator(".attachment-cover img")).toBeVisible();
+  } finally {
+    gate.resolve();
+  }
+});
+
+test("renders image and PDF covers when a Gmail thumbnail is a placeholder or missing", async () => {
+  missingSnapshots = true;
+  await identifyProfiles();
   const page = ggmail.renderer;
   await page.getByRole("button", { name: "Attachments", exact: true }).click();
   const search = page.getByRole("searchbox");
@@ -919,6 +1050,25 @@ test("renders image and PDF covers when a Gmail thumbnail is a placeholder or mi
   await expect(pageCover).toHaveCSS("object-fit", "cover");
   await expect(pageCover).toHaveCSS("object-position", "50% 0%");
   expect(fileRequests).toBe(2);
+  await page.getByRole("button", { name: "List view" }).click();
+  await expect.poll(async () => (await ggmail.readConfig())["attachments.layout"]).toBe("list");
+  const requests = handoverThumbnails;
+  holdListing = true;
+  try {
+    await ggmail.relaunch();
+    await identifyProfiles();
+    const restored = ggmail.renderer;
+    await restored.getByRole("button", { name: "Attachments", exact: true }).click();
+    await restored.getByRole("searchbox").fill("Project handover.pdf");
+    const thumbnail = restored.locator(".attachment-miniature img");
+    await expect
+      .poll(() => thumbnail.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(32);
+    expect(handoverThumbnails).toBe(requests);
+    expect(fileRequests).toBe(2);
+  } finally {
+    holdListing = false;
+  }
 });
 
 test("aligns every card detail with short and long filenames", async () => {
@@ -1205,7 +1355,43 @@ test("compact windows keep filters, file actions and keyboard navigation reachab
   await filters.getByRole("button", { name: "Clear filters" }).click();
   await expect(filters.getByText("10 files", { exact: true })).toBeVisible();
   await filters.getByRole("button", { name: "Done" }).click();
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    const win = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("main.html"),
+    );
+    win?.setMinimumSize(320, 320);
+    win?.setContentSize(360, 440);
+  });
+  await page.getByRole("button", { name: "Filters", exact: true }).click();
+  await expect
+    .poll(() => filters.locator(".attachment-filter-scroll").evaluate((el) => el.clientHeight))
+    .toBeGreaterThan(230);
+  test.info().annotations.push({
+    type: "Filter choices height",
+    description: String(
+      await filters.locator(".attachment-filter-scroll").evaluate((el) => el.clientHeight),
+    ),
+  });
+  await filters.getByLabel("Received through").focus();
+  await expect(filters.getByRole("button", { name: "Done" })).toBeInViewport();
+  await page.screenshot({
+    animations: "disabled",
+    path: test.info().outputPath("attachment-filters-compact.png"),
+  });
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Filters", exact: true })).toBeFocused();
+  await page.keyboard.press("/");
   const search = page.getByRole("searchbox");
+  await expect(search).toBeFocused();
+  await search.fill("Project handover");
+  await search.press("ArrowDown");
+  const file = page.getByRole("button", { name: "Project handover.pdf", exact: true });
+  await expect(file).toBeFocused();
+  await file.press("Enter");
+  const preview = page.getByRole("dialog");
+  await expect(preview.getByRole("button", { name: "Download", exact: true })).toBeInViewport();
+  await preview.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(file).toBeFocused();
   await search.fill("missing");
   await expect(page.getByText("No matching files")).toBeVisible();
   await search.press("Escape");

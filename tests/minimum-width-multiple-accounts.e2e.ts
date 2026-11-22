@@ -95,12 +95,16 @@ test("the unified inbox fits the window at its minimum width", async () => {
   await setMinimumWindowWidth(ggmail);
   await check("unrestricted with messages");
 
-  const accounts = ggmail.renderer.getByRole("group", { name: "Filter by account" });
+  const picker = ggmail.renderer.getByRole("button", { name: "Filter by account" });
+  const accounts = ggmail.renderer.getByRole("dialog", { name: "Filter by account" });
   await ggmail.renderer.getByRole("button", { name: "Next page" }).click();
   await expect(ggmail.renderer.getByRole("row")).toHaveCount(2);
+  await expect(ggmail.renderer.getByRole("row").first()).toBeFocused();
   const first = accounts.getByRole("button", { name: "First", exact: true });
+  await picker.click();
   await first.click();
-  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect(accounts).toBeHidden();
+  await expect(picker).toHaveAccessibleDescription("First");
   await expect(ggmail.renderer.getByRole("row")).toHaveCount(6);
   await expect(ggmail.renderer.getByRole("row", { name: /Second/ })).toHaveCount(0);
   expect(await ggmail.runMenuCommand("Waiting for reply")).toBe(true);
@@ -108,8 +112,10 @@ test("the unified inbox fits the window at its minimum width", async () => {
     ggmail.renderer.getByRole("heading", { name: "Waiting for reply", exact: true }),
   ).toBeVisible();
   expect(await ggmail.runMenuCommand("All Mail")).toBe(true);
-  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect(picker).toHaveAccessibleDescription("First");
   await expect(ggmail.renderer.getByRole("row")).toHaveCount(6);
+  await picker.press("Enter");
+  await expect(first).toHaveAttribute("aria-pressed", "true");
   await accounts.getByRole("button", { name: "All accounts" }).click();
   await expect(ggmail.renderer.getByRole("row")).toHaveCount(10);
 
@@ -118,11 +124,76 @@ test("the unified inbox fits the window at its minimum width", async () => {
   const initialBox = await subject.boundingBox();
   await subject.focus();
   await ggmail.renderer.keyboard.press("Tab");
-  await expect(row.getByRole("button", { name: "Archive" })).toBeFocused();
+  const more = row.getByRole("button", { name: "More options" });
+  await expect(more).toBeFocused();
+  await more.press("Enter");
+  const menu = ggmail.renderer.getByRole("menu");
+  await expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
+  await ggmail.renderer.keyboard.press("Escape");
+  await expect(more).toBeFocused();
   expect((await subject.boundingBox())?.width).toBe(initialBox?.width);
 
   await ggmail.renderer.keyboard.press("/");
   await expect(ggmail.renderer.getByRole("searchbox")).toBeFocused();
 
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()
+      .find((win) => win.webContents.getURL().includes("main.html"))
+      ?.setContentSize(360, 440);
+  });
+  await expect
+    .poll(() =>
+      picker
+        .getByText("All accounts", { exact: true })
+        .evaluate((el) => el.scrollWidth <= el.clientWidth),
+    )
+    .toBe(true);
+  const feed = ggmail.renderer.locator(".inbox-feed");
+  const listTop = await row.evaluate((el) => el.getBoundingClientRect().top);
+  expect(listTop).toBeLessThan(200);
+  test.info().annotations.push({ type: "First unread row", description: String(listTop) });
+  await feed.evaluate((el) => {
+    el.scrollTop = el.scrollHeight;
+  });
+  await expect.poll(() => feed.evaluate((el) => el.scrollTop)).toBeGreaterThan(100);
+  await expect(picker).toBeInViewport();
+  await feed.evaluate((el) => {
+    el.scrollTop = 0;
+  });
+  await ggmail.renderer.screenshot({
+    animations: "disabled",
+    path: test.info().outputPath("all-mail-compact.png"),
+  });
+  // Use the compact menu on the first mailbox's most recent message.
+  await ggmail.app.evaluate(({ ipcMain }) => {
+    ipcMain.removeHandler("gmail.handleMessage");
+    ipcMain.handle("gmail.handleMessage", (_event, ...args) => {
+      Reflect.set(globalThis, "compactInboxAction", args);
+    });
+  });
+  const firstRow = ggmail.renderer.getByRole("row", { name: /First.*take on 0/ });
+  await firstRow.getByRole("button", { name: "More options" }).click();
+  await menu.getByRole("menuitem", { name: "Archive" }).focus();
+  await ggmail.renderer.keyboard.press("ArrowDown");
+  await expect(menu.getByRole("menuitem", { name: "Mark as read" })).toBeFocused();
+  await ggmail.renderer.keyboard.press("Enter");
+  await expect
+    .poll(() => ggmail.app.evaluate(() => Reflect.get(globalThis, "compactInboxAction")))
+    .toEqual([FIRST_ACCOUNT_ID, "first-0", "markAsRead"]);
+  await expect(firstRow.getByRole("button", { name: "More options" })).toBeFocused();
+  await expect(picker).toBeInViewport();
+
+  // A wider, short window fits search and mailbox selection on the same line.
+  await ggmail.app.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()
+      .find((win) => win.webContents.getURL().includes("main.html"))
+      ?.setContentSize(760, 440);
+  });
+  await expect(picker).toBeInViewport();
+  const pickerTop = await picker.evaluate((el) => el.getBoundingClientRect().top);
+  const searchTop = await ggmail.renderer
+    .getByRole("searchbox")
+    .evaluate((el) => el.getBoundingClientRect().top);
+  expect(Math.abs(pickerTop - searchTop)).toBeLessThan(12);
   expect(findings).toEqual([]);
 });

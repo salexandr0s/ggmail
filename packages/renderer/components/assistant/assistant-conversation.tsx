@@ -7,7 +7,8 @@ import {
   type AssistantProvider,
   providerNames,
   type AssistantReply as Reply,
-  type AssistantScope,
+  type AssistantContext,
+  type AssistantTurn,
 } from "@ggmail/shared/assistant";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
@@ -38,21 +39,21 @@ import { EffortPicker } from "./effort-picker";
 import { ModelLogo } from "./model-logo";
 import { SourcePreview } from "./source-preview";
 
-type PromptOrigin = "starter" | "written";
+type PromptOrigin = AssistantTurn["origin"];
 type Preview = {
   text: string;
   draft?: AssistantDraft;
   activity?: Activity;
 };
-type Entry = {
-  id: string;
-  prompt: string;
-  origin: PromptOrigin;
-  modelName: string;
-  reply?: Reply;
-  error?: string;
-  interrupted?: Preview;
-};
+type Entry = AssistantTurn & { modelName?: string };
+
+const promptKey = "assistant.unsentPrompt";
+const originKey = "assistant.unsentOrigin";
+
+export function clearAssistantPrompt() {
+  localStorage.removeItem(promptKey);
+  localStorage.removeItem(originKey);
+}
 
 const ReplyPreview = memo(function ReplyPreview({
   text,
@@ -69,8 +70,8 @@ const ReplyPreview = memo(function ReplyPreview({
 
 export function AssistantConversation({
   provider,
-  scope,
-  contextKey,
+  context,
+  initialEntries,
   models,
   model,
   chooseModel,
@@ -80,10 +81,10 @@ export function AssistantConversation({
   onInserted,
 }: {
   provider: AssistantProvider;
-  scope: AssistantScope;
-  contextKey: string;
+  context?: AssistantContext;
+  initialEntries: AssistantTurn[];
   models: AssistantModel[];
-  model: AssistantModel;
+  model?: AssistantModel;
   chooseModel: (id: string) => void;
   effort?: AssistantEffort;
   chooseEffort: (level?: AssistantEffort) => void;
@@ -96,9 +97,22 @@ export function AssistantConversation({
     citations: Reply["citations"];
     occurrence: number;
   } | null>(null);
-  const [entries, setEntries] = useState<Entry[]>([]);
-  const [prompt, setPrompt] = useState("");
-  const [composerOrigin, setComposerOrigin] = useState<PromptOrigin>("written");
+  const [entries, setEntries] = useState<Entry[]>(initialEntries);
+  const [prompt, setPrompt] = useState(() => localStorage.getItem(promptKey) ?? "");
+  const [composerOrigin, setComposerOrigin] = useState<PromptOrigin>(() =>
+    localStorage.getItem(originKey) === "starter" ? "starter" : "written",
+  );
+  function updatePrompt(value: string, origin: PromptOrigin) {
+    if (value) {
+      localStorage.setItem(promptKey, value);
+      localStorage.setItem(originKey, origin);
+    } else {
+      clearAssistantPrompt();
+    }
+    setPrompt(value);
+    setComposerOrigin(origin);
+  }
+  const scope = context?.kind;
   const [pending, setPending] = useState("");
   const [stopping, setStopping] = useState(false);
   const [preview, setPreview] = useState<Preview>({ text: "" });
@@ -203,7 +217,7 @@ export function AssistantConversation({
 
   async function send(value: string, origin: PromptOrigin, retry?: string) {
     const input = value.trim();
-    if (!input || pendingId.current) {
+    if (!input || pendingId.current || !model || (origin === "starter" && !context)) {
       return;
     }
 
@@ -215,7 +229,13 @@ export function AssistantConversation({
     setPending(id);
     setStopping(false);
     scrollMode.current = "start";
-    const next = { id, prompt: input, origin, modelName: model.label };
+    const next = {
+      id,
+      prompt: input,
+      origin,
+      modelName: model.label,
+      scopeKey: context?.key ?? "",
+    };
     setEntries((previous) =>
       retry ? previous.map((entry) => (entry.id === retry ? next : entry)) : [...previous, next],
     );
@@ -232,13 +252,17 @@ export function AssistantConversation({
         model: model.id,
         effort,
         provider,
-        scopeKey: contextKey,
+        // A written question uses the mailbox active when it reaches the agent.
+        // A contextual starter belongs to the view that displayed its button.
+        scopeKey: origin === "starter" ? context?.key : undefined,
+        origin,
+        retry,
       });
       if (pendingId.current !== id) {
         return;
       }
       if (result.status === "complete") {
-        finish({ reply: result.reply });
+        finish({ reply: result.reply, scopeKey: result.scopeKey });
       } else if (result.status === "stopped") {
         finish({ interrupted: latestPreview.current });
       } else {
@@ -264,12 +288,16 @@ export function AssistantConversation({
   }
 
   function submit() {
-    if (!prompt.trim() || pendingId.current) {
+    if (
+      !prompt.trim() ||
+      pendingId.current ||
+      !model ||
+      (composerOrigin === "starter" && !context)
+    ) {
       return;
     }
     void send(prompt, composerOrigin);
-    setPrompt("");
-    setComposerOrigin("written");
+    updatePrompt("", "written");
     composer.current?.focus();
   }
 
@@ -310,6 +338,10 @@ export function AssistantConversation({
           ...(scope === "mailView" ? [draftStarter] : []),
         ];
 
+  if (!model && !entries.length && !prompt) {
+    return null;
+  }
+
   return (
     <>
       {source && (
@@ -342,28 +374,29 @@ export function AssistantConversation({
         >
           {entries.length === 0 ? (
             <div className="flex min-h-full flex-col justify-end py-2">
-              <div>
-                {starters.map(({ icon: Icon, label, prompt: value }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    className="flex min-h-10 w-full items-center gap-3 rounded-sm px-1.5 py-2 text-start text-sm hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-                    onClick={() => {
-                      if (value) {
-                        void send(value, "starter");
-                      } else {
-                        if (!prompt.trim()) {
-                          setPrompt(t`Find emails about `);
-                          setComposerOrigin("starter");
+              <div className="grid gap-1">
+                {context &&
+                  model &&
+                  starters.map(({ icon: Icon, label, prompt: value }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className="flex min-h-11 w-full items-center gap-3 rounded-2xl px-3 py-2 text-start text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+                      onClick={() => {
+                        if (value) {
+                          void send(value, "starter");
+                        } else {
+                          if (!prompt.trim()) {
+                            updatePrompt(t`Find emails about `, "starter");
+                          }
+                          composer.current?.focus();
                         }
-                        composer.current?.focus();
-                      }
-                    }}
-                  >
-                    <Icon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
-                    <span className="min-w-0">{label}</span>
-                  </button>
-                ))}
+                      }}
+                    >
+                      <Icon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
+                      <span className="min-w-0">{label}</span>
+                    </button>
+                  ))}
               </div>
             </div>
           ) : (
@@ -387,8 +420,9 @@ export function AssistantConversation({
                   {entry.reply && (
                     <AssistantReply
                       reply={entry.reply}
-                      contextKey={contextKey}
-                      inThread={scope === "thread"}
+                      turnId={entry.id}
+                      currentView={context?.key === entry.scopeKey}
+                      inThread={scope === "thread" && context?.key === entry.scopeKey}
                       onSource={showSource}
                       onInserted={onInserted}
                     />
@@ -405,7 +439,7 @@ export function AssistantConversation({
                           <Trans>Reply stopped</Trans>
                         </span>
                       )}
-                      {index === entries.length - 1 && !pending && (
+                      {index === entries.length - 1 && !pending && model && context && (
                         <Button
                           variant="outline"
                           size="xs"
@@ -427,7 +461,7 @@ export function AssistantConversation({
                       {preview.activity && (
                         <AssistantActivity
                           activity={preview.activity}
-                          modelName={entry.modelName}
+                          modelName={entry.modelName ?? ""}
                         />
                       )}
                     </>
@@ -475,8 +509,7 @@ export function AssistantConversation({
             placeholder={t`Ask about your mail…`}
             maxLength={ASSISTANT_PROMPT_LIMIT}
             onChange={(event) => {
-              setPrompt(event.target.value);
-              setComposerOrigin("written");
+              updatePrompt(event.target.value, "written");
             }}
             onKeyDown={(event) => {
               if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) {
@@ -493,41 +526,49 @@ export function AssistantConversation({
           )}
           <div className="flex min-w-0 items-center justify-between gap-1 px-2 pb-2">
             <div className="flex min-w-0 items-center gap-0.5">
-              <Select
-                items={models.map(({ id, label }) => ({ value: id, label }))}
-                value={model.id}
-                onValueChange={(value) => value && chooseModel(value)}
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="max-w-56 min-w-0 border-transparent px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-transparent dark:hover:bg-muted"
-                  title={providerNames[provider]}
-                  aria-label={t`Assistant model`}
-                >
-                  <ModelLogo provider={provider} model={model.id} className="size-3.5" />
-                  <SelectValue className="min-w-0 truncate">{model.label}</SelectValue>
-                </SelectTrigger>
-                <SelectContent
-                  align="start"
-                  side="top"
-                  alignItemWithTrigger={false}
-                  className="w-max max-w-[min(20rem,var(--available-width))] min-w-48"
-                >
-                  {models.map(({ id, label }) => (
-                    <SelectItem
-                      key={id}
-                      value={id}
-                      className="min-h-8 [&>span:first-child]:min-w-0 [&>span:first-child]:shrink"
+              {model && (
+                <>
+                  <Select
+                    items={models.map(({ id, label }) => ({ value: id, label }))}
+                    value={model.id}
+                    onValueChange={(value) => value && chooseModel(value)}
+                  >
+                    <SelectTrigger
+                      size="sm"
+                      className="max-w-56 min-w-0 border-transparent px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-transparent dark:hover:bg-muted"
+                      title={providerNames[provider]}
+                      aria-label={t`Assistant model`}
                     >
-                      <ModelLogo provider={provider} model={id} className="size-4 self-center" />
-                      <span className="truncate" title={label}>
-                        {label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <EffortPicker compact model={model} effort={effort} chooseEffort={chooseEffort} />
+                      <ModelLogo provider={provider} model={model.id} className="size-3.5" />
+                      <SelectValue className="min-w-0 truncate">{model.label}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent
+                      align="start"
+                      side="top"
+                      alignItemWithTrigger={false}
+                      className="w-max max-w-[min(20rem,var(--available-width))] min-w-48"
+                    >
+                      {models.map(({ id, label }) => (
+                        <SelectItem
+                          key={id}
+                          value={id}
+                          className="min-h-8 [&>span:first-child]:min-w-0 [&>span:first-child]:shrink"
+                        >
+                          <ModelLogo
+                            provider={provider}
+                            model={id}
+                            className="size-4 self-center"
+                          />
+                          <span className="truncate" title={label}>
+                            {label}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <EffortPicker compact model={model} effort={effort} chooseEffort={chooseEffort} />
+                </>
+              )}
             </div>
             {pending ? (
               <Button
@@ -551,7 +592,7 @@ export function AssistantConversation({
                 className="rounded-full hover:bg-primary/85 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
                 title={t`Send chat message`}
                 aria-label={t`Send chat message`}
-                disabled={!prompt.trim()}
+                disabled={!prompt.trim() || !model || (composerOrigin === "starter" && !context)}
               >
                 <ArrowUpIcon />
               </Button>

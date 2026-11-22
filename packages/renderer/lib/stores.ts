@@ -51,33 +51,25 @@ if (window.location.pathname.endsWith("/main.html")) {
     .then((active) => useDownloadActivity.setState({ active }));
 }
 
+// Each Find command selects the query, including when the field is already open.
 export const useFindInPageStore = create<{
-  isActive: boolean;
-  deactivate: () => void;
+  activation: number;
   activeMatch: number;
-  totalMatches: number;
-}>((set) => ({
-  isActive: false,
-  deactivate: () => {
-    ipc.main.send("findInPage", null);
-
-    set({ isActive: false });
-  },
+  totalMatches: number | null;
+}>(() => ({
+  activation: 0,
   activeMatch: 0,
-  totalMatches: 0,
+  totalMatches: null,
 }));
 
 ipc.renderer.on("findInPage.activate", () => {
-  useFindInPageStore.setState(() => ({
-    isActive: true,
-  }));
+  useFindInPageStore.setState((state) => ({ activation: state.activation + 1 }));
 });
 
-ipc.renderer.on("findInPage.result", (_event, { activeMatch, totalMatches }) => {
-  useFindInPageStore.setState(() => ({
-    activeMatch,
-    totalMatches,
-  }));
+ipc.renderer.on("findInPage.result", (_event, result) => {
+  if (useFindInPageStore.getState().activation) {
+    useFindInPageStore.setState(result);
+  }
 });
 
 export const useAppUpdaterStore = create<{

@@ -5,15 +5,22 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import {
   attachmentCategories,
+  fileKind,
   isAttachmentCategory,
   isCategorySelection,
+  type AttachmentPreview,
 } from "@ggmail/shared/attachments";
 import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { app } from "electron";
 import { z } from "zod";
 import { log } from "@/lib/log";
 import { classifyIndexedFilename } from "./classify";
-import type { AttachmentEntry } from "./metadata";
+import { markTemplateGraphics, type AttachmentEntry } from "./metadata";
+import { isThumbnailMime } from "./preview";
+
+// Keep the on-disk working set small even for mailboxes with years of image attachments.
+const thumbnailBytes = 16 * 1024 * 1024;
+const maxThumbnailBytes = 2 * 1024 * 1024;
 
 function indexDirectory(accountId?: string) {
   const base = path.join(app.getPath("userData"), "attachment-index");
@@ -29,6 +36,7 @@ export function clearAttachmentIndexes(accountId?: string) {
 const storedFile = z.object({
   id: z.string().regex(/^(?:[\da-f]{15,16}|msg-a:r-?\d{1,20})\/\d+(?:\.\d+)+$/i),
   name: z.string(),
+  isEmbeddedImage: z.boolean().optional(),
   subject: z.string(),
   sender: z.string(),
   senderPhotoUrl: z.string().optional(),
@@ -101,6 +109,7 @@ function upgradeCategories(db: DatabaseSync) {
 // zero files. An interrupted scan never advances a separate cursor past unsaved data.
 export class AttachmentDiskIndex {
   private db?: DatabaseSync;
+  private hasThumbnails = false;
 
   constructor(accountId: string, mailboxKey: string) {
     const directory = indexDirectory(accountId);
@@ -129,6 +138,68 @@ export class AttachmentDiskIndex {
       } catch {
         // The previously saved files are still readable if the upgrade could not commit.
         log.warn("Could not update saved attachment categories; will retry when the index reopens");
+      }
+      try {
+        this.db.exec(`CREATE TABLE IF NOT EXISTS thumbnails (
+          fileId TEXT UNIQUE NOT NULL, threadId TEXT NOT NULL, mime TEXT NOT NULL, bytes BLOB NOT NULL
+        )`);
+        this.db.exec("CREATE INDEX IF NOT EXISTS thumbnails_thread ON thumbnails(threadId)");
+        this.hasThumbnails = true;
+      } catch {
+        // A read-only or locked legacy index still supplies file metadata.
+      }
+    }
+  }
+
+  thumbnail(entry: AttachmentEntry): AttachmentPreview | undefined {
+    if (!this.hasThumbnails || !this.db) {
+      return;
+    }
+    try {
+      const row = this.db
+        .prepare(
+          "SELECT mime, bytes FROM thumbnails WHERE fileId = ? AND threadId = ? AND length(bytes) BETWEEN 1 AND ?",
+        )
+        .get(entry.file.id, entry.threadId, maxThumbnailBytes);
+      if (
+        typeof row?.mime === "string" &&
+        isThumbnailMime(row.mime) &&
+        row.bytes instanceof Uint8Array
+      ) {
+        return { mime: row.mime, bytes: Uint8Array.from(row.bytes).buffer };
+      }
+    } catch {
+      // Gmail can supply the thumbnail if the local cache cannot be read.
+    }
+  }
+
+  saveThumbnail(entry: AttachmentEntry, preview: AttachmentPreview) {
+    const db = this.db;
+    if (
+      !db ||
+      !this.hasThumbnails ||
+      !isThumbnailMime(preview.mime) ||
+      !preview.bytes.byteLength ||
+      preview.bytes.byteLength > maxThumbnailBytes
+    ) {
+      return;
+    }
+    try {
+      db.exec("BEGIN IMMEDIATE");
+      db.prepare(
+        "INSERT OR REPLACE INTO thumbnails (fileId, threadId, mime, bytes) VALUES (?, ?, ?, ?)",
+      ).run(entry.file.id, entry.threadId, preview.mime, new Uint8Array(preview.bytes));
+      db.prepare(`DELETE FROM thumbnails WHERE rowid IN (
+        SELECT id FROM (
+          SELECT rowid AS id, row_number() OVER recent AS position,
+                 sum(length(bytes)) OVER recent AS total FROM thumbnails
+          WINDOW recent AS (ORDER BY rowid DESC)
+        ) WHERE position > 256 OR total > ?
+      )`).run(thumbnailBytes);
+      db.exec("COMMIT");
+    } catch {
+      if (db.isTransaction) {
+        db.exec("ROLLBACK");
       }
     }
   }
@@ -162,7 +233,15 @@ export class AttachmentDiskIndex {
             part,
           };
         });
-        yield { id, signature, entries };
+        // Older indexes lack body references. Show their files immediately and have
+        // the usual discovery pass revisit only conversations with unchecked images.
+        const needsImageCheck = files.some(
+          (file) => file.isEmbeddedImage === undefined && fileKind(file.name) === "image",
+        );
+        if (needsImageCheck) {
+          markTemplateGraphics(entries);
+        }
+        yield { id, signature: needsImageCheck ? "" : signature, entries };
       }
     } catch {
       this.disable();
@@ -180,8 +259,12 @@ export class AttachmentDiskIndex {
     try {
       db.exec("BEGIN IMMEDIATE");
       const save = db.prepare("INSERT OR REPLACE INTO threads VALUES (?, ?, ?)");
+      const invalidate = this.hasThumbnails
+        ? db.prepare("DELETE FROM thumbnails WHERE threadId = ?")
+        : undefined;
       for (const { id, signature, entries } of saved) {
-        // Only persist metadata. Live URLs can contain short-lived Gmail credentials.
+        invalidate?.run(id);
+        // Store the view type. Live URLs can contain short-lived Gmail credentials.
         const files = entries.map(({ file, thumbnailUrl }) =>
           storedFile.parse({
             ...file,
@@ -195,6 +278,7 @@ export class AttachmentDiskIndex {
       if (removed.length) {
         const remove = db.prepare("DELETE FROM threads WHERE id = ?");
         for (const id of removed) {
+          invalidate?.run(id);
           remove.run(id);
         }
       }

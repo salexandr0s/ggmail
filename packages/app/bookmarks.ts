@@ -1,9 +1,5 @@
 import { randomUUID } from "node:crypto";
-import {
-  APP_TITLEBAR_HEIGHT,
-  BASE_SPACING,
-  WORKSPACE_SIDEBAR_WIDTH,
-} from "@ggmail/shared/constants";
+import { BASE_SPACING } from "@ggmail/shared/constants";
 import type { AccountConfig, Bookmark, BookmarkState } from "@ggmail/shared/schemas";
 import { clamp } from "@ggmail/shared/utils";
 import type { BrowserWindow } from "electron";
@@ -13,6 +9,11 @@ import { ipc } from "./ipc";
 import { Popup } from "./lib/popup";
 import { main } from "./main";
 
+// Header, search field and list padding, followed by up to eight two-line rows.
+function bookmarkPopupHeight(count: number) {
+  return count ? 130 + Math.min(count, 8) * 52 : 256;
+}
+
 /**
  * The URLs an account has saved. A bookmark keeps the URL, title and app it was
  * created from and never follows what the user browses to afterwards — opening
@@ -21,16 +22,14 @@ import { main } from "./main";
 class Bookmarks {
   popup = new Popup();
 
-  togglePopup(parentWindow: BrowserWindow) {
+  togglePopup(parentWindow: BrowserWindow, sidebarTop?: number) {
     const open = this.popup.toggle(parentWindow, {
       page: "bookmarks",
       width: BASE_SPACING * 40,
-      height: "fill",
-      anchor: {
-        x: WORKSPACE_SIDEBAR_WIDTH + BASE_SPACING,
-        y: APP_TITLEBAR_HEIGHT + BASE_SPACING,
-        align: "start",
-      },
+      height: bookmarkPopupHeight(
+        this.getAccountBookmarks(accounts.getSelectedAccount().config.id).length,
+      ),
+      anchor: { sidebarTop: sidebarTop ?? null },
     });
     if (open) {
       ipc.renderer.send(parentWindow.webContents, "bookmarks.popupOpen", true);
@@ -149,7 +148,9 @@ class Bookmarks {
       return;
     }
 
-    ipc.renderer.send(popupWebContents, "bookmarks.changed", this.serialize());
+    const items = this.serialize();
+    this.popup.setHeight(bookmarkPopupHeight(items.length));
+    ipc.renderer.send(popupWebContents, "bookmarks.changed", items);
   }
 }
 

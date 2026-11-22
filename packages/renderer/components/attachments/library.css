@@ -3,27 +3,21 @@
   background: var(--canvas);
 }
 .attachment-header {
-  display: grid;
   flex: none;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.5rem var(--mail-gutter);
-}
-.attachment-header .page-heading-title {
-  padding-inline-start: 0.875rem;
+  padding-inline: var(--mail-gutter);
 }
 .attachment-search {
   grid-column: 1 / -1;
   grid-row: 2;
 }
 .attachment-refresh {
+  border-radius: 50%;
   color: var(--muted-foreground);
 }
 @container library (min-width: 38rem) {
   .attachment-header {
     grid-template-columns: var(--mail-rail-width) minmax(0, 1fr) auto;
-    gap: var(--mail-gutter);
   }
   .attachment-search {
     width: min(100%, 42rem);
@@ -47,7 +41,7 @@
 }
 .attachment-facets {
   display: grid;
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 .attachment-filter-scroll > h2 {
   margin: 0 0 0.5rem;
@@ -67,28 +61,29 @@
   gap: 1rem;
 }
 .attachment-results-panel {
-  border-radius: 1rem;
+  border-radius: var(--mail-panel-radius);
   background: var(--card);
   overflow: hidden;
 }
 .attachment-type-bar {
   background: var(--toolbar);
-  padding-inline: var(--table-gutter);
+  padding: 0 var(--table-gutter) 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 .attachment-formats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.125rem 0.55rem;
+  gap: 0.375rem;
 }
 .attachment-format {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   min-width: 0;
-  min-height: 2.75rem;
-  padding: 0.4rem 0.3rem;
-  border-block-end: 2px solid transparent;
+  min-height: 2rem;
+  padding: 0.3rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
   color: var(--muted-foreground);
   font-size: 0.8125rem;
   text-align: start;
@@ -110,9 +105,10 @@
   color: var(--foreground);
 }
 .attachment-format[aria-pressed="true"] {
-  color: var(--primary);
-  border-block-end-color: currentColor;
-  font-weight: 600;
+  border-color: transparent;
+  background: var(--selected);
+  color: var(--selected-foreground);
+  font-weight: 500;
 }
 .attachment-format:focus-visible {
   outline: 2px solid var(--ring);
@@ -126,11 +122,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.45rem;
-  padding: 0.7rem var(--table-gutter);
+  padding: 0.75rem var(--table-gutter);
   border-block-end: 1px solid var(--border);
 }
 .attachment-count {
-  font-size: 1rem;
+  font-size: 1.125rem;
+  line-height: 1.5rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
@@ -145,24 +142,31 @@
   gap: 0.4rem;
 }
 .attachment-view-tools :is(.attachment-sort, [aria-haspopup="dialog"]) {
-  height: 1.95rem;
+  height: 2rem;
+  border-radius: 999px;
 }
 .attachment-layout-toggle {
   flex: none;
-  gap: 0.1rem;
-  padding: 0.14rem;
+  gap: 0.125rem;
+  padding: 0.125rem;
   border: 1px solid var(--border);
   border-radius: 999px;
 }
 .attachment-layout-toggle button {
-  width: 1.7rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 1.625rem;
   border-radius: 999px;
   color: var(--muted-foreground);
 }
 .attachment-layout-toggle button[aria-pressed="true"] {
   color: var(--selected-foreground);
   background: var(--selected);
+}
+@container library (min-width: 54rem) {
+  .attachment-toolbar {
+    min-height: 3.75rem;
+    border-block-end: 0;
+  }
 }
 @container results (max-width: 27rem) {
   .attachment-sort {
@@ -194,7 +198,7 @@
 .attachment-filter-scroll .attachment-format {
   min-height: 2rem;
   border: 0;
-  border-radius: var(--radius-md);
+  border-radius: 0.5rem;
   padding: 0.35rem 0.5rem;
 }
 .attachment-filter-scroll .attachment-format-count {
@@ -235,7 +239,11 @@
 }
 @media (max-height: 31rem) {
   .attachment-header {
-    padding-block: 0.6rem;
+    min-height: 3rem;
+    padding-block: 0.375rem;
+  }
+  .attachment-header .attachment-search {
+    height: 2.375rem;
   }
   .attachment-results {
     gap: 0.5rem;
@@ -244,7 +252,11 @@
     min-height: 2rem;
   }
   .attachment-toolbar {
+    min-height: 2.75rem;
     padding-block: 0.35rem;
+  }
+  .attachment-type-bar {
+    padding-block-end: 0.375rem;
   }
 }
 
@@ -253,6 +265,7 @@
   max-height: min(76vh, var(--available-height));
   padding: 0;
   gap: 0;
+  border-radius: 1rem;
   overflow: hidden;
 }
 .attachment-filter-scroll {
@@ -289,7 +302,7 @@
   flex: none;
   gap: 0.35rem;
   max-width: min(13rem, 100%);
-  min-height: 1.6rem;
+  min-height: 1.75rem;
   border: 1px solid var(--border);
   border-radius: 2rem;
   background: var(--card);
@@ -336,4 +349,60 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.75rem), 1fr));
   gap: 0.5rem;
+}
+
+.attachment-filter-sheet[data-slot="dialog-content"] {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: min(28rem, calc(100vw - 1rem));
+  max-width: none;
+  max-height: calc(100dvh - 4rem);
+  top: calc(50% + 1.25rem);
+  overflow: hidden;
+  border-radius: 1.25rem;
+  padding: 0;
+}
+.attachment-filter-sheet .attachment-filter-scroll {
+  padding: 1rem;
+  scrollbar-width: thin;
+}
+.attachment-filter-sheet .attachment-facets > [role="group"] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.25rem;
+}
+.attachment-filter-sheet .mail-nav-heading {
+  grid-column: 1 / -1;
+}
+.attachment-filter-sheet .mail-nav-row {
+  padding-inline: 0.5rem;
+}
+.attachment-filter-sheet footer button {
+  min-height: 2.25rem;
+  border-radius: 999px;
+}
+@media (max-width: 32rem) {
+  .attachment-filter-sheet[data-slot="dialog-content"] {
+    inset: auto 0 0;
+    translate: none;
+    width: 100%;
+    max-height: calc(100dvh - 3rem);
+    border-radius: 1.25rem 1.25rem 0 0;
+  }
+}
+@container library (max-width: 38rem) {
+  .attachment-header {
+    min-height: 0;
+    padding-block: 0.5rem;
+  }
+  .attachment-header .mail-page-title {
+    font-size: 1.25rem;
+  }
+  .attachment-header .attachment-search {
+    height: 2.5rem;
+  }
+  .attachment-toolbar {
+    padding-block: 0.4rem;
+  }
 }

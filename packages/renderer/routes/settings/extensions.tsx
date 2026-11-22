@@ -545,7 +545,7 @@ function ExtensionItem({
 
   return (
     <>
-      <Item variant="muted">
+      <Item role="listitem">
         <ItemContent>
           <ItemTitle>
             <a

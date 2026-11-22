@@ -10,10 +10,15 @@ import { getWorkspaceAppUrl } from "@ggmail/shared/google";
 import { i18n } from "@ggmail/shared/i18n";
 import { currentMailView, type MailViewsPopupState } from "@ggmail/shared/mail-views";
 import { ms } from "@ggmail/shared/ms";
+import { editNotificationTimes } from "@ggmail/shared/notification-times";
 import { byPlatform } from "@ggmail/shared/platform";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
-import type { IpcMainEvents, IpcRendererEvent } from "@ggmail/shared/types";
-import { sidebarWorkspaceApps, workspaceApps } from "@ggmail/shared/workspace-apps";
+import type { IpcMainEvents, IpcRendererEvent, MenuModifiers } from "@ggmail/shared/types";
+import {
+  isSidebarApp,
+  visibleSidebarShortcuts,
+  workspaceApps,
+} from "@ggmail/shared/workspace-apps";
 import { select, t } from "@lingui/core/macro";
 import {
   app,
@@ -72,7 +77,7 @@ import { hibernatesTabWhenIdle } from "./lib/hibernation";
 import { log } from "./lib/log";
 import {
   areWorkspaceAppNotificationsAllowed,
-  createNewEmailNotification,
+  showTestNotification,
   createNotification,
 } from "./notifications";
 import { getIsDefaultMailtoClient, setAsDefaultMailtoClient } from "./protocol";
@@ -178,6 +183,13 @@ class Ipc {
       ipc.broadcast("config.configChanged", config.store);
     });
 
+    config.onDidChange("sidebar.shortcuts", () => {
+      accounts.sendTabsChangedToRenderer();
+      if (!visibleSidebarShortcuts(config.get("sidebar.shortcuts")).includes("bookmarks")) {
+        bookmarks.popup.close();
+      }
+    });
+
     config.onDidChange("accounts", () => {
       accounts.sendAccountsChangedToRenderer();
 
@@ -266,6 +278,10 @@ class Ipc {
 
     this.main.handle("workspaceApp.getLoadingState", (_event, workspaceAppId) => {
       return getNavigationWebContents(workspaceAppId).isLoading();
+    });
+
+    this.main.handle("workspaceApp.getPageTitle", (event) => {
+      return WorkspaceApp.tryFromWebContents(event.sender)?.title ?? "";
     });
 
     this.main.on("gmail.setOutOfOffice", (event, outOfOffice) => {
@@ -405,7 +421,8 @@ class Ipc {
       if (
         event.sender === main.window.webContents &&
         event.senderFrame === event.sender.mainFrame &&
-        sidebarWorkspaceApps.includes(app)
+        isSidebarApp(app) &&
+        visibleSidebarShortcuts(config.get("sidebar.shortcuts")).includes(app)
       ) {
         accounts.getSelectedAccount().instance.tabs.openSidebarApp(app);
       }
@@ -418,6 +435,41 @@ class Ipc {
       ) {
         settingsWindow.open();
       }
+    });
+
+    // A renderer menu extending below the titlebar would sit behind the native mail view.
+    this.main.handle("titleBar.pickTool", (event, labels, anchor) => {
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame ||
+        !Array.isArray(labels) ||
+        !labels.length ||
+        !labels.every((label) => typeof label === "string") ||
+        !Number.isFinite(anchor?.x) ||
+        !Number.isFinite(anchor?.y)
+      ) {
+        return null;
+      }
+      return new Promise<({ index: number } & MenuModifiers) | null>((resolve) => {
+        const menu = Menu.buildFromTemplate(
+          labels.map((label, index) => ({
+            label: label.replaceAll("&", "&&"),
+            click: (_item, _window, keys) =>
+              resolve({
+                index,
+                ctrlKey: !!keys?.ctrlKey,
+                metaKey: !!keys?.metaKey,
+                shiftKey: !!keys?.shiftKey,
+              }),
+          })),
+        );
+        menu.popup({
+          window: main.window,
+          x: Math.round(anchor.x),
+          y: Math.round(anchor.y),
+          callback: () => setImmediate(() => resolve(null)),
+        });
+      });
     });
 
     this.main.on("titleBar.toggleAppMenu", (event, anchor) => {
@@ -458,8 +510,12 @@ class Ipc {
         // Closing the field gives the keyboard back to the page it searched,
         // which is where the window's own find bar took it from. Clearing the
         // text does not: the field is still open and still being typed in.
-        if (request.kind === "close" && !workspaceApp) {
-          accounts.focusActiveView();
+        if (request.kind === "close") {
+          if (workspaceApp) {
+            targetWebContents.focus();
+          } else {
+            accounts.focusActiveView();
+          }
         }
 
         return;
@@ -1024,26 +1080,24 @@ class Ipc {
       return { canceled: false };
     });
 
-    ipc.main.on("notifications.showTestNotification", () => {
-      createNewEmailNotification({
-        // oxlint-disable-next-line lingui/no-unlocalized-strings -- a sender's name, which stays as it is
-        title: "Tim from ggmail",
-        subtitle: t({
-          message: "Your test notification request",
-          comment: "Subject of the sample email in the test notification",
-        }),
-        body: t`This is what a new email notification looks like.`,
-      });
+    ipc.main.handle("notifications.editTime", (_event, edit) => {
+      const result = editNotificationTimes(config.get("notifications.times"), edit);
+      if (typeof result === "string") {
+        return result;
+      }
+      config.set("notifications.times", result);
+      return "saved" as const;
     });
 
-    ipc.main.on("workspaceApp.showNotification", (event, notification) => {
-      if (!areWorkspaceAppNotificationsAllowed()) {
-        return;
-      }
+    ipc.main.handle("notifications.showTestNotification", showTestNotification);
 
+    ipc.main.on("workspaceApp.showNotification", (event, notification) => {
       const notifyingWorkspaceApp = WorkspaceApp.tryFromViewWebContents(event.sender);
 
-      if (!notifyingWorkspaceApp) {
+      if (
+        !notifyingWorkspaceApp ||
+        !areWorkspaceAppNotificationsAllowed(notifyingWorkspaceApp.accountId)
+      ) {
         return;
       }
 
@@ -1072,21 +1126,31 @@ class Ipc {
       }
 
       createNotification({
+        groupId: notifyingWorkspaceApp.accountId,
         title: notificationTitle,
         subtitle,
         body,
         silent: notifyingWorkspaceApp.app === "calendar" ? true : notification.silent,
         timeoutType: notification.requireInteraction ? "never" : "default",
         click: () => {
+          const account = accounts.instances.get(notifyingWorkspaceApp.accountId);
+          if (!account) {
+            return;
+          }
           if (notifyingWorkspaceApp.isWindowed) {
+            if (notifyingWorkspaceApp.window.isDestroyed()) {
+              return;
+            }
             notifyingWorkspaceApp.window.show();
 
             return;
           }
 
-          main.show();
-
-          notifyingWorkspaceApp.account.instance.tabs.activateTab(notifyingWorkspaceApp.id);
+          if (!account.tabs.getTab(notifyingWorkspaceApp.id)) {
+            return;
+          }
+          main.navigate("/");
+          account.tabs.activateTab(notifyingWorkspaceApp.id);
 
           if (notifyingWorkspaceApp.account.config.selected) {
             accounts.refreshSelectedAccountView();
@@ -1294,14 +1358,14 @@ class Ipc {
       return bookmarks.serialize();
     });
 
-    ipc.main.on("bookmarks.togglePopup", (event) => {
+    ipc.main.on("bookmarks.togglePopup", (event, sidebarTop) => {
       const parentWindow = BrowserWindow.fromWebContents(event.sender);
 
       if (!parentWindow) {
         return;
       }
 
-      bookmarks.togglePopup(parentWindow);
+      bookmarks.togglePopup(parentWindow, Number.isFinite(sidebarTop) ? sidebarTop : undefined);
     });
 
     /*

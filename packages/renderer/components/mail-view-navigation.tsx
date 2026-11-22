@@ -4,40 +4,15 @@ import type { AccountConfig } from "@ggmail/shared/schemas";
 import { Button } from "@ggmail/ui/components/button";
 import { useLingui } from "@lingui/react/macro";
 import { ChevronDownIcon, PanelsTopLeftIcon } from "lucide-react";
-import { type KeyboardEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AccountAvatar } from "@/components/account-avatar";
 import { MailIcon } from "@/components/mail-icons";
 import { getMailViews } from "@/lib/mail-views";
+import { moveToolbarFocus } from "@/lib/move-toolbar-focus";
 
 function anchor(button: HTMLElement) {
   const rect = button.getBoundingClientRect();
   return { x: Math.round(rect.left), y: Math.round(rect.bottom) };
-}
-
-function moveToolbarFocus(event: KeyboardEvent<HTMLDivElement>) {
-  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
-    return;
-  }
-  const buttons = Array.from(event.currentTarget.querySelectorAll("button"));
-  const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
-  if (index < 0) {
-    return;
-  }
-  event.preventDefault();
-  const last = buttons.length - 1;
-  const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
-  switch (event.key) {
-    case "Home":
-      buttons[0]?.focus();
-      break;
-    case "End":
-      buttons[last]?.focus();
-      break;
-    default: {
-      const step = (event.key === "ArrowRight") !== rtl ? 1 : -1;
-      buttons[(index + step + buttons.length) % buttons.length]?.focus();
-    }
-  }
 }
 
 export function MailViewNavigation({

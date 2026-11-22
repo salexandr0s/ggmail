@@ -3,6 +3,9 @@ export default defineConfig({
   testDir: "tests",
   testMatch: [
     "desktop.e2e.ts",
+    "shell-controls.e2e.ts",
+    "notifications.e2e.ts",
+    "do-not-disturb.e2e.ts",
     "gmail-dark-theme.e2e.ts",
     "account-logo.e2e.ts",
     "mail-assistant.e2e.ts",

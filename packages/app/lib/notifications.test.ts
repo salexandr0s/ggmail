@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import {
+  checkWithinNotificationTimes,
+  findNotificationWindow,
+  overlapsNotificationWindow,
+} from "@ggmail/shared/notification-times";
 import type { NotificationTime } from "@ggmail/shared/types";
-import { checkWithinNotificationTimes, shouldPlayNewEmailSound } from "./notifications";
+import { shouldPlayNewEmailSound } from "./notifications";
 
 function makeTime(start: string, end: string, days?: number[]): NotificationTime {
   return {
@@ -143,4 +148,46 @@ describe("shouldPlayNewEmailSound", () => {
   test("a notification after 5 seconds of quiet plays a sound", () => {
     expect(soundsFor([0, 4000, 9000, 20000])).toEqual([true, false, true, true]);
   });
+});
+
+test("Saturday night continues into Sunday, and ends at the specified minute", () => {
+  const times = [makeTime("22:30", "06:15", [6])];
+  expect(checkWithinNotificationTimes(times, makeDate(6, 5, 0))).toBe(false);
+  expect(checkWithinNotificationTimes(times, makeDate(6, 22, 30))).toBe(true);
+  expect(checkWithinNotificationTimes(times, makeDate(0, 6, 14))).toBe(true);
+  expect(checkWithinNotificationTimes(times, makeDate(0, 6, 15))).toBe(false);
+});
+
+test("overlap checks include only occupied weekdays and allow adjacent windows", () => {
+  const saturdayNight = [makeTime("22:00", "06:00", [6])];
+  expect(overlapsNotificationWindow(makeTime("05:00", "06:00", [0]), saturdayNight)).toBe(true);
+  expect(overlapsNotificationWindow(makeTime("05:00", "06:00", [6]), saturdayNight)).toBe(false);
+  expect(overlapsNotificationWindow(makeTime("06:00", "07:00", [0]), saturdayNight)).toBe(false);
+});
+
+test("new windows can use short gaps, the last hour, and a single free weekday", () => {
+  expect(findNotificationWindow([makeTime("09:45", "09:30")])).toMatchObject({
+    start: "09:30",
+    end: "09:45",
+  });
+  expect(findNotificationWindow([makeTime("00:00", "23:00")])).toMatchObject({
+    start: "23:00",
+    end: "00:00",
+  });
+  expect(findNotificationWindow([makeTime("00:00", "24:00", [0, 1, 2, 3, 4, 5])])).toEqual({
+    start: "00:00",
+    end: "01:00",
+    days: [6],
+  });
+  expect(findNotificationWindow([makeTime("12:00", "12:00")])).toBeUndefined();
+});
+
+test("legacy midnight, equal endpoints and incomplete times retain sensible boundaries", () => {
+  expect(checkWithinNotificationTimes([makeTime("23:00", "24:00", [1])], makeDate(1, 23, 59))).toBe(
+    true,
+  );
+  expect(checkWithinNotificationTimes([makeTime("12:00", "12:00", [1])], makeDate(1, 1, 0))).toBe(
+    true,
+  );
+  expect(checkWithinNotificationTimes([makeTime("", "", [1])], makeDate(1, 1, 0))).toBe(false);
 });

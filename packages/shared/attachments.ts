@@ -38,7 +38,11 @@ export function isCategorySelection(value: unknown): value is AttachmentCategory
 
 export type MailAttachment = {
   id: string;
+  /** Changes when discovery replaces this part during the current visit. */
+  previewRevision?: number;
   name: string;
+  /** Set for images once their message has been checked for embedded graphics. */
+  isEmbeddedImage?: boolean;
   subject: string;
   detectedCategories: AttachmentCategory[];
   categoryOverride?: AttachmentCategory[];

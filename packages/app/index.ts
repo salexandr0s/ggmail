@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { is, platform } from "@electron-toolkit/utils";
 import { APP_ID } from "@ggmail/shared/constants";
-import { app, session } from "electron";
+import { app, powerMonitor, session } from "electron";
 import { accounts } from "@/accounts";
 import { navigateOnSwipe } from "@/active-view";
 import { blocker } from "@/blocker";
@@ -202,7 +202,8 @@ async function init() {
 
   extensionUpdater.init();
 
-  doNotDisturb.init();
+  doNotDisturb.restoreTimer();
+  powerMonitor.on("resume", () => doNotDisturb.restoreTimer());
 
   registerWindowsMailClient();
 

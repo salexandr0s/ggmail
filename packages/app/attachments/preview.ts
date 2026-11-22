@@ -7,6 +7,9 @@ import type { Session } from "electron";
 import type { AttachmentEntry } from "./metadata";
 
 const rasterMime = /^image\/(?:png|jpeg|webp|gif|avif|bmp)$/;
+export function isThumbnailMime(mime: string) {
+  return rasterMime.test(mime);
+}
 const previewTypes: Record<string, string> = {
   pdf: "application/pdf",
   png: "image/png",
@@ -121,6 +124,7 @@ export async function readAttachmentPreview(
   size: "thumbnail" | "full",
   signal: AbortSignal,
   maxBytes?: number,
+  onMissingThumbnail?: () => void,
 ): Promise<AttachmentPreview | null> {
   const extension = attachmentExtension(entry.file.name);
   const nativeMime = Object.hasOwn(previewTypes, extension) ? previewTypes[extension] : undefined;
@@ -137,6 +141,9 @@ export async function readAttachmentPreview(
     Number(response.headers.get("content-length")) > limit
   ) {
     await response.body?.cancel();
+    if (response.status === 404 || response.status === 410) {
+      onMissingThumbnail?.();
+    }
     return null;
   }
   // Chunked replies do not always carry a Content-Length.
@@ -183,6 +190,7 @@ export async function readAttachmentPreview(
       (mime === "image/png" || mime === "image/jpeg" || dimensions.width || dimensions.height) &&
       Math.max(dimensions.width, dimensions.height) <= 16
     ) {
+      onMissingThumbnail?.();
       return null;
     }
   }

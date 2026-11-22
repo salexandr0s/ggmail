@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { platform } from "@electron-toolkit/utils";
 import { getAccountLabel } from "@ggmail/shared/accounts";
 import {
-  WORKSPACE_SIDEBAR_WIDTH,
+  workspaceSidebarWidth,
   APP_TITLEBAR_HEIGHT,
   GOOGLE_ACCOUNTS_URL,
 } from "@ggmail/shared/constants";
@@ -1057,7 +1057,7 @@ export class WorkspaceApp {
       return;
     }
 
-    const sidebarWidth = this._window ? 0 : WORKSPACE_SIDEBAR_WIDTH;
+    const sidebarWidth = this._window ? 0 : workspaceSidebarWidth(width);
 
     this.view.setBounds({
       x: sidebarWidth,

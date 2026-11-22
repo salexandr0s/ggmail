@@ -36,8 +36,11 @@ test("commits per-thread metadata, isolates mailboxes and clears removed account
   };
   const original = new AttachmentDiskIndex("A", "primary");
   original.update([{ id, signature: "first", entries: [entry] }], []);
+  const thumbnail = { mime: "image/png", bytes: Uint8Array.of(1, 2, 3).buffer };
+  original.saveThumbnail(entry, thumbnail);
   original.close();
   const db = new AttachmentDiskIndex("A", "primary");
+  expect(db.thumbnail(entry)).toEqual(thumbnail);
   expect(Array.from(db.read())).toMatchObject([
     {
       id,
@@ -54,12 +57,19 @@ test("commits per-thread metadata, isolates mailboxes and clears removed account
   expect(bytes).not.toContain("private-thumbnail-token");
   const delegated = new AttachmentDiskIndex("A", "delegated");
   const other = new AttachmentDiskIndex("B", "primary");
+  expect(delegated.thumbnail(entry)).toBeUndefined();
+  expect(other.thumbnail(entry)).toBeUndefined();
   expect(Array.from(delegated.read())).toEqual([]);
   expect(Array.from(other.read())).toEqual([]);
   other.update([{ id, signature: "other", entries: [entry] }], []);
+  other.saveThumbnail(entry, thumbnail);
   db.update([{ id, signature: "changed", entries: [] }], []);
+  expect(db.thumbnail(entry)).toBeUndefined();
   expect(Array.from(db.read())).toEqual([{ id, signature: "changed", entries: [] }]);
+  db.update([{ id, signature: "new", entries: [entry] }], []);
+  db.saveThumbnail(entry, thumbnail);
   db.update([], [id]);
+  expect(db.thumbnail(entry)).toBeUndefined();
   expect(Array.from(db.read())).toEqual([]);
   db.close();
   delegated.close();
@@ -67,10 +77,98 @@ test("commits per-thread metadata, isolates mailboxes and clears removed account
   clearAttachmentIndexes("A");
   expect(readdirSync(directory)).toHaveLength(1);
   const surviving = new AttachmentDiskIndex("B", "primary");
+  expect(surviving.thumbnail(entry)).toEqual(thumbnail);
   expect(Array.from(surviving.read())).toHaveLength(1);
   surviving.close();
   clearAttachmentIndexes();
   expect(readdirSync(profile)).toEqual([]);
+});
+
+test("caps stored thumbnail count and bytes and rejects full file previews", () => {
+  const db = new AttachmentDiskIndex("limits", "primary");
+  const id = "194a92f8c0000001";
+  const entry = (n: number): AttachmentEntry => ({
+    threadId: id,
+    messageId: id,
+    part: "0." + n,
+    file: {
+      id: id + "/0." + n,
+      name: "file.png",
+      subject: "",
+      sender: "",
+      receivedAt: 0,
+      size: "",
+      detectedCategories: ["uncategorized"],
+    },
+  });
+  const tiny = { mime: "image/png", bytes: new ArrayBuffer(1) };
+  for (let i = 0; i < 257; i++) {
+    db.saveThumbnail(entry(i), tiny);
+  }
+  expect(db.thumbnail(entry(0))).toBeUndefined();
+  expect(db.thumbnail(entry(1))).toEqual(tiny);
+  const large = { mime: "image/png", bytes: new ArrayBuffer(2 * 1024 * 1024) };
+  for (let i = 257; i < 266; i++) {
+    db.saveThumbnail(entry(i), large);
+  }
+  expect(db.thumbnail(entry(257))).toBeUndefined();
+  expect(db.thumbnail(entry(258))?.bytes.byteLength).toBe(large.bytes.byteLength);
+  db.saveThumbnail(entry(266), { ...tiny, mime: "application/pdf" });
+  db.saveThumbnail(entry(267), { ...tiny, bytes: new ArrayBuffer(large.bytes.byteLength + 1) });
+  expect(db.thumbnail(entry(266))).toBeUndefined();
+  expect(db.thumbnail(entry(267))).toBeUndefined();
+  db.close();
+});
+
+test("restores template graphics from old indexes and rechecks the thread once for embedded images", () => {
+  const id = "194a92f8c0000003";
+  const names = ["a", "b", "c", "d"].map((s) => s.repeat(32) + ".png");
+  const entries: AttachmentEntry[] = [...names, "small.png"].map((name, i) => {
+    const part = i < names.length ? "0.1." + (i + 1) : "0.2";
+    return {
+      threadId: id,
+      messageId: id,
+      part,
+      file: {
+        id: id + "/" + part,
+        name,
+        sender: "",
+        subject: "",
+        receivedAt: 0,
+        size: "12K",
+        detectedCategories: ["uncategorized"],
+      },
+    };
+  });
+  const old = new AttachmentDiskIndex("legacy-images", "primary");
+  old.update([{ id, signature: "unchanged", entries }], []);
+  old.close();
+  const upgraded = new AttachmentDiskIndex("legacy-images", "primary");
+  const [previous] = upgraded.read();
+  expect(previous?.signature).toBe("");
+  expect(previous?.entries.map(({ file }) => file.isEmbeddedImage)).toEqual([
+    true,
+    true,
+    true,
+    true,
+    undefined,
+  ]);
+  for (const entry of entries) {
+    entry.file.isEmbeddedImage = entry.part !== "0.2";
+  }
+  upgraded.update([{ id, signature: "unchanged", entries }], []);
+  upgraded.close();
+  const reopened = new AttachmentDiskIndex("legacy-images", "primary");
+  const [current] = reopened.read();
+  expect(current?.signature).toBe("unchanged");
+  expect(current?.entries.map(({ file }) => file.isEmbeddedImage)).toEqual([
+    true,
+    true,
+    true,
+    true,
+    false,
+  ]);
+  reopened.close();
 });
 
 test("upgrades legacy filenames in place across restarts and preserves context-only decisions", () => {

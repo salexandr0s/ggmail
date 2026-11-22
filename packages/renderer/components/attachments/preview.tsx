@@ -4,26 +4,24 @@ import { Button } from "@ggmail/ui/components/button";
 import { Dialog, DialogContent, DialogTitle } from "@ggmail/ui/components/dialog";
 import { useLingui } from "@lingui/react/macro";
 import { DownloadIcon, Loader2Icon, MailIcon } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { FileMark } from "./file-mark";
 import type { LibraryFile } from "./files";
 
-function usePreview(
-  account: string,
-  mailboxKey: string,
-  id: string,
-  size: "full" | "thumbnail" | "cover",
-  enabled: boolean,
-) {
+function useFilePreview(account: string, mailboxKey: string, id: string) {
   const [preview, setPreview] = useState<{ mime: string; url: string; text?: string } | null>();
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
     let active = true;
     let url: string | undefined;
     ipc.main
-      .invoke("attachments.preview", account, mailboxKey, id, size)
+      .invoke("attachments.preview", account, mailboxKey, id, "full")
       .then((file) => {
         if (!active) {
           return;
@@ -50,9 +48,43 @@ function usePreview(
         URL.revokeObjectURL(url);
       }
     };
-  }, [account, mailboxKey, id, size, enabled]);
+  }, [account, mailboxKey, id]);
   return preview;
 }
+
+const lookAhead = 240;
+function thumbnailObserver(root: Element, margin: number) {
+  const callbacks = new WeakMap<Element, () => void>();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target);
+          callbacks.get(entry.target)?.();
+          callbacks.delete(entry.target);
+        }
+      }
+    },
+    // oxlint-disable-next-line lingui/no-unlocalized-strings -- CSS length for IntersectionObserver.
+    { root, rootMargin: margin + "px 0px" },
+  );
+  return (element: Element, load: () => void) => {
+    callbacks.set(element, load);
+    observer.observe(element);
+    return () => {
+      observer.unobserve(element);
+      callbacks.delete(element);
+    };
+  };
+}
+
+const viewports = new WeakMap<
+  Element,
+  {
+    near: ReturnType<typeof thumbnailObserver>;
+    visible: ReturnType<typeof thumbnailObserver>;
+  }
+>();
 
 export function FileThumbnail({
   item,
@@ -64,27 +96,65 @@ export function FileThumbnail({
   children: ReactNode;
 }) {
   const element = useRef<HTMLSpanElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [url, setUrl] = useState<string>();
   const [failed, setFailed] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting) {
-        setVisible(true);
-        observer.disconnect();
-      }
-    });
-    if (element.current) {
-      observer.observe(element.current);
+  const accountId = item.account.id;
+  const { id, mailboxKey } = item;
+  useLayoutEffect(() => {
+    const node = element.current;
+    const root = node?.closest("[data-attachment-viewport]");
+    if (!node || !root) {
+      return;
     }
-    return () => observer.disconnect();
-  }, []);
-  const preview = usePreview(
-    item.account.id,
-    item.mailboxKey,
-    item.id,
-    large ? "cover" : "thumbnail",
-    visible,
-  );
+    let observers = viewports.get(root);
+    if (!observers) {
+      observers = { near: thumbnailObserver(root, lookAhead), visible: thumbnailObserver(root, 0) };
+      viewports.set(root, observers);
+    }
+    let active = true;
+    let objectUrl: string | undefined;
+    let coverRequested = false;
+    const load = (size: "thumbnail" | "cover") => {
+      if (objectUrl || coverRequested) {
+        return;
+      }
+      coverRequested = size === "cover";
+      void ipc.main
+        .invoke("attachments.preview", accountId, mailboxKey, id, size)
+        .then((file) => {
+          if (active && file && !objectUrl) {
+            objectUrl = URL.createObjectURL(new Blob([file.bytes], { type: file.mime }));
+            setUrl(objectUrl);
+          }
+        })
+        .catch(() => {});
+    };
+    const bounds = node.getBoundingClientRect();
+    const viewport = root.getBoundingClientRect();
+    const gap = Math.max(viewport.top - bounds.bottom, bounds.top - viewport.bottom);
+    const cleanup: (() => void)[] = [];
+    if (gap <= 0) {
+      load(large ? "cover" : "thumbnail");
+    } else {
+      if (gap <= lookAhead) {
+        load("thumbnail");
+      } else {
+        cleanup.push(observers.near(node, () => load("thumbnail")));
+      }
+      if (large) {
+        cleanup.push(observers.visible(node, () => load("cover")));
+      }
+    }
+    return () => {
+      active = false;
+      for (const stop of cleanup) {
+        stop();
+      }
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [accountId, mailboxKey, id, large]);
   return (
     <span
       ref={element}
@@ -92,11 +162,7 @@ export function FileThumbnail({
       className={large ? "attachment-cover" : "attachment-miniature"}
       data-file-kind={fileKind(item.name)}
     >
-      {preview && !failed ? (
-        <img src={preview.url} alt="" onError={() => setFailed(true)} />
-      ) : (
-        children
-      )}
+      {url && !failed ? <img src={url} alt="" onError={() => setFailed(true)} /> : children}
     </span>
   );
 }
@@ -117,7 +183,7 @@ export function FilePreview({
   returnFocus: RefObject<HTMLButtonElement | null>;
 }) {
   const { t } = useLingui();
-  const file = usePreview(item.account.id, item.mailboxKey, item.id, "full", true);
+  const file = useFilePreview(item.account.id, item.mailboxKey, item.id);
   const [failed, setFailed] = useState(false);
   return (
     <Dialog

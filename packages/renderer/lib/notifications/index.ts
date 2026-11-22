@@ -1,6 +1,6 @@
+import type { NotificationSound } from "@ggmail/shared/types";
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { NotificationSound } from "@ggmail/shared/types";
 import breeze from "./sounds/breeze.wav";
 import chime from "./sounds/chime.wav";
 import duet from "./sounds/duet.wav";
@@ -31,5 +31,7 @@ export function playNotificationSound({
 
   audio.volume = volume;
 
-  audio.play();
+  void audio
+    .play()
+    .catch((error: unknown) => console.warn("Notification sound could not play", error));
 }

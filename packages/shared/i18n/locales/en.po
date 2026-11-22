@@ -282,8 +282,8 @@ msgstr "8 Hours"
 
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
-msgid "A notification shows the code either way. Press its Copy button to copy the code yourself."
-msgstr "A notification shows the code either way. Press its Copy button to copy the code yourself."
+msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
+msgstr "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -325,6 +325,7 @@ msgstr "Account actions"
 #. A page of Settings, named in the settings sidebar and as the page's title
 #. Heading of the Appearance section for how accounts look
 #: packages/app/menu.ts
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/lib/settings-pages.ts
 #: packages/renderer/mail-views.tsx
@@ -351,9 +352,13 @@ msgid "Add"
 msgstr "Add"
 
 #. Screen reader label of the button that puts a Workspace app in the launcher; label is the app's name
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Add {label} to launcher"
 msgstr "Add {label} to launcher"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Add {label} to sidebar"
+msgstr "Add {label} to sidebar"
 
 #. allowlistEntry is the line to add to 1Password's list of allowed browsers, which stays as it is
 #: packages/renderer/routes/settings/extensions.tsx
@@ -589,7 +594,7 @@ msgid "Automatically select the first account with unread emails when clicking t
 msgstr "Automatically select the first account with unread emails when clicking the system tray icon."
 
 #. Heading of the Workspace apps that can be added to the launcher
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Available"
 msgstr "Available"
 
@@ -659,8 +664,10 @@ msgstr "Bookmark"
 
 #. Heading of the bookmarks popup
 #. Heading of the bookmarks popup
+#. Heading of the bookmarks popup
 #: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/routes/settings/sidebar.tsx
 msgid "Bookmarks"
 msgstr "Bookmarks"
 
@@ -904,6 +911,7 @@ msgstr "Clear color"
 msgid "Clear filters"
 msgstr "Clear filters"
 
+#: packages/renderer/bookmarks.tsx
 #: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -916,6 +924,7 @@ msgstr "Clear search"
 #: packages/renderer/components/attachments/preview.tsx
 #: packages/renderer/components/popup.tsx
 #: packages/renderer/components/settings-dialog-content.tsx
+#: packages/renderer/settings.tsx
 msgid "Close"
 msgstr "Close"
 
@@ -1165,6 +1174,10 @@ msgstr "Couldn’t check {unavailableAccounts} for attachments."
 msgid "Couldn’t check this mailbox."
 msgstr "Couldn’t check this mailbox."
 
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't clear the saved chat."
+msgstr "Couldn't clear the saved chat."
+
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
 msgstr "Couldn't connect to ChatGPT. Try again."
@@ -1193,6 +1206,10 @@ msgstr "Couldn't install {extensionName}"
 #: packages/app/lib/extension-swap.ts
 msgid "Couldn't install the extension: {errorMessage}"
 msgstr "Couldn't install the extension: {errorMessage}"
+
+#: packages/renderer/components/assistant/assistant-panel.tsx
+msgid "Couldn't load the saved chat."
+msgstr "Couldn't load the saved chat."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't open {extensionName}"
@@ -1513,11 +1530,15 @@ msgstr "Draft an email"
 msgid "Draft email"
 msgstr "Draft email"
 
+#: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
-#: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Drag {label} to reorder"
 msgstr "Drag {label} to reorder"
+
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Drag shortcuts into the order you want. Settings stays pinned at the bottom for all accounts."
+msgstr "Drag shortcuts into the order you want. Settings stays pinned at the bottom for all accounts."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
@@ -1632,6 +1653,10 @@ msgctxt "Windows"
 msgid "Enable system tray icon"
 msgstr "Enable system tray icon"
 
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "End time"
+msgstr "End time"
+
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a color"
 msgstr "Enter a color"
@@ -1667,6 +1692,10 @@ msgstr "Enter a valid hex, rgb, or rgba color"
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Enter a website address, like {exampleSite}."
 msgstr "Enter a website address, like {exampleSite}."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Every day"
+msgstr "Every day"
 
 #. Setting that picks the Workspace apps that open in the external browser
 #: packages/renderer/routes/settings/workspace-apps.tsx
@@ -1806,6 +1835,7 @@ msgid "Filter by account"
 msgstr "Filter by account"
 
 #: packages/renderer/components/app-sidebar.tsx
+#: packages/renderer/settings.tsx
 msgid "Filter pages"
 msgstr "Filter pages"
 
@@ -1931,6 +1961,10 @@ msgstr "ggmail can't open this link in a browser."
 msgid "ggmail couldn't check for updates."
 msgstr "ggmail couldn't check for updates."
 
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "ggmail couldn’t confirm delivery. Check your system notification settings."
+msgstr "ggmail couldn’t confirm delivery. Check your system notification settings."
+
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail couldn't delete this account's browsing data. Try again."
 msgstr "ggmail couldn't delete this account's browsing data. Try again."
@@ -1971,10 +2005,6 @@ msgstr "ggmail keeps this account signed in but doesn't load it."
 msgid "ggmail needs at least one account turned on."
 msgstr "ggmail needs at least one account turned on."
 
-#: packages/renderer/routes/settings/ai.tsx
-msgid "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
-msgstr "ggmail sends your prompt and relevant mail to this provider when you ask a question. Switching providers starts a new chat."
-
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
 msgstr "ggmail signs out of this account and clears its data from this computer, including saved tabs and bookmarks. Your Gmail account isn't affected."
@@ -1993,6 +2023,7 @@ msgstr "Gmail Keyboard Shortcuts"
 msgid "Gmail Settings"
 msgstr "Gmail Settings"
 
+#: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/titlebar.tsx
 msgid "Go back"
 msgstr "Go back"
@@ -2174,9 +2205,13 @@ msgid "Important only"
 msgstr "Important only"
 
 #. Heading of the Workspace apps already in the launcher
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "In launcher"
 msgstr "In launcher"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "In sidebar"
+msgstr "In sidebar"
 
 #. Heading of the Gmail page's section about Gmail's inbox; Inbox follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -2187,6 +2222,11 @@ msgstr "Inbox"
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Inbox only"
 msgstr "Inbox only"
+
+#: packages/renderer/components/attachments/detail-filters.tsx
+#: packages/renderer/routes/attachments.tsx
+msgid "Include embedded images"
+msgstr "Include embedded images"
 
 #. How long Do Not Disturb keeps notifications silenced, in its menu
 #: packages/app/do-not-disturb.ts
@@ -2498,6 +2538,8 @@ msgid "More filters"
 msgstr "More filters"
 
 #. Button in a Google Workspace app window's titlebar that opens its menu
+#: packages/renderer/components/app-titlebar.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 #: packages/renderer/workspace-app.tsx
 msgid "More options"
 msgstr "More options"
@@ -2585,7 +2627,7 @@ msgid "No additional languages selected"
 msgstr "No additional languages selected"
 
 #. Available quotes the heading of the apps that can be added, so it matches that heading's wording
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "No apps in the launcher yet. Add one from Available."
 msgstr "No apps in the launcher yet. Add one from Available."
 
@@ -2634,6 +2676,10 @@ msgstr "No free time slot left for another window. Remove or shorten one first."
 #: packages/app/context-menu.ts
 msgid "No Guesses Found"
 msgstr "No Guesses Found"
+
+#: packages/renderer/bookmarks.tsx
+msgid "No matching bookmarks"
+msgstr "No matching bookmarks"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "No matching conversations"
@@ -2745,6 +2791,10 @@ msgstr "Only one password manager can be on at a time. Turning on {extensionName
 #: packages/app/workspace-app.ts
 msgid "Only passkeys created in ggmail work here."
 msgstr "Only passkeys created in ggmail work here."
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Only Settings is pinned. Add a shortcut from Available."
+msgstr "Only Settings is pinned. Add a shortcut from Available."
 
 #. Option of the When to copy setting: when a detected verification code is copied to the clipboard
 #: packages/shared/verification-codes.ts
@@ -3012,6 +3062,10 @@ msgstr "Play a sound when showing a notification."
 msgid "Play sound"
 msgstr "Play sound"
 
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Preview"
+msgstr "Preview"
+
 #: packages/renderer/components/attachments/files.tsx
 msgid "Preview attachment"
 msgstr "Preview attachment"
@@ -3182,9 +3236,13 @@ msgid "Remove"
 msgstr "Remove"
 
 #. Screen reader label of the button that takes a Workspace app out of the launcher; label is the app's name
-#: packages/renderer/routes/settings/workspace-apps.tsx
+#: packages/renderer/components/app-picker.tsx
 msgid "Remove {label} from launcher"
 msgstr "Remove {label} from launcher"
+
+#: packages/renderer/components/app-picker.tsx
+msgid "Remove {label} from sidebar"
+msgstr "Remove {label} from sidebar"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove {label}?"
@@ -3307,6 +3365,10 @@ msgstr "Restart ggmail."
 msgid "Restart now"
 msgstr "Restart now"
 
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Restore defaults"
+msgstr "Restore defaults"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Restrict minimum window size"
 msgstr "Restrict minimum window size"
@@ -3408,6 +3470,10 @@ msgstr "Search all accounts"
 #: packages/renderer/routes/attachments.tsx
 msgid "Search attachments"
 msgstr "Search attachments"
+
+#: packages/renderer/bookmarks.tsx
+msgid "Search bookmarks"
+msgstr "Search bookmarks"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Search files, senders, or subjects"
@@ -3558,6 +3624,7 @@ msgstr "Set up the mail assistant"
 #. Title of the Settings window, in its titlebar
 #: packages/renderer/components/app-sidebar.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
+#: packages/renderer/routes/settings/sidebar.tsx
 #: packages/renderer/settings.tsx
 msgid "Settings"
 msgstr "Settings"
@@ -3842,6 +3909,15 @@ msgstr "Show unread messages from your accounts in one place."
 msgid "Show windows"
 msgstr "Show windows"
 
+#. A page of Settings, named in the settings sidebar and as the page's title
+#: packages/renderer/lib/settings-pages.ts
+msgid "Sidebar"
+msgstr "Sidebar"
+
+#: packages/renderer/routes/settings/sidebar.tsx
+msgid "Sidebar shortcuts"
+msgstr "Sidebar shortcuts"
+
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/components/workspace-sidebar.tsx
@@ -3969,6 +4045,10 @@ msgstr "Start the application automatically when you log in to your computer."
 #: packages/renderer/routes/settings/general.tsx
 msgid "Start the application minimized."
 msgstr "Start the application minimized."
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Start time"
+msgstr "Start time"
 
 #. Heading of the Settings section about how ggmail starts
 #: packages/renderer/routes/settings/general.tsx
@@ -4171,7 +4251,7 @@ msgstr "This deletes the saved search, not the mail it finds."
 msgid "This is the last version of ggmail for this Mac."
 msgstr "This is the last version of ggmail for this Mac."
 
-#: packages/app/ipc.ts
+#: packages/shared/mail-notification.ts
 msgid "This is what a new email notification looks like."
 msgstr "This is what a new email notification looks like."
 
@@ -4368,6 +4448,10 @@ msgid "User styles"
 msgstr "User styles"
 
 #: packages/app/gmail/index.ts
+msgid "Verification code"
+msgstr "Verification code"
+
+#: packages/app/gmail/index.ts
 msgid "Verification code {verificationCode}"
 msgstr "Verification code {verificationCode}"
 
@@ -4458,6 +4542,10 @@ msgstr "When another tab is active"
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "When to copy"
 msgstr "When to copy"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "When you ask a question, ggmail sends recent chat history and relevant mail to the selected provider."
+msgstr "When you ask a question, ggmail sends recent chat history and relevant mail to the selected provider."
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Where downloaded files are saved."
@@ -4553,7 +4641,7 @@ msgid "Your ChatGPT usage limit was reached. Try again later."
 msgstr "Your ChatGPT usage limit was reached. Try again later."
 
 #. Subject of the sample email in the test notification
-#: packages/app/ipc.ts
+#: packages/shared/mail-notification.ts
 msgid "Your test notification request"
 msgstr "Your test notification request"
 

@@ -1,5 +1,5 @@
 import { platform } from "@electron-toolkit/utils";
-import { APP_TITLEBAR_HEIGHT, BASE_SPACING } from "@ggmail/shared/constants";
+import { APP_TITLEBAR_HEIGHT, BASE_SPACING, workspaceSidebarWidth } from "@ggmail/shared/constants";
 import { clamp } from "@ggmail/shared/utils";
 import type { BrowserWindow, Rectangle } from "electron";
 import { WebContentsView } from "electron";
@@ -18,16 +18,19 @@ export type PopupOptions = {
   searchParams?: URLSearchParams;
   /** The size of the popup itself, without the gaps the view spans. */
   width: number;
-  /** `fill` reaches the bottom of the window, leaving the gap it hangs by. */
-  height: number | "fill";
-  anchor?: PopupAnchor;
+  height: number;
+  anchor?: PopupAnchor | { sidebarTop: number | null };
 };
 
-function isSameAnchor(anchor: PopupAnchor | undefined, otherAnchor: PopupAnchor | undefined) {
-  if (!anchor || !otherAnchor) {
+function isSameAnchor(anchor: PopupOptions["anchor"], otherAnchor: PopupOptions["anchor"]) {
+  if (typeof anchor !== "object" || typeof otherAnchor !== "object") {
     return anchor === otherAnchor;
   }
 
+  if ("sidebarTop" in anchor || "sidebarTop" in otherAnchor) {
+    // It is still the same Bookmarks button after the rail has scrolled or resized.
+    return "sidebarTop" in anchor && "sidebarTop" in otherAnchor;
+  }
   return (
     anchor.x === otherAnchor.x && anchor.y === otherAnchor.y && anchor.align === otherAnchor.align
   );
@@ -78,6 +81,13 @@ export class Popup {
     return this.view?.webContents ?? null;
   }
 
+  setHeight(height: number) {
+    if (this.options && this.options.height !== height) {
+      this.options.height = height;
+      this.setBounds();
+    }
+  }
+
   private setBounds = () => {
     const { view, parentWindow, options } = this;
 
@@ -93,19 +103,41 @@ export class Popup {
 
     const { width } = options;
 
+    if (options.anchor && "sidebarTop" in options.anchor) {
+      const sidebarWidth = workspaceSidebarWidth(parentWindowBounds.width);
+      const height = Math.min(
+        options.height + padding * 2,
+        Math.max(0, parentWindowBounds.height - APP_TITLEBAR_HEIGHT),
+      );
+      view.setBounds({
+        x: sidebarWidth,
+        y:
+          options.anchor.sidebarTop === null
+            ? parentWindowBounds.height - height
+            : clamp(
+                options.anchor.sidebarTop - padding,
+                APP_TITLEBAR_HEIGHT,
+                parentWindowBounds.height - height,
+              ),
+        width: Math.min(width + padding * 2, Math.max(0, parentWindowBounds.width - sidebarWidth)),
+        height,
+      });
+      return;
+    }
+
     const anchor = options.anchor ?? {
       x: parentWindowBounds.width - padding,
       y: APP_TITLEBAR_HEIGHT + padding,
       align: "end" as const,
     };
 
-    const viewWidth = width + padding * 2;
+    const viewWidth = Math.min(parentWindowBounds.width, width + padding * 2);
 
     const viewY = anchor.y - padding;
 
     const availableHeight = Math.max(parentWindowBounds.height - viewY, 0);
 
-    const viewHeight = options.height === "fill" ? availableHeight : options.height + padding * 2;
+    const viewHeight = options.height + padding * 2;
 
     view.setBounds({
       x: clamp(

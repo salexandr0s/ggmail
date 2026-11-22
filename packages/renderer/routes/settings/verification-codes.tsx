@@ -37,7 +37,7 @@ export function VerificationCodesSettings() {
             label={t`When to copy`}
             description={t({
               message:
-                "A notification shows the code either way. Press its Copy button to copy the code yourself.",
+                "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button.",
               comment:
                 "Copy names the button on the verification code notification, so it matches that button's label",
             })}

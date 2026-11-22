@@ -37,10 +37,12 @@ import {
   SearchIcon,
   CalendarDaysIcon,
   HardDriveIcon,
+  ImageIcon,
   UserRoundIcon,
   XIcon,
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { create } from "zustand";
 import { categoryIcons, useCategoryLabels } from "@/components/attachments/categories";
 import { DetailFilters, useSizeLabels } from "@/components/attachments/detail-filters";
@@ -51,6 +53,8 @@ import {
   FilterMenu,
   type KindOption,
 } from "@/components/attachments/filters";
+import { AttachmentIcon } from "@/components/mail-icons";
+import { MailPageTitle } from "@/components/mail-page";
 import {
   dateBoundary,
   emptyAttachmentFilters,
@@ -61,7 +65,7 @@ import {
 import { createDateTimeFormatter } from "@/lib/date";
 import { useConfig, useConfigMutation } from "@/lib/react-query";
 import { useAccountsStore } from "@/lib/stores";
-import { useAttachmentFiles } from "@/lib/use-attachment-files";
+import { attachmentPageSize as pageSize, useAttachmentFiles } from "@/lib/use-attachment-files";
 import "@/components/attachments/library.css";
 
 // Keep the reader's place when a file opens in Gmail. Only the layout persists across app launches.
@@ -76,7 +80,6 @@ const setBrowse = (changes: Partial<ReturnType<typeof useBrowseState.getState>>)
   position = { top: 0 };
   useBrowseState.setState(changes);
 };
-const pageSize = 36;
 const changeFilters = (change: Partial<AttachmentFilters>) => setBrowse({ ...change, page: 0 });
 
 export function Attachments() {
@@ -102,6 +105,7 @@ export function Attachments() {
     from,
     through,
     size,
+    includeEmbeddedImages,
     sort,
     page,
   } = browse;
@@ -110,6 +114,20 @@ export function Attachments() {
   const grid = config?.["attachments.layout"] === "grid";
   const searchInput = useRef<HTMLInputElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
+  useHotkeys(
+    "/",
+    (event) => {
+      if (
+        !document.querySelector(
+          ':is([role="dialog"], [role="menu"], [role="listbox"]):not([data-closed])',
+        )
+      ) {
+        event.preventDefault();
+        searchInput.current?.focus();
+      }
+    },
+    { useKey: true },
+  );
   const restore = useRef<LibraryPosition | null>(position);
   const previousBrowse = useRef(browse);
   const previousGrid = useRef(grid);
@@ -171,8 +189,21 @@ export function Attachments() {
         from,
         through,
         size,
+        includeEmbeddedImages,
       }),
-    [index, chosen, kinds, categories, query, sender, extension, from, through, size],
+    [
+      index,
+      chosen,
+      kinds,
+      categories,
+      query,
+      sender,
+      extension,
+      from,
+      through,
+      size,
+      includeEmbeddedImages,
+    ],
   );
   const { results } = matches;
   const count = results.length;
@@ -241,6 +272,12 @@ export function Attachments() {
       label: size ? sizeLabels[size] : "",
       Icon: HardDriveIcon,
       remove: () => changeFilters({ size: null }),
+    },
+    {
+      key: "embedded",
+      label: includeEmbeddedImages && t`Include embedded images`,
+      Icon: ImageIcon,
+      remove: () => changeFilters({ includeEmbeddedImages: false }),
     },
   ].filter(({ label }) => label);
   const activeFilters = [
@@ -371,10 +408,10 @@ export function Attachments() {
       aria-label={t`Attachments`}
       className="mail-workspace attachment-library @container/library flex min-h-0 min-w-0 flex-1 flex-col bg-background"
     >
-      <header className="attachment-header">
-        <h1 className="page-heading-title">
+      <header className="mail-page-header attachment-header">
+        <MailPageTitle icon={<AttachmentIcon />}>
           <Trans>Attachments</Trans>
-        </h1>
+        </MailPageTitle>
         <InputGroup className="mail-search-field attachment-search">
           <InputGroupAddon>
             <SearchIcon />
@@ -383,6 +420,16 @@ export function Attachments() {
             ref={searchInput}
             type="search"
             className="[&::-webkit-search-cancel-button]:hidden"
+            aria-keyshortcuts="/"
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown" && !event.nativeEvent.isComposing) {
+                const first = viewport.current?.querySelector<HTMLButtonElement>("[data-file-key]");
+                if (first) {
+                  event.preventDefault();
+                  first.focus();
+                }
+              }
+            }}
             aria-label={t`Search attachments`}
             placeholder={t`Search files, senders, or subjects`}
             value={query}
@@ -425,7 +472,6 @@ export function Attachments() {
         </aside>
         <section aria-label={t`All files`} className="attachment-results @container/results">
           <div className="attachment-results-panel">
-            <div className="attachment-type-bar hidden @min-[54rem]/library:block">{formats}</div>
             <div className="attachment-toolbar">
               <h2
                 aria-live="polite"
@@ -438,6 +484,7 @@ export function Attachments() {
               <div className="attachment-view-tools">
                 <div className="@min-[54rem]/library:hidden">
                   <FilterMenu
+                    sheet
                     title={t`Filters`}
                     applied={activeFilters.length}
                     count={count}
@@ -505,6 +552,7 @@ export function Attachments() {
                 </div>
               </div>
             </div>
+            <div className="attachment-type-bar hidden @min-[54rem]/library:block">{formats}</div>
             {activeFilters.length > 0 && (
               <div className="attachment-applied">
                 <div className="attachment-filter-chips">
@@ -538,52 +586,9 @@ export function Attachments() {
                 >{t`Clear filters`}</Button>
               </div>
             )}
-            {hasIssue && (
-              <div role="status" className="attachment-warning">
-                <CircleAlertIcon className="size-4 shrink-0" />
-                <div className="min-w-40 flex-1 space-y-1">
-                  {partialAccounts && (
-                    <p>
-                      <Trans>
-                        Some messages in {partialAccounts} couldn’t be checked. Previously loaded
-                        files are still available.
-                      </Trans>
-                    </p>
-                  )}
-                  {unavailableAccounts && (
-                    <p>
-                      <Trans>Couldn’t check {unavailableAccounts} for attachments.</Trans>
-                    </p>
-                  )}
-                  {signedOutAccounts && (
-                    <p>
-                      <Trans>Sign in to {signedOutAccounts} to load attachments.</Trans>
-                    </p>
-                  )}
-                </div>
-                {incomplete.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => retry(incomplete.map((a) => a.config.id))}
-                  >
-                    <Trans>Retry</Trans>
-                  </Button>
-                )}
-              </div>
-            )}
-            {count > 0 && loading && (
-              <div className="attachment-loading">
-                <Loader2Icon className="size-3 motion-safe:animate-spin" />
-                {hasIssue ? (
-                  <Trans>Still checking {loadingAccounts}…</Trans>
-                ) : (
-                  <Trans>Loading older mail…</Trans>
-                )}
-              </div>
-            )}
             <div
               ref={viewport}
+              data-attachment-viewport
               className="flex min-h-0 flex-1 flex-col overflow-y-auto"
               onScroll={(event) => {
                 if (!restore.current) {
@@ -595,6 +600,50 @@ export function Attachments() {
                 position.key = undefined;
               }}
             >
+              {hasIssue && (
+                <div role="status" className="attachment-warning">
+                  <CircleAlertIcon className="size-4 shrink-0" />
+                  <div className="min-w-40 flex-1 space-y-1">
+                    {partialAccounts && (
+                      <p>
+                        <Trans>
+                          Some messages in {partialAccounts} couldn’t be checked. Previously loaded
+                          files are still available.
+                        </Trans>
+                      </p>
+                    )}
+                    {unavailableAccounts && (
+                      <p>
+                        <Trans>Couldn’t check {unavailableAccounts} for attachments.</Trans>
+                      </p>
+                    )}
+                    {signedOutAccounts && (
+                      <p>
+                        <Trans>Sign in to {signedOutAccounts} to load attachments.</Trans>
+                      </p>
+                    )}
+                  </div>
+                  {incomplete.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => retry(incomplete.map((a) => a.config.id))}
+                    >
+                      <Trans>Retry</Trans>
+                    </Button>
+                  )}
+                </div>
+              )}
+              {count > 0 && loading && (
+                <div className="attachment-loading">
+                  <Loader2Icon className="size-3 motion-safe:animate-spin" />
+                  {hasIssue ? (
+                    <Trans>Still checking {loadingAccounts}…</Trans>
+                  ) : (
+                    <Trans>Loading older mail…</Trans>
+                  )}
+                </div>
+              )}
               {count > 0 ? (
                 <>
                   {!grid && <ListHeadings />}

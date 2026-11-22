@@ -55,6 +55,7 @@ for (const starter of [false, true]) {
           }
           return {
             status: "complete",
+            scopeKey: request.scopeKey ?? "fixture",
             reply: { text: request.prompt + " answered", citations: [] },
           };
         },
@@ -152,6 +153,7 @@ for (const provider of assistantProviderSchema.options) {
             }
             return {
               status: "complete",
+              scopeKey: request.scopeKey ?? "fixture",
               reply: {
                 text: markdown,
                 citations: ["Brief", "Agenda"].map((subject, index) => ({
@@ -333,26 +335,30 @@ async function openThread() {
   );
 }
 
+// Hold the first provider response so the test can navigate mid-reply.
+function holdProvider() {
+  return ggmail.app.evaluateHandle(() => {
+    const gate = Promise.withResolvers<void>();
+    const inputs: Array<Array<{ role: string; content: string }>> = [];
+    const fetch = globalThis.fetch;
+    globalThis.fetch = (async (url, options) => {
+      if (String(url) === "https://api.openai.com/v1/responses") {
+        inputs.push(JSON.parse(String(options?.body)).input);
+        await gate.promise;
+      }
+      return fetch(url, options);
+    }) as typeof globalThis.fetch;
+    return { inputs, finish: gate.resolve };
+  });
+}
+
 test("closing the assistant keeps its conversation, pending reply and unsent follow-up", async () => {
   const mail = await openThread();
   const first = "When is the review?";
   const answer = "Friday at ten.";
   const followUp = "Who will attend?";
   await useDraftProvider(null, answer);
-  const provider = await ggmail.app.evaluateHandle(() => {
-    const gate = Promise.withResolvers<void>();
-    const histories: unknown[][] = [];
-    const fetch = globalThis.fetch;
-    globalThis.fetch = (async (url, options) => {
-      if (String(url) === "https://api.openai.com/v1/responses") {
-        const { input } = JSON.parse(String(options?.body)) as { input: unknown[] };
-        histories.push(input.slice(0, -1));
-        await gate.promise;
-      }
-      return fetch(url, options);
-    }) as typeof globalThis.fetch;
-    return { histories, finish: gate.resolve };
-  });
+  const provider = await holdProvider();
 
   const page = ggmail.renderer;
   const toggle = page.getByRole("button", { name: "Mail assistant", exact: true });
@@ -361,11 +367,14 @@ test("closing the assistant keeps its conversation, pending reply and unsent fol
   await toggle.click();
   await composer.fill(first);
   await composer.press("Enter");
-  await expect.poll(() => provider.evaluate(({ histories }) => histories.length)).toBe(1);
+  await expect.poll(() => provider.evaluate(({ inputs }) => inputs.length)).toBe(1);
   await composer.fill(followUp);
   await panel.getByRole("button", { name: "Close mail assistant" }).click();
   await expect(page.locator(".assistant-drawer")).toHaveCSS("width", "0px");
   await expect(panel).toHaveCount(0);
+  await mail.evaluate(() => {
+    location.hash = "#inbox";
+  });
   await provider.evaluate(({ finish }) => finish());
   await toggle.click();
   await expect(panel.getByText(first, { exact: true })).toBeVisible();
@@ -373,11 +382,17 @@ test("closing the assistant keeps its conversation, pending reply and unsent fol
   await expect(composer).toHaveValue(followUp);
   await composer.press("Enter");
   await expect(panel.locator(".assistant-answer")).toHaveCount(2);
-  expect(await provider.evaluate(({ histories }) => histories[1])).toEqual([
+  expect(await provider.evaluate(({ inputs }) => inputs[1]?.slice(0, -1))).toEqual([
     { role: "user", content: first },
     { role: "assistant", content: expect.stringContaining(answer) },
   ]);
 
+  // Open the email with the assistant visible, as when following a result.
+  await mail.evaluate((id) => {
+    location.hash = "#inbox/" + id;
+  }, threadId);
+  await expect(panel.getByText("Open email", { exact: true })).toBeVisible();
+  await expect(panel.locator(".assistant-answer")).toHaveCount(2);
   await composer.fill("Unsent note");
   await composer.press("Escape");
   await expect(toggle).toBeFocused();
@@ -391,7 +406,7 @@ test("closing the assistant keeps its conversation, pending reply and unsent fol
   await composer.fill("New topic");
   await composer.press("Enter");
   await expect(panel.getByText(answer, { exact: true })).toBeVisible();
-  expect(await provider.evaluate(({ histories }) => histories[2])).toEqual([]);
+  expect(await provider.evaluate(({ inputs }) => inputs[2]?.slice(0, -1))).toEqual([]);
 
   await composer.fill("Note for this thread");
   await toggle.click();
@@ -400,10 +415,49 @@ test("closing the assistant keeps its conversation, pending reply and unsent fol
     location.hash = "#inbox";
   });
   await toggle.click();
-  await expect(panel.getByRole("button", { name: "Catch me up" })).toBeVisible();
-  await expect(composer).toHaveValue("");
-  await expect(panel.locator(".assistant-answer")).toHaveCount(0);
+  await expect(panel.getByText("Current mail view", { exact: true })).toBeVisible();
+  await expect(composer).toHaveValue("Note for this thread");
+  await expect(panel.getByText("New topic", { exact: true })).toBeVisible();
+  await expect(panel.locator(".assistant-answer")).toHaveCount(1);
   await provider.dispose();
+});
+
+test("relaunch restores the conversation and unsent message until New chat clears both", async () => {
+  await openThread();
+  await useDraftProvider(null, "The review starts on Friday.");
+  async function openPanel() {
+    const page = ggmail.renderer;
+    await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+    return page.getByRole("complementary", { name: "Mail assistant" });
+  }
+  let panel = await openPanel();
+  let composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await composer.fill("When is the review?");
+  await composer.press("Enter");
+  await expect(panel.getByText("The review starts on Friday.", { exact: true })).toBeVisible();
+  await composer.fill("Which Friday?");
+  await ggmail.relaunch();
+  await useDraftProvider(null, "This Friday.");
+  const provider = await holdProvider();
+  await provider.evaluate(({ finish }) => finish());
+  panel = await openPanel();
+  composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await expect(panel.getByText("When is the review?", { exact: true })).toBeVisible();
+  await expect(composer).toHaveValue("Which Friday?");
+  await composer.press("Enter");
+  await expect(panel.getByText("This Friday.", { exact: true })).toBeVisible();
+  expect(await provider.evaluate(({ inputs }) => inputs[0]?.[1]?.content)).toContain(
+    "The review starts on Friday.",
+  );
+  await provider.dispose();
+  await composer.fill("Another follow-up");
+  await panel.getByRole("button", { name: "New chat" }).click();
+  await expect(composer).toHaveValue("");
+  await ggmail.relaunch();
+  await useDraftProvider(null);
+  panel = await openPanel();
+  await expect(panel.getByRole("textbox")).toHaveValue("");
+  await expect(panel.getByRole("log")).toHaveCount(0);
 });
 
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
@@ -597,6 +651,7 @@ test("the assistant drawer stays uncovered when switching between mail accounts"
   }
 
   await useDraftProvider(null);
+  const provider = await holdProvider();
   await expectLayout(secondUrl, 0);
   await toggle.click();
   await expectLayout(secondUrl, full);
@@ -604,10 +659,12 @@ test("the assistant drawer stays uncovered when switching between mail accounts"
   const scopeAvatar = panel.locator('header [data-slot="account-avatar"]');
   await expect(scopeAvatar).toHaveText("S");
   const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
-  await composer.fill("Private note for the second mailbox");
+  await composer.fill("What needs my attention?");
+  await composer.press("Enter");
+  await expect.poll(() => provider.evaluate(({ inputs }) => inputs.length)).toBe(1);
+  await composer.fill("Follow-up across mailboxes");
 
-  // Hold the scope lookup across the account switch. The old composer must
-  // disappear as soon as the account changes, even before the new scope arrives.
+  // The transcript and unsent text stay visible while the next mailbox loads.
   const gate = await ggmail.app.evaluateHandle(({ BrowserWindow }, context) => {
     const win = BrowserWindow.getAllWindows().find((w) =>
       w.webContents.getURL().includes("main.html"),
@@ -629,17 +686,29 @@ test("the assistant drawer stays uncovered when switching between mail accounts"
   try {
     await accounts.first().click();
     await expectLayout(firstUrl, full);
-    await expect(panel.getByRole("status")).toHaveText("Waiting for the mail view…");
-    await expect(composer).toBeHidden();
+    await expect(panel.getByText("Waiting for the mail view…", { exact: true })).toBeVisible();
+    await expect(composer).toHaveValue("Follow-up across mailboxes");
+    await expect(panel.getByRole("button", { name: "Stop reply" })).toBeVisible();
+    await expect(panel.getByText("What needs my attention?", { exact: true })).toBeVisible();
     await expect(scopeAvatar).toHaveCount(0);
   } finally {
+    await provider.evaluate(({ finish }) => finish());
     await gate.evaluate((release) => release());
     await gate.dispose();
   }
-  await expect(composer).toHaveValue("");
+  await expect(composer).toHaveValue("Follow-up across mailboxes");
+  await expect(panel.getByRole("button", { name: "Send chat message" })).toBeEnabled();
   await expect(scopeAvatar).toHaveText(
     await accounts.first().locator('[data-slot="account-avatar"]').innerText(),
   );
+  await composer.press("Enter");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(2);
+  const sent = await provider.evaluate(({ inputs }) => inputs[1]);
+  expect(sent?.[0]?.content).toBe("What needs my attention?");
+  expect(JSON.parse(sent?.at(-1)?.content ?? "{}").mail.selectedAccountId).toBe(
+    await accounts.first().getAttribute("data-account-id"),
+  );
+  await provider.dispose();
   await toggle.click();
   await expectLayout(firstUrl, 0);
   // Switch again before the opening animation has settled.
@@ -882,7 +951,8 @@ for (const existing of [false, true]) {
         };
       });
       await insert.click();
-      await expect(panel.getByRole("button", { name: "Draft a reply", exact: true })).toBeVisible();
+      await expect(insert).toHaveCount(0);
+      await expect(panel.getByText(prompt, { exact: true })).toBeVisible();
       await expect(editor).toBeVisible();
       expect(await editor.innerHTML()).toBe(original);
     }
@@ -1591,6 +1661,7 @@ test("AI settings connect each API, route mail actions, and remember separate ke
     .click();
   await expect(settings.getByRole("button", { name: "Use Claude Code session" })).toBeVisible();
 
+  let turns = 0;
   for (const [name, provider] of [
     ["Claude API", "anthropic"],
     ["DeepSeek AI", "deepseek"],
@@ -1608,7 +1679,7 @@ test("AI settings connect each API, route mail actions, and remember separate ke
     const brand = provider === "anthropic" ? "claude" : provider;
     await expect(panel.locator(`header [data-brand="${brand}"]`)).toBeVisible();
     const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
-    await expect(panel.locator(".assistant-answer")).toHaveCount(0);
+    await expect(panel.locator(".assistant-answer")).toHaveCount(turns++);
     await composer.fill("Draft a short reply");
     await composer.press("Enter");
     await expect(panel.getByText("Friday works for " + provider, { exact: true })).toBeVisible();

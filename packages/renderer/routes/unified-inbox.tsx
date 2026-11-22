@@ -5,6 +5,12 @@ import { ms } from "@ggmail/shared/ms";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { AvatarGroup } from "@ggmail/ui/components/avatar";
 import { Button } from "@ggmail/ui/components/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@ggmail/ui/components/dropdown-menu";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@ggmail/ui/components/empty";
 import {
   Select,
@@ -30,6 +36,7 @@ import {
   ArchiveIcon,
   ArrowDownWideNarrowIcon,
   MailCheckIcon,
+  MoreHorizontalIcon,
   KeyRoundIcon,
   RefreshCwIcon,
   ChevronLeftIcon,
@@ -42,7 +49,16 @@ import {
   OctagonAlertIcon,
   Trash2Icon,
 } from "lucide-react";
-import { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ComponentProps,
+  createContext,
+  useContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { create } from "zustand";
 import { SenderAvatar } from "@/components/assistant/sender-avatar";
@@ -86,15 +102,53 @@ function MessageActionButton({
   return <Button title={t(label)} {...props} />;
 }
 
-type PendingMessageAction = { accountId: string; messageId: string; action: GmailAction };
-
-const createColumns = ({
-  showSenderIcons,
+function CompactMessageActions({
+  message,
   pending,
   onAction,
 }: {
+  message: UnifiedInboxMessage;
+  pending: boolean;
+  onAction: (message: UnifiedInboxMessage, action: GmailAction) => void;
+}) {
+  const { t } = useLingui();
+  return (
+    <div className="inbox-compact-actions" onClick={(event) => event.stopPropagation()}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={<Button variant="ghost" size="icon-sm" />}
+          aria-busy={pending || undefined}
+          title={t`More options`}
+          aria-description={message.subject}
+        >
+          {pending ? <Loader2Icon className="motion-safe:animate-spin" /> : <MoreHorizontalIcon />}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" onKeyDown={(event) => event.stopPropagation()}>
+          {MESSAGE_ACTIONS.map(({ action, label, icon: Icon }) => (
+            <DropdownMenuItem
+              key={action}
+              disabled={pending}
+              onClick={() => onAction(message, action)}
+            >
+              <Icon aria-hidden="true" />
+              {t(label)}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
+type PendingMessageAction = { accountId: string; messageId: string; action: GmailAction };
+
+const PendingActionContext = createContext<PendingMessageAction | null>(null);
+
+const createColumns = ({
+  showSenderIcons,
+  onAction,
+}: {
   showSenderIcons: boolean;
-  pending: PendingMessageAction | null;
   onAction: (message: UnifiedInboxMessage, action: GmailAction) => void;
 }) => [
   columnHelper.accessor("author.name", {
@@ -119,7 +173,7 @@ const createColumns = ({
           )}
           <div className="grid min-w-0 gap-0.5">
             <span
-              className="truncate text-[13px] font-medium"
+              className="truncate text-sm font-semibold"
               title={senders
                 .map(({ name, email }) => (name ? `${name} <${email}>` : email))
                 .join(", ")}
@@ -164,7 +218,8 @@ const createColumns = ({
     ),
   }),
   columnHelper.accessor("receivedAt", {
-    cell: (props) => {
+    cell: function MessageDateCell(props) {
+      const pending = useContext(PendingActionContext);
       const date = dayjs(props.getValue());
 
       const pendingAction =
@@ -198,6 +253,11 @@ const createColumns = ({
                   }).format(date.toDate())
                 : createDateTimeFormatter().format(date.toDate())}
           </time>
+          <CompactMessageActions
+            message={props.row.original}
+            pending={pendingAction !== null}
+            onAction={onAction}
+          />
           <div className="inbox-row-actions">
             {MESSAGE_ACTIONS.map(({ action, label, icon: Icon }) => (
               <MessageActionButton
@@ -278,8 +338,8 @@ function UnifiedInboxTable({
   }, []);
 
   const columns = useMemo(
-    () => createColumns({ showSenderIcons, pending, onAction: runAction }),
-    [showSenderIcons, pending, runAction],
+    () => createColumns({ showSenderIcons, onAction: runAction }),
+    [showSenderIcons, runAction],
   );
 
   const table = useReactTable({
@@ -494,42 +554,44 @@ function UnifiedInboxTable({
 
   return (
     <>
-      <Table className="unified-inbox-table" aria-labelledby="unread-heading">
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.id}
-              ref={row.id === focusedRow?.id ? focusedRowRef : undefined}
-              tabIndex={row.id === focusedRow?.id ? -1 : undefined}
-              data-state={row.id === focusedRow?.id ? "selected" : undefined}
-              className="inbox-row outline-none"
-              onBlur={(event) => {
-                if (
-                  event.relatedTarget instanceof Element &&
-                  !event.relatedTarget.hasAttribute("data-inbox-row")
-                ) {
-                  setFocus(null);
+      <PendingActionContext value={pending}>
+        <Table className="unified-inbox-table" aria-labelledby="unread-heading">
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.id}
+                ref={row.id === focusedRow?.id ? focusedRowRef : undefined}
+                tabIndex={row.id === focusedRow?.id ? -1 : undefined}
+                data-state={row.id === focusedRow?.id ? "selected" : undefined}
+                className="inbox-row outline-none"
+                onBlur={(event) => {
+                  if (
+                    event.relatedTarget instanceof Element &&
+                    !event.relatedTarget.hasAttribute("data-inbox-row")
+                  ) {
+                    setFocus(null);
+                  }
+                }}
+                data-inbox-row=""
+                data-pending={
+                  (pending?.accountId === row.original.account.id &&
+                    pending.messageId === row.original.id) ||
+                  undefined
                 }
-              }}
-              data-inbox-row=""
-              data-pending={
-                (pending?.accountId === row.original.account.id &&
-                  pending.messageId === row.original.id) ||
-                undefined
-              }
-              onClick={() => {
-                openMessage(row.original);
-              }}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                onClick={() => {
+                  openMessage(row.original);
+                }}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </PendingActionContext>
       {messages.length > 10 && (
         <div className="inbox-pagination">
           <div className="flex items-center gap-2">
@@ -571,8 +633,7 @@ function UnifiedInboxTable({
               size="icon-sm"
               variant="ghost"
               onClick={() => {
-                setFocus(null);
-                table.firstPage();
+                focusPosition(0);
               }}
               title={t`First page`}
               disabled={!table.getCanPreviousPage()}
@@ -583,8 +644,7 @@ function UnifiedInboxTable({
               size="icon-sm"
               variant="ghost"
               onClick={() => {
-                setFocus(null);
-                table.previousPage();
+                focusPosition(pageStart - pagination.pageSize);
               }}
               title={t`Previous page`}
               disabled={!table.getCanPreviousPage()}
@@ -595,8 +655,7 @@ function UnifiedInboxTable({
               size="icon-sm"
               variant="ghost"
               onClick={() => {
-                setFocus(null);
-                table.nextPage();
+                focusPosition(pageStart + pagination.pageSize);
               }}
               title={t`Next page`}
               disabled={!table.getCanNextPage()}
@@ -607,8 +666,7 @@ function UnifiedInboxTable({
               size="icon-sm"
               variant="ghost"
               onClick={() => {
-                setFocus(null);
-                table.lastPage();
+                focusPosition((pageCount - 1) * pagination.pageSize);
               }}
               title={t`Last page`}
               disabled={!table.getCanNextPage()}
@@ -627,6 +685,13 @@ export function UnifiedInbox() {
   const { t, i18n } = useLingui();
   const { inboxes, messages } = useUnifiedInbox();
   const { accountId, select } = useInboxScope();
+  const feed = useRef<HTMLDivElement>(null);
+  const selectAccount = (next?: string) => {
+    if (accountId !== next && feed.current) {
+      feed.current.scrollTop = 0;
+    }
+    select(next);
+  };
   const selected = inboxes.find(({ account }) => account.id === accountId);
   const visibleMessages = useMemo(
     () =>
@@ -678,25 +743,43 @@ export function UnifiedInbox() {
 
   return (
     <main>
-      <UnifiedInboxSearch>
+      <UnifiedInboxSearch
+        accountPicker={
+          inboxes.length > 0 && (
+            <InboxAccounts
+              inboxes={inboxes}
+              selected={selected?.account.id}
+              onSelect={selectAccount}
+              compact
+            />
+          )
+        }
+      >
         <div className="inbox-layout">
           {inboxes.length > 0 && (
-            <InboxAccounts inboxes={inboxes} selected={selected?.account.id} onSelect={select} />
+            <InboxAccounts
+              inboxes={inboxes}
+              selected={selected?.account.id}
+              onSelect={selectAccount}
+            />
           )}
-          <div className="inbox-feed">
+          <div className="inbox-feed" ref={feed}>
             <InboxFollowUps accountId={selected?.account.id} />
             <section className="inbox-panel" aria-labelledby="unread-heading">
               <div className="inbox-panel-heading">
-                <h2 id="unread-heading" className="all-mail-section-heading">
+                <h2 id="unread-heading" className="mail-section-title">
+                  <InboxIcon aria-hidden="true" />
                   <Trans>Unread messages</Trans>
                   {(visibleMessages.length > 0 || ready) && (
-                    <span className="inbox-count">{i18n.number(visibleMessages.length)}</span>
+                    <span className="mail-count">{i18n.number(visibleMessages.length)}</span>
                   )}
                 </h2>
                 {visibleMessages.length > 1 && (
-                  <span className="inbox-sort">
+                  <span className="inbox-sort" title={t`Newest first`}>
                     <ArrowDownWideNarrowIcon aria-hidden="true" />
-                    <Trans>Newest first</Trans>
+                    <span>
+                      <Trans>Newest first</Trans>
+                    </span>
                   </span>
                 )}
               </div>

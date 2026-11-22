@@ -294,8 +294,8 @@ export function AISettings() {
         </div>
         <p className="text-xs leading-relaxed text-muted-foreground">
           <Trans>
-            ggmail sends your prompt and relevant mail to this provider when you ask a question.
-            Switching providers starts a new chat.
+            When you ask a question, ggmail sends recent chat history and relevant mail to the
+            selected provider.
           </Trans>
         </p>
       </SettingsContent>

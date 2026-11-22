@@ -1,4 +1,6 @@
 import { APP_TITLEBAR_HEIGHT } from "@ggmail/shared/constants";
+import { ipc } from "@ggmail/shared/renderer/ipc";
+import type { MenuModifiers } from "@ggmail/shared/types";
 import { Button } from "@ggmail/ui/components/button";
 import {
   DropdownMenu,
@@ -7,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@ggmail/ui/components/dropdown-menu";
+import { useIsMobile } from "@ggmail/ui/hooks/use-mobile";
 import { cn } from "@ggmail/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ArrowLeftIcon, ArrowRightIcon, LoaderCircleIcon, RotateCwIcon, XIcon } from "lucide-react";
@@ -15,12 +18,8 @@ import { useChromeMenu } from "@/lib/chrome-menu";
 import { useCloseOnWindowBlur } from "@/lib/hooks";
 
 /**
- * The titlebar is window chrome, so nothing in it is a tab stop: Tab belongs to
- * whatever is in front, the way it does in a browser's page. Every control here
- * is reachable from the application menu instead, and each one still takes a
- * click. The exceptions carry their own note: the app menu button, which is the
- * keyboard's way into the menu on Windows and Linux, and the find field, which
- * a shortcut opens and the keyboard then works inside.
+ * Icon commands default to menu shortcuts. The view and account toolbars each
+ * provide one tab stop and use arrow keys to move between their buttons.
  */
 export function Titlebar({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -32,7 +31,7 @@ export function Titlebar({ children, className }: { children: ReactNode; classNa
       style={{ height: APP_TITLEBAR_HEIGHT }}
     >
       <div
-        className="absolute top-0 bottom-0 flex items-center justify-between px-1.5"
+        className="absolute inset-y-0 flex items-center justify-between px-2"
         style={{
           left: "env(titlebar-area-x, 0)",
           width: "env(titlebar-area-width, 100%)",
@@ -45,11 +44,11 @@ export function Titlebar({ children, className }: { children: ReactNode; classNa
 }
 
 export function TitlebarLeft({ children }: { children: ReactNode }) {
-  return <div className="flex min-w-0 flex-1 items-center gap-2">{children}</div>;
+  return <div className="titlebar-left flex min-w-0 flex-1 items-center gap-2">{children}</div>;
 }
 
 export function TitlebarRight({ children }: { children: ReactNode }) {
-  return <div className="flex items-center gap-2">{children}</div>;
+  return <div className="titlebar-right flex min-w-0 items-center gap-2">{children}</div>;
 }
 
 export function TitlebarButtonGroup({
@@ -64,7 +63,7 @@ export function TitlebarButtonGroup({
 
 export function TitlebarPageTitle({ children }: { children: string }) {
   return (
-    <div className="max-w-xs truncate text-xs" title={children}>
+    <div className="max-w-xs truncate text-sm font-medium" title={children}>
       {children}
     </div>
   );
@@ -73,7 +72,7 @@ export function TitlebarPageTitle({ children }: { children: string }) {
 export function TitlebarTitle({ children }: { children: string }) {
   return (
     <div
-      className="absolute top-1/2 left-1/2 max-w-xs -translate-x-1/2 -translate-y-1/2 truncate text-xs"
+      className="absolute top-1/2 left-1/2 max-w-xs -translate-x-1/2 -translate-y-1/2 truncate text-sm font-medium"
       title={children}
     >
       {children}
@@ -85,13 +84,21 @@ export function TitlebarIconButton({ className, ...props }: ComponentProps<typeo
   return (
     <Button
       variant="ghost"
-      size="icon-sm"
+      size="icon"
       tabIndex={-1}
       className={cn("draggable-none", className)}
       {...props}
     />
   );
 }
+
+type TitlebarMenuItem = {
+  key: string;
+  label: string;
+  icon?: ReactNode;
+  onChoose: (keys: MenuModifiers) => void;
+  onAuxClick?: ComponentProps<typeof DropdownMenuItem>["onAuxClick"];
+};
 
 export function TitlebarDropdownMenu({
   title,
@@ -100,7 +107,7 @@ export function TitlebarDropdownMenu({
   disabled,
   isOpen,
   onOpenChange,
-  children,
+  items,
 }: {
   title: string;
   icon: ReactNode;
@@ -108,14 +115,51 @@ export function TitlebarDropdownMenu({
   disabled?: boolean;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  children: ReactNode;
+  items: TitlebarMenuItem[];
 }) {
+  const compact = useIsMobile();
   const { rootProps, triggerProps, contentProps } = useChromeMenu(isOpen, onOpenChange);
+  useCloseOnWindowBlur(isOpen, () => onOpenChange(false));
 
-  useCloseOnWindowBlur(isOpen, () => {
-    onOpenChange(false);
-  });
-
+  if (compact) {
+    const pick = async (button: HTMLElement) => {
+      if (isOpen) {
+        return;
+      }
+      const rect = button.getBoundingClientRect();
+      onOpenChange(true);
+      try {
+        const choice = await ipc.main.invoke(
+          "titleBar.pickTool",
+          items.map((item) => item.label),
+          { x: rect.left, y: rect.bottom },
+        );
+        if (choice) {
+          items[choice.index]?.onChoose(choice);
+        }
+      } finally {
+        onOpenChange(false);
+      }
+    };
+    return (
+      <TitlebarIconButton
+        tabIndex={0}
+        title={title}
+        disabled={disabled}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        onClick={(event) => void pick(event.currentTarget)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            void pick(event.currentTarget);
+          }
+        }}
+      >
+        {icon}
+      </TitlebarIconButton>
+    );
+  }
   return (
     <DropdownMenu {...rootProps} orientation="horizontal">
       <DropdownMenuTrigger
@@ -134,17 +178,21 @@ export function TitlebarDropdownMenu({
         collisionPadding={0}
         className="flex w-auto min-w-0 flex-row gap-1 p-0.5 draggable-none"
       >
-        {children}
+        {items.map((item) => (
+          <DropdownMenuItem
+            key={item.key}
+            title={item.label}
+            aria-label={item.label}
+            className="h-7 justify-center"
+            onClick={item.onChoose}
+            onAuxClick={item.onAuxClick}
+          >
+            {item.icon ?? item.label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
-export function TitlebarDropdownMenuItem({
-  className,
-  ...props
-}: ComponentProps<typeof DropdownMenuItem>) {
-  return <DropdownMenuItem className={cn("h-7 justify-center", className)} {...props} />;
 }
 
 export function TitlebarNavigationControls({

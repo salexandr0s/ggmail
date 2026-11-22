@@ -31,8 +31,8 @@ import { toast } from "sonner";
 import { useAccountsStore, useMailboxRevisions } from "@/lib/stores";
 import { submitUnifiedSearch, useUnifiedSearch } from "@/lib/unified-search";
 import { AccountFilters } from "./account-filters";
-import { MailboxSection } from "./mail-page";
-import { SettingsTitle } from "./settings";
+import { AllMailIcon } from "./mail-icons";
+import { MailboxSection, MailPageTitle } from "./mail-page";
 
 // Only literal search terms describe text the reader can find in a result.
 // Gmail operators such as filename: and newer_than: affect the result set instead.
@@ -103,7 +103,7 @@ function MailboxResults({
                 render={<button type="button" />}
                 size="xs"
                 aria-current={selectedThread === thread.id ? "true" : undefined}
-                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 px-3.5 py-2.5 text-left hover:bg-muted/50 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset @2xl:grid-cols-[minmax(7rem,20%)_minmax(0,1fr)_auto]"
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 text-start hover:bg-muted/50 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset @2xl:grid-cols-[minmax(7rem,24%)_minmax(0,1fr)_auto]"
                 data-search-thread={thread.id}
                 data-search-account={accountId}
                 onClick={async (event) => {
@@ -120,14 +120,11 @@ function MailboxResults({
                   }
                 }}
               >
-                <span
-                  className="min-w-0 truncate text-xs leading-4 text-muted-foreground @2xl:text-foreground"
-                  title={thread.sender}
-                >
+                <span className="min-w-0 truncate text-sm font-medium" title={thread.sender}>
                   {highlight(thread.sender, pattern)}
                 </span>
-                <span className="col-span-2 row-start-2 flex min-w-0 flex-col gap-0.5 @2xl:col-span-1 @2xl:col-start-2 @2xl:row-start-1">
-                  <span className="max-w-full truncate font-semibold" title={thread.subject}>
+                <span className="inbox-message-preview col-span-2 row-start-2 @2xl:col-span-1 @2xl:col-start-2 @2xl:row-start-1">
+                  <span className="inbox-subject truncate font-semibold" title={thread.subject}>
                     {thread.subject ? highlight(thread.subject, pattern) : t`(no subject)`}
                   </span>
                   {thread.snippet && (
@@ -187,7 +184,13 @@ function MailboxResults({
   );
 }
 
-export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
+export function UnifiedInboxSearch({
+  children,
+  accountPicker,
+}: {
+  children: ReactNode;
+  accountPicker?: ReactNode;
+}) {
   const { t } = useLingui();
   const { search, draft, accountId } = useUnifiedSearch();
   const revisions = useMailboxRevisions();
@@ -200,7 +203,11 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
   useHotkeys(
     "/",
     (event) => {
-      if (!document.querySelector('[role="dialog"], [role="menu"], [role="listbox"]')) {
+      if (
+        !document.querySelector(
+          ':is([role="dialog"], [role="menu"], [role="listbox"]):not([data-closed])',
+        )
+      ) {
         event.preventDefault();
         input.current?.focus();
       }
@@ -229,10 +236,11 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <header className="all-mail-header">
-        <SettingsTitle>
+      <header className="mail-page-header all-mail-header">
+        <MailPageTitle icon={<AllMailIcon />}>
           <Trans comment="Title of All Mail page">All Mail</Trans>
-        </SettingsTitle>
+        </MailPageTitle>
+        {!search && accountPicker}
         <form
           className="all-mail-search"
           role="search"
@@ -298,7 +306,7 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
                   <Button
                     type="button"
                     variant={chosen ? "secondary" : "outline"}
-                    className="max-w-full min-w-0 shrink"
+                    className="all-mail-search-account max-w-full min-w-0 shrink"
                   />
                 }
               >
@@ -350,16 +358,15 @@ export function UnifiedInboxSearch({ children }: { children: ReactNode }) {
             rows[rows.indexOf(event.target) + direction]?.focus();
           }}
         >
-          <h2 className="all-mail-section-heading">
+          <h2 className="mail-section-title">
+            <SearchIcon aria-hidden="true" />
             <Trans>Search results</Trans>
           </h2>
           {accounts.map(({ config, gmail }) => {
-            const label = getAccountLabel(config.label);
             return (
               <MailboxSection
                 key={config.id}
-                label={label}
-                color={config.color}
+                account={config}
                 hidden={!!chosen && chosen.config.id !== config.id}
               >
                 {gmail.attentionRequired ? (

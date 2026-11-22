@@ -1,5 +1,5 @@
 /* oxlint-disable lingui/no-unlocalized-strings -- Internal Gmail selectors, request parameters and IPC errors. The renderer localizes status messages. */
-import type { MailAttachment } from "@ggmail/shared/attachments";
+import { fileKind, type MailAttachment } from "@ggmail/shared/attachments";
 import { getGoogleProfilePhotoUrl } from "@ggmail/shared/google";
 import { load } from "cheerio/slim";
 import { classifyMessageAttachments } from "./classify";
@@ -16,8 +16,7 @@ export type AttachmentEntry = {
 
 const legacyId = /^[\da-f]{15,16}$/i;
 
-/** Only reconstruct Gmail's attachment request. Never use a link from the email as a download target. */
-function readLocator(href: string, mailbox: string, thumbnail = false) {
+function attachmentParams(href: string, mailbox: string) {
   const url = URL.parse(href, mailbox);
   if (!url || url.username || url.password) {
     return;
@@ -30,20 +29,29 @@ function readLocator(href: string, mailbox: string, thumbnail = false) {
   const attachmentHost =
     url.origin === "https://mail-attachment.googleusercontent.com" &&
     url.pathname === "/attachment";
-  const params = url.searchParams;
-  const view = params.get("view") ?? "";
-  const part = params.get("attid");
+  return sameMailbox || attachmentHost ? url.searchParams : undefined;
+}
+
+function locatorMessageId(params: URLSearchParams) {
   const permanentId = /^msg-f:(\d{1,20})$/.exec(params.get("permmsgid") ?? "")?.[1];
   const legacyMessage = params.get("th") || (permanentId && BigInt(permanentId).toString(16));
   const gmailMessage = params.get("permmsgid") ?? "";
-  const messageId =
-    legacyMessage && legacyId.test(legacyMessage)
-      ? legacyMessage
-      : /^msg-a:r-?\d{1,20}$/.test(gmailMessage)
-        ? gmailMessage
-        : undefined;
+  return legacyMessage && legacyId.test(legacyMessage)
+    ? legacyMessage
+    : /^msg-a:r-?\d{1,20}$/.test(gmailMessage)
+      ? gmailMessage
+      : undefined;
+}
+
+/** Only reconstruct Gmail's attachment request. Never use a link from the email as a download target. */
+function readLocator(params: URLSearchParams | undefined, mailbox: string, thumbnail = false) {
+  if (!params) {
+    return;
+  }
+  const view = params.get("view") ?? "";
+  const part = params.get("attid");
+  const messageId = locatorMessageId(params);
   if (
-    (!sameMailbox && !attachmentHost) ||
     (thumbnail
       ? !["snatt", "fimg", "att"].includes(view) || params.get("disp") !== "thd"
       : view !== "att") ||
@@ -54,6 +62,7 @@ function readLocator(href: string, mailbox: string, thumbnail = false) {
     return;
   }
 
+  const base = new URL(mailbox);
   base.search = new URLSearchParams({
     ui: "2",
     view,
@@ -70,6 +79,80 @@ function readLocator(href: string, mailbox: string, thumbnail = false) {
     }
   }
   return { messageId, part, downloadUrl: base.href };
+}
+
+function groupEntries<K>(entries: AttachmentEntry[], keyFor: (entry: AttachmentEntry) => K) {
+  const groups = new Map<K, AttachmentEntry[]>();
+  for (const entry of entries) {
+    const key = keyFor(entry);
+    const group = groups.get(key);
+    if (group) {
+      group.push(entry);
+    } else {
+      groups.set(key, [entry]);
+    }
+  }
+  return groups;
+}
+
+// Some newsletter print views expose the graphics only as attachment tiles. A nested
+// MIME branch made entirely of distinct hash-named PNG/GIF assets is a template signal.
+export function markTemplateGraphics(entries: AttachmentEntry[]) {
+  const branches = groupEntries(entries, ({ file }) => file.id.slice(0, file.id.lastIndexOf(".")));
+  for (const siblings of branches.values()) {
+    if (
+      siblings.length >= 4 &&
+      siblings.every(
+        ({ file, part }) => /^\d+\.\d+\./.test(part) && /^[a-f\d]{32}\.(png|gif)$/i.test(file.name),
+      ) &&
+      new Set(siblings.map(({ file }) => file.name.toLowerCase())).size >= 4
+    ) {
+      for (const { file } of siblings) {
+        file.isEmbeddedImage = true;
+      }
+    }
+  }
+}
+
+function markBodyImages(images: AttachmentEntry[], sources: string[], mailbox: string) {
+  const byPart = new Map(images.map((entry) => [entry.file.id, entry]));
+  const byContentId = groupEntries(
+    images,
+    ({ downloadUrl }) => downloadUrl && new URL(downloadUrl).searchParams.get("realattid"),
+  );
+  const byName = groupEntries(images, ({ file }) => file.name);
+  for (const src of sources) {
+    let embedded: AttachmentEntry | undefined;
+    if (/^cid:/i.test(src)) {
+      let cid: string;
+      try {
+        cid = decodeURIComponent(src.slice(4));
+      } catch {
+        continue;
+      }
+      const candidates = byContentId.get(cid) ?? byName.get(cid.split("@")[0] ?? cid);
+      embedded = candidates?.length === 1 ? candidates[0] : undefined;
+    } else {
+      const params = attachmentParams(src, mailbox);
+      if (!params || !["att", "fimg"].includes(params.get("view") ?? "")) {
+        continue;
+      }
+      const messageId = locatorMessageId(params);
+      const part = params.get("attid");
+      if (part) {
+        embedded = byPart.get(messageId + "/" + part);
+      } else {
+        const cid = params.get("realattid");
+        const candidates = cid ? byContentId.get(cid) : undefined;
+        if (candidates?.length === 1 && candidates[0]?.messageId === messageId) {
+          embedded = candidates[0];
+        }
+      }
+    }
+    if (embedded) {
+      embedded.file.isEmbeddedImage = true;
+    }
+  }
 }
 
 /** Gmail's print document contains one table per message and nested tables for the attachment tiles. */
@@ -109,13 +192,15 @@ export function readPrintAttachments(
     const messageFiles = new Map<string, AttachmentEntry>();
     for (const table of tiles) {
       for (const link of $(table).find("a[href]")) {
-        const locator = readLocator($(link).attr("href") ?? "", mailbox);
+        const params = attachmentParams($(link).attr("href") ?? "", mailbox);
+        const locator = readLocator(params, mailbox);
         if (!locator) {
           continue;
         }
         const row = $(link).closest("tr");
         const thumbnailSrc = $(link).find("img[src]").attr("src");
-        const thumbnail = thumbnailSrc && readLocator(thumbnailSrc, mailbox, true);
+        const thumbnail =
+          thumbnailSrc && readLocator(attachmentParams(thumbnailSrc, mailbox), mailbox, true);
         const label = row.find("td b").last();
         const name = label.text().trim();
         if (!name) {
@@ -139,6 +224,10 @@ export function readPrintAttachments(
           file: {
             id,
             name,
+            isEmbeddedImage:
+              fileKind(name) === "image"
+                ? messageFiles.get(id)?.file.isEmbeddedImage || params?.get("disp") === "emb"
+                : undefined,
             detectedCategories: ["uncategorized"],
             subject,
             sender,
@@ -171,6 +260,17 @@ export function readPrintAttachments(
       return body.text().slice(0, 4000);
     };
     const entries = [...messageFiles.values()];
+    const images = entries.filter(({ file }) => file.isEmbeddedImage !== undefined);
+    if (images.length) {
+      const sources = rows
+        .slice(1)
+        .find("img[src]")
+        .filter((_i, img) => !$(img).closest("table.att").length)
+        .map((_i, img) => $(img).attr("src"))
+        .get();
+      markBodyImages(images, sources, mailbox);
+      markTemplateGraphics(entries);
+    }
     const detected = classifyMessageAttachments(
       entries.map(({ file }) => file.name),
       // Gmail supplies one subject for the entire thread. In a reply chain it may describe a different message.

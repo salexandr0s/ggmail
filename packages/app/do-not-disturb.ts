@@ -53,69 +53,46 @@ export class DoNotDisturb {
   ] as const;
   // lingui-reset
 
-  timer: NodeJS.Timeout | null = null;
+  private timer?: NodeJS.Timeout;
 
-  init() {
-    if (config.get("doNotDisturb.enabled")) {
-      const until = config.get("doNotDisturb.until");
-
-      if (until) {
-        this.setTimer(until);
-      }
+  restoreTimer() {
+    clearTimeout(this.timer);
+    const until = config.get("doNotDisturb.until");
+    if (!config.get("doNotDisturb.enabled") || until === null) {
+      return;
     }
-  }
-
-  setTimer(until: number) {
-    this.timer = setInterval(() => {
-      if (Date.now() > until) {
-        this.disable();
-      }
-    }, ms("5s"));
+    const remaining = until - Date.now();
+    if (remaining <= 0) {
+      this.disable();
+      return;
+    }
+    this.timer = setTimeout(() => this.restoreTimer(), remaining);
   }
 
   enable(duration: (typeof DoNotDisturb.options)[number]["duration"]) {
-    config.set("doNotDisturb.enabled", true);
-    config.set("doNotDisturb.duration", duration);
-
-    if (this.timer) {
-      clearInterval(this.timer);
-    }
-
-    switch (duration) {
-      case "indefinite": {
-        config.set("doNotDisturb.until", null);
-
-        break;
-      }
-      case "until tomorrow": {
-        const until = dayjs().add(1, "day").startOf("day").valueOf();
-
-        config.set("doNotDisturb.until", until);
-
-        this.setTimer(until);
-
-        break;
-      }
-      default: {
-        const until = dayjs().add(ms(duration), "ms").valueOf();
-
-        config.set("doNotDisturb.until", until);
-
-        this.setTimer(until);
-      }
-    }
+    const until =
+      duration === "indefinite"
+        ? null
+        : duration === "until tomorrow"
+          ? dayjs().add(1, "day").startOf("day").valueOf()
+          : Date.now() + ms(duration);
+    config.store = {
+      ...config.store,
+      "doNotDisturb.enabled": true,
+      "doNotDisturb.duration": duration,
+      "doNotDisturb.until": until,
+    };
+    this.restoreTimer();
   }
 
   disable() {
-    config.set("doNotDisturb.enabled", false);
-    config.set("doNotDisturb.duration", null);
-    config.set("doNotDisturb.until", null);
-
-    if (this.timer) {
-      clearInterval(this.timer);
-
-      this.timer = null;
-    }
+    clearTimeout(this.timer);
+    config.store = {
+      ...config.store,
+      "doNotDisturb.enabled": false,
+      "doNotDisturb.duration": null,
+      "doNotDisturb.until": null,
+    };
   }
 
   toggle() {

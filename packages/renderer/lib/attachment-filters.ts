@@ -18,6 +18,7 @@ export type AttachmentFilters = {
   from: string;
   through: string;
   size: SizeBand | null;
+  includeEmbeddedImages: boolean;
 };
 
 export const emptyAttachmentFilters: AttachmentFilters = {
@@ -30,6 +31,7 @@ export const emptyAttachmentFilters: AttachmentFilters = {
   from: "",
   through: "",
   size: null,
+  includeEmbeddedImages: false,
 };
 
 export function toggleValue<T>(values: T[], value: T) {
@@ -119,6 +121,7 @@ export function filterAttachments<T extends MailAttachment & { accountId: string
 
   for (const item of index) {
     if (
+      (!filters.includeEmbeddedImages && item.file.isEmbeddedImage) ||
       item.file.receivedAt < from ||
       item.file.receivedAt >= until ||
       !senderTerms.every((term) => item.sender.includes(term)) ||

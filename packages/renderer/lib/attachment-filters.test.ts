@@ -36,6 +36,23 @@ const match = (filters: Partial<AttachmentFilters>) =>
   filterAttachments(index, { ...emptyAttachmentFilters, ...filters });
 
 describe("attachment filters", () => {
+  test("includes embedded images on demand in results and all facet counts", () => {
+    const files = [
+      file("badge.png", "work", { size: "173K", isEmbeddedImage: true }),
+      file("diagram.png", "personal", { size: "2K", isEmbeddedImage: false }),
+    ];
+    const hidden = filterAttachments(files, emptyAttachmentFilters);
+    expect(hidden.results.map((f) => f.name)).toEqual(["diagram.png"]);
+    expect(hidden.accounts.values.has("work")).toBe(false);
+    for (const counts of [hidden.kinds, hidden.categories, hidden.extensions, hidden.sizes]) {
+      expect(counts.total).toBe(1);
+    }
+    const filters = { ...emptyAttachmentFilters, query: "badge", size: "small" as const };
+    expect(filterAttachments(files, filters).results).toBeEmpty();
+    expect(filterAttachments(files, { ...filters, includeEmbeddedImages: true }).results).toEqual([
+      files[0]?.file,
+    ]);
+  });
   test("words span metadata fields in any order, and quoted phrases stay together", () => {
     expect(match({ query: " WEISS μαρτιου studio " }).results).toHaveLength(1);
     expect(match({ query: "«March studio» τιμολογιο" }).results).toHaveLength(1);

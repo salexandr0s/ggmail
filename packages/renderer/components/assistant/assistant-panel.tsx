@@ -4,6 +4,7 @@ import {
   assistantPanelWidth,
   providerNames,
   type AssistantContext,
+  type AssistantTurn,
 } from "@ggmail/shared/assistant";
 import { ms } from "@ggmail/shared/ms";
 import { ipc } from "@ggmail/shared/renderer/ipc";
@@ -18,29 +19,21 @@ import {
   MessageSquarePlusIcon,
   XIcon,
 } from "lucide-react";
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { AccountAvatar } from "@/components/account-avatar";
 import { MailAssistantIcon } from "@/components/mail-icons";
 import { useAccountsStore } from "@/lib/stores";
 import { useAssistantConnection } from "@/lib/use-assistant-connection";
 import { useAssistantModel } from "@/lib/use-assistant-model";
-import { AssistantConversation } from "./assistant-conversation";
+import { useWindowWidthValue } from "@/lib/use-window-width";
+import { AssistantConversation, clearAssistantPrompt } from "./assistant-conversation";
 import { ModelLogo } from "./model-logo";
 import "./assistant-drawer.css";
-
-function watchWidth(update: () => void) {
-  window.addEventListener("resize", update);
-  return () => window.removeEventListener("resize", update);
-}
-
-function getWidth() {
-  return assistantPanelWidth(window.innerWidth);
-}
 
 type ClosePanel = (focusToggle?: boolean) => void;
 
 export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePanel }) {
-  const width = useSyncExternalStore(watchWidth, getWidth);
+  const width = useWindowWidthValue(assistantPanelWidth);
   const clip = useRef<HTMLDivElement>(null);
   const account = useAccountsStore(
     (state) => state.accounts.find((item) => item.config.selected)?.config,
@@ -120,7 +113,7 @@ export function AssistantDrawer({ open, close }: { open: boolean; close: ClosePa
     };
   }, [open, accountId]);
 
-  // Check the active mailbox before revealing a conversation that was hidden.
+  // A new turn can use the mailbox once its context has been checked.
   const context = session?.accountId === accountId ? session?.context : undefined;
   return (
     <div
@@ -168,13 +161,28 @@ function AssistantPanel({
     provider,
     connection?.models ?? [],
   );
+  const [transcript, setTranscript] = useState<AssistantTurn[]>();
+  const [chatError, setChatError] = useState("");
+  const [clearing, setClearing] = useState(false);
   const [revision, setRevision] = useState(0);
-
   useLayoutEffect(() => {
-    if (open && panel.current) {
-      (panel.current.querySelector("textarea") ?? panel.current).focus({ preventScroll: true });
-    }
-  }, [open, showContext]);
+    let mounted = true;
+    void ipc.main.invoke("assistant.transcript").then(
+      (entries) => {
+        if (mounted) {
+          setTranscript(entries);
+        }
+      },
+      () => {
+        if (mounted) {
+          setChatError(t`Couldn't load the saved chat.`);
+        }
+      },
+    );
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const scopes = {
     thread: t`Open email`,
@@ -184,12 +192,28 @@ function AssistantPanel({
   };
   const connected = connection?.status === "connected";
   const ready = connected && Boolean(connection.models.length);
+  useLayoutEffect(() => {
+    if (open && panel.current) {
+      (panel.current.querySelector("textarea") ?? panel.current).focus({ preventScroll: true });
+    }
+  }, [open, transcript, ready]);
+
   const checkingConnection = !connection || connection.status === "connecting";
   const waitingForMail = ready && (!model || !context || !showContext);
-  function newChat() {
-    ipc.main.send("assistant.clear");
-    panel.current?.focus();
-    setRevision((previous) => previous + 1);
+  async function newChat() {
+    setClearing(true);
+    try {
+      await ipc.main.invoke("assistant.clear");
+      clearAssistantPrompt();
+      panel.current?.focus();
+      setChatError("");
+      setTranscript([]);
+      setRevision((previous) => previous + 1);
+    } catch {
+      setChatError(t`Couldn't clear the saved chat.`);
+    } finally {
+      setClearing(false);
+    }
   }
 
   return (
@@ -214,8 +238,8 @@ function AssistantPanel({
       }}
     >
       <header className="shrink-0 border-b bg-toolbar">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <div className="grid size-6 shrink-0 place-items-center text-muted-foreground">
+        <div className="flex min-h-16 items-center gap-3 px-5 py-3">
+          <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-muted-foreground">
             {connection ? (
               <ModelLogo provider={provider} model={model?.id} className="size-5" />
             ) : (
@@ -223,7 +247,7 @@ function AssistantPanel({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-base leading-snug font-medium">
+            <h1 className="text-lg leading-6 font-medium">
               <Trans>Mail assistant</Trans>
             </h1>
             {connection && (
@@ -236,13 +260,14 @@ function AssistantPanel({
             )}
           </div>
           <div className="flex shrink-0 items-center gap-0.5 text-muted-foreground">
-            {ready && (
+            {transcript && (
               <Button
                 variant="ghost"
                 size="icon"
                 title={t`New chat`}
                 aria-label={t`New chat`}
-                onClick={newChat}
+                disabled={clearing}
+                onClick={() => void newChat()}
               >
                 <MessageSquarePlusIcon />
               </Button>
@@ -287,22 +312,22 @@ function AssistantPanel({
           </p>
         )}
       </header>
-      {connection?.error && (
+      {(connection?.error || chatError) && (
         <p
           role="alert"
           className="border-b bg-destructive/5 px-4 py-2 text-xs leading-relaxed text-destructive"
         >
-          {connection.error}
+          {chatError || connection?.error}
         </p>
       )}
-      {ready && model && connection && context && (
-        <div className={showContext ? "contents" : "hidden"}>
+      {transcript && (
+        <div inert={clearing} className="contents">
           <AssistantConversation
-            key={JSON.stringify([context.key, provider, revision])}
+            key={revision}
             provider={provider}
-            scope={context.kind}
-            contextKey={context.key}
-            models={connection.models}
+            context={showContext ? context : undefined}
+            initialEntries={transcript}
+            models={connection?.models ?? []}
             model={model}
             chooseModel={chooseModel}
             effort={effort}
@@ -324,8 +349,8 @@ function AssistantPanel({
       )}
       {!checkingConnection && !ready && (
         <div className="min-h-0 flex-1 overflow-y-auto px-5">
-          <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-start justify-end py-6">
-            <h2 className="text-xl font-normal">
+          <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-start justify-center py-6">
+            <h2 className="text-2xl leading-8 font-normal">
               <Trans>Set up the mail assistant</Trans>
             </h2>
             <p className="mt-2 mb-5 text-sm leading-relaxed text-muted-foreground">

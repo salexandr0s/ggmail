@@ -13,6 +13,17 @@ export function configSwitch(settings: Page, configKey: keyof Config) {
   return settings.locator(`[aria-labelledby="${configKey}-label"]`);
 }
 
+export async function showSettingsNavigation(settings: Page) {
+  const trigger = settings.locator(".settings-nav-trigger");
+  if (await settings.evaluate(() => window.matchMedia("(max-width: 767px)").matches)) {
+    await expect(trigger).toBeVisible();
+    if ((await trigger.getAttribute("aria-expanded")) !== "true") {
+      await trigger.click();
+    }
+  }
+  await expect(settings.getByTestId("settings-nav")).toBeVisible();
+}
+
 /**
  * Every settings page, taken from the sidebar the app renders rather than from
  * a list kept here.
@@ -27,6 +38,7 @@ export function configSwitch(settings: Page, configKey: keyof Config) {
  * which is right, because there is no way to open it there either.
  */
 export async function readSettingsPageLabels(settings: Page) {
+  await showSettingsNavigation(settings);
   const labels = await settings.getByTestId("settings-nav").getByRole("button").allInnerTexts();
 
   /*
@@ -47,6 +59,7 @@ export async function readSettingsPageLabels(settings: Page) {
  * was clicked, so an item wired to the wrong page still fails.
  */
 export async function openSettingsPage(settings: Page, label: string) {
+  await showSettingsNavigation(settings);
   await settings
     .getByTestId("settings-nav")
     .getByRole("button", { name: label, exact: true })

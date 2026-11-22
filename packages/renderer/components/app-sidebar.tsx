@@ -10,28 +10,31 @@ import {
   FileClock,
   Fingerprint,
   RefreshCw,
-  Inbox,
   Info,
   Languages,
-  Mail,
-  PanelsTopLeft,
+  PanelLeft,
   Puzzle,
   Search,
   Settings2,
   ShieldBan,
   ShieldCheck,
   SlidersHorizontal,
-  MessageSquareText,
   SunMoon,
   UsersRound,
   X,
-  type LucideIcon,
 } from "lucide-react";
-import { useEffect, useRef, useState, type ComponentType } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useEffect, useRef, useState, type RefObject, type ComponentType } from "react";
 import { useLocation } from "wouter";
+import {
+  AllMailIcon,
+  MailAssistantIcon,
+  MailIcon,
+  WorkspaceAppsIcon,
+} from "@/components/mail-icons";
+import type { ProductIconProps } from "@/components/product-icon";
+import { moveToolbarFocus } from "@/lib/move-toolbar-focus";
 import { settingsPageLabels } from "@/lib/settings-pages";
-import { platform } from "@/lib/utils";
+import { normalizeSearchText, platform } from "@/lib/utils";
 import { AboutSettings } from "@/routes/settings/about";
 import { AccountsSettings } from "@/routes/settings/accounts";
 import { AdvancedSettings } from "@/routes/settings/advanced";
@@ -46,6 +49,7 @@ import { LanguagesSettings } from "@/routes/settings/languages";
 import { NotificationsSettings } from "@/routes/settings/notifications";
 import { PhishingProtectionSettings } from "@/routes/settings/phishing-protection";
 import { SavedSearchesSettings } from "@/routes/settings/saved-searches";
+import { SidebarSettings } from "@/routes/settings/sidebar";
 import { UnifiedInboxSettings } from "@/routes/settings/unified-inbox";
 import { UpdatesSettings } from "@/routes/settings/updates";
 import { VerificationCodesSettings } from "@/routes/settings/verification-codes";
@@ -55,7 +59,7 @@ import { WorkspaceAppsSettings } from "@/routes/settings/workspace-apps";
 type SettingsPage = {
   label: MessageDescriptor | string;
   path: string;
-  icon: LucideIcon;
+  icon: ComponentType<ProductIconProps>;
   component: ComponentType;
   hidden?: boolean;
 };
@@ -83,6 +87,12 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
         component: AppearanceSettings,
       },
       {
+        label: settingsPageLabels.sidebar,
+        path: "/settings/sidebar",
+        icon: PanelLeft,
+        component: SidebarSettings,
+      },
+      {
         label: settingsPageLabels.notifications,
         path: "/settings/notifications",
         icon: Bell,
@@ -107,11 +117,11 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
     label: msg({ message: "Mail", comment: "Group of pages in the Settings sidebar" }),
     pages: [
       // oxlint-disable-next-line lingui/no-unlocalized-strings -- a product name
-      { label: "Gmail", path: "/settings/gmail", icon: Mail, component: GmailSettings },
+      { label: "Gmail", path: "/settings/gmail", icon: MailIcon, component: GmailSettings },
       {
         label: settingsPageLabels.unifiedInbox,
         path: "/settings/unified-inbox",
-        icon: Inbox,
+        icon: AllMailIcon,
         component: UnifiedInboxSettings,
       },
       {
@@ -123,13 +133,13 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
       {
         label: settingsPageLabels.ai,
         path: "/settings/ai",
-        icon: MessageSquareText,
+        icon: MailAssistantIcon,
         component: AISettings,
       },
       {
         label: settingsPageLabels.workspaceApps,
         path: "/settings/workspace-apps",
-        icon: PanelsTopLeft,
+        icon: WorkspaceAppsIcon,
         component: WorkspaceAppsSettings,
       },
       {
@@ -191,15 +201,19 @@ const groups: { label: MessageDescriptor; pages: SettingsPage[] }[] = [
 
 export const settingsPages = groups.flatMap((group) => group.pages);
 
-export function AppSidebar() {
+export function AppSidebar({
+  input,
+  onChoose,
+}: {
+  input: RefObject<HTMLInputElement | null>;
+  onChoose?: () => void;
+}) {
   const [location, navigate] = useLocation();
   const { t, i18n } = useLingui();
   const activeButton = useRef<HTMLButtonElement>(null);
-  const input = useRef<HTMLInputElement>(null);
   const nav = useRef<HTMLElement>(null);
   const [query, setQuery] = useState("");
-  const normalize = (label: string) =>
-    label.trim().toLocaleLowerCase(i18n.locale).normalize("NFD").replace(/\p{M}/gu, "");
+  const normalize = (label: string) => normalizeSearchText(label, i18n.locale);
   const term = normalize(query);
   const matches = groups
     .map((group) => ({
@@ -210,21 +224,6 @@ export function AppSidebar() {
       ),
     }))
     .filter((group) => group.pages.length > 0);
-
-  useHotkeys(
-    "/",
-    (event) => {
-      if (
-        !document.querySelector(
-          '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]',
-        )
-      ) {
-        event.preventDefault();
-        input.current?.focus();
-      }
-    },
-    { useKey: true },
-  );
 
   useEffect(() => {
     setQuery("");
@@ -254,8 +253,9 @@ export function AppSidebar() {
             if (event.nativeEvent.isComposing) {
               return;
             }
-            if (event.key === "Escape") {
+            if (event.key === "Escape" && query) {
               event.preventDefault();
+              event.stopPropagation();
               setQuery("");
             } else if (event.key === "ArrowDown" || (event.key === "Enter" && term)) {
               event.preventDefault();
@@ -282,7 +282,13 @@ export function AppSidebar() {
           <kbd aria-hidden="true">/</kbd>
         )}
       </div>
-      <nav ref={nav} id="settings-pages" data-testid="settings-nav" aria-label={t`Settings`}>
+      <nav
+        onKeyDown={(event) => moveToolbarFocus(event, true)}
+        ref={nav}
+        id="settings-pages"
+        data-testid="settings-nav"
+        aria-label={t`Settings`}
+      >
         <ScrollArea className="h-full">
           <div className="settings-nav-groups">
             {matches.length === 0 && (
@@ -303,6 +309,7 @@ export function AppSidebar() {
                     onClick={() => {
                       setQuery("");
                       navigate(path);
+                      onChoose?.();
                     }}
                   >
                     <Icon aria-hidden="true" />

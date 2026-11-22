@@ -159,8 +159,8 @@ test("the settings window keeps to its size limits and cannot be maximized", asy
 
   const [smallestWidth, smallestHeight] = await resizeSettingsWindow(100, 100);
 
-  expect(smallestWidth).toBeGreaterThanOrEqual(720);
-  expect(smallestHeight).toBeGreaterThanOrEqual(480);
+  expect(smallestWidth).toBe(360);
+  expect(smallestHeight).toBe(360);
 
   const settingsWindow = await readSettingsWindow();
 

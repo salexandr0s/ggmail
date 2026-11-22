@@ -12,6 +12,7 @@ export function SettingsTitle({ className, ...props }: ComponentProps<"h1">) {
   return (
     <h1
       data-testid="settings-title"
+      tabIndex={-1}
       className={cn("settings-title page-heading-title", className)}
       {...props}
     />

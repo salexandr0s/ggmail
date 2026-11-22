@@ -10,7 +10,11 @@ import {
   type SidebarWorkspaceApp,
   tabSections,
 } from "@ggmail/shared/tabs";
-import { sidebarWorkspaceApps, type SupportedWorkspaceApp } from "@ggmail/shared/workspace-apps";
+import {
+  isSidebarApp,
+  visibleSidebarShortcuts,
+  type SupportedWorkspaceApp,
+} from "@ggmail/shared/workspace-apps";
 import type { RestoreOptions, WebContents, WebContentsView } from "electron";
 import { accounts } from "./accounts";
 import { bookmarks } from "./bookmarks";
@@ -265,7 +269,9 @@ export class Tabs {
   }
 
   get activeSidebarApp(): SidebarWorkspaceApp | undefined {
-    for (const app of sidebarWorkspaceApps) {
+    for (const app of visibleSidebarShortcuts(config.get("sidebar.shortcuts")).filter(
+      isSidebarApp,
+    )) {
       if (this.sidebarTab(app)?.id === this.activeTabId) {
         return app;
       }
@@ -277,7 +283,7 @@ export class Tabs {
     const url = app === "calendar" ? new URL("/calendar/u/0/r", base).href : base;
     const account = accounts.getAccount(this.accountId);
     if (!canOpenWorkspaceAppInApp(app)) {
-      const browserUrl = new URL(app === "calendar" ? "/calendar/r" : "/", base);
+      const browserUrl = app === "calendar" ? new URL("/calendar/r", base) : new URL(base);
       if (account.instance.gmail.userEmail) {
         browserUrl.searchParams.set("authuser", account.instance.gmail.userEmail);
       }
@@ -903,7 +909,9 @@ export class Tabs {
 
   serialize(): TabState[] {
     const shortcuts = new Map<Tab, SidebarWorkspaceApp>();
-    for (const app of sidebarWorkspaceApps) {
+    for (const app of visibleSidebarShortcuts(config.get("sidebar.shortcuts")).filter(
+      isSidebarApp,
+    )) {
       const tab = this.sidebarTab(app);
       if (tab) {
         shortcuts.set(tab, app);

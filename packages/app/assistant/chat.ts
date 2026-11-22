@@ -5,6 +5,7 @@ import {
   type AssistantDraft,
   type AssistantRequest,
   type AssistantResult,
+  type AssistantTurn,
   type SourceMessage,
 } from "@ggmail/shared/assistant";
 import { markCitations } from "@ggmail/shared/assistant-citations";
@@ -15,7 +16,8 @@ import { unified } from "unified";
 import { z } from "zod";
 import { insertReply } from "./insert-reply";
 import {
-  ensureCurrentScope,
+  ensureMailboxes,
+  resolveMailbox,
   getMailScope,
   getAssistantMailboxes,
   openMailSource,
@@ -140,33 +142,79 @@ function parseArguments(value: string): unknown {
   }
 }
 
-type Conversation = {
-  key: string;
-  history: ResponseInput[];
-  sources: Map<number, MailSource & { id: string }>;
+export type SavedConversation = {
+  entries: AssistantTurn[];
+  sources: Array<[number, MailSource & { id: string }]>;
 };
+
+// Bound the provider input by size while retaining every turn in the transcript.
+function recentHistory(entries: AssistantTurn[]): ResponseInput[] {
+  const history: ResponseInput[] = [];
+  let characters = 0;
+  for (let index = entries.length - 1; index >= 0; index--) {
+    const turn = entries[index];
+    if (!turn?.reply) {
+      continue;
+    }
+    const { text, draft, citations } = turn.reply;
+    const content = JSON.stringify({
+      answer: text.slice(0, 6000),
+      draft,
+      sources: citations.map(({ number, subject }) => ({ number, subject })),
+    });
+    characters += turn.prompt.length + content.length;
+    if (history.length && characters > 48_000) {
+      break;
+    }
+    history.push({ role: "assistant", content }, { role: "user", content: turn.prompt });
+  }
+  return history.reverse();
+}
 
 export class AssistantChat {
   connection = new AssistantProviders();
-  private conversation: Conversation | undefined;
+  private conversation: SavedConversation;
   private active: { id: string; controller: AbortController } | undefined;
   private inserting: AbortController | undefined;
   private preview?: { id: string; controller: AbortController; messages?: SourceMessage[] };
 
+  constructor(private readonly storage?: { store: SavedConversation }) {
+    this.conversation = storage?.store ?? { entries: [], sources: [] };
+  }
+
+  private save(conversation = this.conversation) {
+    if (this.storage) {
+      this.storage.store = conversation;
+    }
+    this.conversation = conversation;
+  }
+
+  transcript() {
+    return this.conversation.entries;
+  }
+
   context() {
     const { kind, key, accountLabel } = getMailScope();
-    if (this.conversation && this.conversation.key !== key) {
-      this.clear();
-    }
     return { kind, key, accountLabel };
   }
 
-  clear() {
+  interrupt() {
     this.closePreview();
     this.inserting?.abort();
     this.active?.controller.abort();
+  }
+
+  clear() {
+    this.save({ entries: [], sources: [] });
+    this.interrupt();
     this.active = undefined;
-    this.conversation = undefined;
+  }
+
+  beforeQuit() {
+    if (this.active) {
+      this.interrupt();
+      this.save();
+    }
   }
 
   stop(id: string) {
@@ -177,10 +225,8 @@ export class AssistantChat {
 
   private citedSource(id: string) {
     const scope = getMailScope();
-    const source =
-      this.conversation?.key === scope.key &&
-      Array.from(this.conversation.sources.values()).find((item) => item.id === id);
-    if (!source) {
+    const source = this.conversation.sources.find(([, item]) => item.id === id)?.[1];
+    if (!source || !resolveMailbox(source)) {
       throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
     }
     return { scope, source };
@@ -205,7 +251,7 @@ export class AssistantChat {
       const controller = new AbortController();
       this.preview = { id, controller };
       const result = await readMailPreview(scope, source, controller.signal);
-      ensureCurrentScope(scope, controller.signal);
+      ensureMailboxes(scope, controller.signal);
       if (this.preview?.controller !== controller) {
         throw new AssistantError(t`The conversation changed.`);
       }
@@ -228,28 +274,30 @@ export class AssistantChat {
     return { accountId: source.accountId, ...page };
   }
 
-  openDraft(draft: AssistantDraft, key: string) {
+  private draftForCurrentView(id: string) {
     const scope = getMailScope();
-    if (scope.key !== key || this.conversation?.key !== key) {
+    const turn = this.conversation.entries.find((entry) => entry.id === id);
+    if (turn?.scopeKey !== scope.key || !turn.reply?.draft) {
       throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
     }
+    return { scope, draft: turn.reply.draft };
+  }
 
-    // oxlint-disable-next-line lingui/no-unlocalized-strings -- Internal model instruction, tool result or mailto URL.
+  openDraft(id: string) {
+    const { scope, draft } = this.draftForCurrentView(id);
+    // oxlint-disable-next-line lingui/no-unlocalized-strings -- Local mailto URL.
     const mailto = `mailto:?subject=${encodeURIComponent(draft.subject)}&body=${encodeURIComponent(draft.body)}`;
     scope.gmail.createComposeWindow(mailto, scope.mailbox ?? scope.gmail.url);
   }
 
-  async insertReply(body: string, key: string) {
-    const scope = getMailScope();
-    if (scope.key !== key || this.conversation?.key !== key || scope.kind !== "thread") {
-      throw new AssistantError(t`The mail view changed. Ask again to use the new view.`);
-    }
+  async insertReply(id: string) {
+    const { scope, draft } = this.draftForCurrentView(id);
     if (this.inserting) {
       throw new AssistantError(t`A reply is already being inserted.`);
     }
     this.inserting = new AbortController();
     try {
-      await insertReply(scope, body, this.inserting.signal);
+      await insertReply(scope, draft.body, this.inserting.signal);
     } finally {
       this.inserting = undefined;
     }
@@ -257,11 +305,10 @@ export class AssistantChat {
 
   async send(
     request: AssistantRequest,
-    onText: (text: string, activity?: AssistantActivity) => void,
+    publish: (text: string, activity?: AssistantActivity) => void,
   ): Promise<AssistantResult> {
     const scope = getMailScope();
-    this.context();
-    if (scope.key !== request.scopeKey) {
+    if (request.scopeKey !== undefined && scope.key !== request.scopeKey) {
       return { status: "error", message: t`The mail view changed. Ask again to use the new view.` };
     }
     if (this.active) {
@@ -275,8 +322,33 @@ export class AssistantChat {
       return { status: "error", message: t`Choose an available model in the mail assistant.` };
     }
 
-    this.conversation ??= { key: scope.key, history: [], sources: new Map() };
-    const conversation = this.conversation;
+    const entry: AssistantTurn = {
+      id: request.id,
+      prompt: request.prompt,
+      origin: request.origin ?? "written",
+      scopeKey: scope.key,
+      // A turn interrupted by an app restart is immediately available to retry.
+      interrupted: { text: "" },
+    };
+    const { entries, sources: savedSources } = this.conversation;
+    const last = entries.at(-1);
+    const retry = request.retry && last?.id === request.retry && !last.reply;
+    const conversation = {
+      entries: [...(retry ? entries.slice(0, -1) : entries), entry],
+      sources: savedSources,
+    };
+    this.save(conversation);
+    function onText(text: string, activity?: AssistantActivity) {
+      if (entry.interrupted) {
+        if (text) {
+          entry.interrupted.text = text;
+        }
+        if (activity?.kind === "draftReady") {
+          entry.interrupted.draft = activity.draft;
+        }
+      }
+      publish(text, activity);
+    }
     const controller = new AbortController();
     const { signal } = controller;
     this.active = { id: request.id, controller };
@@ -317,7 +389,7 @@ export class AssistantChat {
       const sourceNumbers = currentSources.map(numberSource);
       const mailboxes = getAssistantMailboxes();
       const input: ResponseInput[] = [
-        ...conversation.history,
+        ...recentHistory(conversation.entries),
         {
           role: "user",
           content: JSON.stringify({
@@ -344,7 +416,7 @@ export class AssistantChat {
       // Bound a single provider turn while leaving the model one round to explain partial coverage.
       const budgetUsed = () => callIds.size >= 32 || outputChars >= 160_000;
       for (let round = 0; ; round++) {
-        ensureCurrentScope(scope, signal);
+        ensureMailboxes(scope, signal);
         onText("", activity);
         const finish = round >= 16 || budgetUsed();
         const result = await this.connection.reply(request.provider, {
@@ -357,7 +429,7 @@ export class AssistantChat {
           tools: [searchTool, readTool, draftTool],
           onText,
         });
-        ensureCurrentScope(scope, signal);
+        ensureMailboxes(scope, signal);
         text = result.text;
         if (result.calls.length === 0) {
           break;
@@ -370,7 +442,7 @@ export class AssistantChat {
 
         input.push(...result.items);
         for (const call of result.calls) {
-          ensureCurrentScope(scope, signal);
+          ensureMailboxes(scope, signal);
           if (callIds.has(call.call_id)) {
             throw new AssistantError(
               t`The assistant requested too many mail actions. Try a narrower question.`,
@@ -449,7 +521,7 @@ export class AssistantChat {
         }
       }
 
-      ensureCurrentScope(scope, signal);
+      ensureMailboxes(scope, signal);
       if (!text && !draft) {
         throw new AssistantError(t`The assistant returned an empty reply. Try asking again.`);
       }
@@ -461,45 +533,32 @@ export class AssistantChat {
       if (!references.size && draft && scope.kind === "thread" && sourceNumbers[0] !== undefined) {
         references.add(sourceNumbers[0]);
       }
+      const citedSources = new Map(conversation.sources);
       const citations = [...references].flatMap((number) => {
         const item = sources.get(number);
         if (!item) {
           return [];
         }
-        conversation.sources.set(number, item);
+        citedSources.set(number, item);
         return [{ id: item.id, subject: item.subject, senders: item.senders, number }];
       });
-      conversation.history.push(
-        { role: "user", content: request.prompt },
-        {
-          role: "assistant",
-          content: JSON.stringify({
-            answer: text.slice(0, 6000),
-            draft,
-            sources: citations.map(({ number, subject }) => ({ number, subject })),
-          }),
-        },
-      );
-      conversation.history = conversation.history.slice(-8);
-      return { status: "complete", reply: { text, draft, citations } };
+      conversation.sources = [...citedSources];
+      entry.reply = { text, draft, citations };
+      delete entry.interrupted;
+      return { status: "complete", reply: entry.reply, scopeKey: scope.key };
     } catch (error) {
       if (signal.aborted) {
         return { status: "stopped" };
       }
       this.connection.invalidate(error);
-      return {
-        status: "error",
-        message:
-          error instanceof AssistantError
-            ? error.message
-            : t`Couldn't finish the reply. Try again.`,
-      };
+      entry.error =
+        error instanceof AssistantError ? error.message : t`Couldn't finish the reply. Try again.`;
+      return { status: "error", message: entry.error };
     } finally {
       if (this.active?.controller === controller) {
         this.active = undefined;
+        this.save();
       }
     }
   }
 }
-
-export const assistantChat = new AssistantChat();

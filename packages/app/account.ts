@@ -169,7 +169,7 @@ export class Account {
           break;
         }
         case "notifications": {
-          callback(areWorkspaceAppNotificationsAllowed());
+          callback(areWorkspaceAppNotificationsAllowed(this.accountId));
           break;
         }
         default: {
@@ -191,7 +191,7 @@ export class Account {
       }
 
       if (permission === "notifications") {
-        return areWorkspaceAppNotificationsAllowed();
+        return areWorkspaceAppNotificationsAllowed(this.accountId);
       }
 
       return true;
