@@ -1,55 +1,101 @@
-# ggmail
+<p align="center">
+  <img src="build/icons/256x256.png" width="112" height="112" alt="ggmail app icon">
+</p>
 
-[Download ggmail for Mac with Apple silicon](https://github.com/salexandr0s/ggmail/releases/latest/download/ggmail-mac-arm64.dmg). Open the disk image and drag ggmail into Applications. Requires macOS 13 or later.
+<h1 align="center">ggmail</h1>
 
-ggmail is a desktop app for Gmail. All Mail brings unread mail from all your accounts into one list. The Accounts list shows sync status and unread counts. Select an account to see its unread mail and due follow-ups, or choose **All accounts** to see them together. Select a message to open the conversation in its own account, or use `J` and `K` to move through the list and `Enter` to open it.
+<p align="center">Gmail for Mac, with one inbox for your personal and work accounts.</p>
 
-To find mail across accounts, press `/` to focus **Search all accounts**, enter a Gmail query such as `filename:pdf newer_than:30d` and press **Enter**. You can also choose a saved search in All Mail. Results appear as each mailbox responds. Use **All accounts** to narrow the list, or clear the search to return to unread mail. After opening a result, use **Back** to return to that row. Press **↓** and **Enter** to open the next conversation.
+<p align="center">
+  <a href="https://github.com/salexandr0s/ggmail/releases/latest/download/ggmail-mac-arm64.dmg"><strong>Download for Apple silicon</strong></a>
+  &nbsp;·&nbsp; macOS 13 or later &nbsp;·&nbsp;
+  <a href="https://github.com/salexandr0s/ggmail/releases/latest">Release notes</a>
+</p>
+
+Read and reply in Gmail as usual, or open **All Mail** to see unread messages from every connected inbox. You can find an attachment without remembering who sent it, keep track of conversations that need a reply, and ask the optional mail assistant to help draft one.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/unified-inbox-dark.png">
-  <img src="docs/screenshots/unified-inbox-light.png" alt="All Mail shows unread conversations from Studio and Personal, with per-account counts and sync status in the sidebar.">
+  <img src="docs/screenshots/unified-inbox-light.png" width="100%" alt="All Mail shows eight unread messages, five from Studio and three from Personal. Each row identifies the account it belongs to.">
 </picture>
 
-_The screenshots use fictional mailboxes and files. The assistant conversation is an example._
+_The screenshots use fictional accounts, messages and files._
 
-## Follow up on sent mail
+## Get started
 
-Open a sent conversation, then choose **Waiting for reply → Schedule follow-up**. On the scheduling page, choose **Follow up Friday** or pick a date. Saving returns you to the list, which shows the account, recipient, and last sent date. Due conversations also appear in All Mail once ggmail checks that nobody has replied.
+1. Open the downloaded disk image, drag **ggmail** into **Applications**, then launch it and sign in to Gmail.
+2. To connect another mailbox, open **Settings → Accounts → Add**. Give the account a label, then select it in the title bar to sign in.
+3. Choose **All Mail** in the title bar to see both inboxes. In a small window, open **Mail views** to reach All Mail, Attachments and Waiting for reply.
 
-## Read and compose in dark colors
+## Search across accounts
 
-Turn on **Settings → Gmail → Extend dark theme** to apply it to open messages, replies and compose windows immediately. Select **Original colors** above an email to see its sender’s design. Select it again to return to dark colors. Drafts keep the formatting you send.
+Press `/` in All Mail and enter a Gmail query. For example, `filename:pdf newer_than:30d` finds conversations with PDFs from the past 30 days. Press `Enter` to search. Results appear under each account as it responds. Open a result to read the conversation in its original mailbox. **Back** returns you to your place.
+
+<details>
+  <summary>See the same search across two mailboxes</summary>
+
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/search-dark.png">
+    <img src="docs/screenshots/search-light.png" width="866" alt="A PDF search returns print proofs and an invoice under Studio, with rail tickets and workshop mail under Personal.">
+  </picture>
+</details>
+
+Save queries you use often in **Settings → Saved searches**. To browse unread mail with the keyboard, use `J` and `K` to move between messages and `Enter` to open one.
 
 ## Find an attachment
 
-Select **Attachments** in the title bar. In compact windows, choose it from **Mail views**. Search across filenames, senders, and subjects in any word order. Choose one category, such as Invoice or Receipt. You can combine it with one file type and one or more accounts. Open **More filters** to narrow the results by sender, exact extension, received dates, or size. Embedded images such as signature logos are hidden by default. Select **Include embedded images** to see them. In a narrow window, open **Filters** for all of these options. Use the category beside each file to correct a match. Select a thumbnail or filename to preview the file in the library. The envelope opens the original email. **Back** returns to the file with your filters and scroll position restored. ggmail saves the file list per signed-in mailbox. After a restart, you can browse previously found files while it checks Gmail for changes.
+Open **Attachments** when you remember the file better than the email. Search by filename, sender or subject, or combine a category such as **Invoice** with the **PDF** file type. Use **More filters** for dates, size or an exact extension. In a small window, these controls are under **Filters**.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/attachments-dark.png">
-  <img src="docs/screenshots/attachments-light.png" alt="The attachment library shows nine files from two accounts. Categories and accounts appear in the sidebar, with file formats above the list and a category picker beside each filename.">
+  <img src="docs/screenshots/attachments-light.png" width="100%" alt="The Attachments grid shows a poster proof, an exhibitor guide and a print invoice with their covers. Category and account filters sit beside the grid.">
+</picture>
+
+Click a file to preview it or use the envelope icon to open its email. The file list is saved on your Mac, so you can browse previously found attachments while ggmail checks for new ones.
+
+## Follow up on a conversation
+
+When you’ve sent the last message and need an answer, open that conversation and choose **Waiting for reply → Schedule follow-up**. Pick a date. Due conversations appear in All Mail after ggmail checks for replies, and a conversation leaves the follow-up list when a reply arrives.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/waiting-for-reply-dark.png">
+  <img src="docs/screenshots/waiting-for-reply-light.png" width="740" alt="Waiting for reply in a compact window. Poster proof approval is due, while a delivery slot and a dinner invitation are scheduled for later.">
 </picture>
 
 ## Draft a reply with the mail assistant
 
-Open **Settings → AI** and choose **Claude Code CLI (Subscription)** to use the Claude Code account signed in on this computer. You can also connect a ChatGPT subscription or enter an API key for Claude, OpenAI, or DeepSeek.
+Connect a provider in **Settings → AI**. You can use a ChatGPT subscription, a signed-in Claude Code CLI session, or an API key for Claude, OpenAI or DeepSeek. When you ask a question, your chosen provider receives the chat and relevant mail.
 
-Select **Mail assistant** in the title bar to search your signed-in mailboxes. The assistant can read a full conversation to find a deadline or prepare a reply. Select a citation to read its source in the sidebar. **Back to answer** returns to the same chat and its unfinished question. Your chosen provider receives your prompt and the relevant mail. Choose **Insert into reply** to place a draft in the open thread. Gmail fills in the recipients and keeps the reply ready for you to edit and send. You can also ask for revisions, copy the draft, or start a separate message with **Open in Gmail**.
+Open an email and select **Mail assistant** in the title bar. Ask what the sender needs, open a citation to check the original wording, or ask for a draft. **Insert into reply** puts the draft into the Gmail thread for you to edit and send.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/mail-assistant-dark.png">
-  <img src="docs/screenshots/mail-assistant-light.png" width="450" alt="The mail assistant cites Maya’s proof email and drafts a reply asking her to correct the entrance on a poster before printing.">
+  <img src="docs/screenshots/mail-assistant-light.png" width="400" alt="An example assistant conversation cites Maya’s email, explains which entrance needs correcting on the poster and prepares a draft with an Insert into reply button.">
 </picture>
 
-## Build on Apple Silicon
+## Choose your sidebar shortcuts
 
-Install Bun 1.4, Node.js 24, and the Apple Command Line Tools. From the project directory, run
+The sidebar opens Calendar, Tasks, Meet, Docs, Drive and Sheets for the selected account. In **Settings → Sidebar**, use **+** to add a shortcut, **×** to remove it, or drag its handle to change the order. To reorder with the keyboard, focus a handle, press `Space`, move it with the arrow keys, then press `Space` again.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/sidebar-dark.png">
+  <img src="docs/screenshots/sidebar-light.png" width="100%" alt="Sidebar settings shows a preview above draggable shortcuts for Gmail, Calendar, Tasks, Meet, Docs, Drive, Sheets and Bookmarks. Available apps have an add button.">
+</picture>
+
+You can move or remove Bookmarks. Settings stays pinned at the bottom. To customize the title bar launcher separately, open **Settings → Workspace apps**.
+
+For darker message and compose windows, enable **Settings → Gmail → Extend dark theme**. Choose **Original colors** above an individual message to see the sender’s design.
+
+## Build from source
+
+On an Apple silicon Mac with Bun 1.4, Node.js 24 and the Apple Command Line Tools installed, run the following from the project directory to build a development copy and open it with a separate test profile.
 
 ```sh
 bun install --frozen-lockfile --ignore-scripts
-DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run install:mac:local
+DEVELOPER_DIR=/Library/Developer/CommandLineTools bun run build:mac:local --adhoc
+open -n dist/adhoc/mac-arm64/ggmail.app --args --user-data-dir="$PWD/.ggmail/dev-profile"
 ```
 
-The install command requires ggmail’s Developer ID and opens the verified app in Applications. For a Mac without that identity, use the signed release download above. For test builds and signing details, see the [local build notes](LOCAL-BUILD.md).
+For Developer ID signing, local installation and tests, see the build guide. [Local build guide](LOCAL-BUILD.md) · [Changelog](CHANGELOG.md)
 
 Gmail and its icon are trademarks of Google LLC. ggmail is an independent project.
