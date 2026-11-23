@@ -86,7 +86,7 @@ export function useUnifiedInbox() {
     () =>
       inboxes
         .flatMap(({ account, messages }) => messages.map((mail) => ({ ...mail, account })))
-        .sort((a, b) => (b.receivedAt > a.receivedAt ? 1 : -1)),
+        .sort((a, b) => b.receivedAt - a.receivedAt),
     [inboxes],
   );
 

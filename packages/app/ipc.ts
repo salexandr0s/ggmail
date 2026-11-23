@@ -12,6 +12,7 @@ import { currentMailView, type MailViewsPopupState } from "@ggmail/shared/mail-v
 import { ms } from "@ggmail/shared/ms";
 import { editNotificationTimes } from "@ggmail/shared/notification-times";
 import { byPlatform } from "@ggmail/shared/platform";
+import { accountConfigInputSchema } from "@ggmail/shared/schemas";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { IpcMainEvents, IpcRendererEvent, MenuModifiers } from "@ggmail/shared/types";
 import {
@@ -260,12 +261,26 @@ class Ipc {
       accounts.addAccount(accountDetails);
     });
 
-    this.main.on("accounts.removeAccount", (_event, selectedAccountId) => {
-      accounts.removeAccount(selectedAccountId);
+    this.main.handle("accounts.removeAccount", async (_event, accountId) => {
+      try {
+        await accounts.removeAccount(accountId);
+      } catch (error) {
+        log.error("Failed to remove account", { accountId, error: serializeError(error) });
+
+        throw error;
+      }
     });
 
-    this.main.on("accounts.updateAccount", (_event, updatedAccount) => {
-      accounts.updateAccount(updatedAccount);
+    this.main.on("accounts.updateAccount", (_event, accountId, details) => {
+      const parsed = accountConfigInputSchema.safeParse(details);
+
+      if (typeof accountId !== "string" || !parsed.success) {
+        log.warn("Ignored an account update that did not match the form");
+
+        return;
+      }
+
+      accounts.updateAccount(accountId, parsed.data);
     });
 
     this.main.on("accounts.setAccountEnabled", (_event, accountId, enabled) => {
@@ -1670,32 +1685,55 @@ class Ipc {
       account.instance.gmail.resumeInboxSignIn();
     });
 
-    this.main.on("gmail.openMessage", async (event, messageId, accountId) => {
-      if (accountId !== undefined) {
-        if (
-          event.sender !== main.window.webContents ||
-          event.senderFrame !== event.sender.mainFrame ||
-          main.location !== "/unified-inbox"
-        ) {
-          return;
-        }
-        const { instance } = accounts.getAccount(accountId);
-        instance.tabs.activateTab(GMAIL_TAB_ID);
-        accounts.selectAccount(accountId);
-        await instance.gmail.navigateToHash("#inbox/" + messageId);
-        if (
-          main.location === "/unified-inbox" &&
-          accounts.getSelectedAccount().config.id === accountId
-        ) {
-          main.navigate("/");
-        }
-        return;
+    // Answers with whether the conversation came up, so All Mail can say when
+    // it did not instead of leaving the click with no effect.
+    this.main.handle("unifiedInbox.openMessage", async (event, accountId, messageId) => {
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame ||
+        main.location !== "/unified-inbox"
+      ) {
+        return false;
       }
-      accounts.openMessage(accounts.getSelectedAccount().config.id, messageId);
+
+      const instance = accounts.instances.get(accountId);
+
+      if (!instance?.gmail.hasView) {
+        return false;
+      }
+
+      const previousAccountId = accounts.getSelectedAccount().config.id;
+
+      instance.tabs.activateTab(GMAIL_TAB_ID);
+      accounts.selectAccount(accountId);
+
+      try {
+        await instance.gmail.navigateToHash("#inbox/" + messageId);
+      } catch (error) {
+        log.error("Failed to open message from All Mail", { error: serializeError(error) });
+
+        // The titlebar would otherwise name an account the reader never got to.
+        if (accounts.getSelectedAccount().config.id === accountId) {
+          accounts.selectAccount(previousAccountId);
+        }
+
+        return false;
+      }
+
+      if (
+        main.location === "/unified-inbox" &&
+        accounts.getSelectedAccount().config.id === accountId
+      ) {
+        main.navigate("/");
+      }
+
+      return true;
     });
 
     this.main.handle("gmail.handleMessage", async (_event, accountId, messageId, action) => {
-      await accounts.instances.get(accountId)?.gmail.handleMessage(messageId, action);
+      return (
+        (await accounts.instances.get(accountId)?.gmail.handleMessage(messageId, action)) ?? false
+      );
     });
 
     this.main.on("gmail.messageHandled", (_event, requestId, success) => {

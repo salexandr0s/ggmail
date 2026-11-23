@@ -232,8 +232,7 @@ export type IpcMainEvents =
       "accounts.selectNextAccount": [];
       "accounts.selectPreviousAccount": [];
       "accounts.addAccount": [account: AccountConfigInput];
-      "accounts.removeAccount": [accountId: AccountConfig["id"]];
-      "accounts.updateAccount": [account: AccountConfig];
+      "accounts.updateAccount": [accountId: AccountConfig["id"], details: AccountConfigInput];
       "accounts.setAccountEnabled": [accountId: AccountConfig["id"], enabled: boolean];
       "workspaceApp.goBack": [workspaceAppId?: string];
       "workspaceApp.goForward": [workspaceAppId?: string];
@@ -257,7 +256,6 @@ export type IpcMainEvents =
       "gmail.undoMessageSent": [browserWindowId: number];
       "gmail.setUserEmail": [email: string | undefined, profilePhotoUrl?: string | null];
       "gmail.openInboxSignIn": [accountId: string];
-      "gmail.openMessage": [messageId: string, accountId?: string];
       "gmail.messageHandled": [requestId: string, success: boolean];
       "titleBar.chooseMailView": [value: string | null];
       "titleBar.openMailView": [value: MailViewId];
@@ -396,7 +394,9 @@ export type IpcMainEvents =
         accountId: AccountConfig["id"],
         messageId: string,
         action: GmailAction,
-      ) => void;
+      ) => boolean;
+      "unifiedInbox.openMessage": (accountId: AccountConfig["id"], messageId: string) => boolean;
+      "accounts.removeAccount": (accountId: AccountConfig["id"]) => void;
       "accounts.deleteBrowsingData": (
         accountId: AccountConfig["id"],
         dataTypes: BrowsingDataTypes,

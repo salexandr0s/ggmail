@@ -413,13 +413,11 @@ function EditAccountDialog({
         <AccountForm
           account={{ ...account, label }}
           onSubmit={(values) => {
-            ipc.main.send("accounts.updateAccount", {
-              ...account,
+            ipc.main.send("accounts.updateAccount", account.id, {
               ...values,
               // The field shows the seeded label translated, and saving it
               // unchanged keeps the English the config holds.
               label: values.label === label ? account.label : values.label,
-              gmail: { ...account.gmail, ...values.gmail },
             });
 
             // Its own channel, because turning an account on or off builds or
@@ -447,6 +445,8 @@ function EditAccountDialog({
 }
 
 function RemoveAccountDialog({ account, open, onOpenChange }: DialogProps) {
+  const { t } = useLingui();
+
   const label = getAccountLabel(account.label);
 
   return (
@@ -469,8 +469,14 @@ function RemoveAccountDialog({ account, open, onOpenChange }: DialogProps) {
           </AlertDialogCancel>
           <AlertDialogClose
             render={<AlertDialogAction variant="destructive" />}
-            onClick={() => {
-              ipc.main.send("accounts.removeAccount", account.id);
+            onClick={async () => {
+              try {
+                await ipc.main.invoke("accounts.removeAccount", account.id);
+              } catch {
+                // The account is gone from the list by now, so only the data
+                // left behind is worth reporting.
+                toast.error(t`${label} was removed, but ggmail couldn’t clear its saved data.`);
+              }
             }}
           >
             <Trans>Remove account</Trans>

@@ -1193,3 +1193,27 @@ describe("Save Image As", () => {
     expect(logError).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("checking which downloaded files still exist", () => {
+  test("keeps a download that finishes while the files are being checked", async () => {
+    store["downloads.history"] = [
+      { id: "old", fileName: "old.pdf", filePath: "/old.pdf", createdAt: 1, exists: false },
+    ];
+
+    const check = downloads.checkDownloadHistoryItems();
+
+    const added = downloads.addDownloadHistoryItem({
+      fileName: "new.pdf",
+      filePath: "/new.pdf",
+      createdAt: 2,
+      exists: true,
+    });
+
+    await check;
+
+    expect(history().map(({ id, exists }) => ({ id, exists }))).toEqual([
+      { id: added.id, exists: true },
+      { id: "old", exists: true },
+    ]);
+  });
+});
