@@ -34,12 +34,18 @@ shows the active Gmail view and account in its header.
 
 From the inbox, an open thread, or All Mail, ask the assistant to find a message or check a deadline. It can search signed-in accounts, read the messages in a conversation, and open a cited thread in its original mailbox. You can name a specific account or ask it to search all accounts. Opening another email or switching accounts keeps the same conversation. Each new question uses the mail view shown in the assistant header.
 
-Ask for a draft, then ask for changes to its wording or length. In an open thread, **Insert into reply** places the draft above any existing reply text. Gmail handles recipients and threading. Review the reply and send it when ready. You can also copy the body or choose **Open in Gmail** for a separate message.
+Ask for a draft, then ask for changes to its wording or length. In an open thread, **Insert into reply** places the draft above any existing reply text. Gmail handles recipients and threading. Review the reply and send it when ready. You can also choose **Open in Gmail** for a separate message. A draft for a new email lists its recipients, and **Open in Gmail** fills in the recipients, subject and message together. The recipients, subject and message each have a copy button.
 **Stop reply** keeps the text received so far. **Try again** repeats the last
 interrupted request and preserves anything you have typed for your next message.
 
+With OpenAI, ChatGPT and Claude models, the assistant can search the web for public details, such as a business's contact address. It shows what it is searching for and links the pages it used. Searches run through the selected provider. DeepSeek models answer from mail alone. Turn web search off with **Search the web** in **Settings → AI**.
+
 When you ask a question, ggmail sends the chat and relevant mail context to
 the selected provider. Replies can finish while you browse mail or close the sidebar. The current conversation and your unsent text are saved on this device and restored when you reopen ggmail. Choose **New chat** to clear both and start over. Electron's protected storage keeps the ChatGPT connection on this device.
+
+## Right-click actions
+
+Right-click a message or selected text for mail actions, **Add to Tasks**, **Add to Calendar** and **Quote to assistant**. Selected text can be saved to Google Tasks from a draft window. Quoted passages attach to your next assistant prompt.
 
 ## Workspace sidebar
 
