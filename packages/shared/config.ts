@@ -131,6 +131,7 @@ export function createDefaultConfig({
     "verificationCodes.copyMode": "notificationClick",
     "verificationCodes.autoDelete": false,
     "verificationCodes.autoMarkAsRead": false,
+    "assistant.webSearch": true,
     "doNotDisturb.enabled": false,
     "doNotDisturb.duration": null,
     "doNotDisturb.until": null,

@@ -1073,12 +1073,9 @@ test("a draft outside a thread opens in a composer with its recipients, subject 
     ]);
 });
 
-test("a new email drafted inside a conversation stays out of its reply, with each part copyable", async () => {
-  const mail = await openThread();
-  const body = "Hello,\n\nCould you confirm my late arrival?";
-  await useDraftProvider(body, answer, { to: "desk@hotel.example", reply: false });
-  // This account's provider refuses a request that offers web search.
-  const offers = await ggmail.app.evaluateHandle(() => {
+// Record whether each provider request offers web search, and optionally refuse those that do.
+function watchWebOffers(refuse = false) {
+  return ggmail.app.evaluateHandle((_electron, refuse) => {
     const offers: boolean[] = [];
     const fetch = globalThis.fetch;
     globalThis.fetch = (async (url, options) => {
@@ -1086,14 +1083,49 @@ test("a new email drafted inside a conversation stays out of its reply, with eac
         const { tools } = JSON.parse(String(options?.body));
         const web = tools.some((tool: { type: string }) => tool.type === "web_search");
         offers.push(web);
-        if (web) {
+        if (web && refuse) {
           return Response.json({ error: { code: "unsupported_tool" } }, { status: 400 });
         }
       }
       return fetch(url, options);
     }) as typeof globalThis.fetch;
     return offers;
+  }, refuse);
+}
+
+test("turning off Search the web in AI settings stops offering it to the provider", async () => {
+  await useDraftProvider(null);
+  const offers = await watchWebOffers();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await composer.fill("What is due this week?");
+  await composer.press("Enter");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(1);
+
+  const loaded = ggmail.app.waitForEvent("window", {
+    predicate: (window) => window.url().includes("settings.html"),
   });
+  await panel.getByRole("button", { name: "AI settings", exact: true }).click();
+  const settings = await loaded;
+  const search = settings.getByRole("switch", { name: "Search the web" });
+  await expect(search).toBeChecked();
+  await search.click();
+  await expect(search).not.toBeChecked();
+
+  await composer.fill("And next week?");
+  await composer.press("Enter");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(2);
+  expect(await offers.jsonValue()).toEqual([true, false]);
+});
+
+test("a new email drafted inside a conversation stays out of its reply, with each part copyable", async () => {
+  const mail = await openThread();
+  const body = "Hello,\n\nCould you confirm my late arrival?";
+  await useDraftProvider(body, answer, { to: "desk@hotel.example", reply: false });
+  // This account's provider refuses a request that offers web search.
+  const offers = await watchWebOffers(true);
   const page = ggmail.renderer;
   await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
   const panel = page.getByRole("complementary", { name: "Mail assistant" });

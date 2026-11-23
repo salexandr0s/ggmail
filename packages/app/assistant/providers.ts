@@ -11,6 +11,7 @@ import {
 } from "@ggmail/shared/assistant";
 import { t } from "@lingui/core/macro";
 import { app } from "electron";
+import { config } from "@/config";
 import { CachedStore } from "@/lib/cached-store";
 import { anthropicReply } from "./anthropic";
 import { cliIdentity, cliModels, claudeCliReply } from "./claude-cli";
@@ -177,8 +178,13 @@ export class AssistantProviders {
       throw new AssistantError(t`Choose an available model in the mail assistant.`);
     }
     const model = provider + "/" + options.model;
-    // DeepSeek has no search tool of its own.
-    if (!options.web || provider === "deepseek" || this.withoutWeb.has(model)) {
+    // The user can turn web search off, and DeepSeek has no search tool of its own.
+    if (
+      !options.web ||
+      !config.get("assistant.webSearch") ||
+      provider === "deepseek" ||
+      this.withoutWeb.has(model)
+    ) {
       return this.send(provider, { ...options, web: undefined });
     }
     try {

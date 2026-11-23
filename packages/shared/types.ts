@@ -202,6 +202,7 @@ export type Config = {
   "verificationCodes.copyMode": VerificationCodeCopyMode;
   "verificationCodes.autoDelete": boolean;
   "verificationCodes.autoMarkAsRead": boolean;
+  "assistant.webSearch": boolean;
   "doNotDisturb.enabled": boolean;
   "doNotDisturb.duration": string | null;
   "doNotDisturb.until": number | null;
