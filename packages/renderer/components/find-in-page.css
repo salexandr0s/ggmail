@@ -15,6 +15,7 @@
 .titlebar-find:focus-within {
   border-color: var(--ring);
   background: var(--card);
+  box-shadow: var(--focus-ring);
 }
 
 .titlebar-find input {
@@ -30,6 +31,11 @@
   color: var(--muted-foreground);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
+}
+
+/* With no matches the counter reads 0/0 and takes the error colour. */
+.titlebar-find-count[data-empty] {
+  color: var(--destructive);
 }
 
 .titlebar-find-actions {

@@ -139,7 +139,7 @@
 .mail-search-field[data-slot="input-group"]:focus-within {
   border-color: var(--ring);
   background: var(--card);
-  box-shadow: 0 0 0 1px var(--ring);
+  box-shadow: var(--focus-ring);
 }
 
 .mail-search-field input {
@@ -173,7 +173,6 @@
   padding-block: 0.25rem;
   padding-inline: 0.75rem;
   border: 0;
-  border-radius: 999px;
   color: var(--foreground);
   font: 400 0.875rem/1.25rem var(--font-sans);
   text-align: start;
@@ -201,15 +200,18 @@
   color: inherit;
 }
 
+/* These rows fill lists that clip, so the button's outer halo is turned off. */
 .mail-nav-row:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: -2px;
+  box-shadow: none;
 }
 
 .mail-nav-count {
   flex: none;
   margin-inline-start: auto;
   font-size: 0.75rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
@@ -220,10 +222,6 @@
 
 .download-history .mail-page-header {
   grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.download-history .mail-page-header button {
-  border-radius: 999px;
 }
 
 .download-list {

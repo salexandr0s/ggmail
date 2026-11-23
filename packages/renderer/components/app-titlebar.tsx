@@ -541,13 +541,12 @@ export function AppTitlebar({
 
       return (
         <div className="flex flex-1 items-center justify-center gap-4 text-xs">
-          <div>
+          <div title={t`ggmail ${version} couldn't be verified, so it wasn't installed`}>
             <Trans>ggmail {version} couldn't be verified, so it wasn't installed</Trans>
           </div>
           <div className="flex gap-2">
             <Button
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 ipc.main.send("appUpdater.openReleasePage");
@@ -560,7 +559,6 @@ export function AppTitlebar({
             <Button
               variant="outline"
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 setIsUnverifiedAppUpdateDetailsOpen(false);
@@ -580,13 +578,12 @@ export function AppTitlebar({
 
       return (
         <div className="flex flex-1 items-center justify-center gap-4 text-xs">
-          <div>
+          <div title={t`ggmail ${version} is available and ready to install`}>
             <Trans>ggmail {version} is available and ready to install</Trans>
           </div>
           <div className="flex gap-2">
             <Button
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 ipc.main.send("appUpdater.quitAndInstall");
@@ -599,7 +596,6 @@ export function AppTitlebar({
             <Button
               variant="outline"
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 dismissAppUpdate();
@@ -613,7 +609,6 @@ export function AppTitlebar({
             <Button
               variant="ghost"
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 ipc.main.send("appUpdater.openVersionHistory");
@@ -723,7 +718,7 @@ export function AppTitlebar({
                     <div
                       ref={accountRow.setLeftArrowElement}
                       className={cn(
-                        "absolute top-0 left-0 flex items-center bg-background duration-150 after:pointer-events-none after:absolute after:top-0 after:bottom-0 after:left-full after:w-6 after:bg-linear-to-r after:from-background after:to-transparent motion-safe:transition-opacity",
+                        "absolute top-0 left-0 flex items-center bg-chrome duration-150 after:pointer-events-none after:absolute after:top-0 after:bottom-0 after:left-full after:w-6 after:bg-linear-to-r after:from-chrome after:to-transparent motion-safe:transition-opacity",
                         !accountRow.canScrollLeft && "pointer-events-none opacity-0",
                       )}
                       style={{ height: APP_TITLEBAR_HEIGHT }}
@@ -745,7 +740,7 @@ export function AppTitlebar({
                     <div
                       ref={accountRow.setRightArrowElement}
                       className={cn(
-                        "absolute top-0 right-0 flex items-center bg-background duration-150 before:pointer-events-none before:absolute before:top-0 before:right-full before:bottom-0 before:w-6 before:bg-linear-to-l before:from-background before:to-transparent motion-safe:transition-opacity",
+                        "absolute top-0 right-0 flex items-center bg-chrome duration-150 before:pointer-events-none before:absolute before:top-0 before:right-full before:bottom-0 before:w-6 before:bg-linear-to-l before:from-chrome before:to-transparent motion-safe:transition-opacity",
                         !accountRow.canScrollRight && "pointer-events-none opacity-0",
                       )}
                       style={{ height: APP_TITLEBAR_HEIGHT }}
@@ -867,7 +862,6 @@ export function AppTitlebar({
           {unverifiedAppUpdateVersion && (
             <Button
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 setIsUnverifiedAppUpdateDetailsOpen(true);
@@ -882,7 +876,6 @@ export function AppTitlebar({
           {appUpdateVersion && (
             <Button
               size="sm"
-              tabIndex={-1}
               className="draggable-none"
               onClick={() => {
                 setIsAppUpdateDetailsOpen(true);
