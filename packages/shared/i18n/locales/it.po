@@ -3424,7 +3424,7 @@ msgstr "Rimuovi dai preferiti"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Remove filter “{label}”"
-msgstr "Rimuovi il filtro «{label}»"
+msgstr "Rimuovi il filtro “{label}”"
 
 #. Button that removes a download from the download history
 #: packages/renderer/components/download-history.tsx
@@ -3552,7 +3552,7 @@ msgstr "Verifica dei risultati della ricerca"
 
 #: packages/renderer/bookmarks.tsx
 msgid "Right-click a Workspace tab and choose Bookmark to save its page here."
-msgstr "Fai clic con il pulsante destro su una scheda di Workspace e scegli «Aggiungi ai preferiti» per salvare qui la pagina."
+msgstr "Fai clic con il pulsante destro su una scheda di Workspace e scegli “Aggiungi ai preferiti” per salvare qui la pagina."
 
 #. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
@@ -4139,7 +4139,7 @@ msgstr "Accedi per vedere i messaggi non letti"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
-msgstr "Accedi al tuo abbonamento con «claude auth login» in un terminale, poi connettiti qui."
+msgstr "Accedi al tuo abbonamento con “claude auth login” in un terminale, poi connettiti qui."
 
 #: packages/renderer/task-draft.tsx
 msgid "Sign in with Google in your browser, then return here."
@@ -4650,7 +4650,7 @@ msgstr "Usa la sessione di Claude Code"
 #. Original colors is the label of the toggle on an individual email
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
-msgstr "Scurisci i messaggi e le finestre di scrittura. Seleziona «Colori originali» su un messaggio per vedere la grafica scelta dal mittente."
+msgstr "Scurisci i messaggi e le finestre di scrittura. Seleziona “Colori originali” su un messaggio per vedere la grafica scelta dal mittente."
 
 #. Setting that shares the screen through the operating system's own picker
 #: packages/renderer/routes/settings/advanced.tsx

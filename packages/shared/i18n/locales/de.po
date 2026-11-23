@@ -289,7 +289,7 @@ msgstr "8 Stunden"
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
-msgstr "Für Code-Mitteilungen gelten deine Einstellungen für E-Mail-Mitteilungen. Deaktiviere „Zusammenfassung anzeigen“, um den Code auszublenden. Du kannst weiterhin „Kopieren“ verwenden."
+msgstr "Für Code-Benachrichtigungen gelten deine Einstellungen für E-Mail-Benachrichtigungen. Deaktiviere „Zusammenfassung anzeigen“, um den Code auszublenden. Du kannst weiterhin den Button „Kopieren“ verwenden."
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -406,7 +406,7 @@ msgstr "Zeitfenster hinzufügen"
 
 #: packages/app/mail-context-actions.ts
 msgid "Add to Calendar…"
-msgstr "Zu Google Kalender hinzufügen…"
+msgstr "Zum Kalender hinzufügen …"
 
 #: packages/app/mail-context-actions.ts
 #: packages/app/page-context-menu.ts
@@ -566,11 +566,11 @@ msgstr "Sobald der Code eingeht"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about the quoted text…"
-msgstr "Frage zum zitierten Text stellen…"
+msgstr "Frage zum zitierten Text stellen …"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about your mail…"
-msgstr "Frage zu deinen E-Mails stellen…"
+msgstr "Frage zu deinen E-Mails stellen …"
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Ask where to save each file before it downloads."
@@ -856,11 +856,11 @@ msgstr "Prüfe dein Guthaben oder die Nutzungslimits beim Anbieter und versuche 
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Checking connection…"
-msgstr "Verbindung wird geprüft…"
+msgstr "Verbindung wird geprüft …"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Checking for replies…"
-msgstr "Antworten werden geprüft…"
+msgstr "Suche nach Antworten …"
 
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Checking visible messages"
@@ -2066,7 +2066,7 @@ msgstr "ggmail konnte nicht nach Updates suchen."
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "ggmail couldn’t confirm delivery. Check your system notification settings."
-msgstr "ggmail konnte die Zustellung nicht bestätigen. Prüfe die Mitteilungseinstellungen deines Systems."
+msgstr "ggmail konnte die Zustellung nicht bestätigen. Prüfe die Benachrichtigungseinstellungen deines Systems."
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail couldn't delete this account's browsing data. Try again."
@@ -2512,11 +2512,11 @@ msgstr "Wird geladen"
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Loading email…"
-msgstr "E-Mail wird geladen…"
+msgstr "E-Mail wird geladen …"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Loading older mail…"
-msgstr "Ältere E-Mails werden geladen…"
+msgstr "Ältere E-Mails werden geladen …"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Logo"
@@ -2535,7 +2535,7 @@ msgstr "„{selection}“ nachschlagen"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Looking for attachments…"
-msgstr "Anhänge werden gesucht…"
+msgstr "Anhänge werden gesucht …"
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Low"
@@ -3669,7 +3669,7 @@ msgstr "Suche im Internet nach „{query}“"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
-msgstr "Suche läuft…"
+msgstr "Suche läuft …"
 
 #. Button in the folder picker that chooses where downloads are saved
 #: packages/app/ipc.ts
@@ -4086,7 +4086,7 @@ msgstr "Anzahl ungelesener E-Mails anzeigen"
 
 #: packages/renderer/routes/settings/unified-inbox.tsx
 msgid "Show unread messages from your accounts in one place."
-msgstr "Ungelesene Nachrichten aus Ihren Konten an einem Ort anzeigen."
+msgstr "Ungelesene Nachrichten aus deinen Konten an einem Ort anzeigen."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Show windows"
@@ -4244,7 +4244,7 @@ msgstr "Start"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Still checking {loadingAccounts}…"
-msgstr "{loadingAccounts} wird noch geprüft…"
+msgstr "Prüfung läuft noch für {loadingAccounts} …"
 
 #: packages/renderer/components/titlebar.tsx
 msgid "Stop loading"
@@ -4302,7 +4302,7 @@ msgstr "Zu „Neue Fenster“ wechseln?"
 
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "Syncing…"
-msgstr "Wird synchronisiert…"
+msgstr "Wird synchronisiert …"
 
 #. Group of pages in the Settings sidebar
 #. Language picker option: follow the operating system's language
@@ -4318,7 +4318,7 @@ msgstr "System"
 
 #: packages/app/page-context-menu.ts
 msgid "System menu…"
-msgstr "Systemmenü…"
+msgstr "Systemmenü …"
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgctxt "Linux"
@@ -4738,7 +4738,7 @@ msgstr "Warten auf Antwort"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
-msgstr "Warten auf die E-Mail-Ansicht…"
+msgstr "Warten auf die E-Mail-Ansicht …"
 
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/routes/unified-inbox.tsx

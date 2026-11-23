@@ -65,7 +65,7 @@ msgstr "{label} wordt nog gesynchroniseerd"
 
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is up to date"
-msgstr "{label} is bijgewerkt"
+msgstr "{label} is gesynchroniseerd"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "{label} was removed, but ggmail couldn’t clear its saved data."
@@ -1368,11 +1368,11 @@ msgstr "Extensies kunnen niet worden geüpdatet"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Couldn't update the AI connection. Try again."
-msgstr "Kan de AI-verbinding niet bijwerken. Probeer het opnieuw."
+msgstr "Kan de AI-verbinding niet updaten. Probeer het opnieuw."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t update this follow-up."
-msgstr "Deze herinnering kon niet worden bijgewerkt."
+msgstr "Deze herinnering kon niet worden geüpdatet."
 
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "Couldn’t update this message. Try again."

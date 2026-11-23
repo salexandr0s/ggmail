@@ -61,11 +61,11 @@ msgstr "{failedCount, plural, other {#個の拡張機能をアップデートで
 
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is still syncing"
-msgstr "{label} は同期中です"
+msgstr "{label}は同期中です"
 
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is up to date"
-msgstr "{label} は最新です"
+msgstr "{label}は最新です"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "{label} was removed, but ggmail couldn’t clear its saved data."
@@ -73,7 +73,7 @@ msgstr "{label}を削除しましたが、ggmailは保存されたデータを�
 
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} will retry syncing"
-msgstr "{label} の同期を再試行します"
+msgstr "{label}の同期を再試行します"
 
 #: packages/renderer/components/attachments/detail-filters.tsx
 msgid "{large} or more"
@@ -289,7 +289,7 @@ msgstr "8時間"
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
-msgstr "コードの通知にはメールの通知設定が適用されます。「概要を表示」をオフにするとコードが非表示になります。「コピー」ボタンは引き続き使えます。"
+msgstr "コードの通知にはメールの通知設定が適用されます。“概要を表示”をオフにするとコードが非表示になります。“コピー”ボタンは引き続き使えます。"
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -368,7 +368,7 @@ msgstr "{label}をランチャーに追加"
 
 #: packages/renderer/components/app-picker.tsx
 msgid "Add {label} to sidebar"
-msgstr "{label} をサイドバーに追加"
+msgstr "{label}をサイドバーに追加"
 
 #. allowlistEntry is the line to add to 1Password's list of allowed browsers, which stays as it is
 #: packages/renderer/routes/settings/extensions.tsx
@@ -413,7 +413,7 @@ msgstr "カレンダーに追加…"
 #: packages/app/task-draft.ts
 #: packages/renderer/task-draft.tsx
 msgid "Add to Tasks"
-msgstr "ToDo リストに追加"
+msgstr "ToDoリストに追加"
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Add Workspace apps to the launcher on the right of the titlebar."
@@ -437,7 +437,7 @@ msgstr "AI"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "AI settings"
-msgstr "AI 設定"
+msgstr "AI設定"
 
 #: packages/renderer/components/account-filters.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
@@ -494,7 +494,7 @@ msgstr "すべてのタブ"
 
 #: packages/app/assistant/connection.ts
 msgid "Allow ggmail to use your ChatGPT plan in the browser and try again."
-msgstr "ブラウザーで ggmail に ChatGPT プランの利用を許可してから、もう一度お試しください。"
+msgstr "ブラウザでggmailにChatGPTプランの利用を許可してから、もう一度お試しください。"
 
 #. Option of the Show Gmail unread badge setting: when the Gmail tab shows its unread count
 #: packages/shared/tabs.ts
@@ -529,7 +529,7 @@ msgstr "すべてのサイズ"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "API key"
-msgstr "API キー"
+msgstr "APIキー"
 
 #. Titlebar button on Windows and Linux that opens ggmail's menu, in place of a menu bar
 #: packages/renderer/components/app-menu-button.tsx
@@ -785,11 +785,11 @@ msgstr "監視するカテゴリ"
 #: packages/renderer/components/attachments/files.tsx
 #: packages/renderer/components/attachments/filters.tsx
 msgid "Category"
-msgstr "カテゴリー"
+msgstr "カテゴリ"
 
 #: packages/renderer/components/attachments/categories.tsx
 msgid "Category for {name}"
-msgstr "{name} のカテゴリー"
+msgstr "{name}のカテゴリ"
 
 #. Button that picks another folder for downloads
 #: packages/renderer/routes/settings/downloads.tsx
@@ -798,27 +798,27 @@ msgstr "変更…"
 
 #: packages/app/assistant/connection.ts
 msgid "ChatGPT can't renew this session yet. Try again in a moment."
-msgstr "現在、この ChatGPT セッションは更新できません。しばらくしてからもう一度お試しください。"
+msgstr "現在、このChatGPTセッションは更新できません。しばらくしてからもう一度お試しください。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT couldn't complete sign-in. Try again."
-msgstr "ChatGPT へのログインを完了できませんでした。もう一度お試しください。"
+msgstr "ChatGPTへのログインを完了できませんでした。もう一度お試しください。"
 
 #: packages/app/assistant/responses.ts
 msgid "ChatGPT couldn't complete the request. Try again."
-msgstr "ChatGPT がリクエストを完了できませんでした。もう一度お試しください。"
+msgstr "ChatGPTがリクエストを完了できませんでした。もう一度お試しください。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT returned an invalid identity token."
-msgstr "ChatGPT から無効な ID トークンが返されました。"
+msgstr "ChatGPTから無効なIDトークンが返されました。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT sign-in timed out. Try again."
-msgstr "ChatGPT へのログインがタイムアウトしました。もう一度お試しください。"
+msgstr "ChatGPTへのログインがタイムアウトしました。もう一度お試しください。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT sign-in was canceled."
-msgstr "ChatGPT へのログインをキャンセルしました。"
+msgstr "ChatGPTへのログインをキャンセルしました。"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Check for replies"
@@ -844,15 +844,15 @@ msgstr "更新プログラムの確認…"
 
 #: packages/app/task-draft.ts
 msgid "Check Google Tasks before retrying the save."
-msgstr "再度保存する前に Google ToDo リストを確認してください。"
+msgstr "再度保存する前にGoogle ToDoリストを確認してください。"
 
 #: packages/app/assistant/responses.ts
 msgid "Check the API key and its permissions in AI settings."
-msgstr "AI 設定で API キーとその権限を確認してください。"
+msgstr "AI設定でAPIキーとその権限を確認してください。"
 
 #: packages/app/assistant/responses.ts
 msgid "Check your provider's balance or usage limits and try again."
-msgstr "プロバイダーの残高または利用上限を確認し、もう一度お試しください。"
+msgstr "プロバイダの残高または利用上限を確認し、もう一度お試しください。"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Checking connection…"
@@ -877,7 +877,7 @@ msgstr "日付を選択"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Choose a provider in AI settings to ask about mail or draft a reply."
-msgstr "メールについて質問したり返信の下書きを作成したりするには、AI 設定でプロバイダーを選択してください。"
+msgstr "メールについて質問したり返信の下書きを作成したりするには、AI設定でプロバイダを選択してください。"
 
 #: packages/app/assistant/chat.ts
 #: packages/app/assistant/providers.ts
@@ -901,7 +901,7 @@ msgstr "“アプリケーション”フォルダ内のggmailを選択してく
 
 #: packages/app/task-draft.ts
 msgid "Choose Google desktop OAuth client JSON"
-msgstr "Google デスクトップ OAuth クライアントの JSON を選択"
+msgstr "GoogleデスクトップOAuthクライアントのJSONを選択"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Choose image"
@@ -929,11 +929,11 @@ msgstr "すべての新着メールを通知するか、Gmailで重要とマー�
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Claude Code couldn't complete the request. Check your sign-in, CLI version, and usage limits."
-msgstr "Claude Code はリクエストを完了できませんでした。ログイン状態、CLI のバージョン、利用上限を確認してください。"
+msgstr "Claude Codeはリクエストを完了できませんでした。ログイン状態、CLIのバージョン、利用上限を確認してください。"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Claude Code returned an incomplete reply. Try again."
-msgstr "Claude Code からの返信が途中で終了しました。もう一度お試しください。"
+msgstr "Claude Codeからの回答が途中で終了しました。もう一度お試しください。"
 
 #. Button that clears the whole download history
 #: packages/renderer/routes/download-history.tsx
@@ -1096,15 +1096,15 @@ msgstr "1Passwordに接続"
 
 #: packages/app/assistant/connection.ts
 msgid "Connect ChatGPT to use the mail assistant."
-msgstr "メールアシスタントを使用するには ChatGPT に接続してください。"
+msgstr "メールアシスタントを使用するにはChatGPTに接続してください。"
 
 #: packages/renderer/task-draft.tsx
 msgid "Connect Google Tasks"
-msgstr "Google ToDo リストに接続"
+msgstr "Google ToDoリストに接続"
 
 #: packages/renderer/task-draft.tsx
 msgid "Connect with a Google desktop OAuth client that has the Tasks API enabled."
-msgstr "Tasks API を有効にした Google デスクトップ OAuth クライアントを使用してください。"
+msgstr "Tasks APIを有効にしたGoogleデスクトップOAuthクライアントで接続してください。"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Connected"
@@ -1112,11 +1112,11 @@ msgstr "接続済み"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Connected as {email}"
-msgstr "{email} として接続済み"
+msgstr "{email}として接続済み"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Continue with ChatGPT"
-msgstr "ChatGPT で続ける"
+msgstr "ChatGPTで続ける"
 
 #: packages/renderer/components/attachments/categories.tsx
 msgid "Contract"
@@ -1236,7 +1236,7 @@ msgstr "URLをコピー"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Couldn’t check {unavailableAccounts} for attachments."
-msgstr "{unavailableAccounts} の添付ファイルを確認できませんでした。"
+msgstr "{unavailableAccounts}の添付ファイルを確認できませんでした。"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t check this mailbox."
@@ -1248,15 +1248,15 @@ msgstr "保存済みのチャットを消去できませんでした。"
 
 #: packages/app/task-draft.ts
 msgid "Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here."
-msgstr "Google ToDo リストに接続できませんでした。デスクトップ クライアントを確認し、ここに表示されているメールアドレスでログインしてください。"
+msgstr "Google ToDoリストに接続できませんでした。デスクトップクライアントを確認し、ここに表示されているメールアドレスでログインしてください。"
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
-msgstr "ChatGPT に接続できませんでした。もう一度お試しください。"
+msgstr "ChatGPTに接続できませんでした。もう一度お試しください。"
 
 #: packages/app/assistant/providers.ts
 msgid "Couldn't connect to the AI provider. Try again."
-msgstr "AI プロバイダーに接続できませんでした。もう一度お試しください。"
+msgstr "AIプロバイダに接続できませんでした。もう一度お試しください。"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Couldn't copy to the clipboard."
@@ -1294,7 +1294,7 @@ msgstr "{extensionName}を開けませんでした"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Couldn't open the draft in Gmail."
-msgstr "Gmail で下書きを開けませんでした。"
+msgstr "Gmailで下書きを開けませんでした。"
 
 #: packages/app/assistant/chat.ts
 #: packages/renderer/components/assistant/assistant-quotes.tsx
@@ -1304,7 +1304,7 @@ msgstr "引用元のメールを開けませんでした。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open the local ChatGPT sign-in page."
-msgstr "ChatGPT ログイン用のローカルページを開けませんでした。"
+msgstr "ChatGPTログイン用のローカルページを開けませんでした。"
 
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/unified-inbox.tsx
@@ -1313,7 +1313,7 @@ msgstr "このスレッドを開けませんでした。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open your browser for ChatGPT sign-in."
-msgstr "ChatGPT へのログインに使用するブラウザーを開けませんでした。"
+msgstr "ChatGPTへのログインに使用するブラウザを開けませんでした。"
 
 #: packages/app/task-draft.ts
 msgid "Couldn’t reach Google Tasks. Check your connection and try again."
@@ -1325,7 +1325,7 @@ msgstr "メールアシスタントに接続できませんでした。もう一
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
-msgstr "保存された ChatGPT の接続情報を読み取れませんでした。接続を解除してから、もう一度ログインしてください。"
+msgstr "保存されたChatGPTの接続情報を読み取れませんでした。接続を解除してから、もう一度ログインしてください。"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Couldn’t read this image. Try another file."
@@ -1333,7 +1333,7 @@ msgstr "この画像を読み込めませんでした。別のファイルをお
 
 #: packages/renderer/components/attachments/categories.tsx
 msgid "Couldn’t save the category. Try again."
-msgstr "カテゴリーを保存できませんでした。もう一度お試しください。"
+msgstr "カテゴリを保存できませんでした。もう一度お試しください。"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t schedule this follow-up. Check the conversation and try again."
@@ -1368,7 +1368,7 @@ msgstr "拡張機能をアップデートできませんでした"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Couldn't update the AI connection. Try again."
-msgstr "AI の接続を更新できませんでした。もう一度お試しください。"
+msgstr "AIの接続を更新できませんでした。もう一度お試しください。"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t update this follow-up."
@@ -1728,7 +1728,7 @@ msgstr "エメラルド"
 
 #: packages/renderer/routes/settings/unified-inbox.tsx
 msgid "Enable All Mail"
-msgstr "「すべてのメール」を有効にする"
+msgstr "“すべてのメール”を有効にする"
 
 #: packages/renderer/routes/settings/blocker.tsx
 msgid "Enable blocker"
@@ -1786,7 +1786,7 @@ msgstr "検索条件を入力してください"
 
 #: packages/app/assistant/providers.ts
 msgid "Enter a valid API key."
-msgstr "有効な API キーを入力してください。"
+msgstr "有効なAPIキーを入力してください。"
 
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 msgid "Enter a valid hex, rgb, or rgba color"
@@ -1912,7 +1912,7 @@ msgstr "ファイル形式"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Files attached to your Gmail messages appear here."
-msgstr "Gmail のメールに添付されたファイルがここに表示されます。"
+msgstr "Gmailのメールに添付されたファイルがここに表示されます。"
 
 #: packages/renderer/components/download-history.tsx
 msgid "Files you download appear here for 30 days."
@@ -1979,7 +1979,7 @@ msgstr "検索…"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Finish signing in in your browser."
-msgstr "ブラウザーでログインを完了してください。"
+msgstr "ブラウザでログインを完了してください。"
 
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Finishing your reply"
@@ -2018,7 +2018,7 @@ msgstr "友達"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "From {sender}"
-msgstr "差出人 {sender}"
+msgstr "差出人：{sender}"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
@@ -2066,7 +2066,7 @@ msgstr "ggmailはアップデートを確認できませんでした。"
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "ggmail couldn’t confirm delivery. Check your system notification settings."
-msgstr "ggmail は通知の配信を確認できませんでした。システムの通知設定を確認してください。"
+msgstr "ggmailは通知の配信を確認できませんでした。システムの通知設定を確認してください。"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail couldn't delete this account's browsing data. Try again."
@@ -2141,7 +2141,7 @@ msgstr "Google Meet"
 
 #: packages/renderer/components/workspace-sidebar.tsx
 msgid "Google Tasks"
-msgstr "Google ToDo リスト"
+msgstr "Google ToDoリスト"
 
 #: packages/app/task-draft.ts
 msgid "Google Tasks access expired. Connect again to save."
@@ -2369,7 +2369,7 @@ msgstr "{extensionName}をインストール"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Install Claude Code on this computer, then try again."
-msgstr "このコンピューターに Claude Code をインストールして、もう一度お試しください。"
+msgstr "このコンピュータにClaude Codeをインストールして、もう一度お試しください。"
 
 #: packages/renderer/components/attachments/categories.tsx
 msgid "Invoice"
@@ -2486,7 +2486,7 @@ msgstr "リスト表示"
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "List Workspace windows alongside open tabs. Select one to bring its window forward."
-msgstr "開いているタブの横に Workspace のウィンドウを表示します。選択すると、そのウィンドウが最前面に表示されます。"
+msgstr "開いているタブと一緒にWorkspaceのウィンドウを一覧表示します。選択すると、そのウィンドウが最前面に表示されます。"
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Load clipped messages in full"
@@ -2559,7 +2559,7 @@ msgstr "メールアシスタントとの会話"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Mail assistant provider"
-msgstr "メールアシスタントのプロバイダー"
+msgstr "メールアシスタントのプロバイダ"
 
 #: packages/renderer/components/mail-view-navigation.tsx
 #: packages/renderer/mail-views.tsx
@@ -2733,7 +2733,7 @@ msgstr "次の出典"
 
 #: packages/renderer/routes/unified-inbox.tsx
 msgid "No accounts are included in All Mail."
-msgstr "「すべてのメール」に含まれるアカウントはありません。"
+msgstr "“すべてのメール”に含まれるアカウントはありません。"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "No accounts yet."
@@ -2758,7 +2758,7 @@ msgstr "ブックマークはまだありません"
 
 #: packages/app/assistant/responses.ts
 msgid "No compatible mail assistant models are available for this API key."
-msgstr "この API キーで利用できるメールアシスタント対応モデルはありません。"
+msgstr "このAPIキーで利用できるメールアシスタント対応モデルはありません。"
 
 #: packages/renderer/components/download-history.tsx
 msgid "No downloads yet"
@@ -2812,7 +2812,7 @@ msgstr "一致するページはありません"
 
 #: packages/app/assistant/connection.ts
 msgid "No models are available for this ChatGPT account."
-msgstr "この ChatGPT アカウントで利用できるモデルはありません。"
+msgstr "このChatGPTアカウントで利用できるモデルはありません。"
 
 #: packages/renderer/components/assistant/answer-media.tsx
 #: packages/renderer/components/attachments/preview.tsx
@@ -2944,7 +2944,7 @@ msgstr "このスレッドで返信を開き、もう一度お試しください
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Open AI settings"
-msgstr "AI 設定を開く"
+msgstr "AI設定を開く"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password again."
@@ -3002,11 +3002,11 @@ msgstr "フォルダを開く"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Open in Gmail"
-msgstr "Gmail で開く"
+msgstr "Gmailで開く"
 
 #: packages/renderer/task-draft.tsx
 msgid "Open in Google Tasks"
-msgstr "Google ToDo リストで開く"
+msgstr "Google ToDoリストで開く"
 
 #: packages/app/ipc.ts
 msgid "Open inbox"
@@ -3386,7 +3386,7 @@ msgstr "{label}をランチャーから削除"
 
 #: packages/renderer/components/app-picker.tsx
 msgid "Remove {label} from sidebar"
-msgstr "{label} をサイドバーから削除"
+msgstr "{label}をサイドバーから削除"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove {label}?"
@@ -3399,7 +3399,7 @@ msgstr "{site}を削除"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Remove a quote to add another."
-msgstr "別の引用を追加するには、引用を 1 件削除してください。"
+msgstr "別の引用を追加するには、引用を1件削除してください。"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove account"
@@ -3424,7 +3424,7 @@ msgstr "ブックマークを削除"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Remove filter “{label}”"
-msgstr "フィルター「{label}」を解除"
+msgstr "フィルタ“{label}”を解除"
 
 #. Button that removes a download from the download history
 #: packages/renderer/components/download-history.tsx
@@ -3524,7 +3524,7 @@ msgstr "今すぐ再起動"
 
 #: packages/renderer/routes/settings/sidebar.tsx
 msgid "Restore defaults"
-msgstr "初期設定に戻す"
+msgstr "デフォルトに戻す"
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Restrict minimum window size"
@@ -3540,7 +3540,7 @@ msgstr "再試行"
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Return to ggmail to finish signing in."
-msgstr "ggmail に戻ってログインを完了してください。"
+msgstr "ggmailに戻ってログインを完了してください。"
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Reverse conversation"
@@ -3552,7 +3552,7 @@ msgstr "メールの検索結果を確認中"
 
 #: packages/renderer/bookmarks.tsx
 msgid "Right-click a Workspace tab and choose Bookmark to save its page here."
-msgstr "Workspace のタブを右クリックし、「ブックマークに追加」を選択すると、そのページがここに保存されます。"
+msgstr "Workspaceのタブを右クリックし、“ブックマークに追加”を選択すると、そのページがここに保存されます。"
 
 #. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
@@ -3861,7 +3861,7 @@ msgstr "表示"
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show a moon in the title bar while Do Not Disturb is on."
-msgstr "通知を一時停止している間、タイトルバーに月のアイコンを表示します。"
+msgstr "おやすみモードがオンの間、タイトルバーに月のアイコンを表示します。"
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Show a notification when a download finishes."
@@ -4012,7 +4012,7 @@ msgstr "送信者のアイコンを表示"
 
 #: packages/renderer/routes/settings/unified-inbox.tsx
 msgid "Show sender icons in All Mail."
-msgstr "「すべてのメール」に送信者アイコンを表示します。"
+msgstr "“すべてのメール”に送信者のアイコンを表示します。"
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Show sender icons next to the senders in your inbox."
@@ -4111,15 +4111,15 @@ msgstr "ログイン"
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/mail-views.tsx
 msgid "Sign in to {label}"
-msgstr "{label} にログイン"
+msgstr "{label}にログイン"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Sign in to {signedOutAccounts} to load attachments."
-msgstr "添付ファイルを読み込むには、{signedOutAccounts} にログインしてください。"
+msgstr "添付ファイルを読み込むには、{signedOutAccounts}にログインしてください。"
 
 #: packages/app/assistant/connection.ts
 msgid "Sign in to ChatGPT again to continue."
-msgstr "続けるには ChatGPT にもう一度ログインしてください。"
+msgstr "続けるにはChatGPTにもう一度ログインしてください。"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Sign in to Google with a passkey and Touch ID"
@@ -4139,7 +4139,7 @@ msgstr "ログインして未読メールを表示"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
-msgstr "ターミナルで「claude auth login」を実行してサブスクリプションにログインした後、ここで接続してください。"
+msgstr "ターミナルで“claude auth login”を実行してサブスクリプションにログインした後、ここで接続してください。"
 
 #: packages/renderer/task-draft.tsx
 msgid "Sign in with Google in your browser, then return here."
@@ -4151,7 +4151,7 @@ msgstr "パスワードまたは利用可能なほかの2段階認証の方法�
 
 #: packages/app/assistant/connection.ts
 msgid "Signed out here. Open ChatGPT settings to revoke ggmail's access there."
-msgstr "この端末でログアウトしました。ggmail のアクセス権を取り消すには、ChatGPT の設定を開いてください。"
+msgstr "ggmailではログアウトしました。ChatGPT側でもggmailのアクセス権を取り消すには、ChatGPTの設定を開いてください。"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Signs you out of this account."
@@ -4183,7 +4183,7 @@ msgstr "スカイ"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Some messages in {partialAccounts} couldn’t be checked. Previously loaded files are still available."
-msgstr "{partialAccounts} の一部のメッセージを確認できませんでした。読み込み済みのファイルは引き続き利用できます。"
+msgstr "{partialAccounts}の一部のメッセージを確認できませんでした。読み込み済みのファイルは引き続き利用できます。"
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Some pages may load more slowly the next time."
@@ -4244,7 +4244,7 @@ msgstr "起動"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Still checking {loadingAccounts}…"
-msgstr "{loadingAccounts} を引き続き確認しています…"
+msgstr "{loadingAccounts}を引き続き確認しています…"
 
 #: packages/renderer/components/titlebar.tsx
 msgid "Stop loading"
@@ -4364,7 +4364,7 @@ msgstr "文字色"
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
 msgid "The AI provider couldn't complete the request. Try again."
-msgstr "AI プロバイダーはリクエストを完了できませんでした。もう一度お試しください。"
+msgstr "AIプロバイダはリクエストを完了できませんでした。もう一度お試しください。"
 
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/claude-cli-stream.ts
@@ -4372,13 +4372,13 @@ msgstr "AI プロバイダーはリクエストを完了できませんでした
 #: packages/app/assistant/http.ts
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned a response that is too large."
-msgstr "AI プロバイダーからの応答が大きすぎます。"
+msgstr "AIプロバイダからの応答が大きすぎます。"
 
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/http.ts
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
-msgstr "AI プロバイダーから空の応答が返されました。"
+msgstr "AIプロバイダから空の応答が返されました。"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
@@ -4399,7 +4399,7 @@ msgstr "アシスタントから空の返信が返されました。もう一度
 #: packages/app/assistant/claude-cli.ts
 #: packages/app/assistant/providers.ts
 msgid "The Claude Code account changed. Reconnect in AI settings."
-msgstr "Claude Code のアカウントが変更されました。AI 設定で再接続してください。"
+msgstr "Claude Codeのアカウントが変更されました。AI設定で再接続してください。"
 
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
@@ -4474,7 +4474,7 @@ msgstr "この箇所はすでに添付されています。"
 
 #: packages/app/assistant/connection.ts
 msgid "This sign-in used a different ChatGPT account. Use the account you originally connected."
-msgstr "別の ChatGPT アカウントでログインしています。最初に接続したアカウントを使用してください。"
+msgstr "別のChatGPTアカウントでログインしました。最初に接続したアカウントを使用してください。"
 
 #: packages/app/menu.ts
 msgid "This signs out of every account and clears all settings and data on this device. It can't be undone."
@@ -4505,7 +4505,7 @@ msgstr "宛先"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."
-msgstr "フォローアップを設定するには、Gmail で送信済みのスレッドを開いてからここに戻ってください。"
+msgstr "フォローアップを設定するには、Gmailで送信済みのスレッドを開いてからここに戻ってください。"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -4645,12 +4645,12 @@ msgstr "アップデート"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Use Claude Code session"
-msgstr "Claude Code のセッションを使用"
+msgstr "Claude Codeのセッションを使用"
 
 #. Original colors is the label of the toggle on an individual email
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
-msgstr "メールと作成ウィンドウをダーク表示にします。メールの「元の色」を選ぶと、送信者のデザインで表示されます。"
+msgstr "メールと作成ウィンドウをダーク表示にします。メールの“元の色”を選ぶと、送信者のデザインで表示されます。"
 
 #. Setting that shares the screen through the operating system's own picker
 #: packages/renderer/routes/settings/advanced.tsx
@@ -4659,7 +4659,7 @@ msgstr "システムのピッカーを使用"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Use the Claude Code subscription signed in on this computer. To sign in, run <0>claude auth login</0> in a terminal."
-msgstr "このコンピューターでログイン済みの Claude Code サブスクリプションを使用します。ログインするには、ターミナルで <0>claude auth login</0> を実行してください。"
+msgstr "このコンピュータでログイン済みのClaude Codeサブスクリプションを使用します。ログインするには、ターミナルで<0>claude auth login</0>を実行してください。"
 
 #: packages/renderer/routes/settings/advanced.tsx
 msgid "Use the system's native screen sharing picker when sharing your screen."
@@ -4768,7 +4768,7 @@ msgstr "コピーするタイミング"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "When you ask a question, ggmail sends recent chat history and relevant mail to the selected provider."
-msgstr "質問すると、ggmail は最近のチャット履歴と関連するメールを選択したプロバイダーに送信します。"
+msgstr "質問すると、ggmailは最近のチャット履歴と関連するメールを選択したプロバイダに送信します。"
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Where downloaded files are saved."
@@ -4856,20 +4856,20 @@ msgstr "アシスタントの下書きが文字数の上限に達しました。
 
 #: packages/app/assistant/responses.ts
 msgid "Your ChatGPT account or workspace hasn't enabled plan access for ggmail."
-msgstr "お使いの ChatGPT アカウントまたはワークスペースで、ggmail に対するプランへのアクセスが有効になっていません。"
+msgstr "お使いのChatGPTアカウントまたはワークスペースで、ggmailに対するプランへのアクセスが有効になっていません。"
 
 #: packages/app/assistant/connection.ts
 msgid "Your ChatGPT session couldn't be renewed. Sign in again."
-msgstr "ChatGPT セッションを更新できませんでした。もう一度ログインしてください。"
+msgstr "ChatGPTセッションを更新できませんでした。もう一度ログインしてください。"
 
 #: packages/app/assistant/chatgpt-auth.ts
 #: packages/app/assistant/responses.ts
 msgid "Your ChatGPT session expired. Sign in again."
-msgstr "ChatGPT セッションの有効期限が切れました。もう一度ログインしてください。"
+msgstr "ChatGPTセッションの有効期限が切れました。もう一度ログインしてください。"
 
 #: packages/app/assistant/responses.ts
 msgid "Your ChatGPT usage limit was reached. Try again later."
-msgstr "ChatGPT の利用上限に達しました。後でもう一度お試しください。"
+msgstr "ChatGPTの利用上限に達しました。後でもう一度お試しください。"
 
 #. Subject of the sample email in the test notification
 #: packages/shared/mail-notification.ts

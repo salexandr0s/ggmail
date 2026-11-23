@@ -3861,7 +3861,7 @@ msgstr "Mostrar"
 
 #: packages/renderer/routes/settings/appearance.tsx
 msgid "Show a moon in the title bar while Do Not Disturb is on."
-msgstr "Uma lua aparece na barra de título quando o modo Não perturbe está ativado."
+msgstr "Mostrar uma lua na barra de título enquanto o modo Não Perturbe estiver ativado."
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Show a notification when a download finishes."

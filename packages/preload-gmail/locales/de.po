@@ -9,7 +9,7 @@ msgstr ""
 
 #: packages/preload-gmail/row-context-menu.ts
 msgid "Add to Calendar…"
-msgstr "Zu Google Kalender hinzufügen…"
+msgstr "Zum Kalender hinzufügen …"
 
 #. Accessible name of the close button on a brief notification ggmail shows over Gmail
 #: packages/preload-gmail/ipc.ts

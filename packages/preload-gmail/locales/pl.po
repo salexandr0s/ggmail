@@ -33,7 +33,7 @@ msgstr "Oryginalne kolory"
 
 #: packages/preload-gmail/row-context-menu.ts
 msgid "Quote to assistant"
-msgstr "Zacytuj w asystencie"
+msgstr "Zacytuj w asystencie"
 
 #. Button in the message-sent toast, which recalls the message
 #: packages/preload-gmail/ipc.ts

@@ -289,7 +289,7 @@ msgstr "8 heures"
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
-msgstr "Les alertes de code suivent vos réglages de notification des e-mails. Désactivez « Afficher le résumé » pour masquer le code. Le bouton « Copier » reste disponible."
+msgstr "Les alertes de code suivent vos paramètres de notification des e-mails. Désactivez « Afficher le résumé » pour masquer le code. Le bouton « Copier » reste disponible."
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -776,7 +776,7 @@ msgstr "Faire le point"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Catch me up on recent emails in this view. What needs my attention?"
-msgstr "Fais le point sur les e-mails récents de cette vue. Lesquels demandent mon attention ?"
+msgstr "Fais le point sur les e-mails récents de cette vue. Lesquels demandent mon attention ?"
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Categories to monitor"
@@ -2066,7 +2066,7 @@ msgstr "ggmail n’a pas pu rechercher les mises à jour."
 
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "ggmail couldn’t confirm delivery. Check your system notification settings."
-msgstr "ggmail n’a pas pu confirmer la remise de la notification. Vérifiez les réglages de notification de votre système."
+msgstr "ggmail n’a pas pu confirmer la remise de la notification. Vérifiez les paramètres de notification de votre système."
 
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "ggmail couldn't delete this account's browsing data. Try again."
@@ -3361,7 +3361,7 @@ msgstr "Actualiser"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Reload models"
-msgstr "Recharger les modèles"
+msgstr "Actualiser les modèles"
 
 #: packages/renderer/components/titlebar.tsx
 msgid "Reload page"
@@ -4139,7 +4139,7 @@ msgstr "Connectez-vous pour voir les messages non lus"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
-msgstr "Connectez-vous à votre abonnement avec « claude auth login » dans un terminal, puis établissez la connexion ici."
+msgstr "Connectez-vous à votre abonnement avec « claude auth login » dans un terminal, puis établissez la connexion ici."
 
 #: packages/renderer/task-draft.tsx
 msgid "Sign in with Google in your browser, then return here."
@@ -4672,7 +4672,7 @@ msgstr "Styles personnalisés"
 
 #: packages/app/gmail/index.ts
 msgid "Verification code"
-msgstr "Code de vérification"
+msgstr "Code de validation"
 
 #: packages/app/gmail/index.ts
 msgid "Verification code {verificationCode}"

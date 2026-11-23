@@ -289,7 +289,7 @@ msgstr "8 horas"
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
-msgstr "Los avisos de códigos usan tu configuración de notificaciones de correo. Desactiva «Mostrar resumen» para ocultar el código. Puedes seguir usando el botón «Copiar»."
+msgstr "Los avisos de códigos usan tu configuración de notificaciones de correo. Desactiva “Mostrar resumen” para ocultar el código. Puedes seguir usando el botón “Copiar”."
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -546,7 +546,7 @@ msgstr "Diseño"
 #. Group of pages in the Settings sidebar
 #: packages/renderer/components/app-sidebar.tsx
 msgid "Application"
-msgstr "Aplicación"
+msgstr "App"
 
 #: packages/renderer/routes/settings/about.tsx
 msgid "Application version"
@@ -3424,7 +3424,7 @@ msgstr "Quitar de favoritos"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Remove filter “{label}”"
-msgstr "Quitar el filtro «{label}»"
+msgstr "Quitar el filtro “{label}”"
 
 #. Button that removes a download from the download history
 #: packages/renderer/components/download-history.tsx
@@ -3552,7 +3552,7 @@ msgstr "Revisando los resultados de la búsqueda"
 
 #: packages/renderer/bookmarks.tsx
 msgid "Right-click a Workspace tab and choose Bookmark to save its page here."
-msgstr "Haz clic con el botón derecho en una pestaña de Workspace y elige «Agregar a favoritos» para guardar su página aquí."
+msgstr "Haz clic con el botón derecho en una pestaña de Workspace y elige “Agregar a favoritos” para guardar su página aquí."
 
 #. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
@@ -4139,7 +4139,7 @@ msgstr "Inicia sesión para ver los mensajes no leídos"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
-msgstr "Inicia sesión en tu suscripción con «claude auth login» en una terminal y conéctate aquí."
+msgstr "Para iniciar sesión en tu suscripción, ejecuta “claude auth login” en una terminal y, luego, conéctate aquí."
 
 #: packages/renderer/task-draft.tsx
 msgid "Sign in with Google in your browser, then return here."
@@ -4650,7 +4650,7 @@ msgstr "Usar la sesión de Claude Code"
 #. Original colors is the label of the toggle on an individual email
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
-msgstr "Oscurece los mensajes y las ventanas de redacción. Selecciona «Colores originales» en un mensaje para ver el diseño del remitente."
+msgstr "Oscurece los mensajes y las ventanas de redacción. Selecciona “Colores originales” en un mensaje para ver el diseño del remitente."
 
 #. Setting that shares the screen through the operating system's own picker
 #: packages/renderer/routes/settings/advanced.tsx

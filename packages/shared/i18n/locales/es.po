@@ -289,7 +289,7 @@ msgstr "8 horas"
 #. Copy names the button on the verification code notification, so it matches that button's label
 #: packages/renderer/routes/settings/verification-codes.tsx
 msgid "A code alert follows your email notification settings. Turn off Show summary to hide the code. You can still use the Copy button."
-msgstr "Los avisos de códigos usan tus ajustes de notificaciones de correo. Desactiva «Mostrar resumen» para ocultar el código. Puedes seguir usando el botón «Copiar»."
+msgstr "Los avisos de códigos usan tu configuración de notificaciones de correo. Desactiva “Mostrar resumen” para ocultar el código. Puedes seguir usando el botón “Copiar”."
 
 #: packages/app/assistant/chat.ts
 msgid "A reply is already being inserted."
@@ -437,7 +437,7 @@ msgstr "IA"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "AI settings"
-msgstr "Ajustes de IA"
+msgstr "Configuración de IA"
 
 #: packages/renderer/components/account-filters.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
@@ -802,7 +802,7 @@ msgstr "ChatGPT aún no puede renovar esta sesión. Vuelve a intentarlo en un mo
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "ChatGPT couldn't complete sign-in. Try again."
-msgstr "No se pudo completar el inicio de sesión en ChatGPT. Vuelve a intentarlo."
+msgstr "No se ha podido completar el inicio de sesión en ChatGPT. Vuelve a intentarlo."
 
 #: packages/app/assistant/responses.ts
 msgid "ChatGPT couldn't complete the request. Try again."
@@ -848,7 +848,7 @@ msgstr "Revisa Google Tasks antes de volver a guardar."
 
 #: packages/app/assistant/responses.ts
 msgid "Check the API key and its permissions in AI settings."
-msgstr "Comprueba la clave de API y sus permisos en los ajustes de IA."
+msgstr "Comprueba la clave de API y sus permisos en la configuración de IA."
 
 #: packages/app/assistant/responses.ts
 msgid "Check your provider's balance or usage limits and try again."
@@ -877,7 +877,7 @@ msgstr "Elige una fecha"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Choose a provider in AI settings to ask about mail or draft a reply."
-msgstr "Elige un proveedor en los ajustes de IA para hacer preguntas sobre tus correos o redactar una respuesta."
+msgstr "Elige un proveedor en la configuración de IA para hacer preguntas sobre tus correos o redactar una respuesta."
 
 #: packages/app/assistant/chat.ts
 #: packages/app/assistant/providers.ts
@@ -1248,19 +1248,19 @@ msgstr "No se ha podido borrar el chat guardado."
 
 #: packages/app/task-draft.ts
 msgid "Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here."
-msgstr "No se pudo conectar Google Tasks. Revisa el cliente de escritorio e inicia sesión con la dirección de correo que aparece aquí."
+msgstr "No se ha podido conectar Google Tasks. Revisa el cliente de escritorio e inicia sesión con la dirección de correo que aparece aquí."
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
-msgstr "No se pudo conectar con ChatGPT. Vuelve a intentarlo."
+msgstr "No se ha podido conectar con ChatGPT. Vuelve a intentarlo."
 
 #: packages/app/assistant/providers.ts
 msgid "Couldn't connect to the AI provider. Try again."
-msgstr "No se pudo conectar con el proveedor de IA. Vuelve a intentarlo."
+msgstr "No se ha podido conectar con el proveedor de IA. Vuelve a intentarlo."
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Couldn't copy to the clipboard."
-msgstr "No se pudo copiar al portapapeles."
+msgstr "No se ha podido copiar al portapapeles."
 
 #: packages/renderer/routes/settings/about.tsx
 msgid "Couldn't export the logs."
@@ -1268,7 +1268,7 @@ msgstr "No se han podido exportar los registros."
 
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
-msgstr "No se pudo terminar la respuesta. Vuelve a intentarlo."
+msgstr "No se ha podido terminar la respuesta. Vuelve a intentarlo."
 
 #: packages/app/assistant/ipc.ts
 #: packages/renderer/components/assistant/assistant-reply.tsx
@@ -1294,17 +1294,17 @@ msgstr "No se ha podido abrir {extensionName}"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Couldn't open the draft in Gmail."
-msgstr "No se pudo abrir el borrador en Gmail."
+msgstr "No se ha podido abrir el borrador en Gmail."
 
 #: packages/app/assistant/chat.ts
 #: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Couldn't open the email source."
-msgstr "No se pudo abrir el correo citado."
+msgstr "No se ha podido abrir el correo citado."
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open the local ChatGPT sign-in page."
-msgstr "No se pudo abrir la página local de inicio de sesión de ChatGPT."
+msgstr "No se ha podido abrir la página local de inicio de sesión de ChatGPT."
 
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/unified-inbox.tsx
@@ -1313,7 +1313,7 @@ msgstr "No se ha podido abrir esta conversación."
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open your browser for ChatGPT sign-in."
-msgstr "No se pudo abrir el navegador para iniciar sesión en ChatGPT."
+msgstr "No se ha podido abrir el navegador para iniciar sesión en ChatGPT."
 
 #: packages/app/task-draft.ts
 msgid "Couldn’t reach Google Tasks. Check your connection and try again."
@@ -1321,11 +1321,11 @@ msgstr "No se ha podido acceder a Google Tasks. Comprueba tu conexión y vuelve 
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Couldn't reach the mail assistant. Try again."
-msgstr "No se pudo contactar con el asistente de correo. Vuelve a intentarlo."
+msgstr "No se ha podido acceder al asistente de correo. Vuelve a intentarlo."
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
-msgstr "No se pudo leer la conexión guardada con ChatGPT. Desconéctala y vuelve a iniciar sesión."
+msgstr "No se ha podido leer la conexión guardada con ChatGPT. Desconéctala y vuelve a iniciar sesión."
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Couldn’t read this image. Try another file."
@@ -1368,7 +1368,7 @@ msgstr "No se han podido actualizar las extensiones"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Couldn't update the AI connection. Try again."
-msgstr "No se pudo actualizar la conexión de IA. Vuelve a intentarlo."
+msgstr "No se ha podido actualizar la conexión de IA. Vuelve a intentarlo."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t update this follow-up."
@@ -1636,7 +1636,7 @@ msgstr "Arrastra {label} para reordenar"
 
 #: packages/renderer/routes/settings/sidebar.tsx
 msgid "Drag shortcuts into the order you want. Settings stays pinned at the bottom for all accounts."
-msgstr "Arrastra los accesos directos al orden que prefieras. Los ajustes permanecen fijos en la parte inferior para todas las cuentas."
+msgstr "Arrastra los accesos directos al orden que prefieras. Configuración permanece fija en la parte inferior para todas las cuentas."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
@@ -2911,7 +2911,7 @@ msgstr "Aquí solo funcionan las llaves de acceso creadas en ggmail."
 
 #: packages/renderer/components/app-picker.tsx
 msgid "Only Settings is pinned. Add a shortcut from Available."
-msgstr "Solo están fijados los ajustes. Añade un acceso directo desde Disponibles."
+msgstr "Solo está fijada Configuración. Añade un acceso directo desde Disponibles."
 
 #. Option of the When to copy setting: when a detected verification code is copied to the clipboard
 #: packages/shared/verification-codes.ts
@@ -2944,7 +2944,7 @@ msgstr "Abre una respuesta en esta conversación y vuelve a intentarlo."
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Open AI settings"
-msgstr "Abrir los ajustes de IA"
+msgstr "Abrir la configuración de IA"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Open and unlock 1Password again."
@@ -3424,7 +3424,7 @@ msgstr "Quitar marcador"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Remove filter “{label}”"
-msgstr "Quitar el filtro «{label}»"
+msgstr "Quitar el filtro “{label}”"
 
 #. Button that removes a download from the download history
 #: packages/renderer/components/download-history.tsx
@@ -3552,7 +3552,7 @@ msgstr "Revisando los resultados de la búsqueda"
 
 #: packages/renderer/bookmarks.tsx
 msgid "Right-click a Workspace tab and choose Bookmark to save its page here."
-msgstr "Haz clic con el botón derecho en una pestaña de Workspace y elige «Añadir a marcadores» para guardar su página aquí."
+msgstr "Haz clic con el botón derecho en una pestaña de Workspace y elige “Añadir a marcadores” para guardar su página aquí."
 
 #. Label of All Mail's picker for how many messages a page lists
 #: packages/renderer/routes/unified-inbox.tsx
@@ -4139,7 +4139,7 @@ msgstr "Inicia sesión para ver los mensajes sin leer"
 
 #: packages/app/assistant/claude-cli.ts
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
-msgstr "Inicia sesión en tu suscripción con «claude auth login» en un terminal y conéctate aquí."
+msgstr "Inicia sesión en tu suscripción con “claude auth login” en un terminal y conéctate aquí."
 
 #: packages/renderer/task-draft.tsx
 msgid "Sign in with Google in your browser, then return here."
@@ -4399,7 +4399,7 @@ msgstr "El asistente devolvió una respuesta vacía. Vuelve a preguntar."
 #: packages/app/assistant/claude-cli.ts
 #: packages/app/assistant/providers.ts
 msgid "The Claude Code account changed. Reconnect in AI settings."
-msgstr "La cuenta de Claude Code ha cambiado. Vuelve a conectarte en los ajustes de IA."
+msgstr "La cuenta de Claude Code ha cambiado. Vuelve a conectarte en la configuración de IA."
 
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
@@ -4650,7 +4650,7 @@ msgstr "Usar la sesión de Claude Code"
 #. Original colors is the label of the toggle on an individual email
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Use dark colors for messages and compose windows. Choose Original colors on a message to see the sender’s design."
-msgstr "Oscurecer los mensajes y las ventanas de redacción. Elige «Colores originales» en un mensaje para ver el diseño del remitente."
+msgstr "Oscurecer los mensajes y las ventanas de redacción. Elige “Colores originales” en un mensaje para ver el diseño del remitente."
 
 #. Setting that shares the screen through the operating system's own picker
 #: packages/renderer/routes/settings/advanced.tsx
@@ -4860,7 +4860,7 @@ msgstr "Tu cuenta o espacio de trabajo de ChatGPT no ha habilitado el acceso al 
 
 #: packages/app/assistant/connection.ts
 msgid "Your ChatGPT session couldn't be renewed. Sign in again."
-msgstr "No se pudo renovar tu sesión de ChatGPT. Vuelve a iniciar sesión."
+msgstr "No se ha podido renovar tu sesión de ChatGPT. Vuelve a iniciar sesión."
 
 #: packages/app/assistant/chatgpt-auth.ts
 #: packages/app/assistant/responses.ts
