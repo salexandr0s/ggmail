@@ -15,15 +15,12 @@ const FIRST_ACCOUNT_ID = "first";
 
 const SECOND_ACCOUNT_ID = "second";
 
-const ggmail = useApp(
-  {
-    accounts: [
-      seedAccount({ id: FIRST_ACCOUNT_ID, label: "First" }),
-      seedAccount({ id: SECOND_ACCOUNT_ID, label: "Second", selected: false }),
-    ],
-  },
-  { args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
-);
+const ggmail = useApp({
+  accounts: [
+    seedAccount({ id: FIRST_ACCOUNT_ID, label: "First" }),
+    seedAccount({ id: SECOND_ACCOUNT_ID, label: "Second", selected: false }),
+  ],
+});
 
 function seedMessages(accountId: string): GmailInboxMessage[] {
   return Array.from({ length: 6 }, (_, index) => ({

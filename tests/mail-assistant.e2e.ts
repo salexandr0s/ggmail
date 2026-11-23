@@ -10,10 +10,7 @@ import type { BaseWindow, MessageBoxOptions } from "electron";
 import type { Route } from "playwright";
 import { useApp } from "./lib/app";
 
-const ggmail = useApp(
-  { "window.restrictMinimumSize": false },
-  { args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
-);
+const ggmail = useApp({ "window.restrictMinimumSize": false });
 
 for (const starter of [false, true]) {
   test(`stop and retry preserve a ${starter ? "starter" : "written"} prompt and the next message`, async () => {

@@ -368,7 +368,7 @@ const ggmail = useApp(
     "downloads.location": userDataDir,
     "downloads.saveAs": false,
   }),
-  { env, args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
+  { env },
 );
 
 test.beforeEach(async () => {

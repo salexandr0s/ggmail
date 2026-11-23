@@ -45,7 +45,7 @@ const ggmail = useApp(
     "notifications.playSound": false,
     "notifications.showSummary": false,
   },
-  { env, args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
+  { env },
 );
 
 // Exercise Electron's real constructor, events and IPC without posting banners to the user's desktop.
