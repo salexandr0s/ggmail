@@ -7,6 +7,9 @@
 - All Mail sorts by received time. If a conversation cannot be opened or a row action is refused, All Mail stays in place and says so.
 - Menus, dialogs and search fields share one focus ring. Menus in dark mode show a visible highlight on the hovered row.
 - The find bar counter turns red when nothing matches. Removing a follow-up dims only that row.
+- **Insert into reply** in the mail assistant puts the draft into the Gmail reply again. If a draft cannot be inserted, the assistant says so and suggests copying it.
+- The mail assistant can search the web for public details, such as a business's contact address, with OpenAI, ChatGPT and Claude models. It shows what it is searching for and links the pages it used. DeepSeek models answer from mail alone.
+- A draft for a new email lists its recipients. **Open in Gmail** fills in the recipients, subject and message together, and the draft card has a copy button for each.
 
 ## 3.65.10 — 2026-11-22
 
