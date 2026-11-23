@@ -204,9 +204,11 @@ export function registerAssistantIpc({ main: listener, renderer }: typeof ipc) {
       return {
         ok: false,
         message:
+          // Anything else is a fault in the insertion itself. Asking the user
+          // to open a reply would send them after the wrong cause.
           error instanceof AssistantError
             ? error.message
-            : t`Open a reply in this thread and try again.`,
+            : t`Couldn't insert the draft. Copy it instead.`,
       };
     }
   });

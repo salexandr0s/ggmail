@@ -294,7 +294,7 @@ async function useDraftProvider(body: string | null, text = answer) {
   );
 }
 
-async function openMailFixture(hash: string, html: string) {
+async function openMailFixture(hash: string, html: string, policies = "") {
   const { signInUrl, gmailUrl } = ggmail.gmailStandIn;
   const findAccount = () => ggmail.app.windows().find((page) => page.url() === signInUrl);
   await expect.poll(findAccount).toBeDefined();
@@ -303,8 +303,15 @@ async function openMailFixture(hash: string, html: string) {
     throw new Error("The Gmail view is gone");
   }
   await mail.route(senderPhoto, serveAvatar);
+  // Gmail requires Trusted Types, and the isolated world that edits a reply
+  // inherits that. A fixture without the policy accepts HTML strings that
+  // Gmail's own page rejects.
   await mail.route(gmailUrl + "**", (route) =>
-    route.fulfill({ contentType: "text/html", body: html }),
+    route.fulfill({
+      contentType: "text/html",
+      headers: { "Content-Security-Policy": "require-trusted-types-for 'script'" + policies },
+      body: html,
+    }),
   );
   await mail.goto(gmailUrl + hash);
   return mail;
@@ -846,9 +853,11 @@ for (const existing of [false, true]) {
     if (existing) {
       await mail.locator(".bkH").click();
       await editor.fill("My existing text");
-      await editor.evaluate((el) =>
-        el.insertAdjacentHTML("beforeend", '<div class="gmail_signature">Signature</div>'),
-      );
+      await editor.evaluate((el) => {
+        const signature = el.appendChild(document.createElement("div"));
+        signature.className = "gmail_signature";
+        signature.textContent = "Signature";
+      });
     }
     const body = existing
       ? "Hi Sam,\n\nFriday works for me. <Thanks> & see you then."
@@ -882,9 +891,12 @@ for (const existing of [false, true]) {
     expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
     if (existing) {
       const reply = mail.locator(".ip").first();
-      await reply.evaluate((el) =>
-        el.insertAdjacentHTML("afterbegin", '<div class="Un J-JN-M-I"><i class="mI"></i></div>'),
-      );
+      await reply.evaluate((el) => {
+        const forward = document.createElement("div");
+        forward.className = "Un J-JN-M-I";
+        forward.appendChild(document.createElement("i")).className = "mI";
+        el.prepend(forward);
+      });
       await insert.click();
       await expect(panel.getByRole("alert")).toHaveText(
         "Open a reply in this thread and try again.",
@@ -959,7 +971,8 @@ for (const existing of [false, true]) {
   });
 }
 
-for (const mode of ["rich text", "plaintext-only"]) {
+// The last mode stands for a Gmail that allowlists policy names: the reply is typed.
+for (const mode of ["rich text", "plaintext-only", "rich text without a policy"]) {
   test(`inserts into an open inline reply beside the Gmail thread heading (${mode})`, async () => {
     const mail = await openMailFixture(
       "#inbox/" + threadId,
@@ -974,11 +987,12 @@ for (const mode of ["rich text", "plaintext-only"]) {
         <div class="HM"><div class="I5"><div class="M9">
           <div class="HQ"><div class="Un J-JN-M-I">Reply
             <div role="menu" hidden><i class="mI"></i></div></div><span id="recipient">Sam</span></div>
-          <div class="Ap"><div id="reply" contenteditable="${mode === "rich text" ? "" : "plaintext-only"}" role="textbox" aria-multiline="true"><br><div class="gmail_signature" data-smartmail="gmail_signature"><b>Studio Team</b><br>Studio phone</div></div></div>
+          <div class="Ap"><div id="reply" contenteditable="${mode === "plaintext-only" ? mode : ""}" role="textbox" aria-multiline="true"><br><div class="gmail_signature" data-smartmail="gmail_signature"><b>Studio Team</b><br>Studio phone</div></div></div>
         </div></div></div>
         <div role="dialog"><div class="ip"><div contenteditable role="textbox">Separate draft</div></div></div>
       </main>
       <script>document.querySelector("#reply").oninput = () => document.body.dataset.saved = "yes";</script>`,
+      mode.endsWith("policy") ? "; trusted-types 'none'" : "",
     );
     await useDraftProvider("Hi Sam,\n\nThe proof looks good.\n\nStudio Team\nStudio phone");
     const page = ggmail.renderer;
