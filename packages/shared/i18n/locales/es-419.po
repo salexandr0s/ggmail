@@ -67,6 +67,10 @@ msgstr "{label} aún se está sincronizando"
 msgid "{label} is up to date"
 msgstr "{label} está al día"
 
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "{label} was removed, but ggmail couldn’t clear its saved data."
+msgstr "Se quitó la cuenta {label}, pero ggmail no pudo borrar sus datos guardados."
+
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} will retry syncing"
 msgstr "Se volverá a intentar la sincronización de {label}"
@@ -1219,7 +1223,6 @@ msgstr "Copiar respuesta"
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
 #: packages/app/ipc.ts
-#: packages/app/page-context-menu.ts
 msgid "Copy URL"
 msgstr "Copiar URL"
 
@@ -1291,12 +1294,17 @@ msgid "Couldn't open the local ChatGPT sign-in page."
 msgstr "No se pudo abrir la página local de inicio de sesión de ChatGPT."
 
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Couldn’t open this conversation."
 msgstr "No se pudo abrir esta conversación."
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open your browser for ChatGPT sign-in."
 msgstr "No se pudo abrir el navegador para iniciar sesión en ChatGPT."
+
+#: packages/app/task-draft.ts
+msgid "Couldn’t reach Google Tasks. Check your connection and try again."
+msgstr "No se pudo contactar con Google Tasks. Revisa tu conexión y vuelve a intentarlo."
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Couldn't reach the mail assistant. Try again."
@@ -1352,6 +1360,10 @@ msgstr "No se pudo actualizar la conexión de IA. Vuelve a intentarlo."
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t update this follow-up."
 msgstr "No se pudo actualizar este seguimiento."
+
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Couldn’t update this message. Try again."
+msgstr "No se pudo actualizar este mensaje. Vuelve a intentarlo."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t verify replies"
@@ -2108,6 +2120,14 @@ msgstr "Google Meet"
 #: packages/renderer/components/workspace-sidebar.tsx
 msgid "Google Tasks"
 msgstr "Google Tasks"
+
+#: packages/app/task-draft.ts
+msgid "Google Tasks access expired. Connect again to save."
+msgstr "El acceso a Google Tasks caducó. Vuelve a conectar Google Tasks para guardar."
+
+#: packages/app/task-draft.ts
+msgid "Google Tasks didn’t save this task. Try again."
+msgstr "Google Tasks no guardó esta tarea. Vuelve a intentarlo."
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
@@ -2939,7 +2959,6 @@ msgstr "Abrir en la app"
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/context-menu.ts
 #: packages/app/ipc.ts
-#: packages/app/page-context-menu.ts
 msgid "Open in Default Browser"
 msgstr "Abrir en el navegador predeterminado"
 
@@ -4084,6 +4103,10 @@ msgstr "Inicia sesión para ver los mensajes no leídos"
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
 msgstr "Inicia sesión en tu suscripción con «claude auth login» en una terminal y conéctate aquí."
 
+#: packages/renderer/task-draft.tsx
+msgid "Sign in with Google in your browser, then return here."
+msgstr "Accede con Google en tu navegador y, luego, vuelve aquí."
+
 #: packages/app/workspace-app.ts
 msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
 msgstr "Accede con tu contraseña u otro segundo factor disponible. Si la cuenta no tiene contraseña, primero agrega una en myaccount.google.com desde un navegador y, luego, accede aquí."
@@ -4761,6 +4784,10 @@ msgstr "Apps de Workspace"
 #: packages/shared/accounts.ts
 msgid "Yellow"
 msgstr "Amarillo"
+
+#: packages/app/task-draft.ts
+msgid "You can close this tab and return to ggmail."
+msgstr "Puedes cerrar esta pestaña y volver a ggmail."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "You can schedule a follow-up when you sent the last message."
