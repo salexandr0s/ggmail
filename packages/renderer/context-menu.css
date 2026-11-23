@@ -1,0 +1,162 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+.context-surface {
+  margin: 8px;
+  padding-block: 6px;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: none;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  color: #202124;
+  box-shadow:
+    0 2px 6px #3c40434d,
+    0 1px 2px #3c404326;
+  font:
+    400 14px/20px "Roboto Variable",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+.dark .context-surface {
+  background: #292a2d;
+  color: #e8eaed;
+  border-color: #45474b;
+}
+.context-surface button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  height: 36px;
+  padding-inline: 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  font: inherit;
+}
+.context-icon {
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  opacity: 0.82;
+}
+.context-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.context-surface button:enabled:hover {
+  background: #f1f3f4;
+}
+.context-surface button:focus-visible {
+  outline: none;
+  background: #e8f0fe;
+  color: #174ea6;
+}
+.dark .context-surface button:enabled:hover {
+  background: #37393c;
+}
+.dark .context-surface button:focus-visible {
+  background: #394457;
+  color: #d2e3fc;
+}
+.context-surface button:disabled {
+  opacity: 0.45;
+}
+.context-surface hr {
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid #dadce0;
+}
+.dark .context-surface hr {
+  border-color: #494b50;
+}
+
+.calendar-choices {
+  --choice-accent: #0b57d0;
+  --choice-tint: #e8f0fe;
+  --choice-detail: #50565d;
+  --choice-divider: #e1e4e8;
+  border-radius: 16px;
+  padding: 0 6px 6px;
+  scrollbar-width: thin;
+  scroll-padding-block: 6px;
+}
+.dark .calendar-choices {
+  --choice-accent: #a8c7fa;
+  --choice-tint: #32425b;
+  --choice-detail: #bdc5ce;
+  --choice-divider: #494b50;
+}
+.calendar-choice-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--choice-divider);
+}
+.calendar-heading-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: var(--choice-accent);
+  background: var(--choice-tint);
+}
+.calendar-choice-heading strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+.calendar-choice-zone {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--choice-detail);
+  overflow-wrap: anywhere;
+}
+.calendar-choice-zone svg {
+  flex: none;
+}
+.calendar-choices button {
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 64px;
+  height: auto;
+  padding: 8px 14px;
+  border-radius: 9px;
+}
+.calendar-choice-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.calendar-choice-info strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.calendar-choice-info > span {
+  color: var(--choice-detail);
+  font-size: 13px;
+  line-height: 18px;
+}
+.calendar-choice-arrow {
+  flex: none;
+  color: var(--choice-detail);
+}
+[dir="rtl"] .calendar-choice-arrow {
+  transform: scaleX(-1);
+}
+.calendar-choices button:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--choice-accent);
+}

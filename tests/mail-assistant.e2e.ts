@@ -77,7 +77,7 @@ for (const starter of [false, true]) {
       await composer.press("Enter");
     }
     const bubble = panel.getByText(first, { exact: true });
-    await expect(panel.getByRole("status")).toHaveText(
+    await expect(panel.getByRole("log").getByRole("status")).toHaveText(
       starter ? "Reading “Planning review”" : "Searching Studio · page 2",
     );
     await expect(panel.getByText("Partial response")).toBeVisible();
@@ -779,7 +779,7 @@ test("streams answer text and shows a validated draft before the provider finish
   await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
   const panel = page.getByRole("complementary", { name: "Mail assistant" });
   await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
-  await expect(panel.getByRole("status")).toHaveText("Waiting for Fixture model");
+  await expect(panel.getByRole("log").getByRole("status")).toHaveText("Waiting for Fixture model");
   await send({ type: "response.output_text.delta", delta: "Friday" });
   const partial = panel.locator(".assistant-answer");
   await expect(partial).toHaveText("Friday");
@@ -806,7 +806,7 @@ test("streams answer text and shows a validated draft before the provider finish
     true,
   );
   await expect(panel.getByText(draft.body, { exact: true })).toBeVisible();
-  await expect(panel.getByRole("status")).toHaveText("Finishing your reply");
+  await expect(panel.getByRole("log").getByRole("status")).toHaveText("Finishing your reply");
   await expect(partial).toHaveText("Friday works.");
   const insert = panel.getByRole("button", { name: "Insert into reply", exact: true });
   const open = panel.getByRole("button", { name: "Open in Gmail", exact: true });
@@ -833,7 +833,7 @@ test("streams answer text and shows a validated draft before the provider finish
   await expect(insert).toBeEnabled();
   await expect(open).toBeEnabled();
   await expect(panel.getByText(draft.body, { exact: true })).toHaveCount(1);
-  await expect(panel.getByRole("status")).toHaveCount(0);
+  await expect(panel.getByRole("log").getByRole("status")).toHaveCount(0);
   await transport.dispose();
 });
 
@@ -1385,12 +1385,12 @@ test("inbox answers show sender identities, fit the panel, and open the cited th
   const team = answer.getByRole("button", { name: "2. Review notes" }).first();
   await expect(team).toHaveText("DT2");
   for (const dark of [false, true]) {
-    await ggmail.app.evaluate(({ BrowserWindow }, dark) => {
+    await ggmail.app.evaluate(({ BrowserWindow, nativeTheme }, dark) => {
       const win = BrowserWindow.getAllWindows().find((candidate) =>
         candidate.webContents.getURL().includes("main.html"),
       );
       win?.setContentSize(dark ? 480 : 1200, 940);
-      win?.webContents.send("theme.darkModeChanged", dark);
+      nativeTheme.themeSource = dark ? "dark" : "light";
     }, dark);
     await expect
       .poll(() => page.locator("html").evaluate((el) => el.classList.contains("dark")))

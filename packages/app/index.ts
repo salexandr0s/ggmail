@@ -74,6 +74,8 @@ async function resetApp() {
   // reach far past the extensions
   await extensions.clearSessionData(session.defaultSession);
 
+  const { resetTaskConnections } = await import("./google-task-connections");
+  resetTaskConnections();
   clearAttachmentCategories();
   clearAttachmentIndexes();
   const { removeReminders } = await import("./follow-ups/store");

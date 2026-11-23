@@ -1,11 +1,13 @@
 import { workspaceSidebarWidth } from "@ggmail/shared/constants";
-import { useState, type CSSProperties } from "react";
+import { ipc } from "@ggmail/shared/renderer/ipc";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Route, Router, Switch } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
 import { AppMain } from "@/components/app-main";
 import { AppTitlebar } from "@/components/app-titlebar";
 import { AppToaster } from "@/components/app-toaster";
 import { AssistantDrawer } from "@/components/assistant/assistant-panel";
+import { appendAssistantQuote } from "@/components/assistant/prompt";
 import { FollowUps } from "@/components/follow-ups";
 import { WorkspaceSidebar } from "@/components/workspace-sidebar";
 import { useMouseAccountSwitching } from "@/lib/hooks";
@@ -21,6 +23,14 @@ function Main() {
   useMouseAccountSwitching();
   const [location] = useHashLocation();
   const [showAssistant, setShowAssistant] = useState(false);
+  useEffect(
+    () =>
+      ipc.renderer.on("assistant.quote", (_event, text) => {
+        appendAssistantQuote(text);
+        setShowAssistant(true);
+      }),
+    [],
+  );
 
   return (
     <Router hook={useHashLocation}>

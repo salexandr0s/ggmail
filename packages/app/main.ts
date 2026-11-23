@@ -17,6 +17,7 @@ import {
 import { appMenu } from "@/menu";
 import { shellHistory } from "@/shell-history";
 import { ipc } from "./ipc";
+import { setupPageContextMenu } from "./page-context-menu";
 
 class Main {
   private _window: BrowserWindow | undefined;
@@ -190,6 +191,7 @@ class Main {
     }
 
     watchForAppMenuKey(this.window.webContents);
+    setupPageContextMenu(this.window);
 
     this.window.webContents.on("did-navigate-in-page", (_event, url) => {
       this.setLocation(`/${new URL(url).hash.replace(/^#?\/?/, "")}`);

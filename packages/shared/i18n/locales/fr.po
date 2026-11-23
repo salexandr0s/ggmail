@@ -7,10 +7,12 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: fr\n"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/task-draft.tsx
 msgid "(no subject)"
 msgstr "(sans objet)"
 
@@ -333,6 +335,10 @@ msgstr "Actions du compte"
 msgid "Accounts"
 msgstr "Comptes"
 
+#: packages/renderer/context-menu.tsx
+msgid "Actions"
+msgstr "Actions"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Actual Size"
@@ -394,6 +400,17 @@ msgstr "Ajouter des sites"
 msgid "Add time window"
 msgstr "Ajouter un créneau horaire"
 
+#: packages/app/mail-context-actions.ts
+msgid "Add to Calendar…"
+msgstr "Ajouter à Google Agenda…"
+
+#: packages/app/mail-context-actions.ts
+#: packages/app/page-context-menu.ts
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Add to Tasks"
+msgstr "Ajouter à Tasks"
+
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Add Workspace apps to the launcher on the right of the titlebar."
 msgstr "Ajouter des applis Workspace au lanceur, à droite de la barre de titre."
@@ -431,6 +448,10 @@ msgstr "Tous les comptes"
 msgid "All categories"
 msgstr "Toutes les catégories"
 
+#: packages/renderer/context-menu.tsx
+msgid "All day"
+msgstr "Toute la journée"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "All files"
 msgstr "Tous les fichiers"
@@ -449,6 +470,7 @@ msgstr "Tous les messages"
 #. Switch, and a badge on the account, for including the account in All Mail
 #. Title of All Mail page
 #: packages/app/menu.ts
+#: packages/app/page-context-menu.ts
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/lib/mail-views.ts
 #: packages/renderer/lib/settings-pages.ts
@@ -537,6 +559,10 @@ msgstr "Archiver"
 #: packages/shared/verification-codes.ts
 msgid "As soon as it arrives"
 msgstr "Dès sa réception"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Ask about the quoted text…"
+msgstr "Posez une question sur le texte cité…"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about your mail…"
@@ -714,6 +740,7 @@ msgstr "Agenda"
 #: packages/renderer/routes/settings/extensions.tsx
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -811,6 +838,10 @@ msgctxt "Windows"
 msgid "Check for Updates…"
 msgstr "Rechercher les mises à jour…"
 
+#: packages/app/task-draft.ts
+msgid "Check Google Tasks before retrying the save."
+msgstr "Vérifiez Google Tasks avant de réessayer d’enregistrer."
+
 #: packages/app/assistant/responses.ts
 msgid "Check the API key and its permissions in AI settings."
 msgstr "Vérifiez la clé API et ses autorisations dans les paramètres de l’IA."
@@ -836,6 +867,10 @@ msgstr "Vérification des messages affichés"
 msgid "Chime"
 msgstr "Carillon"
 
+#: packages/renderer/context-menu.tsx
+msgid "Choose a date"
+msgstr "Choisir une date"
+
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Choose a provider in AI settings to ask about mail or draft a reply."
 msgstr "Choisissez un fournisseur dans les paramètres de l’IA pour poser des questions sur vos e-mails ou rédiger une réponse."
@@ -859,6 +894,10 @@ msgstr "Choisissez ggmail dans <0>{installFolder}</0>."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Choose ggmail in the Applications folder."
 msgstr "Choisissez ggmail dans le dossier Applications."
+
+#: packages/app/task-draft.ts
+msgid "Choose Google desktop OAuth client JSON"
+msgstr "Choisir le fichier JSON du client OAuth Google pour ordinateur"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Choose image"
@@ -905,6 +944,10 @@ msgstr "Vider le cache"
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Clear color"
 msgstr "Effacer la couleur"
+
+#: packages/renderer/task-draft.tsx
+msgid "Clear due date"
+msgstr "Effacer la date d’échéance"
 
 #: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -1008,6 +1051,10 @@ msgstr "Réduit"
 msgid "Color"
 msgstr "Couleur"
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Compare quotes"
+msgstr "Comparer les citations"
+
 #. Heading of the Gmail page's section about writing emails
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Compose"
@@ -1046,6 +1093,14 @@ msgstr "Connecter 1Password"
 #: packages/app/assistant/connection.ts
 msgid "Connect ChatGPT to use the mail assistant."
 msgstr "Connectez ChatGPT pour utiliser l’assistant de messagerie."
+
+#: packages/renderer/task-draft.tsx
+msgid "Connect Google Tasks"
+msgstr "Connecter Google Tasks"
+
+#: packages/renderer/task-draft.tsx
+msgid "Connect with a Google desktop OAuth client that has the Tasks API enabled."
+msgstr "Utilisez un client OAuth Google pour ordinateur avec l’API Tasks activée."
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Connected"
@@ -1152,6 +1207,7 @@ msgid "Copy Message Link"
 msgstr "Copier le lien du message"
 
 #: packages/app/context-menu.ts
+#: packages/app/mail-context-actions.ts
 msgctxt "context menu"
 msgid "Copy Message Link"
 msgstr "Copier le lien du message"
@@ -1163,6 +1219,7 @@ msgstr "Copier la réponse"
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
 #: packages/app/ipc.ts
+#: packages/app/page-context-menu.ts
 msgid "Copy URL"
 msgstr "Copier l’URL"
 
@@ -1177,6 +1234,10 @@ msgstr "Impossible de vérifier cette boîte mail."
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Couldn't clear the saved chat."
 msgstr "Impossible d’effacer la discussion enregistrée."
+
+#: packages/app/task-draft.ts
+msgid "Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here."
+msgstr "Connexion à Google Tasks impossible. Vérifiez le client pour ordinateur et connectez-vous avec l’adresse e-mail affichée ici."
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
@@ -1220,6 +1281,7 @@ msgid "Couldn't open the draft in Gmail."
 msgstr "Impossible d’ouvrir le brouillon dans Gmail."
 
 #: packages/app/assistant/chat.ts
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Couldn't open the email source."
 msgstr "Impossible d’ouvrir l’e-mail cité."
@@ -1450,6 +1512,7 @@ msgid "Disabled"
 msgstr "Désactivé"
 
 #: packages/renderer/routes/settings/ai.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Disconnect"
 msgstr "Déconnecter"
 
@@ -1481,6 +1544,7 @@ msgstr "Ne plus afficher"
 #. Button that closes the dialog of an extension's sites
 #: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/settings/extensions.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Done"
 msgstr "OK"
 
@@ -1543,6 +1607,11 @@ msgstr "Faites glisser les raccourcis dans l’ordre souhaité. Les paramètres 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
 msgstr "À relancer"
+
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Due date"
+msgstr "Date d’échéance"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due for follow-up"
@@ -2839,6 +2908,7 @@ msgstr "Ouvrez et déverrouillez de nouveau 1Password."
 msgid "Open and unlock 1Password."
 msgstr "Ouvrez et déverrouillez 1Password."
 
+#: packages/app/mail-context-actions.ts
 #: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/attachments/files.tsx
 #: packages/renderer/components/attachments/preview.tsx
@@ -2869,6 +2939,7 @@ msgstr "Ouvrir dans l’application"
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/context-menu.ts
 #: packages/app/ipc.ts
+#: packages/app/page-context-menu.ts
 msgid "Open in Default Browser"
 msgstr "Ouvrir dans le navigateur par défaut"
 
@@ -2888,6 +2959,15 @@ msgstr "Ouvrir dans le dossier"
 msgid "Open in Gmail"
 msgstr "Ouvrir dans Gmail"
 
+#: packages/renderer/task-draft.tsx
+msgid "Open in Google Tasks"
+msgstr "Ouvrir dans Google Tasks"
+
+#: packages/app/ipc.ts
+msgid "Open inbox"
+msgstr "Ouvrir la boîte de réception"
+
+#: packages/app/page-context-menu.ts
 #: packages/app/url.ts
 msgid "Open link"
 msgstr "Ouvrir le lien"
@@ -2896,6 +2976,11 @@ msgstr "Ouvrir le lien"
 #: packages/app/dialogs.ts
 msgid "Open links here"
 msgstr "Ouvrir les liens ici"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+#: packages/renderer/task-draft.tsx
+msgid "Open original"
+msgstr "Ouvrir l’original"
 
 #. A pop-out is Gmail's own name for a reply in its own window, so it follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -3145,6 +3230,20 @@ msgstr "Quitter {appName}"
 msgid "Quit 1Password."
 msgstr "Quittez 1Password."
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Quote added."
+msgstr "Citation ajoutée."
+
+#: packages/app/mail-context-actions.ts
+#: packages/app/page-context-menu.ts
+msgid "Quote to assistant"
+msgstr "Citer dans l’assistant"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Quoted passages"
+msgstr "Passages cités"
+
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reading “{subject}”"
 msgstr "Lecture de « {subject} »"
@@ -3253,6 +3352,10 @@ msgstr "Supprimer {label} ?"
 msgid "Remove {site}"
 msgstr "Supprimer {site}"
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Remove a quote to add another."
+msgstr "Retirez une citation pour en ajouter une autre."
+
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove account"
 msgstr "Supprimer le compte"
@@ -3287,6 +3390,10 @@ msgstr "Supprimer de l’historique"
 msgid "Remove logo"
 msgstr "Supprimer le logo"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Remove quote"
+msgstr "Retirer la citation"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Remove time window"
 msgstr "Supprimer le créneau horaire"
@@ -3304,6 +3411,11 @@ msgstr "Rouvrir l’onglet fermé"
 msgctxt "context menu"
 msgid "Reopen Closed Tab"
 msgstr "Rouvrir l’onglet fermé"
+
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Reopen the email and try again."
+msgstr "Rouvrez l’e-mail et réessayez."
 
 #. Button that turns on a password manager extension in place of the one that is on
 #: packages/renderer/routes/settings/extensions.tsx
@@ -3430,6 +3542,7 @@ msgstr "&Enregistrer l’image sous…"
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -3438,6 +3551,7 @@ msgstr "Enregistrer"
 msgid "Saved searches"
 msgstr "Recherches enregistrées"
 
+#: packages/app/page-context-menu.ts
 #: packages/renderer/components/follow-ups.tsx
 msgid "Schedule follow-up"
 msgstr "Programmer une relance"
@@ -3647,6 +3761,10 @@ msgctxt "Windows"
 msgid "Settings…"
 msgstr "Paramètres…"
 
+#: packages/renderer/task-draft.tsx
+msgid "Setup instructions"
+msgstr "Instructions de configuration"
+
 #. A menu or a menu item in ggmail's menu bar
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/context-menu.ts
@@ -3770,6 +3888,14 @@ msgstr "Afficher dans le dossier"
 #: packages/app/downloads.ts
 msgid "Show in your file manager"
 msgstr "Afficher dans le gestionnaire de fichiers"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Show less"
+msgstr "Afficher moins"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Show more"
+msgstr "Afficher plus"
 
 #. Setting that shows a notification when a download finishes
 #: packages/renderer/routes/settings/notifications.tsx
@@ -4124,6 +4250,10 @@ msgstr "Synchronisation…"
 msgid "System"
 msgstr "Système"
 
+#: packages/app/page-context-menu.ts
+msgid "System menu…"
+msgstr "Menu système…"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgctxt "Linux"
 msgid "System tray icon"
@@ -4142,6 +4272,14 @@ msgstr "Icône de la zone de notification"
 #: packages/shared/workspace-apps.ts
 msgid "Tabs"
 msgstr "Onglets"
+
+#: packages/renderer/task-draft.tsx
+msgid "Task created"
+msgstr "Tâche créée"
+
+#: packages/renderer/task-draft.tsx
+msgid "Task title"
+msgstr "Titre de la tâche"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
@@ -4229,6 +4367,11 @@ msgstr "Vous devez être l’auteur du dernier message."
 msgid "The mail view changed. Ask again to use the new view."
 msgstr "La vue de messagerie a changé. Reposez votre question pour utiliser la nouvelle vue."
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "The quote was shortened to fit your assistant draft."
+msgstr "La citation a été raccourcie pour tenir dans le brouillon de l’assistant."
+
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
 msgid "The reply was incomplete. Try again with a shorter request."
@@ -4254,6 +4397,10 @@ msgstr "Il s’agit de la dernière version de ggmail pour ce Mac."
 #: packages/shared/mail-notification.ts
 msgid "This is what a new email notification looks like."
 msgstr "Voici à quoi ressemble une notification de nouvel e-mail."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "This passage is already attached."
+msgstr "Ce passage est déjà joint."
 
 #: packages/app/assistant/connection.ts
 msgid "This sign-in used a different ChatGPT account. Use the account you originally connected."
@@ -4352,6 +4499,7 @@ msgctxt "Windows"
 msgid "Undo"
 msgstr "Annuler"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Unknown sender"
 msgstr "Expéditeur inconnu"
@@ -4622,6 +4770,10 @@ msgstr "Vous pouvez programmer une relance si vous avez envoyé le dernier messa
 #: packages/app/ipc.ts
 msgid "You have unread messages"
 msgstr "Vous avez des messages non lus"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Your assistant draft is full. Shorten it to add a quote."
+msgstr "Le brouillon de l’assistant est plein. Raccourcissez-le pour ajouter une citation."
 
 #: packages/app/assistant/responses.ts
 msgid "Your ChatGPT account or workspace hasn't enabled plan access for ggmail."

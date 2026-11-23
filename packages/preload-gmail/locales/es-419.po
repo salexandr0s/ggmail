@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: es-419\n"
 
+#: packages/preload-gmail/row-context-menu.ts
+msgid "Add to Calendar…"
+msgstr "Agregar a Calendario…"
+
 #. Accessible name of the close button on a brief notification ggmail shows over Gmail
 #: packages/preload-gmail/ipc.ts
 msgid "Close toast"
@@ -26,6 +30,10 @@ msgstr "Mensajes emergentes"
 #: packages/preload-gmail/dark-theme/index.ts
 msgid "Original colors"
 msgstr "Colores originales"
+
+#: packages/preload-gmail/row-context-menu.ts
+msgid "Quote to assistant"
+msgstr "Citar en el asistente"
 
 #. Button in the message-sent toast, which recalls the message
 #: packages/preload-gmail/ipc.ts

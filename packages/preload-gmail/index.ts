@@ -11,6 +11,7 @@ import { initCss } from "./css";
 import { initGmailDarkTheme } from "./dark-theme";
 import { observeOutOfOfficeBanner } from "./out-of-office";
 import { replyForwardInPopOut } from "./reply-forward";
+import { initRowContextMenu } from "./row-context-menu";
 import { addSenderIcons } from "./sender-icons";
 import { observeUnreadCount } from "./unread-count";
 import { initUrlPreview } from "./url-preview";
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initGmailDarkTheme();
   initCss();
+  initRowContextMenu();
   initUrlPreview();
 
   setUserEmail();

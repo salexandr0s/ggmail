@@ -7,10 +7,12 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: el\n"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/task-draft.tsx
 msgid "(no subject)"
 msgstr "(χωρίς θέμα)"
 
@@ -333,6 +335,10 @@ msgstr "Ενέργειες λογαριασμού"
 msgid "Accounts"
 msgstr "Λογαριασμοί"
 
+#: packages/renderer/context-menu.tsx
+msgid "Actions"
+msgstr "Ενέργειες"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Actual Size"
@@ -394,6 +400,17 @@ msgstr "Προσθήκη ιστοτόπων"
 msgid "Add time window"
 msgstr "Προσθήκη χρονικού διαστήματος"
 
+#: packages/app/mail-context-actions.ts
+msgid "Add to Calendar…"
+msgstr "Προσθήκη στο Ημερολόγιο…"
+
+#: packages/app/mail-context-actions.ts
+#: packages/app/page-context-menu.ts
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Add to Tasks"
+msgstr "Προσθήκη στις Εργασίες"
+
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Add Workspace apps to the launcher on the right of the titlebar."
 msgstr "Προσθέστε εφαρμογές Workspace στην εκκίνηση εφαρμογών στη δεξιά πλευρά της γραμμής τίτλου."
@@ -431,6 +448,10 @@ msgstr "Όλοι οι λογαριασμοί"
 msgid "All categories"
 msgstr "Όλες οι κατηγορίες"
 
+#: packages/renderer/context-menu.tsx
+msgid "All day"
+msgstr "Όλη μέρα"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "All files"
 msgstr "Όλα τα αρχεία"
@@ -449,6 +470,7 @@ msgstr "Όλα τα μηνύματα"
 #. Switch, and a badge on the account, for including the account in All Mail
 #. Title of All Mail page
 #: packages/app/menu.ts
+#: packages/app/page-context-menu.ts
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/lib/mail-views.ts
 #: packages/renderer/lib/settings-pages.ts
@@ -537,6 +559,10 @@ msgstr "Αρχειοθέτηση"
 #: packages/shared/verification-codes.ts
 msgid "As soon as it arrives"
 msgstr "Μόλις ληφθεί"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Ask about the quoted text…"
+msgstr "Ρωτήστε για το απόσπασμα…"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about your mail…"
@@ -714,6 +740,7 @@ msgstr "Ημερολόγιο"
 #: packages/renderer/routes/settings/extensions.tsx
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Cancel"
 msgstr "Ακύρωση"
 
@@ -811,6 +838,10 @@ msgctxt "Windows"
 msgid "Check for Updates…"
 msgstr "Έλεγχος για ενημερώσεις…"
 
+#: packages/app/task-draft.ts
+msgid "Check Google Tasks before retrying the save."
+msgstr "Ελέγξτε τις Εργασίες Google πριν δοκιμάσετε ξανά να αποθηκεύσετε."
+
 #: packages/app/assistant/responses.ts
 msgid "Check the API key and its permissions in AI settings."
 msgstr "Ελέγξτε το κλειδί API και τα δικαιώματά του στις ρυθμίσεις τεχνητής νοημοσύνης."
@@ -836,6 +867,10 @@ msgstr "Έλεγχος ορατών μηνυμάτων"
 msgid "Chime"
 msgstr "Κουδούνισμα"
 
+#: packages/renderer/context-menu.tsx
+msgid "Choose a date"
+msgstr "Επιλέξτε ημερομηνία"
+
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Choose a provider in AI settings to ask about mail or draft a reply."
 msgstr "Επιλέξτε πάροχο στις ρυθμίσεις τεχνητής νοημοσύνης για ερωτήσεις σχετικά με την αλληλογραφία ή για σύνταξη απαντήσεων."
@@ -859,6 +894,10 @@ msgstr "Επιλέξτε το ggmail στο <0>{installFolder}</0>."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Choose ggmail in the Applications folder."
 msgstr "Επιλέξτε το ggmail στον φάκελο Εφαρμογές."
+
+#: packages/app/task-draft.ts
+msgid "Choose Google desktop OAuth client JSON"
+msgstr "Επιλογή αρχείου JSON του προγράμματος-πελάτη Google OAuth για υπολογιστή"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Choose image"
@@ -905,6 +944,10 @@ msgstr "Εκκαθάριση κρυφής μνήμης"
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Clear color"
 msgstr "Κατάργηση χρώματος"
+
+#: packages/renderer/task-draft.tsx
+msgid "Clear due date"
+msgstr "Κατάργηση προθεσμίας"
 
 #: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -1008,6 +1051,10 @@ msgstr "Σε σύμπτυξη"
 msgid "Color"
 msgstr "Χρώμα"
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Compare quotes"
+msgstr "Σύγκριση αποσπασμάτων"
+
 #. Heading of the Gmail page's section about writing emails
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Compose"
@@ -1046,6 +1093,14 @@ msgstr "Σύνδεση 1Password"
 #: packages/app/assistant/connection.ts
 msgid "Connect ChatGPT to use the mail assistant."
 msgstr "Συνδέστε το ChatGPT για να χρησιμοποιήσετε τον βοηθό αλληλογραφίας."
+
+#: packages/renderer/task-draft.tsx
+msgid "Connect Google Tasks"
+msgstr "Σύνδεση με τις Εργασίες Google"
+
+#: packages/renderer/task-draft.tsx
+msgid "Connect with a Google desktop OAuth client that has the Tasks API enabled."
+msgstr "Χρησιμοποιήστε ένα πρόγραμμα-πελάτη Google OAuth για υπολογιστή με ενεργοποιημένο το Tasks API."
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Connected"
@@ -1152,6 +1207,7 @@ msgid "Copy Message Link"
 msgstr "Αντιγραφή συνδέσμου μηνύματος"
 
 #: packages/app/context-menu.ts
+#: packages/app/mail-context-actions.ts
 msgctxt "context menu"
 msgid "Copy Message Link"
 msgstr "Αντιγραφή συνδέσμου μηνύματος"
@@ -1163,6 +1219,7 @@ msgstr "Αντιγραφή απάντησης"
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
 #: packages/app/ipc.ts
+#: packages/app/page-context-menu.ts
 msgid "Copy URL"
 msgstr "Αντιγραφή URL"
 
@@ -1177,6 +1234,10 @@ msgstr "Δεν ήταν δυνατός ο έλεγχος αυτού του γρ�
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Couldn't clear the saved chat."
 msgstr "Δεν ήταν δυνατή η διαγραφή της αποθηκευμένης συνομιλίας."
+
+#: packages/app/task-draft.ts
+msgid "Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here."
+msgstr "Η σύνδεση με τις Εργασίες Google απέτυχε. Ελέγξτε το πρόγραμμα-πελάτη και συνδεθείτε με τη διεύθυνση email που εμφανίζεται εδώ."
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
@@ -1220,6 +1281,7 @@ msgid "Couldn't open the draft in Gmail."
 msgstr "Δεν άνοιξε το πρόχειρο μήνυμα στο Gmail."
 
 #: packages/app/assistant/chat.ts
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Couldn't open the email source."
 msgstr "Δεν άνοιξε η πηγή του μηνύματος."
@@ -1450,6 +1512,7 @@ msgid "Disabled"
 msgstr "Απενεργοποιημένο"
 
 #: packages/renderer/routes/settings/ai.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Disconnect"
 msgstr "Αποσύνδεση"
 
@@ -1481,6 +1544,7 @@ msgstr "Να μην εμφανιστεί ξανά"
 #. Button that closes the dialog of an extension's sites
 #: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/settings/extensions.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Done"
 msgstr "Τέλος"
 
@@ -1543,6 +1607,11 @@ msgstr "Σύρετε τις συντομεύσεις στη σειρά που θ
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
 msgstr "Σε εκκρεμότητα"
+
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Due date"
+msgstr "Ημερομηνία λήξης"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due for follow-up"
@@ -2839,6 +2908,7 @@ msgstr "Ανοίξτε και ξεκλειδώστε ξανά το 1Password."
 msgid "Open and unlock 1Password."
 msgstr "Ανοίξτε και ξεκλειδώστε το 1Password."
 
+#: packages/app/mail-context-actions.ts
 #: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/attachments/files.tsx
 #: packages/renderer/components/attachments/preview.tsx
@@ -2869,6 +2939,7 @@ msgstr "Άνοιγμα στην εφαρμογή"
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/context-menu.ts
 #: packages/app/ipc.ts
+#: packages/app/page-context-menu.ts
 msgid "Open in Default Browser"
 msgstr "Άνοιγμα στο προεπιλεγμένο πρόγραμμα περιήγησης"
 
@@ -2888,6 +2959,15 @@ msgstr "Άνοιγμα στον φάκελο"
 msgid "Open in Gmail"
 msgstr "Άνοιγμα στο Gmail"
 
+#: packages/renderer/task-draft.tsx
+msgid "Open in Google Tasks"
+msgstr "Άνοιγμα στις Εργασίες Google"
+
+#: packages/app/ipc.ts
+msgid "Open inbox"
+msgstr "Άνοιγμα εισερχομένων"
+
+#: packages/app/page-context-menu.ts
 #: packages/app/url.ts
 msgid "Open link"
 msgstr "Άνοιγμα συνδέσμου"
@@ -2896,6 +2976,11 @@ msgstr "Άνοιγμα συνδέσμου"
 #: packages/app/dialogs.ts
 msgid "Open links here"
 msgstr "Άνοιγμα συνδέσμων εδώ"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+#: packages/renderer/task-draft.tsx
+msgid "Open original"
+msgstr "Άνοιγμα πρωτοτύπου"
 
 #. A pop-out is Gmail's own name for a reply in its own window, so it follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -3145,6 +3230,20 @@ msgstr "Έξοδος από το {appName}"
 msgid "Quit 1Password."
 msgstr "Κλείστε το 1Password."
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Quote added."
+msgstr "Το απόσπασμα προστέθηκε."
+
+#: packages/app/mail-context-actions.ts
+#: packages/app/page-context-menu.ts
+msgid "Quote to assistant"
+msgstr "Παράθεση στον βοηθό"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Quoted passages"
+msgstr "Παραθέματα"
+
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reading “{subject}”"
 msgstr "Ανάγνωση του «{subject}»"
@@ -3253,6 +3352,10 @@ msgstr "Κατάργηση του {label};"
 msgid "Remove {site}"
 msgstr "Κατάργηση του {site}"
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Remove a quote to add another."
+msgstr "Αφαιρέστε ένα απόσπασμα για να προσθέσετε άλλο."
+
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove account"
 msgstr "Κατάργηση λογαριασμού"
@@ -3287,6 +3390,10 @@ msgstr "Κατάργηση από το ιστορικό"
 msgid "Remove logo"
 msgstr "Κατάργηση λογοτύπου"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Remove quote"
+msgstr "Αφαίρεση αποσπάσματος"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Remove time window"
 msgstr "Κατάργηση χρονικού διαστήματος"
@@ -3304,6 +3411,11 @@ msgstr "Επανάνοιγμα κλειστής καρτέλας"
 msgctxt "context menu"
 msgid "Reopen Closed Tab"
 msgstr "Επανάνοιγμα κλειστής καρτέλας"
+
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Reopen the email and try again."
+msgstr "Ανοίξτε ξανά το email και δοκιμάστε πάλι."
 
 #. Button that turns on a password manager extension in place of the one that is on
 #: packages/renderer/routes/settings/extensions.tsx
@@ -3430,6 +3542,7 @@ msgstr "Αποθήκευση εικόνας &ως…"
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Save"
 msgstr "Αποθήκευση"
 
@@ -3438,6 +3551,7 @@ msgstr "Αποθήκευση"
 msgid "Saved searches"
 msgstr "Αποθηκευμένες αναζητήσεις"
 
+#: packages/app/page-context-menu.ts
 #: packages/renderer/components/follow-ups.tsx
 msgid "Schedule follow-up"
 msgstr "Προγραμματισμός υπενθύμισης"
@@ -3647,6 +3761,10 @@ msgctxt "Windows"
 msgid "Settings…"
 msgstr "Ρυθμίσεις…"
 
+#: packages/renderer/task-draft.tsx
+msgid "Setup instructions"
+msgstr "Οδηγίες ρύθμισης"
+
 #. A menu or a menu item in ggmail's menu bar
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/context-menu.ts
@@ -3770,6 +3888,14 @@ msgstr "Εμφάνιση στον φάκελο"
 #: packages/app/downloads.ts
 msgid "Show in your file manager"
 msgstr "Εμφάνιση στη διαχείριση αρχείων"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Show less"
+msgstr "Εμφάνιση λιγότερων"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Show more"
+msgstr "Εμφάνιση περισσότερων"
 
 #. Setting that shows a notification when a download finishes
 #: packages/renderer/routes/settings/notifications.tsx
@@ -4124,6 +4250,10 @@ msgstr "Συγχρονισμός…"
 msgid "System"
 msgstr "Σύστημα"
 
+#: packages/app/page-context-menu.ts
+msgid "System menu…"
+msgstr "Μενού συστήματος…"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgctxt "Linux"
 msgid "System tray icon"
@@ -4142,6 +4272,14 @@ msgstr "Εικονίδιο περιοχής ειδοποιήσεων"
 #: packages/shared/workspace-apps.ts
 msgid "Tabs"
 msgstr "Καρτέλες"
+
+#: packages/renderer/task-draft.tsx
+msgid "Task created"
+msgstr "Η εργασία δημιουργήθηκε"
+
+#: packages/renderer/task-draft.tsx
+msgid "Task title"
+msgstr "Τίτλος εργασίας"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
@@ -4229,6 +4367,11 @@ msgstr "Το τελευταίο μήνυμα πρέπει να έχει σταλ
 msgid "The mail view changed. Ask again to use the new view."
 msgstr "Η προβολή αλληλογραφίας άλλαξε. Ρωτήστε ξανά για να χρησιμοποιηθεί η νέα προβολή."
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "The quote was shortened to fit your assistant draft."
+msgstr "Το απόσπασμα συντομεύτηκε για να χωρέσει στο πρόχειρο του βοηθού."
+
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
 msgid "The reply was incomplete. Try again with a shorter request."
@@ -4254,6 +4397,10 @@ msgstr "Αυτή είναι η τελευταία έκδοση του ggmail γ�
 #: packages/shared/mail-notification.ts
 msgid "This is what a new email notification looks like."
 msgstr "Έτσι εμφανίζεται μια ειδοποίηση νέου μηνύματος."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "This passage is already attached."
+msgstr "Αυτό το απόσπασμα έχει ήδη επισυναφθεί."
 
 #: packages/app/assistant/connection.ts
 msgid "This sign-in used a different ChatGPT account. Use the account you originally connected."
@@ -4352,6 +4499,7 @@ msgctxt "Windows"
 msgid "Undo"
 msgstr "Αναίρεση"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Unknown sender"
 msgstr "Άγνωστος αποστολέας"
@@ -4622,6 +4770,10 @@ msgstr "Μπορείτε να προγραμματίσετε υπενθύμισ�
 #: packages/app/ipc.ts
 msgid "You have unread messages"
 msgstr "Έχετε μη αναγνωσμένα μηνύματα"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Your assistant draft is full. Shorten it to add a quote."
+msgstr "Το πρόχειρο του βοηθού είναι γεμάτο. Συντομεύστε το για να προσθέσετε ένα απόσπασμα."
 
 #: packages/app/assistant/responses.ts
 msgid "Your ChatGPT account or workspace hasn't enabled plan access for ggmail."

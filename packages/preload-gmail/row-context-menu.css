@@ -1,0 +1,36 @@
+[role="menu"]:has(> .ggmail-thread-actions) {
+  max-height: min(calc(100vh - 12px), var(--ggmail-menu-space, 100vh));
+  overflow-y: auto;
+}
+.ggmail-thread-actions {
+  padding-block: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+.ggmail-thread-actions button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 14px;
+  min-height: 32px;
+  padding: 4px 18px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+}
+.ggmail-thread-actions button:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, currentColor 9%, transparent);
+}
+.ggmail-thread-actions svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}

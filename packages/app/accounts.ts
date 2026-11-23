@@ -599,6 +599,8 @@ class Accounts {
       await extensions.clearSessionData(accountSession);
     }
 
+    const { forgetTaskAccount } = await import("./google-task-connections");
+    forgetTaskAccount(selectedAccountId);
     const { clearAttachmentCategories } = await import("./attachments/categories");
     clearAttachmentCategories(selectedAccountId);
     const { clearAttachmentIndexes } = await import("./attachments/disk-index");

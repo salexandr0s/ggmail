@@ -5,6 +5,8 @@ import type {
   AssistantContext,
   AssistantProvider,
   AssistantRequest,
+  AssistantQuote,
+  QuoteSource,
   AssistantResult,
   AssistantTurn,
   SourcePreviewPage,
@@ -68,6 +70,16 @@ export type NotificationTime = {
   start: string; // "HH:mm" 24-hour
   end: string; // "HH:mm" 24-hour
   days?: number[]; // 0=Sun,1=Mon,...,6=Sat; undefined/empty = all days
+};
+
+export type CalendarChoiceDisplay = { date: string; time?: string; zone?: string };
+
+export type ContextMenuItem = {
+  id?: string;
+  label: string;
+  enabled?: boolean;
+  checked?: boolean;
+  calendar?: CalendarChoiceDisplay;
 };
 
 /** Which button asked for the bookmarks popup, and so where it hangs. */
@@ -253,6 +265,20 @@ export type IpcMainEvents =
       "sidebar.openSettings": [];
       "titleBar.showMailViews": [anchor: { x: number; y: number }];
       "titleBar.toggleAppMenu": [anchor?: { x: number; y: number }];
+      "contextMenu.choose": [index: number | null];
+      "contextMenu.rowAction": [
+        action: "calendar" | "quote",
+        thread: { id: string; subject: string; snippet: string; sender?: string },
+      ];
+      "contextMenu.inboxRow": [
+        accountId: string,
+        id: string,
+        subject: string,
+        snippet: string,
+        sender: string,
+        x: number,
+        y: number,
+      ];
       "window.focusActiveView": [];
       "desktopSources.select": [desktopSource: SelectedDesktopSource];
       findInPage: [text: string | null, options?: { forward?: boolean; findNext: boolean }];
@@ -266,8 +292,16 @@ export type IpcMainEvents =
       "tabs.selectTab": [accountId: AccountConfig["id"], tabId: string];
       "tabs.closeTab": [accountId: AccountConfig["id"], tabId: string];
       "tabs.moveTab": [accountId: AccountConfig["id"], tabId: string, targetSectionIndex: number];
-      "tabs.showTabContextMenu": [accountId: AccountConfig["id"], tabId: string];
-      "tabs.showVerticalTabsContextMenu": [accountId: AccountConfig["id"]];
+      "tabs.showTabContextMenu": [
+        accountId: AccountConfig["id"],
+        tabId: string,
+        point: { x: number; y: number },
+      ];
+      "tabs.showVerticalTabsContextMenu": [
+        accountId: AccountConfig["id"],
+        point: { x: number; y: number },
+        shortcut?: SidebarShortcut | "settings",
+      ];
       "workspaceApps.openApp": [
         app: SupportedWorkspaceApp,
         openBehavior?: WorkspaceAppOpenBehavior,
@@ -331,6 +365,19 @@ export type IpcMainEvents =
         fileId: string,
         size: "thumbnail" | "cover" | "full",
       ) => AttachmentPreview | null;
+      "taskDraft.read": () => {
+        title: string;
+        due: string;
+        owner: string;
+        subject: string;
+        link: string;
+        connected: boolean;
+        configured: boolean;
+      };
+      "taskDraft.act": (
+        action: "setup" | "connect" | "save" | "original" | "view" | "disconnect",
+        edits?: { title: string; due: string },
+      ) => { connected?: boolean; saved?: boolean; error?: string };
       "assistant.status": () => AssistantConnection;
       "assistant.openSettings": () => void;
       "assistant.selectProvider": (provider: AssistantProvider) => AssistantConnection;
@@ -341,6 +388,7 @@ export type IpcMainEvents =
       "assistant.context": () => AssistantContext;
       "assistant.send": (request: AssistantRequest) => AssistantResult;
       "assistant.previewSource": (id: string, offset: number) => SourcePreviewPage;
+      "assistant.openQuote": (source: QuoteSource) => boolean;
       "assistant.openSource": (id: string) => void;
       "assistant.openDraft": (turnId: string) => void;
       "assistant.insertReply": (turnId: string) => { ok: true } | { ok: false; message: string };
@@ -384,6 +432,7 @@ export type IpcMainEvents =
     };
 
 export type IpcRendererEvent = {
+  "assistant.quote": [text: string | AssistantQuote];
   navigate: [to: string];
   "titleBar.mailViewsOpen": [open: boolean];
   "bookmarks.popupOpen": [open: boolean];

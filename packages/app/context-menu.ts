@@ -334,12 +334,17 @@ function linkItems({ parameters, labels }: MenuContext): MenuItems {
   ];
 }
 
-function messageItems({ parameters }: MenuContext): MenuItems {
+function messageItems({ view, parameters }: MenuContext): MenuItems {
   const { gmail } = accounts.getSelectedAccount().instance;
 
   const { userEmail, messageId } = gmail;
 
-  if (!userEmail || !messageId || parameters.pageURL !== gmail.view.webContents.getURL()) {
+  if (
+    !userEmail ||
+    !messageId ||
+    view !== gmail.view ||
+    parameters.pageURL !== gmail.view.webContents.getURL()
+  ) {
     return [];
   }
 
@@ -369,7 +374,10 @@ function messageItems({ parameters }: MenuContext): MenuItems {
 }
 
 function pageItems({ view }: MenuContext): MenuItems {
-  if (view === accounts.getSelectedAccount().instance.gmail.view) {
+  if (
+    !/^https?:\/\//.test(view.webContents.getURL()) ||
+    view === accounts.getSelectedAccount().instance.gmail.view
+  ) {
     return [];
   }
 
@@ -434,12 +442,24 @@ function buildTemplate(view: View, parameters: Electron.ContextMenuParams): Menu
     .flatMap((section, index) => (index === 0 ? section : [{ type: "separator" }, ...section]));
 }
 
-export function setupWindowContextMenu(view: View) {
+export function setupWindowContextMenu(
+  view: View,
+  present?: (
+    parameters: Electron.ContextMenuParams,
+    template: MenuItems,
+    systemMenu: () => void,
+  ) => void,
+) {
   view.webContents.on("context-menu", (_event, parameters) => {
     // macOS adds Apple Writing Tools, Proofread among them, only to a menu
     // popped up with the frame it belongs to.
-    Menu.buildFromTemplate(buildTemplate(view, parameters)).popup({
-      frame: view.webContents.focusedFrame ?? undefined,
-    });
+    const template = buildTemplate(view, parameters);
+    const frame = parameters.frame ?? view.webContents.focusedFrame;
+    const systemMenu = () => Menu.buildFromTemplate(template).popup({ frame: frame ?? undefined });
+    if (present) {
+      present(parameters, template, systemMenu);
+    } else {
+      systemMenu();
+    }
   });
 }

@@ -67,10 +67,34 @@ export type ConnectionState = {
 
 export type AssistantConnection = ConnectionState & { provider: AssistantProvider };
 
+export const QUOTE_LIMIT = 8;
+export const assistantQuoteSchema = z.object({
+  id: z.uuid(),
+  text: z.string().min(1).max(ASSISTANT_PROMPT_LIMIT),
+  truncated: z.boolean().optional(),
+  subject: z.string().max(512),
+  sender: z.string().max(512),
+  accountId: z.string().min(1).max(128),
+  owner: z.string().max(320),
+  mailbox: z.string().max(2048).optional(),
+  messageId: z.string().regex(/^[a-zA-Z0-9]{15,128}$/),
+});
+export type AssistantQuote = z.infer<typeof assistantQuoteSchema>;
+export const quoteSourceSchema = assistantQuoteSchema.pick({
+  accountId: true,
+  owner: true,
+  messageId: true,
+  mailbox: true,
+});
+export type QuoteSource = z.infer<typeof quoteSourceSchema>;
+export const quoteListSchema = z.array(assistantQuoteSchema).max(QUOTE_LIMIT);
+
 export const assistantRequestSchema = z.object({
   provider: assistantProviderSchema,
   id: z.uuid(),
   origin: z.enum(["starter", "written"]).optional(),
+  quotes: quoteListSchema.optional(),
+  compareQuotes: z.boolean().optional(),
   retry: z.uuid().optional(),
   scopeKey: z.string().min(1).max(2000).optional(),
   prompt: z.string().trim().min(1).max(ASSISTANT_PROMPT_LIMIT),
@@ -142,6 +166,9 @@ export type AssistantResult =
 export type AssistantTurn = {
   id: string;
   prompt: string;
+  quotes?: AssistantQuote[];
+  compareQuotes?: boolean;
+  quoteSourceNumbers?: Array<number | null>;
   origin: "starter" | "written";
   scopeKey: string;
   reply?: AssistantReply;

@@ -19,6 +19,7 @@ export type PopupOptions = {
   /** The size of the popup itself, without the gaps the view spans. */
   width: number;
   height: number;
+  fitVertically?: boolean;
   anchor?: PopupAnchor | { sidebarTop: number | null };
 };
 
@@ -133,7 +134,13 @@ export class Popup {
 
     const viewWidth = Math.min(parentWindowBounds.width, width + padding * 2);
 
-    const viewY = anchor.y - padding;
+    const viewY = options.fitVertically
+      ? clamp(
+          anchor.y - padding,
+          0,
+          Math.max(0, parentWindowBounds.height - options.height - padding * 2),
+        )
+      : anchor.y - padding;
 
     const availableHeight = Math.max(parentWindowBounds.height - viewY, 0);
 

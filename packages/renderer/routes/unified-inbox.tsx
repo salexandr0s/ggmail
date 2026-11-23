@@ -573,6 +573,23 @@ function UnifiedInboxTable({
                   }
                 }}
                 data-inbox-row=""
+                onContextMenu={(event) => {
+                  if (window.getSelection()?.toString()) {
+                    return;
+                  }
+                  event.preventDefault();
+                  const { id, subject, summary, account } = row.original;
+                  ipc.main.send(
+                    "contextMenu.inboxRow",
+                    account.id,
+                    id,
+                    subject.slice(0, 512),
+                    summary.slice(0, 4096),
+                    (row.original.author.name || row.original.author.email).slice(0, 512),
+                    event.clientX,
+                    event.clientY,
+                  );
+                }}
                 data-pending={
                   (pending?.accountId === row.original.account.id &&
                     pending.messageId === row.original.id) ||

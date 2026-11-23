@@ -9,6 +9,7 @@ import {
   type AssistantReply as Reply,
   type AssistantContext,
   type AssistantTurn,
+  type AssistantQuote,
 } from "@ggmail/shared/assistant";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
@@ -22,6 +23,9 @@ import {
 import { Textarea } from "@ggmail/ui/components/textarea";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+  ChevronDownIcon,
+  Columns2Icon,
+  QuoteIcon,
   ArrowDownIcon,
   ArrowUpIcon,
   ClipboardListIcon,
@@ -31,12 +35,23 @@ import {
   SquareIcon,
   TextIcon,
 } from "lucide-react";
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Answer } from "./answer";
 import { AssistantActivity } from "./assistant-activity";
+import { QuoteCards } from "./assistant-quotes";
 import { AssistantReply, DraftCard } from "./assistant-reply";
 import { EffortPicker } from "./effort-picker";
 import { ModelLogo } from "./model-logo";
+import {
+  readQuotes,
+  writeQuotes,
+  originKey,
+  promptKey,
+  quoteDraftChanged,
+  composerId,
+  takeQuoteInsertion,
+  type QuoteInsertion,
+} from "./prompt";
 import { SourcePreview } from "./source-preview";
 
 type PromptOrigin = AssistantTurn["origin"];
@@ -46,14 +61,6 @@ type Preview = {
   activity?: Activity;
 };
 type Entry = AssistantTurn & { modelName?: string };
-
-const promptKey = "assistant.unsentPrompt";
-const originKey = "assistant.unsentOrigin";
-
-export function clearAssistantPrompt() {
-  localStorage.removeItem(promptKey);
-  localStorage.removeItem(originKey);
-}
 
 const ReplyPreview = memo(function ReplyPreview({
   text,
@@ -98,6 +105,31 @@ export function AssistantConversation({
     occurrence: number;
   } | null>(null);
   const [entries, setEntries] = useState<Entry[]>(initialEntries);
+  const [quotes, setQuotes] = useState(readQuotes);
+  const trayId = useId();
+  const [collapsed, setCollapsed] = useState(false);
+  const [insertion, setInsertion] = useState<QuoteInsertion>();
+  const arrival = insertion?.kind === "card" ? insertion : undefined;
+  let feedback = "";
+  switch (insertion?.kind) {
+    case "cardsFull":
+      feedback = t`Remove a quote to add another.`;
+      break;
+    case "promptFull":
+      feedback = t`Your assistant draft is full. Shorten it to add a quote.`;
+      break;
+    case "text":
+      if (insertion.trimmed) {
+        feedback = t`The quote was shortened to fit your assistant draft.`;
+      }
+      break;
+    case "card":
+      if (insertion.duplicate) {
+        feedback = t`This passage is already attached.`;
+      }
+      break;
+  }
+
   const [prompt, setPrompt] = useState(() => localStorage.getItem(promptKey) ?? "");
   const [composerOrigin, setComposerOrigin] = useState<PromptOrigin>(() =>
     localStorage.getItem(originKey) === "starter" ? "starter" : "written",
@@ -107,7 +139,8 @@ export function AssistantConversation({
       localStorage.setItem(promptKey, value);
       localStorage.setItem(originKey, origin);
     } else {
-      clearAssistantPrompt();
+      localStorage.removeItem(promptKey);
+      localStorage.removeItem(originKey);
     }
     setPrompt(value);
     setComposerOrigin(origin);
@@ -119,7 +152,48 @@ export function AssistantConversation({
   const pendingId = useRef("");
   const latestPreview = useRef<Preview>({ text: "" });
   const composer = useRef<HTMLTextAreaElement>(null);
+  const removeQuote = useCallback(
+    (id: string) => {
+      const remaining = quotes.filter((quote) => quote.id !== id);
+      writeQuotes(remaining);
+      setQuotes(remaining);
+      setInsertion(undefined);
+      composer.current?.focus();
+    },
+    [quotes],
+  );
   const transcript = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const refresh = () => {
+      const next = takeQuoteInsertion();
+      if (!next) {
+        return;
+      }
+      setSource(null);
+      setQuotes(readQuotes());
+      setPrompt(localStorage.getItem(promptKey) ?? "");
+      setComposerOrigin(localStorage.getItem(originKey) === "starter" ? "starter" : "written");
+      if (next.kind === "card" || next.kind === "cardsFull") {
+        setCollapsed(false);
+      }
+      setInsertion(next);
+    };
+    window.addEventListener(quoteDraftChanged, refresh);
+    refresh();
+    return () => window.removeEventListener(quoteDraftChanged, refresh);
+  }, []);
+  useLayoutEffect(() => {
+    const field = composer.current;
+    if (!insertion || !field) {
+      return;
+    }
+    field.focus({ preventScroll: true });
+    if (insertion.kind === "text") {
+      field.setSelectionRange(insertion.caret, insertion.caret);
+    }
+    const timer = window.setTimeout(() => setInsertion(undefined), feedback ? 4600 : 2000);
+    return () => window.clearTimeout(timer);
+  }, [insertion, feedback]);
   // Markdown can recreate inline citation buttons. Resolve the same occurrence after Back.
   const citationButtons = useCallback(
     (id: string) =>
@@ -215,7 +289,13 @@ export function AssistantConversation({
     return () => observer.disconnect();
   }, [hasEntries]);
 
-  async function send(value: string, origin: PromptOrigin, retry?: string) {
+  async function send(
+    value: string,
+    origin: PromptOrigin,
+    retry?: string,
+    attached?: AssistantQuote[],
+    compareQuotes?: boolean,
+  ) {
     const input = value.trim();
     if (!input || pendingId.current || !model || (origin === "starter" && !context)) {
       return;
@@ -232,6 +312,8 @@ export function AssistantConversation({
     const next = {
       id,
       prompt: input,
+      quotes: attached?.length ? attached : undefined,
+      compareQuotes,
       origin,
       modelName: model.label,
       scopeKey: context?.key ?? "",
@@ -249,6 +331,8 @@ export function AssistantConversation({
       const result = await ipc.main.invoke("assistant.send", {
         id,
         prompt: input,
+        quotes: attached?.length ? attached : undefined,
+        compareQuotes,
         model: model.id,
         effort,
         provider,
@@ -287,16 +371,20 @@ export function AssistantConversation({
     }
   }
 
-  function submit() {
+  function submit(compare = false) {
+    const value = compare ? t`Compare quotes` : prompt;
     if (
-      !prompt.trim() ||
+      !value.trim() ||
       pendingId.current ||
       !model ||
       (composerOrigin === "starter" && !context)
     ) {
       return;
     }
-    void send(prompt, composerOrigin);
+    void send(value, compare ? "written" : composerOrigin, undefined, quotes, compare || undefined);
+    writeQuotes([]);
+    setQuotes([]);
+    setInsertion(undefined);
     updatePrompt("", "written");
     composer.current?.focus();
   }
@@ -339,7 +427,9 @@ export function AssistantConversation({
         ];
 
   if (!model && !entries.length && !prompt) {
-    return null;
+    if (!quotes.length) {
+      return null;
+    }
   }
 
   return (
@@ -414,6 +504,7 @@ export function AssistantConversation({
                 >
                   {entry.origin === "written" && (
                     <div className="ml-auto w-fit max-w-[92%] rounded-2xl rounded-br-md border border-border/60 bg-muted px-3.5 py-2.5 text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap text-foreground">
+                      {entry.quotes?.length ? <QuoteCards quotes={entry.quotes} /> : null}
                       {entry.prompt}
                     </div>
                   )}
@@ -443,7 +534,15 @@ export function AssistantConversation({
                         <Button
                           variant="outline"
                           size="xs"
-                          onClick={() => void send(entry.prompt, entry.origin, entry.id)}
+                          onClick={() =>
+                            void send(
+                              entry.prompt,
+                              entry.origin,
+                              entry.id,
+                              entry.quotes,
+                              entry.compareQuotes,
+                            )
+                          }
                         >
                           <RotateCcwIcon />
                           <Trans>Try again</Trans>
@@ -501,12 +600,47 @@ export function AssistantConversation({
         className="shrink-0 bg-card px-4 pt-2 pb-4"
       >
         <div className="rounded-3xl border border-transparent bg-secondary transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/40">
+          {!!quotes.length && (
+            <div className="quote-tray">
+              <div className="quote-toolbar">
+                <button
+                  type="button"
+                  className="quote-caption"
+                  aria-expanded={!collapsed}
+                  aria-controls={trayId}
+                  onClick={() => setCollapsed((value) => !value)}
+                >
+                  <QuoteIcon size={15} aria-hidden />
+                  {t`Quoted passages`} <span>{quotes.length}</span>
+                  <ChevronDownIcon size={14} aria-hidden className="quote-disclosure" />
+                </button>
+                {quotes.length >= 2 && !prompt.trim() && model && (
+                  <button
+                    type="button"
+                    disabled={!!pending}
+                    className="quote-compare"
+                    onClick={() => submit(true)}
+                  >
+                    <Columns2Icon size={15} aria-hidden />
+                    {t`Compare quotes`}
+                  </button>
+                )}
+              </div>
+              <div id={trayId} hidden={collapsed}>
+                <QuoteCards quotes={quotes} remove={removeQuote} arrival={arrival} />
+              </div>
+            </div>
+          )}
+          <span role="status" className={feedback ? "quote-feedback" : "sr-only"}>
+            {feedback || (insertion && t`Quote added.`)}
+          </span>
           <Textarea
             ref={composer}
+            id={composerId}
             aria-label={t`Message the mail assistant`}
             className="max-h-[min(18vh,9rem)] min-h-12 resize-none border-0 bg-transparent px-3.5 py-3 text-sm shadow-none focus-visible:ring-0 dark:bg-transparent"
             value={prompt}
-            placeholder={t`Ask about your mail…`}
+            placeholder={quotes.length ? t`Ask about the quoted text…` : t`Ask about your mail…`}
             maxLength={ASSISTANT_PROMPT_LIMIT}
             onChange={(event) => {
               updatePrompt(event.target.value, "written");

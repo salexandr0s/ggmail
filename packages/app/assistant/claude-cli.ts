@@ -264,14 +264,16 @@ export async function claudeCliReply(options: ResponseOptions, fingerprint: stri
   }
   const schema = z.object({
     text: z.string().max(64_000),
-    calls: z
-      .array(
-        z.object({
-          name: z.enum(options.tools.map((tool) => tool.name)),
-          arguments: z.string().max(24_000),
-        }),
-      )
-      .max(12),
+    calls: options.tools.length
+      ? z
+          .array(
+            z.object({
+              name: z.enum(options.tools.map((tool) => tool.name)),
+              arguments: z.string().max(24_000),
+            }),
+          )
+          .max(12)
+      : z.tuple([]),
   });
   const args = [
     "--print",

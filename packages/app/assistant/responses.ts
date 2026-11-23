@@ -370,7 +370,7 @@ export async function respond(
           : // oxlint-disable-next-line lingui/no-unlocalized-strings -- Responses API include field.
             { include: ["reasoning.encrypted_content"], store: false }),
         tools:
-          provider === "chatgpt"
+          provider === "chatgpt" && options.tools.length > 0
             ? [
                 {
                   type: "namespace",
