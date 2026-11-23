@@ -11,6 +11,13 @@
         "Toast": "toast",
         "Banner": "banner"
       },
+      "el": {
+        "αναδυόμενο": "αναδυ[οό]μεν",
+        "ειδοποίηση": "ειδοπο[ιί]\\p{L}*",
+        "μήνυμα": "μ[ηή]ν[υύ]μα",
+        "toast": "toast",
+        "μπάνερ": "μπ[αά]νερ|banner"
+      },
       "fr": {
         "avis": "\\bavis\\b",
         "notification": "notification",
@@ -79,6 +86,7 @@
     },
     "exclude": {
       "de": ["Benachrichtigung"],
+      "el": ["ειδοποίηση"],
       "fr": ["notification"],
       "it": ["notifica"],
       "es": ["notificación"],
@@ -101,6 +109,15 @@
         "Abzeichen": "abzeichen",
         "Zähler": "zähler",
         "Plakette": "plakette"
+      },
+      "el": {
+        "σήμα": "\\bσ[ηή]μ[αά](?:τ\\p{L}+)?\\b",
+        "ένδειξη": "[εέ]νδειξ|ενδε[ιί]ξ",
+        "ταμπέλα": "ταμπ[εέ]λ",
+        "διακριτικό": "διακριτικ",
+        "έμβλημα": "[εέ]μβλημα|εμβλ[ηή]μ",
+        "σήμανση": "σ[ηή]μανσ|σημ[αά]νσ",
+        "μετρητής": "μετρητ"
       },
       "fr": {
         "pastille": "pastille",
@@ -167,6 +184,10 @@
       "de": {
         "ungelesen": "ungelesen"
       },
+      "el": {
+        "μη αναγνωσμένα": "μη αναγνωσμ[εέ]ν",
+        "αδιάβαστα": "αδι[αά]βαστ"
+      },
       "fr": {
         "non lu": "non[- ]lu"
       },
@@ -204,6 +225,11 @@
         "Upgrade/upgraden": "upgrade",
         "aktualisieren": "aktualisier",
         "umstellen": "umstell"
+      },
+      "el": {
+        "αναβάθμιση": "αναβ[αά]θμ",
+        "ενημέρωση": "ενημ[εέ]ρωσ|ενημερ[ωώ]",
+        "μετάβαση": "μετ[αά]βασ|μεταβ[εέ][ιί]τε|μεταβ[αά][ιί]ν"
       },
       "fr": {
         "passer à": "pass(er|ez) à",
@@ -262,6 +288,11 @@
         "informieren": "informier",
         "mitteilen": "mitteil"
       },
+      "el": {
+        "ειδοποιώ": "ειδοπο[ιί]",
+        "ενημερώνω": "ενημερ[ωώ]|ενημ[εέ]ρωσ",
+        "γνωστοποιώ": "γνωστοπο[ιί]"
+      },
       "fr": {
         "avertir": "avert",
         "notifier": "notifi",
@@ -316,6 +347,10 @@
         "Name": "name",
         "Bezeichnung": "bezeichnung"
       },
+      "el": {
+        "όνομα": "[οό]νομα|ον[οό]μ",
+        "ετικέτα": "ετικ[εέ]τ"
+      },
       "fr": {
         "nom": "\\bnom\\b",
         "libellé": "libellé"
@@ -365,6 +400,12 @@
         "Probeabo": "probeabo",
         "Testphase": "testphase",
         "Probezeit": "probezeit"
+      },
+      "el": {
+        "δοκιμαστική περίοδος": "δοκιμαστικ\\p{L}* περ[ιί]οδ|περ[ιί]οδ\\p{L}* δοκιμ\\p{L}*",
+        "δοκιμαστική έκδοση": "δοκιμαστικ\\p{L}* [εέ]κδοσ\\p{L}*",
+        "δοκιμή": "\\bδοκιμ(?:[ηή]ς?|[εέ]ς|[ωώ]ν)\\b",
+        "δοκιμαστικός": "δοκιμαστικ"
       },
       "fr": {
         "période d'essai": "période d.essai",
@@ -424,6 +465,12 @@
         "Lizenzschlüssel": "lizenzschlüssel",
         "Produktschlüssel": "produktschlüssel"
       },
+      "el": {
+        "κλειδί άδειας χρήσης": "κλειδ\\p{L}* [αά]δειας χρ[ηή]σης",
+        "κλειδί άδειας": "κλειδ\\p{L}* [αά]δειας",
+        "κλειδί προϊόντος": "\\bκλειδ\\p{L}* προ[ϊι][οό]ντος",
+        "αριθμός-κλειδί προϊόντος": "αριθμ\\p{L}*[- ]κλειδ\\p{L}* προ[ϊι][οό]ντος"
+      },
       "fr": {
         "clé de licence": "clé de licence",
         "clé de produit": "clé de produit|clé produit"
@@ -469,6 +516,11 @@
       "de": {
         "Blocker": "blocker",
         "Blockierung": "blockierung"
+      },
+      "el": {
+        "αποκλεισμός": "αποκλεισμ|αποκλε[ιί]",
+        "φραγή": "φραγ",
+        "μπλοκάρισμα": "μπλοκ[αά]ρ"
       },
       "fr": {
         "bloqueur": "bloqueur",
@@ -519,6 +571,12 @@
         "Abwesenheitsnachricht": "abwesenheitsnachricht",
         "automatische Antwort": "automatische antwort",
         "abwesend": "abwesend"
+      },
+      "el": {
+        "αυτόματη απάντηση": "αυτ[οό]ματ\\p{L}* απ[αά]ντησ|αυτ[οό]ματ\\p{L}* απαντ[ηή]σ",
+        "εκτός γραφείου": "εκτ[οό]ς γραφε[ιί]ου",
+        "απουσία": "απουσ[ιί]",
+        "αυτόματος απαντητής": "απαντητ"
       },
       "fr": {
         "réponse automatique d'absence": "absence",
@@ -574,6 +632,11 @@
       "de": {
         "vertikale Tabs": "vertikale\\w* tab"
       },
+      "el": {
+        "κάθετες καρτέλες": "κ[αά]θετ\\p{L}* καρτ[εέ]λ",
+        "κατακόρυφες καρτέλες": "κατακ[οό]ρυφ\\p{L}* καρτ[εέ]λ",
+        "στηλοθέτης": "στηλοθ[εέ]τ"
+      },
       "fr": {
         "onglets verticaux": "onglets verticaux|verticale"
       },
@@ -615,6 +678,13 @@
         "Aktualisierungskanal": "aktualisierungskanal",
         "Kanal": "kanal"
       },
+      "el": {
+        "κανάλι ενημερώσεων": "καν[αά]λ\\p{L}* ενημερ[ωώ]σεων",
+        "κανάλι ενημέρωσης": "καν[αά]λ\\p{L}* ενημ[εέ]ρωσης",
+        "κανάλι κυκλοφορίας": "καν[αά]λ\\p{L}* κυκλοφορ[ιί]ας",
+        "κανάλι beta": "καν[αά]λ\\p{L}* beta",
+        "κανάλι": "\\bκαν[αά]λ"
+      },
       "pt-BR": {
         "canal de atualização": "canal de atualiza[çc]",
         "canal de versões": "canal de vers[õo]es",
@@ -654,6 +724,14 @@
         "kombinierte Ansicht": "kombinier",
         "gruppierte Ordner": "gruppiert",
         "alle Posteingänge": "alle posteing"
+      },
+      "el": {
+        "ενοποιημένα εισερχόμενα": "ενοποιημ[εέ]ν\\p{L}* εισερχ[οό]μεν\\p{L}*",
+        "ενοποιημένοι φάκελοι": "ενοποιημ[εέ]ν\\p{L}* φ[αά]κελ\\p{L}*|ενοποιημ[εέ]ν\\p{L}* φακ[εέ]λ\\p{L}*",
+        "συνδυασμένη προβολή": "συνδυασμ[εέ]ν\\p{L}* προβολ\\p{L}*",
+        "όλα τα εισερχόμενα": "[οό]λα τα εισερχ[οό]μενα",
+        "ενοποιημένα": "ενοποιημ[εέ]ν",
+        "συνδυασμένα": "συνδυασμ[εέ]ν"
       },
       "pt-BR": {
         "caixa de entrada unificada": "caixas? de entrada unificadas?",
@@ -695,6 +773,17 @@
         "Zeitfenster": "zeitfenster",
         "Zeitraum": "zeitraum",
         "Zeitspanne": "zeitspanne"
+      },
+      "el": {
+        "χρονικό διάστημα": "χρονικ\\p{L}* δι[αά]στημα|χρονικ\\p{L}* διαστ[ηή]μ",
+        "χρονικό εύρος": "χρονικ\\p{L}* ε[υύ]ρ",
+        "χρονική περίοδος": "χρονικ\\p{L}* περ[ιί]οδ|χρονικ\\p{L}* περι[οό]δ",
+        "χρονικό πλαίσιο": "χρονικ\\p{L}* πλα[ιί]σι",
+        "χρονικό περιθώριο": "χρονικ\\p{L}* περιθ[ωώ]ρ",
+        "χρονική θέση": "χρονικ\\p{L}* θ[εέ]σ",
+        "χρονικό παράθυρο": "χρονικ\\p{L}* παρ[αά]θ[υύ]ρ|παρ[αά]θ[υύ]ρ\\p{L}* χρ[οό]νου",
+        "περίοδος": "περ[ιί]οδ|περι[οό]δ",
+        "διάστημα": "δι[αά]στημα|διαστ[ηή]μ"
       },
       "fr": {
         "plage horaire": "plage horaire",
@@ -749,6 +838,13 @@
     "concept": "at startup",
     "english": "\\b(on|at) (startup|start-up|launch)\\b",
     "candidates": {
+      "el": {
+        "κατά την εκκίνηση": "κατ[αά] την εκκ[ιί]νηση",
+        "στην εκκίνηση": "στην εκκ[ιί]νηση",
+        "με την εκκίνηση": "με την εκκ[ιί]νηση",
+        "κατά την έναρξη": "κατ[αά] την [εέ]ναρξη",
+        "στην αρχή": "στην αρχ[ηή]"
+      },
       "pt-BR": {
         "ao iniciar": "\\bao iniciar",
         "na inicialização": "\\bna inicializa[çc][ãa]o",
@@ -785,6 +881,11 @@
         "Upgrade/upgraden": "upgrade",
         "aktualisieren": "aktualisier",
         "umstellen": "umstell"
+      },
+      "el": {
+        "αναβάθμιση": "αναβ[αά]θμ",
+        "ενημέρωση": "ενημ[εέ]ρωσ|ενημερ[ωώ]",
+        "μετάβαση": "μετ[αά]βασ|μεταβ[εέ][ιί]τε|μεταβ[αά][ιί]ν"
       },
       "fr": {
         "passer à": "pass(er|ez) à",
@@ -838,6 +939,13 @@
     "concept": "phishing protection",
     "english": "\\bphishing (protection|filter)|\\b(protection|protect\\w*) (against|from) phishing",
     "candidates": {
+      "el": {
+        "προστασία από ηλεκτρονικό ψάρεμα": "προστασ[ιί]\\p{L}* (?:απ[οό]|κατ[αά]) (?:το |του )?ηλεκτρονικ\\p{L}* [\"«“]?ψ[αά]ρ[εέ]μ",
+        "φίλτρο ηλεκτρονικού ψαρέματος": "φ[ιί]λτρ\\p{L}* (?:για )?ηλεκτρονικ\\p{L}* [\"«“]?ψ[αά]ρ[εέ]μ",
+        "προστασία από phishing": "προστασ[ιί]\\p{L}* (?:απ[οό]|κατ[αά]) (?:το |του )?phishing",
+        "φίλτρο phishing": "φ[ιί]λτρ\\p{L}* (?:anti-?)?phishing",
+        "anti-phishing": "anti-?phishing"
+      },
       "pt-BR": {
         "proteção contra phishing": "prote[çc][ãa]o contra (?:o )?phishing",
         "filtro de phishing": "filtro (?:de|contra|anti-?) ?phishing",
@@ -872,6 +980,15 @@
         "Seitenleiste": "seitenleiste",
         "Sidebar": "sidebar",
         "Seitenbereich": "seitenbereich"
+      },
+      "el": {
+        "πλαϊνή γραμμή": "πλα[ϊι]ν\\p{L}* γραμμ",
+        "πλευρική γραμμή": "πλευρικ\\p{L}* γραμμ",
+        "πλαϊνή στήλη": "πλα[ϊι]ν\\p{L}* στ[ηή]λ",
+        "πλευρική στήλη": "πλευρικ\\p{L}* στ[ηή]λ",
+        "πλαϊνό πλαίσιο": "πλα[ϊι]ν\\p{L}* πλα[ιί]σι",
+        "πλευρικό πλαίσιο": "πλευρικ\\p{L}* πλα[ιί]σι",
+        "πλαϊνή μπάρα": "πλα[ϊι]ν\\p{L}* μπ[αά]ρ"
       },
       "fr": {
         "barre latérale": "barre latérale",
@@ -921,6 +1038,16 @@
         "dunkler Modus": "dunkle\\w* modus",
         "Dunkelmodus": "dunkelmodus"
       },
+      "el": {
+        "σκούρο θέμα": "σκο[υύ]ρ(?![οό]χρωμ)\\p{L}* θ[εέ]μα|θ[εέ]μα\\p{L}* σκο[υύ]ρ(?![οό]χρωμ)",
+        "σκοτεινό θέμα": "σκοτειν\\p{L}* θ[εέ]μα|θ[εέ]μα\\p{L}* σκοτειν",
+        "σκουρόχρωμο θέμα": "σκουρ[οό]χρωμ\\p{L}* θ[εέ]μα",
+        "σκουρόχρωμη λειτουργία": "σκουρ[οό]χρωμ\\p{L}* λειτουργ",
+        "σκοτεινή λειτουργία": "σκοτειν\\p{L}* λειτουργ|λειτουργ[ιί]\\p{L}* σκοτειν",
+        "σκούρα λειτουργία": "σκο[υύ]ρ(?![οό]χρωμ)\\p{L}* λειτουργ",
+        "σκούρα εμφάνιση": "σκο[υύ]ρ(?![οό]χρωμ)\\p{L}* εμφ[αά]νισ",
+        "σκουρόχρωμη εμφάνιση": "σκουρ[οό]χρωμ\\p{L}* εμφ[αά]νισ"
+      },
       "fr": {
         "thème sombre": "thème sombre",
         "mode sombre": "mode sombre"
@@ -963,6 +1090,15 @@
     "concept": "app badge",
     "english": "\\b(app(lication)?|icon|unread|notification|dock|taskbar)\\b.*\\bbadges?\\b|\\bbadges?\\b.*\\b(app(lication)?|icon|unread|notification)\\b|^badges?$",
     "candidates": {
+      "el": {
+        "σήμα": "\\bσ[ηή]μ[αά](?:τ\\p{L}+)?\\b",
+        "ένδειξη": "[εέ]νδειξ|ενδε[ιί]ξ",
+        "ταμπέλα": "ταμπ[εέ]λ",
+        "διακριτικό": "διακριτικ",
+        "έμβλημα": "[εέ]μβλημα|εμβλ[ηή]μ",
+        "σήμανση": "σ[ηή]μανσ|σημ[αά]νσ",
+        "μετρητής": "μετρητ"
+      },
       "pt-BR": {
         "selo": "\\bselo",
         "emblema": "emblema",
@@ -999,6 +1135,13 @@
     "english": "\\bamber\\b",
     "englishNot": "\\balerts?\\b",
     "candidates": {
+      "el": {
+        "κεχριμπαρί": "κεχριμπαρ[ιί]\\b",
+        "κεχριμπάρι": "κεχριμπ[αά]ρι\\b",
+        "κεχριμπαρένιο": "κεχριμπαρ[εέ]νι",
+        "πορτοκαλί": "πορτοκαλ",
+        "κίτρινο": "κ[ιί]τριν"
+      },
       "it": {
         "ambra": "ambra",
         "ambrato": "ambrat",
@@ -1038,6 +1181,7 @@
       }
     },
     "exclude": {
+      "el": ["πορτοκαλί", "κίτρινο"],
       "it": ["giallo", "arancione"],
       "es": ["amarillo", "naranja"],
       "es-419": ["amarillo", "naranja"],
@@ -1050,6 +1194,12 @@
     "concept": "emerald (account color)",
     "english": "\\bemerald\\b",
     "candidates": {
+      "el": {
+        "σμαραγδί": "σμαραγδ[ιί]\\b",
+        "σμαράγδι": "σμαρ[αά]γδι\\b",
+        "σμαραγδένιο": "σμαραγδ[εέ]νι",
+        "πράσινο": "\\bπρ[αά]σιν"
+      },
       "it": {
         "smeraldo": "smerald",
         "verde": "verd"
@@ -1080,6 +1230,7 @@
       }
     },
     "exclude": {
+      "el": ["πράσινο"],
       "it": ["verde"],
       "es": ["verde"],
       "es-419": ["verde"],
@@ -1092,6 +1243,13 @@
     "concept": "indigo (account color)",
     "english": "\\bindigo\\b",
     "candidates": {
+      "el": {
+        "λουλακί": "λουλακ",
+        "ίντιγκο": "[ιί]ντιγκο|indigo",
+        "μπλε": "\\bμπλε\\b",
+        "μοβ": "\\bμ[οω]β\\b",
+        "βιολετί": "βιολετ"
+      },
       "it": {
         "indaco": "indaco",
         "blu": "\\bblu\\b",
@@ -1134,6 +1292,7 @@
       }
     },
     "exclude": {
+      "el": ["μπλε", "μοβ", "βιολετί"],
       "it": ["blu", "viola"],
       "es": ["azul", "violeta"],
       "es-419": ["azul", "violeta"],
@@ -1146,6 +1305,14 @@
     "concept": "sky (account color)",
     "english": "\\bsky[- ]?blue\\b|^sky$",
     "candidates": {
+      "el": {
+        "ουρανί": "ουραν[ιί]\\b",
+        "ουρανός": "ουραν[οό]ς",
+        "γαλάζιο": "γαλ[αά]ζι",
+        "μπλε του ουρανού": "μπλε του ουρανο[υύ]",
+        "μπλε": "\\bμπλε\\b",
+        "κυανό": "\\bκυαν"
+      },
       "it": {
         "azzurro": "azzurr",
         "celeste": "celest",
@@ -1200,6 +1367,7 @@
       }
     },
     "exclude": {
+      "el": ["μπλε", "κυανό"],
       "it": ["blu", "ciano"],
       "es": ["azul", "cian"],
       "es-419": ["azul", "cian"],
@@ -1212,6 +1380,16 @@
     "concept": "teal (account color)",
     "english": "\\bteal\\b",
     "candidates": {
+      "el": {
+        "πετρόλ": "πετρ[οό]λ",
+        "γαλαζοπράσινο": "γαλαζοπρ[αά]σιν",
+        "τιρκουάζ": "τιρκου[αά]ζ",
+        "κυανοπράσινο": "κυανοπρ[αά]σιν",
+        "teal": "\\bteal\\b",
+        "πράσινο": "\\bπρ[αά]σιν",
+        "μπλε": "\\bμπλε\\b",
+        "κυανό": "\\bκυαν[οό]\\b"
+      },
       "it": {
         "verde acqua": "verde acqua",
         "foglia di tè": "foglia di t[èe]",
@@ -1281,6 +1459,7 @@
       }
     },
     "exclude": {
+      "el": ["πράσινο", "μπλε", "κυανό"],
       "it": ["ciano", "verde", "blu"],
       "es": ["verde", "azul", "cian"],
       "es-419": ["verde", "azul", "cian"],
@@ -1293,6 +1472,12 @@
     "concept": "wide (a UI element's size)",
     "english": "^wide$|\\bwide view\\b",
     "candidates": {
+      "el": {
+        "ευρύ": "\\bευρ(?:[υύ]ς?|ε[ιί]α)\\b",
+        "πλατύ": "\\bπλατ(?:[υύ]ς?|ι[αά])\\b",
+        "φαρδύ": "\\bφαρδ(?:[υύ]ς?|ι[αά])\\b",
+        "πλάτος": "\\bπλ[αά]το"
+      },
       "es": {
         "ancho": "\\banch[oa]s?\\b",
         "amplio": "\\bampli[oa]s?\\b",
@@ -1329,6 +1514,7 @@
       }
     },
     "exclude": {
+      "el": ["πλάτος"],
       "es": ["ancho"],
       "es-419": ["ancho"],
       "pt-BR": ["largura"],
@@ -1341,6 +1527,16 @@
     "english": "\\bbadges?\\b",
     "englishNot": "\\b(work|security|employee|achievement|gift|recommended)\\b|ID badge|\\b(unread|counts?|numbers?|notifications?)\\b",
     "candidates": {
+      "el": {
+        "σήμα": "\\bσ[ηή]μ[αά](?:τ\\p{L}+)?\\b",
+        "ένδειξη": "[εέ]νδειξ|ενδε[ιί]ξ",
+        "ταμπέλα": "ταμπ[εέ]λ",
+        "διακριτικό": "διακριτικ",
+        "έμβλημα": "[εέ]μβλημα|εμβλ[ηή]μ",
+        "σήμανση": "σ[ηή]μανσ|σημ[αά]νσ",
+        "μετρητής": "μετρητ",
+        "badge": "\\bbadges?\\b"
+      },
       "es-419": {
         "indicador": "indicador",
         "insignia": "insignia",
@@ -1387,6 +1583,7 @@
       }
     },
     "exclude": {
+      "el": ["μετρητής"],
       "es-419": ["contador"],
       "pt-BR": ["emblema", "aviso"],
       "sv": ["bricka"]

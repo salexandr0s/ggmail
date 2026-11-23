@@ -47,10 +47,7 @@ export function upgradeToHttps(url: string) {
     : url;
 }
 
-export function createGgmailMessageUrl(userEmail: string, messageId: string) {
-  // oxlint-disable-next-line lingui/no-unlocalized-strings -- a URL
-  return `${GGMAIL_URL_PREFIX}${userEmail}/message/${messageId}`;
-}
+export { createGgmailMessageUrl } from "@ggmail/shared/message-links";
 
 /**
  * Deliberately hand-parsed rather than handed to `new URL`. `ggmail:` is not a

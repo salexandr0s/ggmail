@@ -103,6 +103,88 @@ test("Anthropic streams answer text before completion and keeps tool inputs and 
   }
 });
 
+test("Anthropic reports a web search, resumes the paused turn and joins the cited answer", async () => {
+  const search = { type: "server_tool_use", id: "srv", name: "web_search", input: {} };
+  const found = {
+    type: "web_search_tool_result",
+    tool_use_id: "srv",
+    content: [{ type: "web_search_result", url: "https://hotel.example", encrypted_content: "x" }],
+  };
+  const sse = { headers: { "content-type": "text/event-stream" } };
+  const fetchMock = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      new Response(
+        frames(
+          start,
+          begin(0, { type: "text", text: "Looking it up." }),
+          end(0),
+          begin(1, search),
+          delta(1, { type: "input_json_delta", partial_json: '{"query":"hotel reception email"}' }),
+          end(1),
+          begin(2, found),
+          end(2),
+          reason("pause_turn"),
+          stop,
+        ),
+        sse,
+      ),
+    )
+    .mockResolvedValueOnce(
+      new Response(
+        frames(
+          start,
+          begin(0, { type: "text", text: "The reception address is " }),
+          end(0),
+          begin(1, { type: "text", text: "", citations: [] }),
+          delta(1, { type: "citations_delta", citation: { url: "https://hotel.example" } }),
+          delta(1, { type: "text_delta", text: "desk@hotel.example" }),
+          end(1),
+          begin(2, { type: "text", text: "." }),
+          end(2),
+          reason("end_turn"),
+          stop,
+        ),
+        sse,
+      ),
+    );
+  try {
+    const searches: Array<string | undefined> = [];
+    const previews: string[] = [];
+    const result = await anthropicReply(
+      {
+        model: "test",
+        instructions: "",
+        input: [{ role: "user", content: "Find the address" }],
+        tools: [],
+        web: { instructions: "", onSearch: (query) => searches.push(query) },
+        signal: new AbortController().signal,
+        onText: (text) => previews.push(text),
+      },
+      "fixture",
+    );
+    const answer = "Looking it up.\n\nThe reception address is desk@hotel.example.";
+    expect(result.text).toBe(answer);
+    expect(previews.at(-1)).toBe(answer);
+    expect(searches).toEqual([undefined, "hotel reception email"]);
+    const [first, resumed] = fetchMock.mock.calls.map(([, init]) => JSON.parse(String(init?.body)));
+    expect(first.tools).toEqual([{ type: "web_search_20250305", name: "web_search", max_uses: 5 }]);
+    // The paused reply returns with the search and its results exactly as they arrived.
+    expect(resumed.messages).toEqual([
+      { role: "user", content: [{ type: "text", text: "Find the address" }] },
+      {
+        role: "assistant",
+        content: [
+          { type: "text", text: "Looking it up." },
+          { ...search, input: { query: "hotel reception email" } },
+          found,
+        ],
+      },
+    ]);
+  } finally {
+    fetchMock.mockRestore();
+  }
+});
+
 test("Anthropic releases no calls from interrupted, truncated or malformed tool streams", async () => {
   const tool = begin(0, { type: "tool_use", id: "a", name: "search_mail", input: {} });
   for (const events of [

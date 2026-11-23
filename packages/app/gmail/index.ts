@@ -57,7 +57,6 @@ import {
 import { main } from "@/main";
 import { areMailNotificationsAllowed, createNotification } from "@/notifications";
 import { registerTabBroadcasts } from "@/tabs";
-import { appTray } from "@/tray";
 import { WorkspaceApp } from "@/workspace-app";
 import { syncGmailDarkTheme } from "./dark-theme";
 import { readProfilePhoto } from "./profile-photo";
@@ -1246,6 +1245,9 @@ export class Gmail {
    * caller can hold its own progress until then. Nothing is removed ahead of
    * that: a row taken away optimistically is put back by the next poll, which
    * reads a feed the action has not reached yet.
+   *
+   * Returns whether Gmail carried the action out, so a caller with a row on
+   * screen can say so when it did not.
    */
   async handleMessage(messageId: string, action: GmailAction) {
     // `destroy()` leaves a shown notification alone, so removing the account
@@ -1254,7 +1256,7 @@ export class Gmail {
     const view = this._view;
 
     if (!view || view.webContents.isDestroyed()) {
-      return;
+      return false;
     }
 
     const requestId = randomUUID();
@@ -1280,10 +1282,12 @@ export class Gmail {
     // A refused action leaves the feed exactly as it was, so the retry loop
     // would spend its ten attempts confirming that nothing happened.
     if (!success) {
-      return;
+      return false;
     }
 
     await this.fetchInboxFeed();
+
+    return true;
   }
 
   /**
@@ -1340,33 +1344,11 @@ export class Gmail {
     );
 
     if (this.getIsUnreadCountEnabled()) {
-      const dockUnreadBadge = config.get("dock.unreadBadge");
-
       this.storeUnsubscribers.push(
         this.store.subscribe(
           (state) => state.unreadCount,
           () => {
-            const totalUnreadCount = accounts.getTotalUnreadCount();
-
-            if (dockUnreadBadge) {
-              if (platform.isMacOS && app.dock) {
-                app.dock.setBadge(totalUnreadCount ? totalUnreadCount.toString() : "");
-              } else if (platform.isLinux) {
-                app.badgeCount = totalUnreadCount;
-              } else if (platform.isWindows) {
-                if (totalUnreadCount) {
-                  ipc.renderer.send(
-                    main.window.webContents,
-                    "taskbar.setOverlayIcon",
-                    totalUnreadCount,
-                  );
-                } else {
-                  main.window.setOverlayIcon(null, "");
-                }
-              }
-            }
-
-            appTray.updateUnreadStatus(totalUnreadCount);
+            accounts.syncUnreadIndicators();
 
             accounts.sendAccountsChangedToRenderer();
           },

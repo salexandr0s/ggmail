@@ -60,6 +60,7 @@ import {
   useState,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
 import { create } from "zustand";
 import { SenderAvatar } from "@/components/assistant/sender-avatar";
 import { InboxFollowUps } from "@/components/follow-ups";
@@ -319,23 +320,42 @@ function UnifiedInboxTable({
   // Held until the whole cycle is done rather than removing the row at once,
   // because the poll a moment later rewrites the list from a feed the action
   // has not reached yet, and a row taken away optimistically comes back.
-  const runAction = useCallback(async (message: UnifiedInboxMessage, action: GmailAction) => {
-    if (pendingRef.current) {
-      return;
-    }
+  const runAction = useCallback(
+    async (message: UnifiedInboxMessage, action: GmailAction) => {
+      if (pendingRef.current) {
+        return;
+      }
 
-    pendingRef.current = { accountId: message.account.id, messageId: message.id, action };
+      pendingRef.current = { accountId: message.account.id, messageId: message.id, action };
 
-    setPending(pendingRef.current);
+      setPending(pendingRef.current);
 
-    try {
-      await ipc.main.invoke("gmail.handleMessage", message.account.id, message.id, action);
-    } finally {
-      pendingRef.current = null;
+      let handled = false;
 
-      setPending(null);
-    }
-  }, []);
+      try {
+        handled = await ipc.main.invoke(
+          "gmail.handleMessage",
+          message.account.id,
+          message.id,
+          action,
+        );
+      } catch {
+        // Reported below, the same as an action Gmail refused.
+      } finally {
+        pendingRef.current = null;
+
+        setPending(null);
+      }
+
+      // The row is still there either way, so without this a refused action
+      // looks like one that was never asked for.
+      if (!handled) {
+        toast.error(t`Couldn’t update this message. Try again.`);
+      }
+      // `t` changes identity only with the language.
+    },
+    [t],
+  );
 
   const columns = useMemo(
     () => createColumns({ showSenderIcons, onAction: runAction }),
@@ -384,8 +404,18 @@ function UnifiedInboxTable({
 
   const gPrefixTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const openMessage = (message: UnifiedInboxMessage) => {
-    ipc.main.send("gmail.openMessage", message.id, message.account.id);
+  const openMessage = async (message: UnifiedInboxMessage) => {
+    let opened = false;
+
+    try {
+      opened = await ipc.main.invoke("unifiedInbox.openMessage", message.account.id, message.id);
+    } catch {
+      // Reported below.
+    }
+
+    if (!opened) {
+      toast.error(t`Couldn’t open this conversation.`);
+    }
   };
 
   useHotkeys(
@@ -573,6 +603,23 @@ function UnifiedInboxTable({
                   }
                 }}
                 data-inbox-row=""
+                onContextMenu={(event) => {
+                  if (window.getSelection()?.toString()) {
+                    return;
+                  }
+                  event.preventDefault();
+                  const { id, subject, summary, account } = row.original;
+                  ipc.main.send(
+                    "contextMenu.inboxRow",
+                    account.id,
+                    id,
+                    subject.slice(0, 512),
+                    summary.slice(0, 4096),
+                    (row.original.author.name || row.original.author.email).slice(0, 512),
+                    event.clientX,
+                    event.clientY,
+                  );
+                }}
                 data-pending={
                   (pending?.accountId === row.original.account.id &&
                     pending.messageId === row.original.id) ||

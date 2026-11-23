@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: el\n"
+
+# fault: banned:gnostopoiisi
+# fault: pinned:notification
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "Show notifications"
+msgstr "Εμφάνιση γνωστοποιήσεων"
+
+# fault: banned:adranopoiisi
+# fault: pinned:hibernation
+#: packages/renderer/routes/settings/workspace-apps.tsx
+msgid "Hibernate after"
+msgstr "Αδρανοποίηση μετά από"
+
+# fault: banned:katalogos
+# fault: pinned:folder
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Open folder when done"
+msgstr "Άνοιγμα καταλόγου μετά την ολοκλήρωση"
+
+# fault: banned:email-latin
+#: packages/app/context-menu.ts
+msgid "Copy Email Address"
+msgstr "Αντιγραφή διεύθυνσης email"
+
+# fault: banned:email-latin
+#: packages/renderer/components/attachments/detail-filters.tsx
+msgid "Name or email address"
+msgstr "Όνομα ή διεύθυνση e-mail"
+
+# fault: banned:styl
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Tab style"
+msgstr "Στυλ καρτελών"
+
+# fault: banned:informal-address
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "ggmail keeps this account signed in but doesn't load it."
+msgstr "Το ggmail διατηρεί τον λογαριασμό σου συνδεδεμένο, αλλά δεν τον φορτώνει."
+
+# fault: banned:informal-address
+#: packages/renderer/routes/settings/general.tsx
+msgid "We'll send you a code."
+msgstr "Θα στείλουμε έναν κωδικό σε εσένα."
+
+# fault: banned:quotes
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove {label}?"
+msgstr "Κατάργηση του λογαριασμού \"{label}\";"
+
+# Apple's label has Greek quotation marks, so the English's curly ones break the platform word too.
+# fault: banned:quotes
+# fault: platform-word:Look Up “{selection}”
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Look Up “{selection}”"
+msgstr "Διερεύνηση “{selection}”"
+
+# fault: banned:question-mark
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Delete all data?"
+msgstr "Διαγραφή όλων των δεδομένων?"
+
+# U+037E, the Greek question mark character, looks the same as the semicolon the rule wants.
+# fault: banned:question-mark
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove this account?"
+msgstr "Κατάργηση αυτού του λογαριασμού;"
+
+# fault: banned:final-sigma
+#: packages/app/menu.ts
+msgid "Downloads"
+msgstr "Λήψεισ"
+
+# fault: banned:final-sigma
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Accounts"
+msgstr "Λογαριαςμοί"
+
+# fault: banned:caps-tonos
+#: packages/renderer/routes/settings/license.tsx
+msgid "NEW"
+msgstr "ΝΈΟ"
+
+# fault: banned:three-dots
+#: packages/renderer/components/app-titlebar.tsx
+msgid "Search…"
+msgstr "Αναζήτηση..."
+
+# fault: banned:ellipsis-space
+#: packages/app/menu.ts
+msgid "Find…"
+msgstr "Εύρεση …"
+
+# fault: banned:apology
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Couldn't add the account."
+msgstr "Δυστυχώς, δεν ήταν δυνατή η προσθήκη του λογαριασμού."
+
+# fault: platform-word:File
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "File"
+msgstr "Αρχεία"
+
+# Apple's Τερματισμός in the Windows label, whose word is Microsoft's Έξοδος.
+# fault: platform-word:Quit {appName}
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Quit {appName}"
+msgstr "Τερματισμός {appName}"
+
+# fault: access-key:inline
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Cu&t"
+msgstr "Αποκοπή"
+
+# fault: catalog:placeholder dropped
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Delete {label}?"
+msgstr "Διαγραφή;"
+
+# The English's access key is ignored, so the link pin picks up Copy Link
+# Addr&ess, and the translation's, so the pin reads the word whole.
+# fault: pinned:link
+#: packages/app/context-menu.ts
+msgid "Copy Link Addr&ess"
+msgstr "Αντιγραφή διεύ&θυνσης δεσμού"

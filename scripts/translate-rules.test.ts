@@ -148,12 +148,14 @@ function bannedDescriptionOpeners(markdown: string) {
 /** First words of a description's English that are no verb, so no imperative of theirs is listed. */
 const NON_VERB_OPENERS = new Set([
   "A",
+  "DeepSeek",
   "Extensions",
   "Gmail",
   "How",
   "ggmail",
   "No",
   "Some",
+  "The",
   "Where",
   "With",
 ]);

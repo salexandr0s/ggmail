@@ -98,14 +98,24 @@ function FollowUpRows({
 }) {
   const { t } = useLingui();
   const client = useQueryClient();
+  // The mutation only reports its latest call, so the rows being removed are kept here.
+  // Opening a row is quick and leaves it in place, so it does not dim the row.
+  const [busyIds, setBusyIds] = useState<readonly string[]>([]);
   const action = useMutation({
     mutationFn: ({ id, action }: { id: string; action: "open" | "remove" }) =>
       ipc.main.invoke("followUps.act", accountId, id, action),
-    onSuccess: (_result, { action }) => {
+    onMutate: ({ id, action }) => {
       if (action === "remove") {
-        void client.invalidateQueries({ queryKey: ["followUps", accountId] });
+        setBusyIds((ids) => [...ids, id]);
       }
     },
+    // Waiting for the refetch keeps a removed row busy until it leaves the list.
+    onSuccess: (_result, { action }) =>
+      action === "remove"
+        ? client.invalidateQueries({ queryKey: ["followUps", accountId] })
+        : undefined,
+    onSettled: (_result, _error, { id }) =>
+      setBusyIds((ids) => ids.filter((busyId) => busyId !== id)),
     onError: () => toast.error(t`Couldn’t update this follow-up.`),
   });
   return (
@@ -113,11 +123,13 @@ function FollowUpRows({
       {rows.map(({ id, status, due, subject, recipient, lastSent }) => {
         const { label, icon: Icon, className } = statuses[status];
         const dueDate = dayjs(due).format("ll");
+        const busy = busyIds.includes(id);
         return (
-          <li key={id} className="follow-up-row" data-status={status}>
+          <li key={id} className="follow-up-row" data-status={status} aria-busy={busy || undefined}>
             <button
               type="button"
               className="follow-up-open"
+              disabled={busy}
               onClick={() => action.mutate({ id, action: "open" })}
             >
               <span className="follow-up-details">
@@ -149,7 +161,7 @@ function FollowUpRows({
                 aria-label={t`Remove`}
                 aria-description={subject || t`(no subject)`}
                 title={t`Remove`}
-                disabled={action.isPending}
+                disabled={busy}
                 onClick={() => action.mutate({ id, action: "remove" })}
               >
                 <XIcon aria-hidden="true" />
@@ -299,7 +311,7 @@ function ScheduleFollowUp() {
                   aria-pressed={value === day}
                   onClick={() => setDay(value)}
                 >
-                  {label}
+                  <span className="first-letter:capitalize">{label}</span>
                 </Button>
               ))}
             </div>

@@ -26,8 +26,6 @@ const isolation = [
   "--settings",
   '{"disableAllHooks":true,"enabledPlugins":{}}',
   "--disable-slash-commands",
-  "--tools",
-  "",
   "--strict-mcp-config",
   "--mcp-config",
   '{"mcpServers":{}}',
@@ -55,11 +53,17 @@ async function executable() {
   throw new AssistantError(t`Install Claude Code on this computer, then try again.`);
 }
 
+// Web search is the only built-in tool a mail turn may use. It reads the web
+// through the provider and cannot run commands, read files or fetch a chosen URL.
+// oxlint-disable-next-line lingui/no-unlocalized-strings -- Claude Code tool name.
+const webSearch = "WebSearch";
+
 async function runCLI(
   args: string[],
   signal?: AbortSignal,
   input?: string,
   stream?: ClaudeCliStream,
+  web = false,
 ) {
   const catalogOnly = args.includes("--input-format");
   const file = await executable();
@@ -88,7 +92,9 @@ async function runCLI(
       DISABLE_AUTOUPDATER: "1",
     };
     // Keep mail on stdin and out of process arguments. Never return raw CLI diagnostics.
-    const child = spawn(file, [...isolation, ...args], {
+    // oxlint-disable-next-line lingui/no-unlocalized-strings -- Claude Code flags.
+    const tools = web ? ["--tools", webSearch, "--allowedTools", webSearch] : ["--tools", ""];
+    const child = spawn(file, [...isolation, ...tools, ...args], {
       cwd: dir,
       env,
       windowsHide: true,
@@ -264,14 +270,16 @@ export async function claudeCliReply(options: ResponseOptions, fingerprint: stri
   }
   const schema = z.object({
     text: z.string().max(64_000),
-    calls: z
-      .array(
-        z.object({
-          name: z.enum(options.tools.map((tool) => tool.name)),
-          arguments: z.string().max(24_000),
-        }),
-      )
-      .max(12),
+    calls: options.tools.length
+      ? z
+          .array(
+            z.object({
+              name: z.enum(options.tools.map((tool) => tool.name)),
+              arguments: z.string().max(24_000),
+            }),
+          )
+          .max(12)
+      : z.tuple([]),
   });
   const args = [
     "--print",
@@ -306,7 +314,15 @@ export async function claudeCliReply(options: ResponseOptions, fingerprint: stri
       is_error: z.literal(false),
       structured_output: schema,
     })
-    .safeParse(await runCLI(args, options.signal, input, new ClaudeCliStream(options.onText)));
+    .safeParse(
+      await runCLI(
+        args,
+        options.signal,
+        input,
+        new ClaudeCliStream(options.onText, options.web?.onSearch),
+        Boolean(options.web),
+      ),
+    );
   if (!envelope.success) {
     throw new AssistantError(t`Claude Code returned an incomplete reply. Try again.`);
   }

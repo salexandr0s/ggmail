@@ -67,7 +67,10 @@ function WorkspaceTab({
         }}
         onContextMenu={(event) => {
           event.preventDefault();
-          ipc.main.send("tabs.showTabContextMenu", accountId, tab.id);
+          ipc.main.send("tabs.showTabContextMenu", accountId, tab.id, {
+            x: event.clientX,
+            y: event.clientY,
+          });
         }}
       >
         <TabIcon app={tab.app} />

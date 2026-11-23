@@ -77,7 +77,7 @@ for (const starter of [false, true]) {
       await composer.press("Enter");
     }
     const bubble = panel.getByText(first, { exact: true });
-    await expect(panel.getByRole("status")).toHaveText(
+    await expect(panel.getByRole("log").getByRole("status")).toHaveText(
       starter ? "Reading “Planning review”" : "Searching Studio · page 2",
     );
     await expect(panel.getByText("Partial response")).toBeVisible();
@@ -224,7 +224,11 @@ const answer = [
 
 // Use a synthetic provider session in this test's temporary profile. Exercise
 // the real assistant.send, tool call, conversation guard and reply IPC.
-async function useDraftProvider(body: string | null, text = answer) {
+async function useDraftProvider(
+  body: string | null,
+  text = answer,
+  fields: { to?: string; reply?: boolean } = {},
+) {
   const { writeFile } = await import("node:fs/promises");
   const { join } = await import("node:path");
   await writeFile(join(ggmail.userDataDir, "assistant-credentials"), "fixture");
@@ -287,14 +291,14 @@ async function useDraftProvider(body: string | null, text = answer) {
       }) as typeof globalThis.fetch;
     },
     {
-      draft: body === null ? null : { subject: "Planning review", body },
+      draft: body === null ? null : { subject: "Planning review", body, ...fields },
       answer: text,
       senderPhoto,
     },
   );
 }
 
-async function openMailFixture(hash: string, html: string) {
+async function openMailFixture(hash: string, html: string, policies = "") {
   const { signInUrl, gmailUrl } = ggmail.gmailStandIn;
   const findAccount = () => ggmail.app.windows().find((page) => page.url() === signInUrl);
   await expect.poll(findAccount).toBeDefined();
@@ -303,8 +307,15 @@ async function openMailFixture(hash: string, html: string) {
     throw new Error("The Gmail view is gone");
   }
   await mail.route(senderPhoto, serveAvatar);
+  // Gmail requires Trusted Types, and the isolated world that edits a reply
+  // inherits that. A fixture without the policy accepts HTML strings that
+  // Gmail's own page rejects.
   await mail.route(gmailUrl + "**", (route) =>
-    route.fulfill({ contentType: "text/html", body: html }),
+    route.fulfill({
+      contentType: "text/html",
+      headers: { "Content-Security-Policy": "require-trusted-types-for 'script'" + policies },
+      body: html,
+    }),
   );
   await mail.goto(gmailUrl + hash);
   return mail;
@@ -779,7 +790,15 @@ test("streams answer text and shows a validated draft before the provider finish
   await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
   const panel = page.getByRole("complementary", { name: "Mail assistant" });
   await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
-  await expect(panel.getByRole("status")).toHaveText("Waiting for Fixture model");
+  const status = panel.getByRole("log").getByRole("status");
+  await expect(status).toHaveText("Waiting for Fixture model");
+  await send({ type: "response.web_search_call.searching" });
+  await expect(status).toHaveText("Searching the web");
+  await send({
+    type: "response.output_item.done",
+    item: { type: "web_search_call", action: { type: "search", query: "studio opening hours" } },
+  });
+  await expect(status).toHaveText("Searching the web for “studio opening hours”");
   await send({ type: "response.output_text.delta", delta: "Friday" });
   const partial = panel.locator(".assistant-answer");
   await expect(partial).toHaveText("Friday");
@@ -806,7 +825,7 @@ test("streams answer text and shows a validated draft before the provider finish
     true,
   );
   await expect(panel.getByText(draft.body, { exact: true })).toBeVisible();
-  await expect(panel.getByRole("status")).toHaveText("Finishing your reply");
+  await expect(panel.getByRole("log").getByRole("status")).toHaveText("Finishing your reply");
   await expect(partial).toHaveText("Friday works.");
   const insert = panel.getByRole("button", { name: "Insert into reply", exact: true });
   const open = panel.getByRole("button", { name: "Open in Gmail", exact: true });
@@ -833,7 +852,7 @@ test("streams answer text and shows a validated draft before the provider finish
   await expect(insert).toBeEnabled();
   await expect(open).toBeEnabled();
   await expect(panel.getByText(draft.body, { exact: true })).toHaveCount(1);
-  await expect(panel.getByRole("status")).toHaveCount(0);
+  await expect(panel.getByRole("log").getByRole("status")).toHaveCount(0);
   await transport.dispose();
 });
 
@@ -846,9 +865,11 @@ for (const existing of [false, true]) {
     if (existing) {
       await mail.locator(".bkH").click();
       await editor.fill("My existing text");
-      await editor.evaluate((el) =>
-        el.insertAdjacentHTML("beforeend", '<div class="gmail_signature">Signature</div>'),
-      );
+      await editor.evaluate((el) => {
+        const signature = el.appendChild(document.createElement("div"));
+        signature.className = "gmail_signature";
+        signature.textContent = "Signature";
+      });
     }
     const body = existing
       ? "Hi Sam,\n\nFriday works for me. <Thanks> & see you then."
@@ -862,9 +883,10 @@ for (const existing of [false, true]) {
     await expect(insert).toBeVisible();
     const prompt = "Draft a reply to the open email.";
     await expect(panel.getByText(prompt, { exact: true })).toHaveCount(0);
-    await expect(panel.locator("dl")).toHaveCount(2);
-    await expect(panel.locator("dt").first()).toHaveText("Action");
-    await expect(panel.locator("dd strong")).toHaveText("review time");
+    const facts = panel.locator(".assistant-answer");
+    await expect(facts.locator("dl")).toHaveCount(2);
+    await expect(facts.locator("dt").first()).toHaveText("Action");
+    await expect(facts.locator("dd strong")).toHaveText("review time");
     await expect(panel.getByRole("button", { name: "1. Planning review" })).toBeVisible();
     await expect(panel.locator("details")).not.toHaveAttribute("open", "");
     await panel.locator("summary").click();
@@ -882,9 +904,12 @@ for (const existing of [false, true]) {
     expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
     if (existing) {
       const reply = mail.locator(".ip").first();
-      await reply.evaluate((el) =>
-        el.insertAdjacentHTML("afterbegin", '<div class="Un J-JN-M-I"><i class="mI"></i></div>'),
-      );
+      await reply.evaluate((el) => {
+        const forward = document.createElement("div");
+        forward.className = "Un J-JN-M-I";
+        forward.appendChild(document.createElement("i")).className = "mI";
+        el.prepend(forward);
+      });
       await insert.click();
       await expect(panel.getByRole("alert")).toHaveText(
         "Open a reply in this thread and try again.",
@@ -959,7 +984,8 @@ for (const existing of [false, true]) {
   });
 }
 
-for (const mode of ["rich text", "plaintext-only"]) {
+// The last mode stands for a Gmail that allowlists policy names: the reply is typed.
+for (const mode of ["rich text", "plaintext-only", "rich text without a policy"]) {
   test(`inserts into an open inline reply beside the Gmail thread heading (${mode})`, async () => {
     const mail = await openMailFixture(
       "#inbox/" + threadId,
@@ -974,11 +1000,12 @@ for (const mode of ["rich text", "plaintext-only"]) {
         <div class="HM"><div class="I5"><div class="M9">
           <div class="HQ"><div class="Un J-JN-M-I">Reply
             <div role="menu" hidden><i class="mI"></i></div></div><span id="recipient">Sam</span></div>
-          <div class="Ap"><div id="reply" contenteditable="${mode === "rich text" ? "" : "plaintext-only"}" role="textbox" aria-multiline="true"><br><div class="gmail_signature" data-smartmail="gmail_signature"><b>Studio Team</b><br>Studio phone</div></div></div>
+          <div class="Ap"><div id="reply" contenteditable="${mode === "plaintext-only" ? mode : ""}" role="textbox" aria-multiline="true"><br><div class="gmail_signature" data-smartmail="gmail_signature"><b>Studio Team</b><br>Studio phone</div></div></div>
         </div></div></div>
         <div role="dialog"><div class="ip"><div contenteditable role="textbox">Separate draft</div></div></div>
       </main>
       <script>document.querySelector("#reply").oninput = () => document.body.dataset.saved = "yes";</script>`,
+      mode.endsWith("policy") ? "; trusted-types 'none'" : "",
     );
     await useDraftProvider("Hi Sam,\n\nThe proof looks good.\n\nStudio Team\nStudio phone");
     const page = ggmail.renderer;
@@ -999,19 +1026,134 @@ for (const mode of ["rich text", "plaintext-only"]) {
   });
 }
 
-test("a draft outside a thread opens in its own composer", async () => {
-  await useDraftProvider("See you on Friday.");
+// The stand-in sends a signed-out composer on to sign-in, so record the mail
+// link each new page is first asked to open.
+function watchComposeLinks() {
+  return ggmail.app.evaluateHandle(({ app }) => {
+    const links: string[] = [];
+    app.on("web-contents-created", (_event, contents) => {
+      contents.on("did-start-navigation", ({ url }) => {
+        const link = URL.canParse(url) && new URL(url).searchParams.get("url");
+        if (link) {
+          links.push(link);
+        }
+      });
+    });
+    return links;
+  });
+}
+
+test("a draft outside a thread opens in a composer with its recipients, subject and body", async () => {
+  const body = "Hello,\n\nIs breakfast included & when does it start?";
+  await useDraftProvider(body, answer, {
+    to: "desk@hotel.example; sam@studio.example",
+    reply: true,
+  });
   const panel = ggmail.renderer.getByRole("complementary", { name: "Mail assistant" });
   await ggmail.renderer.getByRole("button", { name: "Mail assistant", exact: true }).click();
   await panel.getByRole("button", { name: "Draft an email", exact: true }).click();
   const open = panel.getByRole("button", { name: "Open in Gmail" });
   await expect(open).toBeVisible();
+  // No conversation is open, so nothing can be inserted whatever the model claims.
   await expect(panel.getByRole("button", { name: "Insert into reply" })).toHaveCount(0);
-  const countWindows = () =>
-    ggmail.app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length);
-  const count = await countWindows();
+  const card = panel.getByRole("region", { name: "Draft email", exact: true });
+  await expect(card.locator("dt")).toHaveText(["To", "Subject", "Message"]);
+  await expect(card.locator("dd")).toHaveText([
+    "desk@hotel.example, sam@studio.example",
+    "Planning review",
+    body,
+  ]);
+  const links = await watchComposeLinks();
   await open.click();
-  await expect.poll(countWindows).toBe(count + 1);
+  await expect
+    .poll(() => links.jsonValue())
+    .toEqual([
+      "mailto:desk@hotel.example,sam@studio.example?subject=Planning%20review&body=" +
+        encodeURIComponent(body),
+    ]);
+});
+
+// Record whether each provider request offers web search, and optionally refuse those that do.
+function watchWebOffers(refuse = false) {
+  return ggmail.app.evaluateHandle((_electron, refuse) => {
+    const offers: boolean[] = [];
+    const fetch = globalThis.fetch;
+    globalThis.fetch = (async (url, options) => {
+      if (String(url) === "https://api.openai.com/v1/responses") {
+        const { tools } = JSON.parse(String(options?.body));
+        const web = tools.some((tool: { type: string }) => tool.type === "web_search");
+        offers.push(web);
+        if (web && refuse) {
+          return Response.json({ error: { code: "unsupported_tool" } }, { status: 400 });
+        }
+      }
+      return fetch(url, options);
+    }) as typeof globalThis.fetch;
+    return offers;
+  }, refuse);
+}
+
+test("turning off Search the web in AI settings stops offering it to the provider", async () => {
+  await useDraftProvider(null);
+  const offers = await watchWebOffers();
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  const composer = panel.getByRole("textbox", { name: "Message the mail assistant" });
+  await composer.fill("What is due this week?");
+  await composer.press("Enter");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(1);
+
+  const loaded = ggmail.app.waitForEvent("window", {
+    predicate: (window) => window.url().includes("settings.html"),
+  });
+  await panel.getByRole("button", { name: "AI settings", exact: true }).click();
+  const settings = await loaded;
+  const search = settings.getByRole("switch", { name: "Search the web" });
+  await expect(search).toBeChecked();
+  await search.click();
+  await expect(search).not.toBeChecked();
+
+  await composer.fill("And next week?");
+  await composer.press("Enter");
+  await expect(panel.locator(".assistant-answer")).toHaveCount(2);
+  expect(await offers.jsonValue()).toEqual([true, false]);
+});
+
+test("a new email drafted inside a conversation stays out of its reply, with each part copyable", async () => {
+  const mail = await openThread();
+  const body = "Hello,\n\nCould you confirm my late arrival?";
+  await useDraftProvider(body, answer, { to: "desk@hotel.example", reply: false });
+  // This account's provider refuses a request that offers web search.
+  const offers = await watchWebOffers(true);
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
+  const card = panel.getByRole("region", { name: "Draft email", exact: true });
+  await expect(card.getByRole("button", { name: "Open in Gmail" })).toBeVisible();
+  // The turn still answers from mail, and the refused tool is not offered again.
+  expect(await offers.jsonValue()).toEqual([true, false, false]);
+  await expect(panel.getByRole("button", { name: "Insert into reply" })).toHaveCount(0);
+  await expect(mail.locator("#reply")).toBeHidden();
+
+  // The clipboard is the whole machine's, so read it straight after each write.
+  const copied = () => ggmail.app.evaluate(({ clipboard }) => clipboard.readText());
+  for (const [name, value] of [
+    ["Copy recipients", "desk@hotel.example"],
+    ["Copy subject", "Planning review"],
+    ["Copy draft body", body],
+  ]) {
+    await card.getByRole("button", { name, exact: true }).click();
+    await expect.poll(copied).toBe(value);
+  }
+  const links = await watchComposeLinks();
+  await card.getByRole("button", { name: "Open in Gmail" }).click();
+  await expect
+    .poll(() => links.jsonValue())
+    .toEqual([
+      "mailto:desk@hotel.example?subject=Planning%20review&body=" + encodeURIComponent(body),
+    ]);
 });
 
 test("the inbox assistant searches later result pages and reads a deadline from the full thread", async () => {
@@ -1385,12 +1527,12 @@ test("inbox answers show sender identities, fit the panel, and open the cited th
   const team = answer.getByRole("button", { name: "2. Review notes" }).first();
   await expect(team).toHaveText("DT2");
   for (const dark of [false, true]) {
-    await ggmail.app.evaluate(({ BrowserWindow }, dark) => {
+    await ggmail.app.evaluate(({ BrowserWindow, nativeTheme }, dark) => {
       const win = BrowserWindow.getAllWindows().find((candidate) =>
         candidate.webContents.getURL().includes("main.html"),
       );
       win?.setContentSize(dark ? 480 : 1200, 940);
-      win?.webContents.send("theme.darkModeChanged", dark);
+      nativeTheme.themeSource = dark ? "dark" : "light";
     }, dark);
     await expect
       .poll(() => page.locator("html").evaluate((el) => el.classList.contains("dark")))

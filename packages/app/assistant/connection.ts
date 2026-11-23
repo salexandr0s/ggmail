@@ -33,11 +33,14 @@ function credentialPath() {
   return path.join(app.getPath("userData"), "assistant-credentials");
 }
 
+export function canStoreSecrets() {
+  return (
+    safeStorage.isEncryptionAvailable() &&
+    (process.platform !== "linux" || safeStorage.getSelectedStorageBackend() !== "basic_text")
+  );
+}
 function requireProtectedStorage() {
-  if (
-    !safeStorage.isEncryptionAvailable() ||
-    (process.platform === "linux" && safeStorage.getSelectedStorageBackend() === "basic_text")
-  ) {
+  if (!canStoreSecrets()) {
     throw new AssistantError(t`Unlock your system credential store to connect the assistant.`);
   }
 }

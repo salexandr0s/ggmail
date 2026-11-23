@@ -8,6 +8,7 @@ import {
   InputGroupInput,
 } from "@ggmail/ui/components/input-group";
 import { Item } from "@ggmail/ui/components/item";
+import { Kbd } from "@ggmail/ui/components/kbd";
 import {
   Popover,
   PopoverContent,
@@ -57,7 +58,10 @@ function highlight(text: string, pattern: RegExp | null) {
   return pattern
     ? text.split(pattern).map((part, index) =>
         index % 2 ? (
-          <mark key={index} className="rounded-xs bg-selected font-semibold text-inherit">
+          <mark
+            key={index}
+            className="rounded-xs bg-selected font-semibold text-inherit group-aria-[current=true]/item:bg-card"
+          >
             {part}
           </mark>
         ) : (
@@ -103,7 +107,7 @@ function MailboxResults({
                 render={<button type="button" />}
                 size="xs"
                 aria-current={selectedThread === thread.id ? "true" : undefined}
-                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 text-start hover:bg-muted/50 focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset @2xl:grid-cols-[minmax(7rem,24%)_minmax(0,1fr)_auto]"
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 rounded-none border-0 text-start focus-ring-inset hover:bg-muted focus-visible:bg-muted @2xl:grid-cols-[minmax(7rem,24%)_minmax(0,1fr)_auto]"
                 data-search-thread={thread.id}
                 data-search-account={accountId}
                 onClick={async (event) => {
@@ -294,9 +298,9 @@ export function UnifiedInboxSearch({
                 </InputGroupButton>
               </InputGroupAddon>
             ) : (
-              <kbd aria-hidden="true" className="all-mail-search-key">
+              <Kbd aria-hidden="true" className="all-mail-search-key">
                 /
-              </kbd>
+              </Kbd>
             )}
           </InputGroup>
           {search && accounts.length > 1 && (

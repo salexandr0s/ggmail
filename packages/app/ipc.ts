@@ -12,6 +12,7 @@ import { currentMailView, type MailViewsPopupState } from "@ggmail/shared/mail-v
 import { ms } from "@ggmail/shared/ms";
 import { editNotificationTimes } from "@ggmail/shared/notification-times";
 import { byPlatform } from "@ggmail/shared/platform";
+import { accountConfigInputSchema } from "@ggmail/shared/schemas";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { IpcMainEvents, IpcRendererEvent, MenuModifiers } from "@ggmail/shared/types";
 import {
@@ -55,6 +56,12 @@ import {
   resolveWorkspaceAppOpenBehavior,
   WorkspaceApp,
 } from "@/workspace-app";
+import {
+  contextMenuContents,
+  chooseContextAction,
+  showContextActions,
+  type ContextAction,
+} from "./context-menu-popup";
 import { confirmAppLinksTabHandover } from "./dialogs";
 import { DoNotDisturb, doNotDisturb } from "./do-not-disturb";
 import { downloads } from "./downloads";
@@ -75,6 +82,7 @@ import {
 } from "./lib/extension-swap";
 import { hibernatesTabWhenIdle } from "./lib/hibernation";
 import { log } from "./lib/log";
+import { registerMailContextActions } from "./mail-context-actions";
 import {
   areWorkspaceAppNotificationsAllowed,
   showTestNotification,
@@ -82,6 +90,7 @@ import {
 } from "./notifications";
 import { getIsDefaultMailtoClient, setAsDefaultMailtoClient } from "./protocol";
 import { openWindowsDefaultAppsSettings } from "./protocol/windows-mail-client";
+import { registerTaskDraft, taskDraftContents } from "./task-draft";
 import { appUpdater } from "./updater";
 import { openExternalUrl } from "./url";
 
@@ -159,6 +168,24 @@ function getCouldNotUninstallExtensionMessage(error: unknown) {
   });
 }
 
+function showTabActions(point: Electron.Point, template: MenuItemConstructorOptions[]) {
+  const groups: ContextAction[][] = [[]];
+  for (const item of Menu.buildFromTemplate(template).items) {
+    if (item.type === "separator") {
+      groups.push([]);
+    } else {
+      groups.at(-1)?.push({
+        id: item.id,
+        label: item.label,
+        enabled: item.enabled,
+        checked: item.type === "checkbox" ? item.checked : undefined,
+        run: () => item.click(),
+      });
+    }
+  }
+  showContextActions(main.window, main.window.webContents, point, groups);
+}
+
 class Ipc {
   main = new IpcListener<IpcMainEvents>();
 
@@ -168,12 +195,23 @@ class Ipc {
     channel: Extract<E, string>,
     ...args: IpcRendererEvent[E]
   ) {
-    for (const rendererWebContents of getRendererWebContents()) {
+    const recipients = getRendererWebContents();
+    if (channel === "theme.darkModeChanged") {
+      recipients.push(...taskDraftContents());
+      const menu = contextMenuContents();
+      if (menu) {
+        recipients.push(menu);
+      }
+    }
+    for (const rendererWebContents of recipients) {
       this.renderer.send(rendererWebContents, channel, ...args);
     }
   }
 
   init() {
+    this.main.on("contextMenu.choose", chooseContextAction);
+    registerMailContextActions(this.main);
+    registerTaskDraft(this.main);
     registerAssistantIpc(this);
     registerAttachmentIpc(this);
     registerUnifiedSearchIpc(this);
@@ -223,12 +261,26 @@ class Ipc {
       accounts.addAccount(accountDetails);
     });
 
-    this.main.on("accounts.removeAccount", (_event, selectedAccountId) => {
-      accounts.removeAccount(selectedAccountId);
+    this.main.handle("accounts.removeAccount", async (_event, accountId) => {
+      try {
+        await accounts.removeAccount(accountId);
+      } catch (error) {
+        log.error("Failed to remove account", { accountId, error: serializeError(error) });
+
+        throw error;
+      }
     });
 
-    this.main.on("accounts.updateAccount", (_event, updatedAccount) => {
-      accounts.updateAccount(updatedAccount);
+    this.main.on("accounts.updateAccount", (_event, accountId, details) => {
+      const parsed = accountConfigInputSchema.safeParse(details);
+
+      if (typeof accountId !== "string" || !parsed.success) {
+        log.warn("Ignored an account update that did not match the form");
+
+        return;
+      }
+
+      accounts.updateAccount(accountId, parsed.data);
     });
 
     this.main.on("accounts.setAccountEnabled", (_event, accountId, enabled) => {
@@ -675,10 +727,46 @@ class Ipc {
       account.instance.tabs.moveTab(tabId, targetSectionIndex);
     });
 
-    ipc.main.on("tabs.showTabContextMenu", (_event, accountId, tabId) => {
+    ipc.main.on("tabs.showTabContextMenu", (event, accountId, tabId, point) => {
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame ||
+        !point ||
+        !Number.isFinite(point.x) ||
+        !Number.isFinite(point.y)
+      ) {
+        return;
+      }
       const account = accounts.getAccount(accountId);
 
       const tab = account.instance.tabs.getTab(tabId);
+
+      if (tabId === GMAIL_TAB_ID) {
+        showContextActions(main.window, event.sender, point, [
+          [
+            {
+              id: "inbox",
+              label: t`Open inbox`,
+              run: () => {
+                account.instance.tabs.activateTab(GMAIL_TAB_ID);
+                accounts.selectAccount(accountId);
+                main.navigate("/");
+                ipc.renderer.send(
+                  account.instance.gmail.view.webContents,
+                  "gmail.navigateTo",
+                  "inbox",
+                );
+              },
+            },
+            {
+              id: "reload",
+              label: t({ message: "Reload", context: "context menu" }),
+              run: () => account.instance.gmail.view.webContents.reload(),
+            },
+          ],
+        ]);
+        return;
+      }
 
       if (!(tab instanceof WorkspaceApp) && !(tab instanceof DormantTab)) {
         return;
@@ -715,10 +803,11 @@ class Ipc {
       };
 
       // lingui-set comment="An item in the context menu of a Google Workspace app's tab"
-      Menu.buildFromTemplate([
+      showTabActions(point, [
         ...(tabApp && !workspaceApps[tabApp].singleInstance
           ? [
               {
+                id: "new",
                 label: getNewTabLabel(
                   workspaceApps[tabApp].label,
                   isWindowsMode ? "window" : "tab",
@@ -730,6 +819,7 @@ class Ipc {
             ]
           : []),
         {
+          id: "reload",
           label: t({ message: "Reload", context: "context menu" }),
           enabled: tab instanceof WorkspaceApp,
           click: () => {
@@ -739,6 +829,7 @@ class Ipc {
           },
         },
         {
+          id: "copy",
           label: t`Duplicate`,
           click: () => {
             const currentTabUrl =
@@ -753,6 +844,7 @@ class Ipc {
         ...(tab instanceof WorkspaceApp && tab.isWindowed
           ? [
               {
+                id: "tab",
                 label: t`Move to Tab`,
                 click: () => {
                   if (tab instanceof WorkspaceApp) {
@@ -767,6 +859,7 @@ class Ipc {
             ]
           : [
               {
+                id: "window",
                 label: t`Move to New Window`,
                 enabled: tab instanceof WorkspaceApp && !tab.isWindowed,
                 click: () => {
@@ -784,6 +877,7 @@ class Ipc {
           type: "separator",
         },
         {
+          id: "pageUrl",
           label: t({
             message: "Copy URL",
             comment:
@@ -800,6 +894,7 @@ class Ipc {
           },
         },
         {
+          id: "browser",
           label: t`Open in Default Browser`,
           click: () => {
             if (tab instanceof WorkspaceApp) {
@@ -817,12 +912,14 @@ class Ipc {
         ...(tabApp
           ? [
               {
+                id: "pin",
                 label: tab.pinned ? t`Unpin` : t`Pin`,
                 click: () => {
                   account.instance.tabs.setTabPinned(tabId, !tab.pinned);
                 },
               },
               {
+                id: "bookmark",
                 label: bookmarks.isBookmarked(accountId, tab.url)
                   ? t`Remove Bookmark`
                   : t({
@@ -912,6 +1009,7 @@ class Ipc {
         ...(tab instanceof DormantTab
           ? [
               {
+                id: "open",
                 label: t({
                   message: "Open",
                   context: "context menu",
@@ -933,6 +1031,7 @@ class Ipc {
           ? []
           : [
               {
+                id: "close",
                 label: t({
                   message: "Close",
                   context: "context menu",
@@ -948,6 +1047,7 @@ class Ipc {
               },
             ]),
         {
+          id: "close",
           label: t`Close Other Tabs`,
           enabled: hasOtherClosableTabs,
           click: () => {
@@ -959,6 +1059,7 @@ class Ipc {
           },
         },
         {
+          id: "close",
           label: t`Close Tabs Below`,
           enabled: hasClosableTabsBelow,
           click: () => {
@@ -969,15 +1070,71 @@ class Ipc {
             }
           },
         },
-      ]).popup();
+      ]);
       // lingui-reset
     });
 
-    ipc.main.on("tabs.showVerticalTabsContextMenu", (_event, accountId) => {
+    ipc.main.on("tabs.showVerticalTabsContextMenu", (event, accountId, point, shortcut) => {
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame ||
+        !point ||
+        !Number.isFinite(point.x) ||
+        !Number.isFinite(point.y)
+      ) {
+        return;
+      }
       const account = accounts.getAccount(accountId);
 
-      Menu.buildFromTemplate([
+      const openLabel = t({ message: "Open", context: "context menu" });
+      if (shortcut === "settings" || shortcut === "bookmarks") {
+        showContextActions(main.window, event.sender, point, [
+          [
+            {
+              id: "open",
+              label: openLabel,
+              run: () => {
+                if (shortcut === "settings") {
+                  settingsWindow.open();
+                } else {
+                  bookmarks.togglePopup(main.window, point.y);
+                }
+              },
+            },
+          ],
+        ]);
+        return;
+      }
+      if (
+        shortcut &&
+        isSidebarApp(shortcut) &&
+        visibleSidebarShortcuts(config.get("sidebar.shortcuts")).includes(shortcut)
+      ) {
+        showContextActions(main.window, event.sender, point, [
+          [
+            {
+              id: "open",
+              label: openLabel,
+              run: () => account.instance.tabs.openSidebarApp(shortcut),
+            },
+            {
+              id: "browser",
+              label: t`Open in Default Browser`,
+              run: () => {
+                const url = new URL(getWorkspaceAppUrl(shortcut));
+                if (account.instance.gmail.userEmail) {
+                  url.searchParams.set("authuser", account.instance.gmail.userEmail);
+                }
+                openExternalUrl(url.href, { skipTrustedHostCheck: true });
+              },
+            },
+          ],
+        ]);
+        return;
+      }
+      showTabActions(point, [
         {
+          id: "reopen",
           label: t({ message: "Reopen Closed Tab", context: "context menu" }),
           enabled: account.instance.tabs.hasRecentlyClosedTabs,
           click: () => {
@@ -986,7 +1143,7 @@ class Ipc {
             }
           },
         },
-      ]).popup();
+      ]);
     });
 
     ipc.main.handle("config.getConfig", () => config.store);
@@ -1528,32 +1685,55 @@ class Ipc {
       account.instance.gmail.resumeInboxSignIn();
     });
 
-    this.main.on("gmail.openMessage", async (event, messageId, accountId) => {
-      if (accountId !== undefined) {
-        if (
-          event.sender !== main.window.webContents ||
-          event.senderFrame !== event.sender.mainFrame ||
-          main.location !== "/unified-inbox"
-        ) {
-          return;
-        }
-        const { instance } = accounts.getAccount(accountId);
-        instance.tabs.activateTab(GMAIL_TAB_ID);
-        accounts.selectAccount(accountId);
-        await instance.gmail.navigateToHash("#inbox/" + messageId);
-        if (
-          main.location === "/unified-inbox" &&
-          accounts.getSelectedAccount().config.id === accountId
-        ) {
-          main.navigate("/");
-        }
-        return;
+    // Answers with whether the conversation came up, so All Mail can say when
+    // it did not instead of leaving the click with no effect.
+    this.main.handle("unifiedInbox.openMessage", async (event, accountId, messageId) => {
+      if (
+        event.sender !== main.window.webContents ||
+        event.senderFrame !== event.sender.mainFrame ||
+        main.location !== "/unified-inbox"
+      ) {
+        return false;
       }
-      accounts.openMessage(accounts.getSelectedAccount().config.id, messageId);
+
+      const instance = accounts.instances.get(accountId);
+
+      if (!instance?.gmail.hasView) {
+        return false;
+      }
+
+      const previousAccountId = accounts.getSelectedAccount().config.id;
+
+      instance.tabs.activateTab(GMAIL_TAB_ID);
+      accounts.selectAccount(accountId);
+
+      try {
+        await instance.gmail.navigateToHash("#inbox/" + messageId);
+      } catch (error) {
+        log.error("Failed to open message from All Mail", { error: serializeError(error) });
+
+        // The titlebar would otherwise name an account the reader never got to.
+        if (accounts.getSelectedAccount().config.id === accountId) {
+          accounts.selectAccount(previousAccountId);
+        }
+
+        return false;
+      }
+
+      if (
+        main.location === "/unified-inbox" &&
+        accounts.getSelectedAccount().config.id === accountId
+      ) {
+        main.navigate("/");
+      }
+
+      return true;
     });
 
     this.main.handle("gmail.handleMessage", async (_event, accountId, messageId, action) => {
-      await accounts.instances.get(accountId)?.gmail.handleMessage(messageId, action);
+      return (
+        (await accounts.instances.get(accountId)?.gmail.handleMessage(messageId, action)) ?? false
+      );
     });
 
     this.main.on("gmail.messageHandled", (_event, requestId, success) => {

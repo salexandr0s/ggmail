@@ -1,0 +1,148 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+/* The surface colour and its highlight come from the `bg-popover` class, as on every other menu. */
+.context-surface {
+  /* Follows the text colour, so it separates rows on the light and the dark surface alike. */
+  --context-divider: color-mix(in srgb, var(--popover-foreground) 14%, transparent);
+  --context-row-radius: calc(var(--radius) * 0.8);
+  margin: 8px;
+  padding: 4px;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: none;
+  border: 1px solid var(--context-divider);
+  border-radius: calc(var(--radius) * 1.4);
+  box-shadow: var(--elevation-popover);
+  font: 400 14px/20px var(--font-sans);
+}
+/* Row and separator sizes are mirrored in `context-menu-popup.ts`, which sizes the window. */
+.context-surface button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 36px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: var(--context-row-radius);
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  font: inherit;
+}
+.context-icon {
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  opacity: 0.82;
+}
+.context-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The pointer moves focus, so the row under it and the row the keyboard is on are the same row. */
+.context-surface button:focus {
+  outline: none;
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+/* Only the keyboard draws a ring. Under the pointer the fill is enough, and a ring would trail it. */
+.context-surface[data-keyboard] button:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+/* Forced colours drop the fill, so the ring marks the row for the pointer as well. */
+@media (forced-colors: active) {
+  .context-surface button:focus {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+.context-surface button:disabled {
+  opacity: 0.5;
+}
+.context-surface hr {
+  margin: 4px -4px;
+  border: 0;
+  border-top: 1px solid var(--context-divider);
+}
+
+.calendar-choices {
+  --choice-accent: var(--primary);
+  /* The same tint as the emblem in the task window. */
+  --choice-tint: color-mix(in srgb, var(--primary) 13%, var(--popover));
+  --choice-detail: var(--muted-foreground);
+  --choice-divider: var(--context-divider);
+  padding: 0 6px 6px;
+  scrollbar-width: thin;
+  scroll-padding-block: 6px;
+}
+.calendar-choice-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  /* Room for the title and a zone line, so the heading is one height with or without the zone. */
+  min-height: 69px;
+  padding: 14px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--choice-divider);
+}
+.calendar-heading-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: var(--choice-accent);
+  background: var(--choice-tint);
+}
+.calendar-choice-heading strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+.calendar-choice-zone {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--choice-detail);
+  overflow-wrap: anywhere;
+}
+.calendar-choice-zone svg {
+  flex: none;
+}
+.calendar-choices button {
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 64px;
+  height: auto;
+  padding: 8px 12px;
+}
+.calendar-choice-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.calendar-choice-info strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.calendar-choice-info > span {
+  color: var(--choice-detail);
+  font-size: 13px;
+  line-height: 18px;
+}
+.calendar-choice-arrow {
+  flex: none;
+  color: var(--choice-detail);
+}
+[dir="rtl"] .calendar-choice-arrow {
+  transform: scaleX(-1);
+}

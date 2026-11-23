@@ -33,6 +33,8 @@ export function FindInPage() {
     return null;
   }
 
+  const noMatches = !!text && totalMatches === 0;
+
   function move(forward: boolean) {
     if (!text || totalMatches === 0) {
       return;
@@ -84,7 +86,12 @@ export function FindInPage() {
           }
         }}
       />
-      <span role="status" aria-atomic="true" className="titlebar-find-count">
+      <span
+        role="status"
+        aria-atomic="true"
+        className="titlebar-find-count"
+        data-empty={noMatches || undefined}
+      >
         {text && totalMatches !== null && `${activeMatch}/${totalMatches}`}
       </span>
       <div className="titlebar-find-actions">

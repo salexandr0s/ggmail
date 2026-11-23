@@ -69,6 +69,7 @@ export type Pair = [english: string, translation: string];
 const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   chrome: {
     de: "de",
+    el: "el",
     fr: "fr",
     it: "it",
     es: "es",
@@ -81,6 +82,7 @@ const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   },
   firefox: {
     de: "de",
+    el: "el",
     fr: "fr",
     it: "it",
     es: "es-ES",
@@ -93,6 +95,7 @@ const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   },
   thunderbird: {
     de: "de",
+    el: "el",
     fr: "fr",
     it: "it",
     es: "es-ES",
@@ -115,6 +118,7 @@ const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   },
   android: {
     de: "-de",
+    el: "-el",
     fr: "-fr",
     it: "-it",
     es: "-es",
@@ -127,6 +131,7 @@ const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   },
   libreoffice: {
     de: "de",
+    el: "el",
     fr: "fr",
     it: "it",
     es: "es",
@@ -139,6 +144,7 @@ const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   },
   microsoft: {
     de: "GERMAN",
+    el: "GREEK",
     fr: "FRENCH",
     it: "ITALIAN",
     es: "SPANISH",
@@ -151,6 +157,7 @@ const CODES: Record<Exclude<Source, "apple">, Record<string, string>> = {
   },
   gnome: {
     de: "de",
+    el: "el",
     fr: "fr",
     it: "it",
     es: "es",

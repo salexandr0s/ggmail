@@ -177,6 +177,8 @@ export type RendererPage =
   | "main"
   | "settings"
   | "workspace-app"
+  | "task-draft"
+  | "context-menu"
   | "desktop-sources"
   | "mail-views"
   | "recent-download-history"

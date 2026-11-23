@@ -5,8 +5,8 @@ import {
   type WebContentsViewConstructorOptions,
 } from "electron";
 import { watchForAppMenuKey } from "@/app-menu-shortcut";
-import { setupWindowContextMenu } from "@/context-menu";
 import { ipc } from "@/ipc";
+import { setupPageContextMenu } from "@/page-context-menu";
 import { shouldOpenDevToolsOnLaunch } from "./dev-tools";
 import { isLoadFailureWorthLogging } from "./load-failures";
 import { log } from "./log";
@@ -119,7 +119,7 @@ export function createChildWebContentsView({
 
   attachView(view);
 
-  setupWindowContextMenu(view);
+  setupPageContextMenu(view);
 
   watchForAppMenuKey(view.webContents);
 

@@ -20,6 +20,7 @@ import { useState } from "react";
 import chatGPTLogo from "@/components/assistant/chatgpt-logo.svg";
 import { EffortPicker } from "@/components/assistant/effort-picker";
 import { ModelLogo } from "@/components/assistant/model-logo";
+import { ConfigSwitchField } from "@/components/config-switch-field";
 import { Settings, SettingsContent, SettingsHeader, SettingsTitle } from "@/components/settings";
 import { settingsPageLabels } from "@/lib/settings-pages";
 import { useAssistantConnection } from "@/lib/use-assistant-connection";
@@ -291,6 +292,18 @@ export function AISettings() {
               )}
             </div>
           </form>
+          <div className="border-t py-4">
+            <ConfigSwitchField
+              configKey="assistant.webSearch"
+              label={t`Search the web`}
+              description={
+                provider === "deepseek"
+                  ? t`DeepSeek models can't search the web.`
+                  : t`The assistant can look up public details, such as a business's contact address. Searches run through the selected provider.`
+              }
+              disabled={provider === "deepseek"}
+            />
+          </div>
         </div>
         <p className="text-xs leading-relaxed text-muted-foreground">
           <Trans>

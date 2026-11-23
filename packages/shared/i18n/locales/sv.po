@@ -7,10 +7,12 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: sv\n"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 #: packages/renderer/components/follow-ups.tsx
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/routes/unified-inbox.tsx
+#: packages/renderer/task-draft.tsx
 msgid "(no subject)"
 msgstr "(inget ämne)"
 
@@ -64,6 +66,10 @@ msgstr "{label} synkroniseras fortfarande"
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} is up to date"
 msgstr "{label} är uppdaterat"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "{label} was removed, but ggmail couldn’t clear its saved data."
+msgstr "Kontot {label} har tagits bort, men ggmail kunde inte rensa dess sparade data."
 
 #: packages/renderer/components/inbox-accounts.tsx
 msgid "{label} will retry syncing"
@@ -333,6 +339,10 @@ msgstr "Kontoåtgärder"
 msgid "Accounts"
 msgstr "Konton"
 
+#: packages/renderer/context-menu.tsx
+msgid "Actions"
+msgstr "Åtgärder"
+
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
 msgid "Actual Size"
@@ -394,6 +404,17 @@ msgstr "Lägg till webbplatser"
 msgid "Add time window"
 msgstr "Lägg till tidsintervall"
 
+#: packages/app/mail-context-actions.ts
+msgid "Add to Calendar…"
+msgstr "Lägg till i Kalender…"
+
+#: packages/app/mail-context-actions.ts
+#: packages/app/page-context-menu.ts
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Add to Tasks"
+msgstr "Lägg till i Tasks"
+
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Add Workspace apps to the launcher on the right of the titlebar."
 msgstr "Lägg till Workspace-appar i appstartaren till höger i namnlisten."
@@ -431,6 +452,10 @@ msgstr "Alla konton"
 msgid "All categories"
 msgstr "Alla kategorier"
 
+#: packages/renderer/context-menu.tsx
+msgid "All day"
+msgstr "Hela dagen"
+
 #: packages/renderer/routes/attachments.tsx
 msgid "All files"
 msgstr "Alla filer"
@@ -449,6 +474,7 @@ msgstr "Alla mail"
 #. Switch, and a badge on the account, for including the account in All Mail
 #. Title of All Mail page
 #: packages/app/menu.ts
+#: packages/app/page-context-menu.ts
 #: packages/renderer/components/unified-search.tsx
 #: packages/renderer/lib/mail-views.ts
 #: packages/renderer/lib/settings-pages.ts
@@ -495,7 +521,7 @@ msgstr "Bärnstensgul"
 
 #: packages/renderer/components/attachments/detail-filters.tsx
 msgid "Any extension"
-msgstr "Alla filändelser"
+msgstr "Alla filnamnstillägg"
 
 #: packages/renderer/components/attachments/detail-filters.tsx
 msgid "Any size"
@@ -539,8 +565,12 @@ msgid "As soon as it arrives"
 msgstr "Så snart den kommer"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Ask about the quoted text…"
+msgstr "Fråga om den citerade texten…"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Ask about your mail…"
-msgstr "Fråga om dina mejl…"
+msgstr "Fråga om din e-post…"
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Ask where to save each file before it downloads."
@@ -714,6 +744,7 @@ msgstr "Kalender"
 #: packages/renderer/routes/settings/extensions.tsx
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -745,7 +776,7 @@ msgstr "Ge mig en överblick"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Catch me up on recent emails in this view. What needs my attention?"
-msgstr "Ge mig en överblick över de senaste mejlen i den här vyn. Vad behöver jag ta tag i?"
+msgstr "Ge mig en överblick över de senaste e-postmeddelandena i den här vyn. Vad behöver jag ta tag i?"
 
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Categories to monitor"
@@ -811,6 +842,10 @@ msgctxt "Windows"
 msgid "Check for Updates…"
 msgstr "Sök efter uppdateringar…"
 
+#: packages/app/task-draft.ts
+msgid "Check Google Tasks before retrying the save."
+msgstr "Kontrollera Google Tasks innan du försöker spara igen."
+
 #: packages/app/assistant/responses.ts
 msgid "Check the API key and its permissions in AI settings."
 msgstr "Kontrollera API-nyckeln och dess behörigheter i AI-inställningarna."
@@ -836,6 +871,10 @@ msgstr "Kontrollerar de synliga meddelandena"
 msgid "Chime"
 msgstr "Klockspel"
 
+#: packages/renderer/context-menu.tsx
+msgid "Choose a date"
+msgstr "Välj ett datum"
+
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Choose a provider in AI settings to ask about mail or draft a reply."
 msgstr "Välj en leverantör i AI-inställningarna för att ställa frågor om din e-post eller skriva ett svarsutkast."
@@ -859,6 +898,10 @@ msgstr "Välj ggmail i <0>{installFolder}</0>."
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Choose ggmail in the Applications folder."
 msgstr "Välj ggmail i mappen Program."
+
+#: packages/app/task-draft.ts
+msgid "Choose Google desktop OAuth client JSON"
+msgstr "Välj JSON-filen för Googles OAuth-klient för datorer"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Choose image"
@@ -905,6 +948,10 @@ msgstr "Rensa cache"
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Clear color"
 msgstr "Rensa färg"
+
+#: packages/renderer/task-draft.tsx
+msgid "Clear due date"
+msgstr "Ta bort förfallodatum"
 
 #: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/attachments.tsx
@@ -962,7 +1009,7 @@ msgstr "Stäng sökning på sidan"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Close mail assistant"
-msgstr "Stäng mejlassistenten"
+msgstr "Stäng e-postassistenten"
 
 #. An item in the context menu of a Google Workspace app's tab
 #: packages/app/ipc.ts
@@ -1008,6 +1055,10 @@ msgstr "Hopfälld"
 msgid "Color"
 msgstr "Färg"
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Compare quotes"
+msgstr "Jämför citat"
+
 #. Heading of the Gmail page's section about writing emails
 #: packages/renderer/routes/settings/gmail/index.tsx
 msgid "Compose"
@@ -1045,7 +1096,15 @@ msgstr "Anslut 1Password"
 
 #: packages/app/assistant/connection.ts
 msgid "Connect ChatGPT to use the mail assistant."
-msgstr "Anslut ChatGPT för att använda mejlassistenten."
+msgstr "Anslut ChatGPT för att använda e-postassistenten."
+
+#: packages/renderer/task-draft.tsx
+msgid "Connect Google Tasks"
+msgstr "Anslut Google Tasks"
+
+#: packages/renderer/task-draft.tsx
+msgid "Connect with a Google desktop OAuth client that has the Tasks API enabled."
+msgstr "Använd en Google OAuth-klient för datorer med Tasks API aktiverat."
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Connected"
@@ -1152,13 +1211,22 @@ msgid "Copy Message Link"
 msgstr "Kopiera meddelandelänk"
 
 #: packages/app/context-menu.ts
+#: packages/app/mail-context-actions.ts
 msgctxt "context menu"
 msgid "Copy Message Link"
 msgstr "Kopiera meddelandelänk"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "Kopiera mottagare"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "Kopiera svar"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "Kopiera ämne"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1177,6 +1245,10 @@ msgstr "Det gick inte att kontrollera den här brevlådan."
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Couldn't clear the saved chat."
 msgstr "Det gick inte att rensa den sparade chatten."
+
+#: packages/app/task-draft.ts
+msgid "Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here."
+msgstr "Det gick inte att ansluta Google Tasks. Kontrollera klienten och logga in med e-postadressen som visas här."
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't connect to ChatGPT. Try again."
@@ -1197,6 +1269,11 @@ msgstr "Det gick inte att exportera loggarna."
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "Det gick inte att slutföra svaret. Försök igen."
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "Det gick inte att infoga utkastet. Kopiera det i stället."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1220,15 +1297,17 @@ msgid "Couldn't open the draft in Gmail."
 msgstr "Det gick inte att öppna utkastet i Gmail."
 
 #: packages/app/assistant/chat.ts
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Couldn't open the email source."
-msgstr "Det gick inte att öppna det citerade mejlet."
+msgstr "Det gick inte att öppna det citerade e-postmeddelandet."
 
 #: packages/app/assistant/chatgpt-auth.ts
 msgid "Couldn't open the local ChatGPT sign-in page."
 msgstr "Det gick inte att öppna den lokala sidan för inloggning i ChatGPT."
 
 #: packages/renderer/components/unified-search.tsx
+#: packages/renderer/routes/unified-inbox.tsx
 msgid "Couldn’t open this conversation."
 msgstr "Det gick inte att öppna konversationen."
 
@@ -1236,9 +1315,13 @@ msgstr "Det gick inte att öppna konversationen."
 msgid "Couldn't open your browser for ChatGPT sign-in."
 msgstr "Det gick inte att öppna webbläsaren för inloggning i ChatGPT."
 
+#: packages/app/task-draft.ts
+msgid "Couldn’t reach Google Tasks. Check your connection and try again."
+msgstr "Det gick inte att nå Google Tasks. Kontrollera internetanslutningen och försök igen."
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Couldn't reach the mail assistant. Try again."
-msgstr "Det gick inte att nå mejlassistenten. Försök igen."
+msgstr "Det gick inte att nå e-postassistenten. Försök igen."
 
 #: packages/app/assistant/connection.ts
 msgid "Couldn't read the saved ChatGPT connection. Disconnect it and sign in again."
@@ -1291,6 +1374,10 @@ msgstr "Det gick inte att uppdatera AI-anslutningen. Försök igen."
 msgid "Couldn’t update this follow-up."
 msgstr "Det gick inte att uppdatera uppföljningen."
 
+#: packages/renderer/routes/unified-inbox.tsx
+msgid "Couldn’t update this message. Try again."
+msgstr "Det gick inte att uppdatera e-postmeddelandet. Försök igen."
+
 #: packages/renderer/components/follow-ups.tsx
 msgid "Couldn’t verify replies"
 msgstr "Det gick inte att kontrollera svaren"
@@ -1320,7 +1407,7 @@ msgstr "Klipp u&t"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Current mail view"
-msgstr "Aktuell mejlvy"
+msgstr "Aktuell e-postvy"
 
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/menu.ts
@@ -1355,6 +1442,10 @@ msgstr "Mörkt"
 msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Mörk"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "DeepSeek-modeller kan inte söka på webben."
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
@@ -1450,6 +1541,7 @@ msgid "Disabled"
 msgstr "Inaktiverat"
 
 #: packages/renderer/routes/settings/ai.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Disconnect"
 msgstr "Koppla från"
 
@@ -1481,6 +1573,7 @@ msgstr "Visa inte igen"
 #. Button that closes the dialog of an extension's sites
 #: packages/renderer/components/attachments/filters.tsx
 #: packages/renderer/routes/settings/extensions.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Done"
 msgstr "Klart"
 
@@ -1519,16 +1612,21 @@ msgstr "Skriv ett svarsutkast"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Draft a reply to the open email."
-msgstr "Skriv ett svarsutkast till det öppna mejlet."
+msgstr "Skriv ett svarsutkast till det öppna e-postmeddelandet."
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Draft an email"
-msgstr "Skriv ett mejlutkast"
+msgstr "Skriv ett e-postutkast"
 
 #. Label for a suggested email draft
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
-msgstr "Mejlutkast"
+msgstr "E-postutkast"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "Svarsutkast"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -1538,11 +1636,16 @@ msgstr "Dra {label} för att ändra ordningen"
 
 #: packages/renderer/routes/settings/sidebar.tsx
 msgid "Drag shortcuts into the order you want. Settings stays pinned at the bottom for all accounts."
-msgstr "Dra genvägarna till önskad ordning. Inställningar ligger kvar längst ned för alla konton."
+msgstr "Dra genvägarna till önskad ordning. Inställningar är alltid fäst längst ned för alla konton."
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due"
 msgstr "Aktuella"
+
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Due date"
+msgstr "Förfallodatum"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "Due for follow-up"
@@ -1606,12 +1709,12 @@ msgstr "E-postutdrag"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Email source"
-msgstr "Citerat mejl"
+msgstr "Citerat e-postmeddelande"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Email sources"
-msgstr "Citerade mejl"
+msgstr "Citerade e-postmeddelanden"
 
 #. Heading of the Notifications section about notifications for new emails
 #: packages/renderer/routes/settings/notifications.tsx
@@ -1790,7 +1893,7 @@ msgstr "Arkiv"
 
 #: packages/renderer/components/attachments/detail-filters.tsx
 msgid "File extension"
-msgstr "Filändelse"
+msgstr "Filnamnstillägg"
 
 #. In the download history, in place of when a file was downloaded, once the file is no longer where it was saved
 #: packages/renderer/components/download-history.tsx
@@ -1846,15 +1949,15 @@ msgstr "Filter"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Find an email"
-msgstr "Hitta ett mejl"
+msgstr "Hitta ett e-postmeddelande"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Find emails about "
-msgstr "Hitta mejl om "
+msgstr "Hitta e-postmeddelanden om "
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Find my to-dos in this mail scope. Include due dates when the email gives them."
-msgstr "Hitta mina uppgifter i de här mejlen. Ta med sista datum när det anges i mejlet."
+msgstr "Hitta mina uppgifter i den här e-posten. Ta med sista datum när de anges."
 
 #: packages/renderer/components/find-in-page.tsx
 msgid "Find next match"
@@ -2040,6 +2143,14 @@ msgstr "Google Meet"
 msgid "Google Tasks"
 msgstr "Google Tasks"
 
+#: packages/app/task-draft.ts
+msgid "Google Tasks access expired. Connect again to save."
+msgstr "Åtkomsten till Google Tasks har gått ut. Anslut igen för att spara."
+
+#: packages/app/task-draft.ts
+msgid "Google Tasks didn’t save this task. Try again."
+msgstr "Google Tasks sparade inte uppgiften. Försök igen."
+
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
 msgid "Green"
@@ -2078,7 +2189,7 @@ msgstr "Hjälp"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Help me draft an email. Ask me for the details you need."
-msgstr "Hjälp mig att skriva ett mejl. Fråga efter de uppgifter du behöver."
+msgstr "Hjälp mig att skriva ett e-postmeddelande. Fråga efter de uppgifter du behöver."
 
 #: packages/renderer/routes/settings/workspace-apps.tsx
 msgid "Hibernate after"
@@ -2405,7 +2516,7 @@ msgstr "Läser in e-post…"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "Loading older mail…"
-msgstr "Läser in äldre mejl…"
+msgstr "Läser in äldre e-post…"
 
 #: packages/renderer/components/account-logo-field.tsx
 msgid "Logo"
@@ -2440,11 +2551,11 @@ msgstr "E-post"
 #: packages/renderer/components/app-titlebar.tsx
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Mail assistant"
-msgstr "Mejlassistent"
+msgstr "E-postassistent"
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Mail assistant conversation"
-msgstr "Chatt med mejlassistenten"
+msgstr "Chatt med e-postassistenten"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "Mail assistant provider"
@@ -2509,9 +2620,15 @@ msgstr "Ikon i menyraden"
 msgid "Message"
 msgstr "Meddelande"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "Meddelande"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
-msgstr "Skriv till mejlassistenten"
+msgstr "Skriv till e-postassistenten"
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Minimal"
@@ -2654,7 +2771,7 @@ msgstr "Ingen emoji hittades."
 #: packages/renderer/components/attachments/detail-filters.tsx
 #: packages/renderer/routes/attachments.tsx
 msgid "No extension"
-msgstr "Utan filändelse"
+msgstr "Utan filnamnstillägg"
 
 #: packages/renderer/routes/attachments.tsx
 msgid "No files available"
@@ -2822,8 +2939,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Öppna ett nytt fönster för att skriva ett e-postmeddelande i stället för att skriva i Gmail."
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "Öppna ett svar i den här tråden och försök igen."
 
@@ -2839,15 +2954,16 @@ msgstr "Öppna och lås upp 1Password igen."
 msgid "Open and unlock 1Password."
 msgstr "Öppna och lås upp 1Password."
 
+#: packages/app/mail-context-actions.ts
 #: packages/renderer/components/assistant/assistant-panel.tsx
 #: packages/renderer/components/attachments/files.tsx
 #: packages/renderer/components/attachments/preview.tsx
 msgid "Open email"
-msgstr "Öppet mejl"
+msgstr "Öppna e-postmeddelande"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open email source"
-msgstr "Öppna citerat mejl"
+msgstr "Öppna citerat e-postmeddelande"
 
 #. Option of what a finished download's notification does
 #: packages/renderer/routes/settings/notifications.tsx
@@ -2888,6 +3004,15 @@ msgstr "Öppna i mapp"
 msgid "Open in Gmail"
 msgstr "Öppna i Gmail"
 
+#: packages/renderer/task-draft.tsx
+msgid "Open in Google Tasks"
+msgstr "Öppna i Google Tasks"
+
+#: packages/app/ipc.ts
+msgid "Open inbox"
+msgstr "Öppna inkorgen"
+
+#: packages/app/page-context-menu.ts
 #: packages/app/url.ts
 msgid "Open link"
 msgstr "Öppna länk"
@@ -2896,6 +3021,11 @@ msgstr "Öppna länk"
 #: packages/app/dialogs.ts
 msgid "Open links here"
 msgstr "Öppna länkar här"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+#: packages/renderer/task-draft.tsx
+msgid "Open original"
+msgstr "Öppna originalet"
 
 #. A pop-out is Gmail's own name for a reply in its own window, so it follows Gmail's word for it
 #: packages/renderer/routes/settings/gmail/index.tsx
@@ -3145,6 +3275,20 @@ msgstr "Avsluta {appName}"
 msgid "Quit 1Password."
 msgstr "Avsluta 1Password."
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Quote added."
+msgstr "Citatet har lagts till."
+
+#: packages/app/mail-context-actions.ts
+#: packages/app/page-context-menu.ts
+msgid "Quote to assistant"
+msgstr "Citera i assistenten"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Quoted passages"
+msgstr "Citerade avsnitt"
+
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Reading “{subject}”"
 msgstr "Läser ”{subject}”"
@@ -3253,6 +3397,10 @@ msgstr "Vill du ta bort {label}?"
 msgid "Remove {site}"
 msgstr "Ta bort {site}"
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Remove a quote to add another."
+msgstr "Ta bort ett citat för att lägga till ett annat."
+
 #: packages/renderer/routes/settings/accounts.tsx
 msgid "Remove account"
 msgstr "Ta bort konto"
@@ -3287,6 +3435,10 @@ msgstr "Ta bort från historiken"
 msgid "Remove logo"
 msgstr "Ta bort logotyp"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Remove quote"
+msgstr "Ta bort citat"
+
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "Remove time window"
 msgstr "Ta bort tidsintervall"
@@ -3304,6 +3456,11 @@ msgstr "Öppna stängd flik igen"
 msgctxt "context menu"
 msgid "Reopen Closed Tab"
 msgstr "Öppna stängd flik igen"
+
+#: packages/app/task-draft.ts
+#: packages/renderer/task-draft.tsx
+msgid "Reopen the email and try again."
+msgstr "Öppna e-postmeddelandet igen och försök på nytt."
 
 #. Button that turns on a password manager extension in place of the one that is on
 #: packages/renderer/routes/settings/extensions.tsx
@@ -3430,6 +3587,7 @@ msgstr "Spa&ra bild som…"
 #: packages/renderer/routes/settings/accounts.tsx
 #: packages/renderer/routes/settings/gmail/label-colors.tsx
 #: packages/renderer/routes/settings/saved-searches.tsx
+#: packages/renderer/task-draft.tsx
 msgid "Save"
 msgstr "Spara"
 
@@ -3438,6 +3596,7 @@ msgstr "Spara"
 msgid "Saved searches"
 msgstr "Sparade sökningar"
 
+#: packages/app/page-context-menu.ts
 #: packages/renderer/components/follow-ups.tsx
 msgid "Schedule follow-up"
 msgstr "Schemalägg uppföljning"
@@ -3483,6 +3642,10 @@ msgstr "Sök efter filer, avsändare eller ämnen"
 msgid "Search results"
 msgstr "Sökresultat"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "Sök på webben"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3495,6 +3658,14 @@ msgstr "Söker i {account}"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Searching {account} · page {page}"
 msgstr "Söker i {account} · sida {page}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "Söker på webben"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "Söker på webben efter ”{query}”"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -3647,6 +3818,10 @@ msgctxt "Windows"
 msgid "Settings…"
 msgstr "Inställningar…"
 
+#: packages/renderer/task-draft.tsx
+msgid "Setup instructions"
+msgstr "Installationsanvisningar"
+
 #. A menu or a menu item in ggmail's menu bar
 #. A menu or a menu item in ggmail's menu bar
 #: packages/app/context-menu.ts
@@ -3770,6 +3945,14 @@ msgstr "Visa i mapp"
 #: packages/app/downloads.ts
 msgid "Show in your file manager"
 msgstr "Visa i filhanteraren"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Show less"
+msgstr "Visa mindre"
+
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "Show more"
+msgstr "Visa mer"
 
 #. Setting that shows a notification when a download finishes
 #: packages/renderer/routes/settings/notifications.tsx
@@ -3958,6 +4141,10 @@ msgstr "Logga in för att se olästa meddelanden"
 msgid "Sign in to your subscription with “claude auth login” in a terminal, then connect here."
 msgstr "Logga in på ditt abonnemang med ”claude auth login” i en terminal och anslut sedan här."
 
+#: packages/renderer/task-draft.tsx
+msgid "Sign in with Google in your browser, then return here."
+msgstr "Logga in med Google i webbläsaren och återvänd sedan hit."
+
 #: packages/app/workspace-app.ts
 msgid "Sign in with your password or another available second factor. If the account has no password, add one at myaccount.google.com in a browser first, then sign in here."
 msgstr "Logga in med ditt lösenord eller en annan tillgänglig tvåstegsmetod. Om kontot inte har något lösenord lägger du först till ett på myaccount.google.com i en webbläsare och loggar sedan in här."
@@ -4081,13 +4268,18 @@ msgstr "Förhindra att appfönstret görs mindre än en användbar minsta storle
 msgid "Stop the current reply before asking another question."
 msgstr "Stoppa det pågående svaret innan du ställer en ny fråga."
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "Ämne"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
-msgstr "Sammanfatta det öppna mejlet och lyft fram det jag behöver veta."
+msgstr "Sammanfatta det öppna e-postmeddelandet och lyft fram det jag behöver veta."
 
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize this email"
-msgstr "Sammanfatta mejlet"
+msgstr "Sammanfatta e-postmeddelandet"
 
 #: packages/renderer/routes/settings/general.tsx
 msgid "Swipe between pages"
@@ -4124,6 +4316,10 @@ msgstr "Synkroniserar…"
 msgid "System"
 msgstr "System"
 
+#: packages/app/page-context-menu.ts
+msgid "System menu…"
+msgstr "Systemmeny…"
+
 #: packages/renderer/routes/settings/appearance.tsx
 msgctxt "Linux"
 msgid "System tray icon"
@@ -4142,6 +4338,14 @@ msgstr "Ikon i systemfältet"
 #: packages/shared/workspace-apps.ts
 msgid "Tabs"
 msgstr "Flikar"
+
+#: packages/renderer/task-draft.tsx
+msgid "Task created"
+msgstr "Uppgiften har skapats"
+
+#: packages/renderer/task-draft.tsx
+msgid "Task title"
+msgstr "Uppgiftens titel"
 
 #. A color an account can be marked with, in the account form's Color picker
 #: packages/shared/accounts.ts
@@ -4175,6 +4379,10 @@ msgstr "AI-leverantören gav ett för stort svar."
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "AI-leverantören gav ett tomt svar."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "Låt assistenten slå upp offentliga uppgifter, till exempel ett företags kontaktadress. Sökningarna görs via den valda leverantören."
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
@@ -4227,7 +4435,12 @@ msgstr "Det senaste meddelandet måste vara skickat av dig."
 #: packages/app/assistant/insert-reply.ts
 #: packages/app/assistant/mail-context.ts
 msgid "The mail view changed. Ask again to use the new view."
-msgstr "Mejlvyn har ändrats. Fråga igen för att använda den nya vyn."
+msgstr "E-postvyn har ändrats. Fråga igen för att använda den nya vyn."
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+#: packages/renderer/components/assistant/assistant-quotes.tsx
+msgid "The quote was shortened to fit your assistant draft."
+msgstr "Citatet kortades för att få plats i utkastet till assistenten."
 
 #: packages/app/assistant/anthropic.ts
 #: packages/app/assistant/responses.ts
@@ -4255,6 +4468,10 @@ msgstr "Det här är den sista versionen av ggmail för den här Macen."
 msgid "This is what a new email notification looks like."
 msgstr "Så här ser en avisering om ett nytt e-postmeddelande ut."
 
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "This passage is already attached."
+msgstr "Det här avsnittet har redan bifogats."
+
 #: packages/app/assistant/connection.ts
 msgid "This sign-in used a different ChatGPT account. Use the account you originally connected."
 msgstr "Du loggade in med ett annat ChatGPT-konto. Använd kontot du anslöt från början."
@@ -4280,6 +4497,11 @@ msgstr "Namnlist"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "till"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "Till"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."
@@ -4352,6 +4574,7 @@ msgctxt "Windows"
 msgid "Undo"
 msgstr "Ångra"
 
+#: packages/renderer/components/assistant/assistant-quotes.tsx
 #: packages/renderer/components/assistant/source-preview.tsx
 msgid "Unknown sender"
 msgstr "Okänd avsändare"
@@ -4515,7 +4738,7 @@ msgstr "Väntar på svar"
 
 #: packages/renderer/components/assistant/assistant-panel.tsx
 msgid "Waiting for the mail view…"
-msgstr "Väntar på mejlvyn…"
+msgstr "Väntar på e-postvyn…"
 
 #: packages/renderer/components/inbox-accounts.tsx
 #: packages/renderer/routes/unified-inbox.tsx
@@ -4545,7 +4768,7 @@ msgstr "När koden kopieras"
 
 #: packages/renderer/routes/settings/ai.tsx
 msgid "When you ask a question, ggmail sends recent chat history and relevant mail to the selected provider."
-msgstr "När du ställer en fråga skickar ggmail den senaste chatthistoriken och relevanta mejl till den valda leverantören."
+msgstr "När du ställer en fråga skickar ggmail den senaste chatthistoriken och relevant e-post till den valda leverantören."
 
 #: packages/renderer/routes/settings/downloads.tsx
 msgid "Where downloaded files are saved."
@@ -4614,6 +4837,10 @@ msgstr "Workspace-appar"
 msgid "Yellow"
 msgstr "Gul"
 
+#: packages/app/task-draft.ts
+msgid "You can close this tab and return to ggmail."
+msgstr "Du kan stänga den här fliken och återgå till ggmail."
+
 #: packages/renderer/components/follow-ups.tsx
 msgid "You can schedule a follow-up when you sent the last message."
 msgstr "Du kan schemalägga en uppföljning om du skickade det senaste meddelandet."
@@ -4622,6 +4849,10 @@ msgstr "Du kan schemalägga en uppföljning om du skickade det senaste meddeland
 #: packages/app/ipc.ts
 msgid "You have unread messages"
 msgstr "Du har olästa meddelanden"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Your assistant draft is full. Shorten it to add a quote."
+msgstr "Utkastet till assistenten är fullt. Korta ned det för att lägga till ett citat."
 
 #: packages/app/assistant/responses.ts
 msgid "Your ChatGPT account or workspace hasn't enabled plan access for ggmail."

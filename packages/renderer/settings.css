@@ -18,17 +18,24 @@
   min-height: 2.5rem;
   margin: 1rem 0.75rem 0;
   padding-inline: 0.875rem 0.625rem;
+  border: 1px solid transparent;
   border-radius: 999px;
   background: var(--search-surface);
   color: var(--muted-foreground);
 }
 
 .settings-nav-search:focus-within {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
+  border-color: var(--ring);
+  background: var(--card);
+  box-shadow: var(--focus-ring);
 }
 
-.settings-nav-search > svg,
+.settings-nav-search > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
 .settings-nav-search button svg {
   width: 0.95rem;
   height: 0.95rem;
@@ -58,12 +65,13 @@
   min-width: 1.25rem;
   height: 1.25rem;
   place-items: center;
-  border-radius: 0.25rem;
+  border-radius: calc(var(--radius) * 0.6);
 }
 
 .settings-nav-search kbd {
-  border: 1px solid var(--border);
-  font: 0.71rem/1 var(--font-sans);
+  padding-inline: 0.25rem;
+  background: var(--muted);
+  font: 500 0.75rem/1rem var(--font-sans);
 }
 
 .settings-nav-search button:hover {
@@ -224,7 +232,6 @@
   max-block-size: calc(100dvh - 4rem);
   overflow-y: auto;
   overscroll-behavior: contain;
-  box-shadow: 0 0.75rem 3rem rgb(0 0 0 / 0.16);
 }
 
 .settings-window [data-slot="dialog-header"] {
@@ -235,10 +242,6 @@
   flex-wrap: wrap;
   border-end-start-radius: inherit;
   border-end-end-radius: inherit;
-}
-
-.settings-window :is([data-slot="dialog-footer"], [data-slot="alert-dialog-footer"]) button {
-  border-radius: 999px;
 }
 
 @container settings (min-width: 38rem) {
@@ -257,19 +260,19 @@
   padding: clamp(2.5rem, 8cqi, 4.5rem) 1rem;
   color: var(--muted-foreground);
   text-align: center;
-  font-size: 0.9rem;
-  font-weight: 550;
+  font-size: 1.125rem;
+  font-weight: 500;
 }
 
 .settings-empty > svg {
   box-sizing: content-box;
-  padding: 0.8rem;
-  border-radius: 1rem;
-  background: var(--muted);
+  padding: 1rem;
+  border-radius: 1.125rem;
+  background: var(--secondary);
   color: var(--muted-foreground);
 }
 
-@media (max-width: 800px) {
+@media (width < 50rem) {
   .settings-nav-search kbd {
     display: none;
   }

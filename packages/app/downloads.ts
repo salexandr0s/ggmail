@@ -389,21 +389,36 @@ class Downloads {
   }
 
   async checkDownloadHistoryItems(limit?: number) {
-    const downloadHistory = config.get("downloads.history");
+    const checkedHistory = config.get("downloads.history");
 
-    await Promise.all(
-      (limit ? downloadHistory.slice(0, limit) : downloadHistory).map(
-        async ({ filePath }, index) => {
-          const item = downloadHistory[index];
-
-          if (item) {
-            item.exists = await fileExists(filePath);
-          }
-        },
+    const checks = await Promise.all(
+      (limit ? checkedHistory.slice(0, limit) : checkedHistory).map(
+        async ({ id, filePath }) => [id, await fileExists(filePath)] as const,
       ),
     );
 
-    config.set("downloads.history", downloadHistory);
+    const existsById = new Map(checks);
+
+    // Read again rather than writing back what was checked: a download that
+    // finished while the files were being looked at is in the stored history
+    // and not in that copy, and writing the copy would drop it.
+    const downloadHistory = config.get("downloads.history");
+
+    let hasChanged = false;
+
+    for (const item of downloadHistory) {
+      const exists = existsById.get(item.id);
+
+      if (exists !== undefined && item.exists !== exists) {
+        item.exists = exists;
+
+        hasChanged = true;
+      }
+    }
+
+    if (hasChanged) {
+      config.set("downloads.history", downloadHistory);
+    }
   }
 }
 

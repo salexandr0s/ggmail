@@ -19,6 +19,7 @@ export type PopupOptions = {
   /** The size of the popup itself, without the gaps the view spans. */
   width: number;
   height: number;
+  fitVertically?: boolean;
   anchor?: PopupAnchor | { sidebarTop: number | null };
 };
 
@@ -133,7 +134,13 @@ export class Popup {
 
     const viewWidth = Math.min(parentWindowBounds.width, width + padding * 2);
 
-    const viewY = anchor.y - padding;
+    const viewY = options.fitVertically
+      ? clamp(
+          anchor.y - padding,
+          0,
+          Math.max(0, parentWindowBounds.height - options.height - padding * 2),
+        )
+      : anchor.y - padding;
 
     const availableHeight = Math.max(parentWindowBounds.height - viewY, 0);
 
@@ -236,7 +243,10 @@ export class Popup {
 
     this.setBounds();
 
-    this.view.webContents.once("blur", this.handleBlur);
+    // Kept for the popup's whole life rather than its first blur: one that
+    // arrives while the pointer rests on the toggle button is ignored, and the
+    // outside click after it still has to close the popup. `close` removes it.
+    this.view.webContents.on("blur", this.handleBlur);
 
     parentWindow.on("resize", this.setBounds);
 

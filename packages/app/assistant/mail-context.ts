@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   getSenderDomain,
   type AssistantScope,
+  type AssistantQuote,
   type AssistantSender,
 } from "@ggmail/shared/assistant";
 import { parseGmailMessageId } from "@ggmail/shared/gmail";
@@ -154,6 +155,35 @@ export type MailSource = MailboxIdentity & {
   rowSender?: string;
   excerpt?: string;
 };
+
+export function sourcesForQuotes(quotes: AssistantQuote[]): Array<MailSource | undefined> {
+  const ready = new Map(activeMailboxes().map((item) => [item.accountId, item]));
+  return quotes.map((quote) => {
+    const account = ready.get(quote.accountId);
+    if (
+      !account ||
+      (account.ownerEmail ?? "") !== quote.owner ||
+      (quote.mailbox && quote.mailbox !== account.mailbox)
+    ) {
+      return;
+    }
+    // Reading a source asks Gmail for the whole conversation, which goes by the
+    // conversation's id. A later message in it has an id of its own.
+    const threadId = quote.threadId ?? quote.messageId;
+    return {
+      accountId: account.accountId,
+      mailbox: account.mailbox,
+      ownerEmail: account.ownerEmail,
+      subject: quote.subject.slice(0, 300),
+      hash: "#all/" + threadId,
+      threadId,
+      senders: quote.sender
+        ? [{ name: quote.sender.slice(0, 320), domain: getSenderDomain(quote.sender) }]
+        : undefined,
+      excerpt: quote.text,
+    };
+  });
+}
 
 function snippetsToSources(rows: Snippet[], fallback: string, identity: MailboxIdentity) {
   return rows.map(({ id, senders, ...row }) => {

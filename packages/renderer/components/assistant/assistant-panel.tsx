@@ -26,8 +26,9 @@ import { useAccountsStore } from "@/lib/stores";
 import { useAssistantConnection } from "@/lib/use-assistant-connection";
 import { useAssistantModel } from "@/lib/use-assistant-model";
 import { useWindowWidthValue } from "@/lib/use-window-width";
-import { AssistantConversation, clearAssistantPrompt } from "./assistant-conversation";
+import { AssistantConversation } from "./assistant-conversation";
 import { ModelLogo } from "./model-logo";
+import { clearAssistantPrompt } from "./prompt";
 import "./assistant-drawer.css";
 
 type ClosePanel = (focusToggle?: boolean) => void;

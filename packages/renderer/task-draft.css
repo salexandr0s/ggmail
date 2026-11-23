@@ -1,0 +1,201 @@
+.task-dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  block-size: 100dvh;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+.task-header,
+.task-footer,
+.task-account,
+.task-date-row,
+.task-source,
+.task-source-action,
+.task-result time,
+.task-error {
+  display: flex;
+  align-items: center;
+}
+.task-header {
+  gap: 12px;
+  padding: 20px 24px 14px;
+}
+.task-emblem,
+.task-source-icon,
+.task-clear {
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.task-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--primary) 13%, var(--card));
+  color: var(--primary);
+}
+.task-emblem.is-saved {
+  background: var(--success-surface);
+  color: var(--success);
+}
+.task-identity {
+  min-width: 0;
+}
+.task-identity h1 {
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.task-account {
+  gap: 8px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.task-account span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.task-account button,
+.task-setup button {
+  color: var(--primary);
+}
+.task-account button:enabled:hover,
+.task-setup button:enabled:hover {
+  text-decoration: underline;
+}
+.task-account button:disabled,
+.task-setup button:disabled,
+.task-clear:disabled {
+  opacity: 0.5;
+}
+.task-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  padding: 8px 24px 18px;
+  overflow-y: auto;
+  scroll-padding: 12px;
+}
+.task-field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.task-field input {
+  height: 40px;
+  border-radius: 8px;
+}
+.task-field .task-title-input {
+  font-size: 16px;
+}
+.task-date-row {
+  gap: 6px;
+}
+.task-date-row input {
+  width: min(100%, 13rem);
+  font-size: 14px;
+}
+.task-clear {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: var(--muted-foreground);
+}
+.task-clear:enabled:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+.task-source {
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--muted);
+  text-decoration: none;
+  color: inherit;
+}
+.task-source:hover {
+  background: color-mix(in srgb, var(--primary) 8%, var(--muted));
+}
+.task-source-icon {
+  color: var(--muted-foreground);
+}
+.task-source-text {
+  min-width: 0;
+}
+.task-source-subject {
+  display: block;
+  line-height: 19px;
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.task-source-action {
+  gap: 2px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 500;
+}
+.task-source:hover .task-source-action {
+  text-decoration: underline;
+}
+.task-footer {
+  gap: 6px;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+.task-footer button {
+  min-height: 36px;
+  padding-inline: 16px;
+}
+.task-setup,
+.task-error {
+  font-size: 13px;
+  line-height: 1.45;
+}
+.task-setup {
+  color: var(--muted-foreground);
+}
+.task-error {
+  gap: 8px;
+  align-items: flex-start;
+  color: var(--destructive);
+}
+.task-error svg {
+  flex: none;
+  margin-top: 1px;
+}
+.task-result {
+  padding-block: 12px;
+}
+.task-result p {
+  font-size: 20px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.task-result time {
+  margin-top: 8px;
+  font-size: 14px;
+  gap: 8px;
+  color: var(--muted-foreground);
+}
+.task-dialog :is(a, button):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (max-width: 420px), (max-height: 395px) {
+  .task-header {
+    padding: 14px 16px 10px;
+  }
+  .task-body {
+    padding-inline: 16px;
+    gap: 12px;
+  }
+  .task-footer {
+    padding: 8px 12px;
+  }
+}

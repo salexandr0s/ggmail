@@ -32,13 +32,6 @@
 
 .all-mail-search-key {
   margin-inline-end: 0.6rem;
-  padding: 0.05rem 0.35rem;
-  border: 1px solid var(--border);
-  border-radius: 0.25rem;
-  color: var(--muted-foreground);
-  font:
-    0.7rem/1rem ui-monospace,
-    monospace;
 }
 
 .inbox-layout {
@@ -63,7 +56,7 @@
 }
 
 .inbox-account[data-unread] {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .inbox-account-icon {
@@ -195,7 +188,7 @@
 }
 
 .inbox-row:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--ring);
   outline-offset: -2px;
 }
 
@@ -233,8 +226,8 @@
 }
 
 .inbox-subject:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .inbox-row td:last-child {
@@ -297,7 +290,7 @@
 
 .all-mail-results [data-search-thread][aria-current="true"] {
   background: var(--selected);
-  box-shadow: inset 3px 0 var(--primary);
+  color: var(--selected-foreground);
 }
 
 @container (min-width: 50rem) {
@@ -434,7 +427,6 @@
     grid-area: account;
     min-width: 0;
     max-width: min(42cqi, 13rem);
-    border-radius: 999px;
   }
   .inbox-accounts {
     display: none;
@@ -448,7 +440,8 @@
     gap: 0.375rem;
     padding: 0.5rem 0.875rem;
   }
-  .inbox-panel-heading .mail-section-title {
+  .inbox-panel-heading .mail-section-title,
+  .all-mail-results > h2 {
     font-size: 1rem;
   }
   .inbox-pagination {

@@ -24,6 +24,9 @@ export class AssistantError extends Error {}
 
 class UnauthorizedError extends AssistantError {}
 
+/** The provider refused the request itself, for example a tool it does not offer. */
+export class RejectedRequestError extends AssistantError {}
+
 export function isUnauthorized(error: unknown) {
   return error instanceof UnauthorizedError;
 }
@@ -40,7 +43,8 @@ function providerError(
     if (status === 402 || status === 429) {
       return new AssistantError(t`Check your provider's balance or usage limits and try again.`);
     }
-    return new AssistantError(t`The AI provider couldn't complete the request. Try again.`);
+    const message = t`The AI provider couldn't complete the request. Try again.`;
+    return rejected(status) ? new RejectedRequestError(message) : new AssistantError(message);
   }
   if (status === 401) {
     return new UnauthorizedError(t`Your ChatGPT session expired. Sign in again.`);
@@ -53,7 +57,12 @@ function providerError(
       t`Your ChatGPT account or workspace hasn't enabled plan access for ggmail.`,
     );
   }
-  return new AssistantError(t`ChatGPT couldn't complete the request. Try again.`);
+  const message = t`ChatGPT couldn't complete the request. Try again.`;
+  return rejected(status) ? new RejectedRequestError(message) : new AssistantError(message);
+}
+
+function rejected(status: number) {
+  return status === 400 || status === 404 || status === 422;
 }
 
 export async function checkResponse(
@@ -167,10 +176,19 @@ const textSchema = z
   })
   .passthrough();
 
+// The provider runs web searches itself. Their records return to it unchanged.
+const webSearchSchema = z
+  .object({
+    type: z.literal("web_search_call"),
+    action: z.object({ type: z.string(), query: z.string().optional() }).passthrough().optional(),
+  })
+  .passthrough();
+
 const outputSchema = z.discriminatedUnion("type", [
   functionCallSchema,
   textSchema,
   z.object({ type: z.literal("reasoning") }).passthrough(),
+  webSearchSchema,
 ]);
 
 type Output = z.infer<typeof outputSchema>;
@@ -188,7 +206,7 @@ export type AssistantTool = {
   strict: true;
   parameters: {
     type: "object";
-    properties: Record<string, { type: "string" | "integer" }>;
+    properties: Record<string, { type: "string" | "integer" | "boolean"; description?: string }>;
     required: string[];
     additionalProperties: false;
   };
@@ -257,6 +275,7 @@ export async function readResponseStream(
   body: ReadableStream<Uint8Array>,
   onText: (text: string) => void,
   provider: ResponsesProvider = "chatgpt",
+  onSearch?: (query?: string) => void,
 ) {
   const streamedItems: unknown[] = [];
   const textBlocks: string[][] = [];
@@ -277,8 +296,15 @@ export async function readResponseStream(
         throw new AssistantError(t`The AI provider returned a response that is too large.`);
       }
       onText(text);
+    } else if (event.type === "response.web_search_call.searching") {
+      onSearch?.();
     } else if (event.type === "response.output_item.done") {
       streamedItems.push(event.item);
+      // The query is only known once the search has run.
+      const search = webSearchSchema.safeParse(event.item).data;
+      if (search?.action?.type === "search" && search.action.query) {
+        onSearch?.(search.action.query);
+      }
     } else if (event.type === "response.failed" || event.type === "error") {
       throw providerError(0, provider, event.code ?? event.response?.error?.code);
     } else if (event.type === "response.incomplete") {
@@ -331,6 +357,8 @@ export type ResponseOptions = {
   instructions: string;
   input: ResponseInput[];
   tools: AssistantTool[];
+  /** Set when the provider may search the web on this round. */
+  web?: { instructions: string; onSearch: (query?: string) => void };
   signal: AbortSignal;
   onText: (text: string) => void;
 };
@@ -353,24 +381,25 @@ export async function respond(
       body: JSON.stringify({
         model: options.model,
         instructions: options.instructions,
-        input:
-          provider === "chatgpt"
-            ? options.input
-            : options.input.map((item) => {
-                if ("type" in item && item.type === "function_call") {
-                  const { namespace: _, ...call } = item;
-                  return call;
-                }
-                return item;
-              }),
+        input: options.input.flatMap((item): object[] => {
+          // A round retried without web search cannot return its search records.
+          if (!options.web && "type" in item && item.type === "web_search_call") {
+            return [];
+          }
+          if (provider !== "chatgpt" && "type" in item && item.type === "function_call") {
+            const { namespace: _, ...call } = item;
+            return [call];
+          }
+          return [item];
+        }),
         // oxlint-disable-next-line lingui/no-unlocalized-strings -- OpenAI endpoint or request protocol text.
         ...(effort && { reasoning: { effort } }),
         ...(provider === "deepseek"
           ? {}
           : // oxlint-disable-next-line lingui/no-unlocalized-strings -- Responses API include field.
             { include: ["reasoning.encrypted_content"], store: false }),
-        tools:
-          provider === "chatgpt"
+        tools: [
+          ...(provider === "chatgpt" && options.tools.length > 0
             ? [
                 {
                   type: "namespace",
@@ -384,7 +413,9 @@ export async function respond(
               ]
             : options.tools.map(({ strict, ...tool }) =>
                 provider === "deepseek" ? tool : { ...tool, strict },
-              ),
+              )),
+          ...(options.web ? [{ type: "web_search" }] : []),
+        ],
         stream: true,
       }),
       signal: options.signal,
@@ -397,7 +428,7 @@ export async function respond(
     throw new AssistantError(t`The AI provider returned an empty response.`);
   }
 
-  return readResponseStream(response.body, options.onText, provider);
+  return readResponseStream(response.body, options.onText, provider, options.web?.onSearch);
 }
 
 export function apiHeaders(provider: ApiProvider, key: string): Record<string, string> {

@@ -1,0 +1,2007 @@
+{
+  "platformWords": {
+    "severity": "wrong",
+    "reason": "An entry with a platform msgctxt takes that platform's word from the style sheet's Platform words table.",
+    "rows": [
+      {
+        "row": "File",
+        "macOS": [
+          {
+            "word": "Αρχείο",
+            "source": "(AppKit `MenuCommands` `File`)",
+            "labels": ["File"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Αρχείο",
+            "source": "(TBX `7285_185699_346453`)",
+            "labels": ["File"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Αρχείο",
+            "source": "(gtk4 `File`)",
+            "labels": ["File"]
+          }
+        ]
+      },
+      {
+        "row": "View",
+        "macOS": [
+          {
+            "word": "Προβολή",
+            "source": "(AppKit `MenuCommands` `View`)",
+            "labels": ["View"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Προβολή",
+            "source": "(TBX `9201_185833_346587`)",
+            "labels": ["View"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Προβολή",
+            "source": "(nautilus `shortcuts dialog` `View`)",
+            "labels": ["View"]
+          }
+        ]
+      },
+      {
+        "row": "Edit, the menu",
+        "macOS": [
+          {
+            "word": "Επεξεργασία",
+            "source": "(Mail `MainMenu` `61.title`)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Επεξεργασία",
+            "source": "(TBX `9433_179566_228319` _Μενού \"Επεξεργασία\"_, the Edit menu)",
+            "labels": ["Edit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Επεξεργασία",
+            "source": "(gnome-control-center `Edit`)",
+            "labels": ["Edit"]
+          }
+        ]
+      },
+      {
+        "row": "Undo",
+        "macOS": [
+          {
+            "word": "Αναίρεση",
+            "source": "(Mail `MainMenu` `281.title`)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Αναίρεση",
+            "source": "(TBX `5274_168784_2731636` _αναιρώ_, as the action noun)",
+            "labels": ["Undo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Αναίρεση",
+            "source": "(gtk4 `_Undo`)",
+            "labels": ["Undo"]
+          }
+        ]
+      },
+      {
+        "row": "Redo",
+        "macOS": [
+          {
+            "word": "Επανάληψη",
+            "source": "(Mail `MainMenu` `282.title`)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Επανάληψη",
+            "source": "(TBX `10268_169412_169427`)",
+            "labels": ["Redo"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Επανάληψη",
+            "source": "(gtk4 `_Redo`)",
+            "labels": ["Redo"]
+          }
+        ]
+      },
+      {
+        "row": "Cut, `Cu&t`",
+        "macOS": [
+          {
+            "word": "Αποκοπή",
+            "source": "(AppKit `MenuCommands` `Cut`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Αποκοπή",
+            "source": "(TBX `1735_41913_41912`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Αποκοπή",
+            "source": "(gtk4 `Cu_t`)",
+            "labels": ["Cut", "Cu&t"]
+          }
+        ]
+      },
+      {
+        "row": "Copy, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Αντιγραφή",
+            "source": "(AppKit `MenuCommands` `Copy`)",
+            "labels": ["Copy"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Αντιγραφή",
+            "source": "(TBX `11991_39848_39847`)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Αντιγραφή",
+            "source": "(gtk4 `_Copy`)",
+            "labels": ["Copy", "&Copy"]
+          }
+        ]
+      },
+      {
+        "row": "Paste, `&Paste`",
+        "macOS": [
+          {
+            "word": "Επικόλληση",
+            "source": "(AppKit `MenuCommands` `Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Επικόλληση",
+            "source": "(TBX `11068_91030_2740604` _επικολλώ_, as the action noun)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Επικόλληση",
+            "source": "(gtk4 `_Paste`)",
+            "labels": ["Paste", "&Paste"]
+          }
+        ]
+      },
+      {
+        "row": "Paste and Match Style, `Paste and &Match Style`",
+        "macOS": [
+          {
+            "word": "Επικόλληση και αντιστοίχιση στιλ",
+            "source": "(AppKit `MenuCommands` `Paste and Match Style`)",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Επικόλληση και αντιστοίχιση μορφής",
+            "source": "inferred from TBX `11068_91030_2740604` and `5511_55836_55835` _μορφή_",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Επικόλληση και αντιστοίχιση στιλ",
+            "source": "inferred from gtk4 `_Paste`",
+            "labels": ["Paste and Match Style", "Paste and &Match Style"]
+          }
+        ]
+      },
+      {
+        "row": "Select All, `Select &All`",
+        "macOS": [
+          {
+            "word": "Επιλογή όλων",
+            "source": "(AppKit `MenuCommands` `Select All`)",
+            "labels": ["Select All"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Επιλογή όλων",
+            "source": "(TBX `10476_185277_346541`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Επιλογή όλων",
+            "source": "(gtk4 `Select _All`)",
+            "labels": ["Select All", "Select &All"]
+          }
+        ]
+      },
+      {
+        "row": "Delete, the Edit menu item",
+        "macOS": [
+          {
+            "word": "Διαγραφή",
+            "source": "(AppKit `MenuCommands` `Delete`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Διαγραφή",
+            "source": "(TBX `5396_185654_346436`)",
+            "labels": ["Delete"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Διαγραφή",
+            "source": "(gtk4 `_Delete`)",
+            "labels": ["Delete"]
+          }
+        ]
+      },
+      {
+        "row": "About {appName}",
+        "macOS": [
+          {
+            "word": "Πληροφορίες για το {appName}",
+            "source": "(Mail `MainMenu` `628.title`, _Πληροφορίες για το Mail_)",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Πληροφορίες για το {appName}",
+            "source": "inferred from TBX `6036_211259_326520` _Πληροφορίες_, the About menu item",
+            "labels": ["About {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Περί {appName}",
+            "source": "(gtk4 `About %s`)",
+            "labels": ["About {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Check for Updates…",
+        "macOS": [
+          {
+            "word": "Έλεγχος για ενημερώσεις…",
+            "source": "(Software Update `Check for Updates`)",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Έλεγχος για ενημερώσεις…",
+            "source": "inferred from TBX `1821_4592_4610` _ενημέρωση_",
+            "labels": ["Check for Updates…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Έλεγχος για ενημερώσεις…",
+            "source": "inferred from gtk4 `Show Graphic Updates`, _Εμφάνιση ενημερώσεων γραφικών_",
+            "labels": ["Check for Updates…"]
+          }
+        ]
+      },
+      {
+        "row": "Settings, the app-menu item",
+        "macOS": [
+          {
+            "word": "Ρυθμίσεις…",
+            "source": "(AppKit `MenuCommands` `Settings\\U2026`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Ρυθμίσεις…",
+            "source": "(TBX `21910_780478_1052547`)",
+            "labels": ["Settings…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ρυθμίσεις…",
+            "source": "(gtk4 `Settings`)",
+            "labels": ["Settings…"]
+          }
+        ]
+      },
+      {
+        "row": "Compose, the File menu item",
+        "macOS": [
+          {
+            "word": "Νέο μήνυμα",
+            "source": "(Mail `MainMenu` `374.title`, New Message)",
+            "labels": ["Compose"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Νέα αλληλογραφία",
+            "source": "inferred: TBX `34677_1998714_2001799` gives _νέα αλληλογραφία_ for mail received",
+            "labels": ["Compose"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Νέο μήνυμα",
+            "source": "inferred from nautilus `New _Window`, _Νέο παράθυρο_",
+            "labels": ["Compose"]
+          }
+        ]
+      },
+      {
+        "row": "Save As, in `Sa&ve Image As…` and the Save As dialog",
+        "macOS": [
+          {
+            "word": "Αποθήκευση ως",
+            "source": "(Mail `MainMenu` `367.title`, `Save As…`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Αποθήκευση εικόνας ως…",
+            "source": "inferred with Mail `Localizable` `CopyImageMenuItem`, _Αντιγραφή εικόνας_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Αποθήκευση ως",
+            "source": "(TBX `12985_534974_536980`)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Αποθήκευση εικόνας ως…",
+            "source": "inferred with TBX `1294_64520_64519` _εικόνα_",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Αποθήκευση ως",
+            "source": "(gnome-text-editor `Save _As…`, its ellipsis dropped where a sentence names the dialog)",
+            "sentences": ["Show Save As dialog before downloading"]
+          },
+          {
+            "word": "Αποθήκευση εικόνας ως…",
+            "source": "inferred",
+            "labels": ["Sa&ve Image As…"]
+          }
+        ]
+      },
+      {
+        "row": "Export, the save dialog's button",
+        "macOS": [
+          {
+            "word": "Εξαγωγή",
+            "source": "(AppKit `Document` `Export`)",
+            "labels": ["Export"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Εξαγωγή",
+            "source": "(TBX `7948_52504_2242765` _εξάγω_, as the action noun)",
+            "labels": ["Export"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Εξαγωγή",
+            "source": "inferred: no GNOME source has it",
+            "labels": ["Export"]
+          }
+        ]
+      },
+      {
+        "row": "Shift, the key",
+        "macOS": [
+          {
+            "word": "Shift",
+            "source": "(AppKit `FunctionKeyNames` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Shift",
+            "source": "(TBX `3412_112291_112290` _Πλήκτρο SHIFT_, short as the glossary's Keyboard keys gives it)",
+            "labels": ["Shift"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Shift",
+            "source": "(gtk4 `keyboard label` `Shift`)",
+            "labels": ["Shift"]
+          }
+        ]
+      },
+      {
+        "row": "Show ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Εμφάνιση ggmail",
+            "source": "(AppKit `Common` `Show`, _Εμφάνιση_)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Εμφάνιση ggmail",
+            "source": "(TBX `19508_660023_2728924` _εμφανίζω_, as the action noun)",
+            "labels": ["Show ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Προβολή ggmail",
+            "source": "(gtk4 `Show`, _Προβολή_)",
+            "labels": ["Show ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Hide ggmail, the tray item",
+        "macOS": [
+          {
+            "word": "Απόκρυψη ggmail",
+            "source": "(Mail `MainMenu` `632.title`, _Απόκρυψη Mail_)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Απόκρυψη ggmail",
+            "source": "(TBX `20202_719546_1105798` _αποκρύπτω_, as the action noun)",
+            "labels": ["Hide ggmail"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Απόκρυψη ggmail",
+            "source": "(gtk4 `Hide %s`)",
+            "labels": ["Hide ggmail"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, the tray item",
+        "macOS": "macOS shows the menu's Quit {appName}",
+        "Windows": [
+          {
+            "word": "Έξοδος",
+            "source": "(TBX `11976_185681_346449`, the Exit item of a taskbar icon's menu)",
+            "labels": ["Exit"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Έξοδος",
+            "source": "(nautilus `shortcuts dialog` `Quit`)",
+            "labels": ["Quit"]
+          }
+        ]
+      },
+      {
+        "row": "Quit, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Τερματισμός",
+            "source": "(AppKit `Document` `Quit`)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Έξοδος",
+            "source": "(TBX `24498_1133557_1364499`)",
+            "labels": ["Quit"]
+          }
+        ],
+        "Linux": "one message with the tray item's Quit, its word above"
+      },
+      {
+        "row": "System tray, in the Appearance settings",
+        "macOS": "macOS shows the menu bar instead: _γραμμή μενού_",
+        "Windows": [
+          {
+            "word": "συστήματος",
+            "source": "the genitive every case of _περιοχή συστήματος_ keeps (TBX `55084_3122863_3122880`, system tray; TBX `10299_85657_85656` gives _περιοχή ειδοποιήσεων_ and `10299_85657_318911` _περιοχή κατάστασης_ for the notification area)",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "συστήματος",
+            "source": "the genitive of _περιοχή συστήματος_, inferred: GNOME has no tray; TBX `55084_3122863_3122880` gives it for the system tray",
+            "sentences": [
+              "Enable system tray icon",
+              "System tray icon",
+              "Choose the color of the system tray icon.",
+              "Show the application icon in the system tray.",
+              "Automatically select the first account with unread emails when clicking the system tray icon."
+            ]
+          }
+        ]
+      },
+      {
+        "row": "Hide {appName}",
+        "macOS": [
+          {
+            "word": "Απόκρυψη {appName}",
+            "source": "(Mail `MainMenu` `632.title`, _Απόκρυψη Mail_)",
+            "labels": ["Hide {appName}"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Hide Others",
+        "macOS": [
+          {
+            "word": "Απόκρυψη άλλων",
+            "source": "(Mail `MainMenu` `622.title`)",
+            "labels": ["Hide Others"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show All",
+        "macOS": [
+          {
+            "word": "Εμφάνιση όλων",
+            "source": "(Mail `MainMenu` `625.title`)",
+            "labels": ["Show All"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Quit {appName}",
+        "macOS": [
+          {
+            "word": "Τερματισμός {appName}",
+            "source": "(Mail `MainMenu` `631.title`, _Τερματισμός Mail_)",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Έξοδος από το {appName}",
+            "source": "inferred from TBX `11976_185681_346449` _Έξοδος_, the Exit menu item",
+            "labels": ["Quit {appName}"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Έξοδος του {appName}",
+            "source": "(gtk4 `Quit %s`)",
+            "labels": ["Quit {appName}"]
+          }
+        ]
+      },
+      {
+        "row": "Close Window",
+        "macOS": [
+          {
+            "word": "Κλείσιμο παραθύρου",
+            "source": "(AppKit `MenuCommands` `Close Window`)",
+            "labels": ["Close Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Window, the menu",
+        "macOS": [
+          {
+            "word": "Παράθυρο",
+            "source": "(AppKit `MenuCommands` `Window`)",
+            "labels": ["Window"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Minimize",
+        "macOS": [
+          {
+            "word": "Ελαχιστοποίηση",
+            "source": "(AppKit `MenuCommands` `Minimize`)",
+            "labels": ["Minimize"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Zoom, the window",
+        "macOS": [
+          {
+            "word": "Ζουμ",
+            "source": "(Mail `MainMenu` `295.title`)",
+            "labels": ["Zoom"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Bring All to Front",
+        "macOS": [
+          {
+            "word": "Μεταφορά όλων σε πρώτο πλάνο",
+            "source": "(AppKit `MenuCommands` `Bring All to Front`)",
+            "labels": ["Bring All to Front"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Speech",
+        "macOS": [
+          {
+            "word": "Εκφώνηση",
+            "source": "(Mail `MainMenu` `1535.title`)",
+            "labels": ["Speech"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Start Speaking",
+        "macOS": [
+          {
+            "word": "Έναρξη εκφώνησης",
+            "source": "(Mail `MainMenu` `1536.title`)",
+            "labels": ["Start Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Stop Speaking",
+        "macOS": [
+          {
+            "word": "Διακοπή εκφώνησης",
+            "source": "(Mail `MainMenu` `1537.title`)",
+            "labels": ["Stop Speaking"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Look Up “{selection}”",
+        "macOS": [
+          {
+            "word": "Διερεύνηση «{selection}»",
+            "source": "(AppKit `MenuCommands` `Look Up \\U201C%@\\U201D`)",
+            "labels": ["Look Up “{selection}”"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Show in Finder",
+        "macOS": [
+          {
+            "word": "Εμφάνιση στο Finder",
+            "source": "(Mail `Preferences` `ShowExtensionApplicationInFinder`)",
+            "labels": ["Show in Finder"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "OK, a native dialog's button",
+        "macOS": [
+          {
+            "word": "OK",
+            "source": "(AppKit `Common` `OK`, in Latin letters; Mail's `Alerts` `OKButton` writes it in Greek letters)",
+            "labels": ["OK"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "OK",
+            "source": "(TBX `43243_2447290_3128456`, the dialog button)",
+            "labels": ["OK"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Εντάξει",
+            "source": "(gtk4 `_OK`, its access key dropped)",
+            "labels": ["OK"]
+          }
+        ]
+      },
+      {
+        "row": "Learn Spelling, `&Learn Spelling`",
+        "macOS": [
+          {
+            "word": "Εκμάθηση ορθογραφίας",
+            "source": "(AppKit `MenuCommands` `Learn Spelling`)",
+            "labels": ["&Learn Spelling"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Search with Google, `&Search with Google`",
+        "macOS": [
+          {
+            "word": "Αναζήτηση με Google",
+            "source": "(AppKit `MenuCommands` `Search with %@`)",
+            "labels": ["&Search with Google"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy, `&Copy`",
+        "macOS": [
+          {
+            "word": "Αντιγραφή",
+            "source": "(AppKit `MenuCommands` `Copy`)",
+            "labels": ["&Copy"]
+          }
+        ],
+        "Windows": "the Edit menu item's word, with its access key",
+        "Linux": "the Edit menu item's word, with its access key"
+      },
+      {
+        "row": "Copy Link Address, `Copy Link Addr&ess`",
+        "macOS": [
+          {
+            "word": "Αντιγραφή συνδέσμου",
+            "source": "(AppKit `MenuCommands` `Copy Link`, as WebKit `Localizable` `Copy Link` has it, Safari's item for a link)",
+            "labels": ["Copy Link Addr&ess"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image, `Cop&y Image`",
+        "macOS": [
+          {
+            "word": "Αντιγραφή εικόνας",
+            "source": "(Mail `Localizable` `CopyImageMenuItem`)",
+            "labels": ["Cop&y Image"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Copy Image Address, `C&opy Image Address`",
+        "macOS": [
+          {
+            "word": "Αντιγραφή διεύθυνσης εικόνας",
+            "source": "inferred from Mail `Localizable` `CopyImageMenuItem` and Mail `Alerts` `CopyAddress`, _Αντιγραφή διεύθυνσης_",
+            "labels": ["C&opy Image Address"]
+          }
+        ],
+        "Windows": "the house word, with its access key",
+        "Linux": "the house word, with its access key"
+      },
+      {
+        "row": "Help, the menu",
+        "macOS": [
+          {
+            "word": "Βοήθεια",
+            "source": "(AppKit `MenuCommands` `Help`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Βοήθεια",
+            "source": "(TBX `13846_61010_61008`)",
+            "labels": ["Help"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Βοήθεια",
+            "source": "(nautilus `_Help`)",
+            "labels": ["Help"]
+          }
+        ]
+      },
+      {
+        "row": "Close, the File menu item",
+        "macOS": "macOS shows Close Window",
+        "Windows": [
+          {
+            "word": "Κλείσιμο",
+            "source": "(TBX `26514_1275570_1340750`)",
+            "labels": ["Close"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Κλείσιμο",
+            "source": "(gtk4 `_Close`)",
+            "labels": ["Close"]
+          }
+        ]
+      },
+      {
+        "row": "Share, the share menu",
+        "macOS": [
+          {
+            "word": "Κοινή χρήση",
+            "source": "(AppKit `MenuCommands` `Share`)",
+            "labels": ["Share"]
+          }
+        ],
+        "Windows": "macOS only",
+        "Linux": "macOS only"
+      },
+      {
+        "row": "Cancel, a native dialog's button",
+        "macOS": [
+          {
+            "word": "Ακύρωση",
+            "source": "(AppKit `Common` `Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Windows": [
+          {
+            "word": "Άκυρο",
+            "source": "(TBX `20151_705248_775060`)",
+            "labels": ["Cancel"]
+          }
+        ],
+        "Linux": [
+          {
+            "word": "Ακύρωση",
+            "source": "(gtk4 `_Cancel`)",
+            "labels": ["Cancel"]
+          }
+        ]
+      }
+    ]
+  },
+  "banned": [
+    {
+      "id": "gnostopoiisi",
+      "pattern": "[Γγ]νωστοπο[ιί]",
+      "severity": "wrong",
+      "reason": "A notification is an ειδοποίηση, as Chrome writes it; γνωστοποίηση is Apple's word, for a macOS label only (Chrome writes the banned form in none of its messages).",
+      "allow": {
+        "contexts": ["macOS"]
+      }
+    },
+    {
+      "id": "adranopoiisi",
+      "pattern": "[Αα]δρανοπο[ιί]",
+      "severity": "wrong",
+      "reason": "A hibernated tab is an ανενεργή καρτέλα, Chrome's word for the tabs its Memory Saver unloads, never αδρανοποίηση, the operating system's word for sleep (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "katalogos",
+      "pattern": "(?<!\\p{L})[Κκ]ατ[αά]λ[οό]γ\\p{L}*",
+      "severity": "wrong",
+      "reason": "A folder is a φάκελος, as Chrome writes it, never κατάλογος (Chrome writes the banned form in 18 messages)."
+    },
+    {
+      "id": "email-latin",
+      "pattern": "(?<![\\p{L}@.{])[Ee]-?mail(?![\\p{L}}])",
+      "severity": "wrong",
+      "reason": "Email is ηλεκτρονικό ταχυδρομείο, as Chrome writes it, and one email is a μήνυμα, as Gmail writes it, never the Latin email or e-mail (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "styl",
+      "pattern": "[Σσ]τυλ",
+      "severity": "wrong",
+      "reason": "Style is στιλ, as Chrome and Apple spell it, never στυλ (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "informal-address",
+      "pattern": "(?<!\\p{L})(?:[Εε]σύ|[Εε]σένα|[Σσ]ου)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "The user is addressed in the formal plural, εσείς and σας, never εσύ, εσένα or σου (Chrome writes the banned form in 29 messages)."
+    },
+    {
+      "id": "quotes",
+      "pattern": "[\"“”„]",
+      "severity": "wrong",
+      "reason": "Quotation marks are «…» (U+00AB, U+00BB), as Apple writes them (Chrome writes the banned form in 162 messages)."
+    },
+    {
+      "id": "question-mark",
+      "pattern": "[?\\u037e]",
+      "severity": "wrong",
+      "reason": "A Greek question ends in the semicolon, ; (U+003B), never the Latin question mark or U+037E, which fonts and searches treat as another character (Chrome writes the banned form in 5 messages)."
+    },
+    {
+      "id": "final-sigma",
+      "pattern": "(?<=\\p{L})σ(?![\\p{L}.])|ς(?=\\p{L})",
+      "severity": "wrong",
+      "reason": "A word ends in the final sigma, ς, and has σ everywhere else (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "caps-tonos",
+      "pattern": "[ΆΈΉΊΌΎΏ]\\p{Lu}|\\p{Lu}[ΆΈΉΊΌΎΏ]",
+      "severity": "wrong",
+      "reason": "A word set in capitals carries no tonos: ΡΥΘΜΙΣΕΙΣ, never ΡΥΘΜΊΣΕΙΣ (Chrome writes the banned form in none of its messages)."
+    },
+    {
+      "id": "three-dots",
+      "pattern": "\\.\\.\\.",
+      "severity": "wrong",
+      "reason": "An ellipsis is one character, …, never three full stops."
+    },
+    {
+      "id": "ellipsis-space",
+      "pattern": "[ \\u00a0]…",
+      "severity": "wrong",
+      "reason": "An ellipsis follows the word without a space: Ρυθμίσεις…"
+    },
+    {
+      "id": "apology",
+      "pattern": "(?<!\\p{L})(?:[Λλ]υπούμαστε|[Λλ]υπάμαι|[Σσ]υγγνώμη|[Δδ]υστυχώς)(?!\\p{L})",
+      "severity": "style",
+      "reason": "Say what happened, without Λυπούμαστε, Συγγνώμη or Δυστυχώς."
+    }
+  ],
+  "pinned": [
+    {
+      "id": "download-history",
+      "msgidPattern": "\\bdownload history\\b",
+      "expect": "[Ιι]στορικ\\p{L}* (?:πρ[οό]σφατων )?λ[ηή]ψ",
+      "severity": "wrong",
+      "reason": "The download history is the ιστορικό λήψεων, as Chrome writes it (Chrome: 10 of 10 messages).",
+      "example": {
+        "msgid": "Download history",
+        "clean": "Ιστορικό λήψεων",
+        "fault": "Ληφθέντα αρχεία"
+      }
+    },
+    {
+      "id": "bookmark",
+      "msgidPattern": "\\bbookmarks?\\b",
+      "expect": "[Σσ]ελιδοδ[εέ][ιί]κτ",
+      "severity": "wrong",
+      "reason": "A bookmark is a σελιδοδείκτης, as Chrome writes it (Chrome: 163 of 163 messages).",
+      "example": {
+        "msgid": "No bookmarks yet",
+        "clean": "Δεν υπάρχουν ακόμη σελιδοδείκτες",
+        "fault": "Δεν υπάρχουν ακόμη αγαπημένα"
+      }
+    },
+    {
+      "id": "notification",
+      "msgidPattern": "(?!Notifications$).*\\bnotifications?\\b",
+      "expect": "[Εε]ιδοπο[ιί]",
+      "countEnglish": "\\bnotifications?\\b",
+      "severity": "wrong",
+      "reason": "A notification is an ειδοποίηση, as Chrome writes it (Chrome: 132 of 132 messages). The bare Notifications is also the toasts' region, whose word the glossary leaves open, so this rule passes it by.",
+      "example": {
+        "msgid": "Show a notification when a download finishes.",
+        "clean": "Εμφάνιση ειδοποίησης όταν ολοκληρωθεί μια λήψη.",
+        "fault": "Εμφάνιση μηνύματος όταν ολοκληρωθεί μια λήψη."
+      }
+    },
+    {
+      "id": "extension",
+      "msgidPattern": "\\bextensions?\\b",
+      "expect": "[Εε]π[εέ]κτ[αά]σ",
+      "severity": "wrong",
+      "reason": "An extension is an επέκταση, as Chrome writes it (Chrome: 303 of 304 messages).",
+      "example": {
+        "msgid": "Extensions",
+        "clean": "Επεκτάσεις",
+        "fault": "Πρόσθετα"
+      }
+    },
+    {
+      "id": "tab-strip",
+      "msgidPattern": "\\btab strip\\b",
+      "expect": "[Γγ]ραμμ\\p{L}* καρτελ[ωώ]ν",
+      "severity": "wrong",
+      "reason": "The tab strip is the γραμμή καρτελών, as Chrome writes it (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Narrow the tab strip",
+        "clean": "Στένεμα της γραμμής καρτελών",
+        "fault": "Στένεμα της λωρίδας καρτελών"
+      }
+    },
+    {
+      "id": "do-not-disturb",
+      "msgidPattern": "\\bdo not disturb\\b",
+      "expect": "Μην ενοχλείτε",
+      "severity": "wrong",
+      "reason": "Do Not Disturb is Apple's Μην ενοχλείτε, the operating system's own name for it, quoted «…» inside a label or a sentence (Chrome: 6 of 6 messages).",
+      "example": {
+        "msgid": "Turn Do Not Disturb on",
+        "clean": "Ενεργοποίηση «Μην ενοχλείτε»",
+        "fault": "Ενεργοποίηση αθόρυβης λειτουργίας"
+      }
+    },
+    {
+      "id": "titlebar",
+      "msgidPattern": "\\btitle ?bar\\b",
+      "expect": "[Γγ]ραμμ\\p{L}* τ[ιί]τλου",
+      "severity": "wrong",
+      "reason": "The titlebar is the γραμμή τίτλου, as Chrome writes it (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Titlebar",
+        "clean": "Γραμμή τίτλου",
+        "fault": "Μπάρα τίτλου"
+      }
+    },
+    {
+      "id": "button",
+      "msgidPattern": "\\bbuttons?\\b",
+      "expect": "[Κκ]ουμπ",
+      "severity": "wrong",
+      "reason": "A button drawn on screen is a κουμπί, as Chrome writes it; πλήκτρο is a key on the keyboard (Chrome: 141 of 141 messages).",
+      "example": {
+        "msgid": "Show Do Not Disturb button",
+        "clean": "Εμφάνιση κουμπιού «Μην ενοχλείτε»",
+        "fault": "Εμφάνιση πλήκτρου «Μην ενοχλείτε»"
+      }
+    },
+    {
+      "id": "password-manager",
+      "msgidPattern": "\\bpassword managers?\\b",
+      "expect": "[Δδ]ιαχε[ιί]ρισ\\p{L}* κωδικ[ωώ]ν πρ[οό]σβασης",
+      "severity": "wrong",
+      "reason": "A password manager is a διαχείριση κωδικών πρόσβασης, the program a διαχειριστής κωδικών πρόσβασης, as Chrome writes them, a password being a κωδικός πρόσβασης in full (Chrome: 77 of 77 messages).",
+      "example": {
+        "msgid": "Password managers",
+        "fault": "Διαχειριστές κωδικών"
+      }
+    },
+    {
+      "id": "passkey",
+      "msgidPattern": "\\bpasskeys?\\b",
+      "expect": "[Κκ]λειδ\\p{L}* πρ[οό]σβασης",
+      "severity": "wrong",
+      "reason": "A passkey is a κλειδί πρόσβασης, as Chrome writes it (Chrome: 103 of 106 messages).",
+      "example": {
+        "msgid": "Only passkeys created in ggmail work here.",
+        "clean": "Εδώ λειτουργούν μόνο κλειδιά πρόσβασης που έχουν δημιουργηθεί στο ggmail.",
+        "fault": "Εδώ λειτουργούν μόνο passkeys που έχουν δημιουργηθεί στο ggmail."
+      }
+    },
+    {
+      "id": "default-browser",
+      "msgidPattern": "\\bdefault browser\\b",
+      "expect": "[Ππ]ροεπιλεγμ[εέ]ν\\p{L}* πρ[οό]γρ[αά]μμα\\p{L}* περι[ηή]γησης",
+      "severity": "wrong",
+      "reason": "The default browser is the προεπιλεγμένο πρόγραμμα περιήγησης, as Chrome writes it (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Open in Default Browser",
+        "clean": "Άνοιγμα στο προεπιλεγμένο πρόγραμμα περιήγησης",
+        "fault": "Άνοιγμα στον προεπιλεγμένο browser"
+      }
+    },
+    {
+      "id": "update",
+      "msgctxt": null,
+      "msgidPattern": "\\bupdat(?:e|es|ed|ing)\\b",
+      "expect": "[Εε]νημ[εέ]ρ[ωώ]",
+      "severity": "wrong",
+      "reason": "An update is an ενημέρωση, and updating is ενημερώνω, as Chrome writes them. A platform label takes its platform's word instead (Chrome: 233 of 234 messages).",
+      "example": {
+        "msgid": "Update available",
+        "clean": "Διαθέσιμη ενημέρωση",
+        "fault": "Διαθέσιμη αναβάθμιση"
+      }
+    },
+    {
+      "id": "restart",
+      "msgidPattern": "\\brestart",
+      "expect": "[Εε]πανεκκ[ιί]ν",
+      "severity": "wrong",
+      "reason": "Restarting is επανεκκίνηση, as Chrome writes it (Chrome: 46 of 47 messages).",
+      "example": {
+        "msgid": "Restart now",
+        "clean": "Επανεκκίνηση τώρα",
+        "fault": "Επανέναρξη τώρα"
+      }
+    },
+    {
+      "id": "menu-bar",
+      "msgidPattern": "\\bmenu bar\\b",
+      "expect": "[Γγ]ραμμ\\p{L}* μενο[υύ]",
+      "severity": "wrong",
+      "reason": "The menu bar is Apple's γραμμή μενού, the name of macOS's own bar, in ggmail's own copy too (ControlCenterSettings.appex Localizable Show in Menu Bar; Chrome: 3 of 3 messages).",
+      "example": {
+        "msgid": "Menu bar icon",
+        "clean": "Εικονίδιο γραμμής μενού",
+        "fault": "Εικονίδιο μενού"
+      }
+    },
+    {
+      "id": "verification-code",
+      "msgidPattern": "\\bverification codes?\\b",
+      "expect": "[Κκ]ωδικ\\p{L}* επαλ[ηή]θευσης",
+      "severity": "wrong",
+      "reason": "A verification code is a κωδικός επαλήθευσης, as Chrome writes it (Chrome: 7 of 7 messages).",
+      "example": {
+        "msgid": "Verification code",
+        "clean": "Κωδικός επαλήθευσης",
+        "fault": "Κωδικός επιβεβαίωσης"
+      }
+    },
+    {
+      "id": "device-label",
+      "msgidPattern": "\\bdevice label\\b",
+      "expect": "[ΌόΟο]ν[οό]μ[αά]\\p{L}* (?:της )?συσκευής",
+      "countEnglish": "\\bdevice name\\b",
+      "severity": "wrong",
+      "reason": "A device label is an όνομα συσκευής, as Chrome writes a device name (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Device label",
+        "clean": "Όνομα συσκευής",
+        "fault": "Ετικέτα συσκευής"
+      }
+    },
+    {
+      "id": "spellcheck",
+      "msgidPattern": "\\bspell ?check",
+      "expect": "[Οο]ρθογραφικ\\p{L}* [εέ]λ[εέ]γχ",
+      "severity": "wrong",
+      "reason": "The spellchecker is the ορθογραφικός έλεγχος, as Chrome writes it (Chrome: 22 of 23 messages).",
+      "example": {
+        "msgid": "Spellchecker",
+        "clean": "Ορθογραφικός έλεγχος",
+        "fault": "Διορθωτής ορθογραφίας"
+      }
+    },
+    {
+      "id": "dark-theme",
+      "msgidPattern": "\\bdark theme\\b",
+      "expect": "[Σσ]κο[υύ]ρ\\p{L}* θ[εέ]μα",
+      "severity": "wrong",
+      "reason": "The dark theme is the σκούρο θέμα, as Chrome writes it (Chrome: 5 of 5 messages).",
+      "example": {
+        "msgid": "Extend dark theme",
+        "clean": "Επέκταση σκούρου θέματος",
+        "fault": "Επέκταση σκοτεινής λειτουργίας"
+      }
+    },
+    {
+      "id": "trusted-hosts",
+      "msgidPattern": "\\b(?:un)?trusted hosts?\\b",
+      "expect": "[Αα]ξι[οό]πιστ\\p{L}* κεντρικ\\p{L}* υπολογιστ",
+      "countEnglish": "\\btrusted\\b",
+      "countExpect": "αξι[οό]πιστ",
+      "severity": "wrong",
+      "reason": "Trusted hosts are αξιόπιστοι κεντρικοί υπολογιστές, as Chrome writes trusted (Chrome: 18 of 22 messages) with its word for a host, κεντρικός υπολογιστής; an ιστότοπος is a site, which a host is not.",
+      "example": {
+        "msgid": "Trusted hosts",
+        "fault": "Αξιόπιστοι ιστότοποι"
+      }
+    },
+    {
+      "id": "release-channel",
+      "msgidPattern": "\\bchannel\\b",
+      "expect": "[Κκ]αν[αά]λ",
+      "severity": "wrong",
+      "reason": "A release channel is a κανάλι, as Chrome writes it in its own Update channel, Κανάλι ενημέρωσης (Chrome: 11 of 11 messages).",
+      "example": {
+        "msgid": "Release channel",
+        "clean": "Κανάλι ενημέρωσης",
+        "fault": "Έκδοση κυκλοφορίας"
+      }
+    },
+    {
+      "id": "link",
+      "msgidPattern": "\\blinks?\\b",
+      "expect": "[Σσ][υύ]νδ[εέ]σμ",
+      "severity": "wrong",
+      "reason": "A link is a σύνδεσμος, as Chrome writes it (Chrome: 146 of 164 messages; the rest are the name Family Link, the verb, an abbreviation and an attribute).",
+      "example": {
+        "msgid": "Copy link",
+        "clean": "Αντιγραφή συνδέσμου",
+        "fault": "Αντιγραφή διεύθυνσης URL"
+      }
+    },
+    {
+      "id": "clipboard",
+      "msgidPattern": "\\bclipboard\\b",
+      "expect": "[Ππ]ρ[οό]χειρ",
+      "severity": "wrong",
+      "reason": "The clipboard is the πρόχειρο, as Chrome writes it (Chrome: 41 of 44 messages).",
+      "example": {
+        "msgid": "Copy codes to clipboard",
+        "clean": "Αντιγραφή κωδικών στο πρόχειρο",
+        "fault": "Αντιγραφή κωδικών στη μνήμη"
+      }
+    },
+    {
+      "id": "folder",
+      "msgidPattern": "\\bfolders?\\b",
+      "expect": "[Φφ][αά]κ[εέ]λ",
+      "severity": "wrong",
+      "reason": "A folder is a φάκελος, as Chrome writes it (Chrome: 104 of 104 messages).",
+      "example": {
+        "msgid": "Open folder when done",
+        "clean": "Άνοιγμα φακέλου μετά την ολοκλήρωση",
+        "fault": "Άνοιγμα καταλόγου μετά την ολοκλήρωση"
+      }
+    },
+    {
+      "id": "save",
+      "msgctxt": null,
+      "msgid": "Save",
+      "expect": "^Αποθήκευση$",
+      "countEnglish": "^Save$",
+      "severity": "wrong",
+      "reason": "Save is Αποθήκευση, as Chrome writes its Save button (Chrome: 2 of 2 messages).",
+      "example": {
+        "fault": "Φύλαξη"
+      }
+    },
+    {
+      "id": "saved-search",
+      "msgidPattern": "\\bsaved search(?:es)?\\b",
+      "expect": "[Αα]ποθηκευμ[εέ]ν\\p{L}* αναζ[ηή]τ[ηή]σ",
+      "countEnglish": "\\bsaved\\b",
+      "countExpect": "αποθηκε[υύ]",
+      "severity": "wrong",
+      "reason": "A saved search is an αποθηκευμένη αναζήτηση, built on Chrome's words for saved (Chrome: 284 of 289 messages) and for a search, αναζήτηση; Chrome's one saved search message names saved search engines.",
+      "example": {
+        "msgid": "Add saved search",
+        "clean": "Προσθήκη αποθηκευμένης αναζήτησης",
+        "fault": "Προσθήκη αγαπημένης αναζήτησης"
+      }
+    },
+    {
+      "id": "upgrade",
+      "msgidPattern": "\\bupgrad(?:e|es|ed|ing)\\b",
+      "expect": "[Αα]ναβ[αά]θμ",
+      "severity": "wrong",
+      "reason": "An upgrade is an αναβάθμιση, as Chrome writes it (Chrome: 15 of 15 messages).",
+      "example": {
+        "msgid": "Hide upgrade button",
+        "clean": "Απόκρυψη κουμπιού αναβάθμισης",
+        "fault": "Απόκρυψη κουμπιού ενημέρωσης"
+      }
+    },
+    {
+      "id": "gmail-label",
+      "msgctxt": "Gmail label",
+      "msgidPattern": "\\blabel\\b",
+      "expect": "[Εε]τικ[εέ]τ",
+      "severity": "wrong",
+      "reason": "A Gmail label is Gmail's ετικέτα (glossary).",
+      "example": {
+        "msgid": "Label",
+        "clean": "Ετικέτα",
+        "fault": "Σήμανση"
+      }
+    },
+    {
+      "id": "unread-badge",
+      "msgctxt": null,
+      "msgidPattern": "\\bunread badges?\\b",
+      "expect": "(?<!\\p{L})[Σσ](?:ήμα(?:τος|τα)?|ημάτων)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count: the unread badge is σήμα, counted as ggmail uses it, an unread count on an app icon (the apps tie, Thunderbird σήμα, Microsoft ένδειξη, Apple ταμπέλα; Google has no word for a count; the direct matches split, Thunderbird's App icon badge, Σήμα εικονιδίου εφαρμογής, and Apple's unread badge, ταμπέλα «μη αναγνωσμένα», so the existing σήμα stays).",
+      "example": {
+        "msgid": "Show unread badge",
+        "clean": "Εμφάνιση σήματος μη αναγνωσμένων",
+        "fault": "Εμφάνιση μετρητή μη αναγνωσμένων"
+      }
+    },
+    {
+      "id": "app-links-badge",
+      "msgidPattern": "\\bapp links badge\\b",
+      "expect": "(?<!\\p{L})[Σσ](?:ήμα(?:τος|τα)?|ημάτων)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count: the badge that marks the app links tab takes the unread badge's word, σήμα, which names a badge of either kind (σήμα: 2 of 7 (Thunderbird, Microsoft), thin, LibreOffice έμβλημα, Apple ταμπέλα; Chrome has no badge message).",
+      "example": {
+        "msgid": "Show app links badge",
+        "clean": "Εμφάνιση σήματος συνδέσμων εφαρμογής",
+        "fault": "Εμφάνιση ένδειξης συνδέσμων εφαρμογής"
+      }
+    },
+    {
+      "id": "ggmail-label",
+      "msgctxt": null,
+      "msgid": "Label",
+      "expect": "[Όό]νομα",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (όνομα: 6 of 7).",
+      "example": {
+        "clean": "Όνομα",
+        "fault": "Ετικέτα"
+      }
+    },
+    {
+      "id": "ggmail-label-prompt",
+      "msgctxt": "saved search",
+      "msgid": "Enter a label",
+      "expect": "[Όό]νομα",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (όνομα: 6 of 7).",
+      "example": {
+        "clean": "Εισαγάγετε ένα όνομα",
+        "fault": "Εισαγάγετε μια ετικέτα"
+      }
+    },
+    {
+      "id": "out-of-office",
+      "msgidPattern": "\\bout[- ]of[- ]office\\b",
+      "expect": "[Αα]υτ[οό]ματ\\p{L}* απ[αά]ντησ",
+      "severity": "wrong",
+      "reason": "Out of office is Gmail's αυτόματη απάντηση, as Gmail Help names its vacation responder, Αυτόματη απάντηση (support.google.com/mail/answer/25922?hl=el), never ειδοποίηση απουσίας.",
+      "example": {
+        "msgid": "Open Gmail settings to turn off out of office",
+        "fault": "Άνοιγμα ρυθμίσεων Gmail για απενεργοποίηση της ειδοποίησης απουσίας"
+      }
+    },
+    {
+      "id": "multiple-inboxes",
+      "msgidPattern": "\\bmultiple inboxes\\b",
+      "expect": "[Ππ]ολλαπλ\\p{L}* εισερχ[οό]μ[εέ]ν",
+      "severity": "wrong",
+      "reason": "Multiple inboxes is Gmail's πολλαπλά εισερχόμενα, as Gmail Help names the inbox type, Πολλαπλά εισερχόμενα (support.google.com/mail/answer/9694882?hl=el).",
+      "example": {
+        "msgid": "With multiple inboxes, choose which sections count toward the unread count shown in the app. The default combines every section.",
+        "clean": "Με πολλαπλά εισερχόμενα, επιλέξτε ποιες ενότητες προσμετρώνται στον αριθμό μη αναγνωσμένων της εφαρμογής. Από προεπιλογή προσμετρώνται όλες.",
+        "fault": "Με περισσότερα γραμματοκιβώτια, επιλέξτε ποιες ενότητες προσμετρώνται στον αριθμό μη αναγνωσμένων της εφαρμογής."
+      }
+    },
+    {
+      "id": "notify",
+      "msgidPattern": "\\bnotify\\b",
+      "expect": "[Εε]ιδοπο[ιί]",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen (ειδοποιώ: 5 of 7).",
+      "example": {
+        "msgid": "Notify for",
+        "clean": "Ειδοποιήσεις για",
+        "fault": "Πληροφόρηση για"
+      }
+    },
+    {
+      "id": "sound-breeze",
+      "msgid": "Breeze",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Αύρα$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Αύρα, Κουδούνισμα, Ντουέτο, Χτύπος and Λινό, each a name for what one hears.",
+      "example": {
+        "fault": "αύρα"
+      }
+    },
+    {
+      "id": "sound-chime",
+      "msgid": "Chime",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Κουδούνισμα$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Αύρα, Κουδούνισμα, Ντουέτο, Χτύπος and Λινό, each a name for what one hears.",
+      "example": {
+        "fault": "κουδούνισμα"
+      }
+    },
+    {
+      "id": "sound-duet",
+      "msgid": "Duet",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Ντουέτο$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Αύρα, Κουδούνισμα, Ντουέτο, Χτύπος and Λινό, each a name for what one hears.",
+      "example": {
+        "fault": "ντουέτο"
+      }
+    },
+    {
+      "id": "sound-knock",
+      "msgid": "Knock",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Χτύπος$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Αύρα, Κουδούνισμα, Ντουέτο, Χτύπος and Λινό, each a name for what one hears.",
+      "example": {
+        "fault": "χτύπος"
+      }
+    },
+    {
+      "id": "sound-linen",
+      "msgid": "Linen",
+      "origin": "packages/renderer/lib/notifications/",
+      "expect": "^Λινό$",
+      "severity": "wrong",
+      "reason": "Glossary, agent-chosen, unresolved by the app count (no name is in more than two of the seven apps): the notification sounds are Αύρα, Κουδούνισμα, Ντουέτο, Χτύπος and Λινό, each a name for what one hears.",
+      "example": {
+        "fault": "λινό"
+      }
+    },
+    {
+      "id": "system-settings",
+      "msgidPattern": "\\bSystem Settings\\b",
+      "expect": "Ρυθμ[ιί]σε\\p{L}* συστήματος",
+      "severity": "wrong",
+      "reason": "System Settings is Apple's Ρυθμίσεις συστήματος, the name of macOS's own app, in ggmail's own copy too (System Settings InfoPlist CFBundleDisplayName).",
+      "example": {
+        "msgid": "Swipe left or right with two fingers on a trackpad to go back or forward. Swipe between pages must also be on in System Settings.",
+        "clean": "Σύρετε δύο δάχτυλα αριστερά ή δεξιά στην επιφάνεια αφής για μετάβαση πίσω ή εμπρός. Η σάρωση μεταξύ σελίδων πρέπει να είναι ενεργή και στις Ρυθμίσεις συστήματος.",
+        "fault": "Ενεργοποιήστε το και στις Προτιμήσεις συστήματος."
+      }
+    },
+    {
+      "id": "dock",
+      "msgidPattern": "\\bdock\\b",
+      "expect": "Dock",
+      "severity": "wrong",
+      "reason": "The Dock is Apple's Dock, in Latin letters with its capital, in ggmail's own copy too (DesktopSettings.appex Localizable Dock).",
+      "example": {
+        "msgid": "Dock icon",
+        "clean": "Εικονίδιο στο Dock",
+        "fault": "Εικονίδιο στην αποβάθρα"
+      }
+    },
+    {
+      "id": "hibernation",
+      "msgidPattern": "\\bhibernat",
+      "expect": "[Αα]νεν[εέ]ργ",
+      "countEnglish": "\\binactive tabs?\\b",
+      "severity": "wrong",
+      "reason": "A hibernated tab is an ανενεργή καρτέλα, Chrome's word for the tabs its Memory Saver unloads, and hibernating a tab makes it ανενεργή (Chrome: 8 of 8 messages).",
+      "example": {
+        "msgid": "Hibernate after",
+        "fault": "Αδρανοποίηση μετά από"
+      }
+    },
+    {
+      "id": "launcher",
+      "msgidPattern": "\\blauncher\\b",
+      "expect": "[Λλ]ειτουργ[ιί]\\p{L}* εκκ[ιί]νησης",
+      "severity": "wrong",
+      "reason": "The launcher is the λειτουργία εκκίνησης, as Chrome writes ChromeOS's launcher (Chrome: 13 of 19 messages; εφαρμογή εκκίνησης in the other six).",
+      "example": {
+        "msgid": "In launcher",
+        "fault": "Στην εκκίνηση εφαρμογών"
+      }
+    },
+    {
+      "id": "phishing",
+      "msgidPattern": "\\bphishing\\b",
+      "expect": "[Ηη]λεκτρονικ\\p{L}* ψ[αά]ρ[εέ]μ",
+      "severity": "wrong",
+      "reason": "Phishing is ηλεκτρονικό ψάρεμα, as Chrome writes it (Chrome: 4 of 4 messages).",
+      "example": {
+        "msgid": "Phishing protection",
+        "clean": "Προστασία από ηλεκτρονικό ψάρεμα",
+        "fault": "Προστασία από phishing"
+      }
+    },
+    {
+      "id": "unified-inbox",
+      "msgidPattern": "\\bunified inbox\\b",
+      "expect": "[Όό]λ(?:α|ων) τ(?:α|ων) εισερχ[οό]μ[εέ]ν",
+      "severity": "wrong",
+      "reason": "The unified inbox is Όλα τα εισερχόμενα, the Gmail app's name for its every-account inbox (Gmail Help answer/6078445, hl=el), taken by the source order's fallback since the app count leaves it unresolved; never ενοποιημένα εισερχόμενα.",
+      "example": {
+        "msgid": "Open unified inbox",
+        "clean": "Άνοιγμα της προβολής «Όλα τα εισερχόμενα»",
+        "fault": "Άνοιγμα ενοποιημένων εισερχομένων"
+      }
+    },
+    {
+      "id": "auto-width",
+      "msgid": "Auto",
+      "msgctxt": "width",
+      "expect": "^Αυτόματα$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Width setting's Auto is Αυτόματα, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside πλάτος as in every other setting, never the adjective Αυτόματο or Αυτόματη.",
+      "example": {
+        "fault": "Αυτόματο"
+      }
+    },
+    {
+      "id": "auto-placement",
+      "msgid": "Auto",
+      "msgctxt": "placement",
+      "expect": "^Αυτόματα$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Placement setting's Auto is Αυτόματα, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside θέση as in every other setting, never the adjective Αυτόματο or Αυτόματη.",
+      "example": {
+        "fault": "Αυτόματη"
+      }
+    },
+    {
+      "id": "auto-launcher-display",
+      "msgid": "Auto",
+      "msgctxt": "launcher display",
+      "expect": "^Αυτόματα$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Launcher display setting's Auto is Αυτόματα, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside εμφάνιση as in every other setting, never the adjective Αυτόματο or Αυτόματη.",
+      "example": {
+        "fault": "Αυτόματη"
+      }
+    },
+    {
+      "id": "auto-text-color",
+      "msgid": "Auto",
+      "msgctxt": "text color",
+      "expect": "^Αυτόματα$",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "The Text color setting's Auto is Αυτόματα, as Chrome writes Auto (Chrome: 2 of 2 messages): an adverb, so it agrees with no noun and reads the same beside χρώμα as in every other setting, never the adjective Αυτόματο or Αυτόματη.",
+      "example": {
+        "fault": "Αυτόματο"
+      }
+    },
+    {
+      "id": "auto-in-sentences",
+      "msgidPattern": "\\bAuto (?:expands|switches|moves)\\b",
+      "expect": "Αυτόματα",
+      "countEnglish": "^Auto$",
+      "severity": "wrong",
+      "reason": "A sentence names the Auto option by its label, Αυτόματα, quoted «…», as Chrome writes Auto (Chrome: 2 of 2 messages), never an adjective such as αυτόματη προβολή, which names no option the setting shows.",
+      "example": {
+        "msgid": "How launcher apps are shown in the titlebar. Auto expands up to three apps into individual buttons and collapses beyond that. Collapsed always keeps them behind a single button, and Expanded always shows them as individual buttons.",
+        "fault": "Ορίζει πώς εμφανίζονται οι εφαρμογές στη γραμμή τίτλου. Η αυτόματη προβολή εμφανίζει έως τρεις εφαρμογές με ξεχωριστά κουμπιά και τις συμπτύσσει αν είναι περισσότερες. Η σύμπτυξη τις κρατά σε ένα κουμπί και η ανάπτυξη εμφανίζει ξεχωριστό κουμπί για καθεμία."
+      }
+    },
+    {
+      "id": "none-account-color",
+      "msgid": "None",
+      "msgctxt": "account color",
+      "expect": "^Κανένα$",
+      "countEnglish": "^None$",
+      "severity": "wrong",
+      "reason": "The account's color when none is picked is Κανένα, agreeing with χρώμα, as Chrome writes None by what it stands for (Chrome: 1 of 3 messages; Καμία in the other two).",
+      "example": {
+        "fault": "Καμία"
+      }
+    },
+    {
+      "id": "none-excluded-apps",
+      "msgid": "None",
+      "msgctxt": "excluded apps",
+      "expect": "^Καμία$",
+      "countEnglish": "^None$",
+      "severity": "wrong",
+      "reason": "The Excluded apps field with no app excluded is Καμία, agreeing with εφαρμογή, as Chrome writes None by what it stands for (Chrome: 2 of 3 messages; Κανένα in the other).",
+      "example": {
+        "fault": "Κανένα"
+      }
+    },
+    {
+      "id": "tray-icon-light",
+      "msgid": "Light",
+      "msgctxt": "tray icon color",
+      "expect": "^Ανοιχτόχρωμο$",
+      "countEnglish": "^Light$",
+      "severity": "wrong",
+      "reason": "The system tray icon's Light is Ανοιχτόχρωμο, as Chrome writes Light (Chrome: 2 of 4 messages; Φωτεινό once, and Ελαφρύ, a font weight, once), agreeing with χρώμα.",
+      "example": {
+        "fault": "Ανοιχτό"
+      }
+    },
+    {
+      "id": "tray-icon-dark",
+      "msgid": "Dark",
+      "msgctxt": "tray icon color",
+      "expect": "^Σκούρο$",
+      "countEnglish": "\\bdark\\b",
+      "countExpect": "σκο[υύ]ρ",
+      "severity": "wrong",
+      "reason": "The system tray icon's Dark is Σκούρο, the word of Chrome's σκούρο θέμα (Chrome: 16 of 24 messages), agreeing with χρώμα; Chrome's messages that are Dark alone write Σκούρο once and Σκοτεινή or Σκοτεινό three times, a mode's word.",
+      "example": {
+        "fault": "Σκοτεινό"
+      }
+    },
+    {
+      "id": "download-action-show-in-folder",
+      "msgid": "Show in folder",
+      "msgctxt": "download action",
+      "expect": "^Εμφάνιση στον? φάκελο$",
+      "countEnglish": "^Show in folder$",
+      "countExpect": "^Εμφάνιση στον? φάκελο$",
+      "severity": "wrong",
+      "reason": "Show in folder is Εμφάνιση στον φάκελο, as Chrome writes it (Chrome: 4 of 4 messages, which drop the article's final ν, στο φάκελο; this sheet keeps it), never Άνοιγμα φακέλου, which opens the folder rather than showing the file.",
+      "example": {
+        "clean": "Εμφάνιση στον φάκελο",
+        "fault": "Άνοιγμα φακέλου"
+      }
+    },
+    {
+      "id": "show-in-folder",
+      "msgid": "Show in folder",
+      "msgctxt": null,
+      "expect": "^Εμφάνιση στον? φάκελο$",
+      "countEnglish": "^Show in folder$",
+      "countExpect": "^Εμφάνιση στον? φάκελο$",
+      "severity": "wrong",
+      "reason": "Show in folder is Εμφάνιση στον φάκελο, as Chrome writes it (Chrome: 4 of 4 messages, which drop the article's final ν, στο φάκελο; this sheet keeps it), never Άνοιγμα φακέλου, which opens the folder rather than showing the file.",
+      "example": {
+        "clean": "Εμφάνιση στον φάκελο",
+        "fault": "Άνοιγμα φακέλου"
+      }
+    },
+    {
+      "id": "width",
+      "msgid": "Width",
+      "expect": "^Πλάτος$",
+      "countEnglish": "\\bwidth\\b",
+      "countExpect": "(?<!\\p{L})πλ[αά]τ(?:ος|ους)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "The vertical tabs sidebar's Width setting is Πλάτος, as Chrome writes width (Chrome: 3 of 5 messages; εύρος in the other two).",
+      "example": {
+        "fault": "Μέγεθος"
+      }
+    },
+    {
+      "id": "wide",
+      "msgid": "Wide",
+      "expect": "^Πλατύ$",
+      "severity": "wrong",
+      "reason": "The Width setting's Wide is Πλατύ, agreeing with πλάτος. Chrome's one Wide, Μεγάλο πλάτος, is Reading mode's letter spacing beside Very wide, not a sidebar's size, so it is out under the narrowest sense, and the apps' word decides (agent-chosen: πλατύ: 2 of 7 (Firefox, LibreOffice), thin; of the apps' three messages that are Wide alone, Firefox's and LibreOffice's are Πλατύ and Apple's is Ευρεία).",
+      "example": {
+        "fault": "Ευρύ"
+      }
+    },
+    {
+      "id": "narrow",
+      "msgid": "Narrow",
+      "expect": "^Στενό$",
+      "severity": "wrong",
+      "reason": "The Width setting's Narrow is Στενό, agreeing with πλάτος and the antonym of Wide's Πλατύ, as LibreOffice pairs Στενό and Πλατύ; Chrome has no Narrow.",
+      "example": {
+        "fault": "Μικρό"
+      }
+    },
+    {
+      "id": "wide-in-sentences",
+      "msgidPattern": "\\bnarrow and wide\\b",
+      "expect": "[Σσ]τεν\\p{L}* και πλατ",
+      "severity": "wrong",
+      "reason": "A sentence names the Width setting's Narrow and Wide by their labels' words, στενό and πλατύ (the wide and narrow pins).",
+      "example": {
+        "msgid": "Show the button at the bottom of the sidebar that switches between narrow and wide. With this off, use Reset Width from the sidebar's context menu or the Width setting above.",
+        "clean": "Εμφάνιση του κουμπιού στο κάτω μέρος της πλευρικής γραμμής για εναλλαγή μεταξύ στενού και πλατιού πλάτους. Όταν είναι ανενεργό, χρησιμοποιήστε την επιλογή «Επαναφορά πλάτους» από το μενού περιβάλλοντος της πλευρικής γραμμής ή τη ρύθμιση «Πλάτος» παραπάνω.",
+        "fault": "Εμφάνιση του κουμπιού στο κάτω μέρος της πλευρικής γραμμής για εναλλαγή μεταξύ μικρού και μεγάλου πλάτους."
+      }
+    },
+    {
+      "id": "width-in-sentences",
+      "msgidPattern": "\\b[Ww]idth\\b",
+      "expect": "[Ππ]λ[αά]τ(?:ος|ους)",
+      "countEnglish": "\\bwidth\\b",
+      "countExpect": "(?<!\\p{L})πλ[αά]τ(?:ος|ους)(?!\\p{L})",
+      "severity": "wrong",
+      "reason": "Width is πλάτος in a label and in a sentence, as Chrome writes it (Chrome: 3 of 5 messages; εύρος in the other two).",
+      "example": {
+        "msgid": "Show width button",
+        "clean": "Εμφάνιση κουμπιού πλάτους",
+        "fault": "Εμφάνιση κουμπιού μεγέθους"
+      }
+    },
+    {
+      "id": "release-stable",
+      "msgctxt": null,
+      "msgid": "Stable",
+      "expect": "^Σταθερό$",
+      "countEnglish": "^Stable$",
+      "severity": "wrong",
+      "reason": "The Release channel setting's Stable is Σταθερό, as Chrome writes Stable, agreeing with κανάλι (Chrome: 2 of 2 messages); Beta stays Beta.",
+      "example": {
+        "fault": "Σταθερή"
+      }
+    },
+    {
+      "id": "beta",
+      "msgctxt": null,
+      "msgid": "Beta",
+      "expect": "^Beta$",
+      "countEnglish": "\\bbeta\\b",
+      "countExpect": "beta",
+      "severity": "wrong",
+      "reason": "Beta, the maturity badge and the update channel, stays Beta in Latin letters, as Chrome writes it (Chrome: 8 of 8 messages), never a phrase such as Δοκιμαστική έκδοση, which the trial would also read as.",
+      "example": {
+        "fault": "Δοκιμαστική έκδοση"
+      }
+    },
+    {
+      "id": "emoji",
+      "msgidPattern": "\\bemoji\\b",
+      "expect": "emoji",
+      "severity": "wrong",
+      "reason": "An emoji is an emoji, in Latin letters, as Chrome writes it (Chrome: 4 of 4 messages).",
+      "example": {
+        "msgid": "Pick emoji",
+        "clean": "Επιλογή emoji",
+        "fault": "Επιλογή φατσούλας"
+      }
+    },
+    {
+      "id": "logs",
+      "msgidPattern": "\\blogs\\b|^View Logs$|^Logs$",
+      "expect": "[Αα]ρχε[ιί]\\p{L}* καταγραφ[ηή]ς",
+      "countEnglish": "\\blogs?\\b",
+      "severity": "wrong",
+      "reason": "Logs are αρχεία καταγραφής, as Chrome writes them (Chrome: 46 of 54 messages).",
+      "example": {
+        "msgid": "Export logs",
+        "clean": "Εξαγωγή αρχείων καταγραφής",
+        "fault": "Εξαγωγή ημερολογίων"
+      }
+    },
+    {
+      "id": "reload",
+      "msgidPattern": "^Reload$",
+      "expect": "^Επανάληψη φόρτωσης$",
+      "countEnglish": "\\breload",
+      "countExpect": "επαν[αά]ληψη\\p{L}* φ[οό]ρτωσης|επαναλ[αά]β\\p{L}* (?:τη )?φ[οό]ρτωση",
+      "severity": "wrong",
+      "reason": "Reload, a menu item, is Επανάληψη φόρτωσης, as Chrome writes its View menu's Reload and its Hard reload (Chrome: 27 of 39 messages); Chrome's plain Reload label is Επαναφόρτωση, which would sit beside Υποχρεωτική επανάληψη φόρτωσης in one menu.",
+      "example": {
+        "msgid": "Reload",
+        "fault": "Επαναφόρτωση"
+      }
+    },
+    {
+      "id": "hard-reload",
+      "msgctxt": null,
+      "msgid": "Hard Reload",
+      "expect": "^Υποχρεωτική επανάληψη φόρτωσης$",
+      "countEnglish": "^Hard Reload$",
+      "severity": "wrong",
+      "reason": "Hard Reload is Υποχρεωτική επανάληψη φόρτωσης, as Chrome writes it (Chrome: 1 of 1 messages).",
+      "example": {
+        "fault": "Αναγκαστική επαναφόρτωση"
+      }
+    },
+    {
+      "id": "user-agent",
+      "msgidPattern": "\\buser agent\\b",
+      "expect": "[Ππ]αρ[αά]γοντ\\p{L}* χρήστη",
+      "countEnglish": "\\buser[- ]agent\\b",
+      "countExpect": "^Παράγοντας χρήστη$",
+      "severity": "wrong",
+      "reason": "The user agent is the παράγοντας χρήστη, as Chrome writes it (Chrome: 1 of 1 messages), never πράκτορας χρήστη.",
+      "example": {
+        "msgid": "Use default user agent",
+        "clean": "Χρήση προεπιλεγμένου παράγοντα χρήστη",
+        "fault": "Χρήση προεπιλεγμένου πράκτορα χρήστη"
+      }
+    },
+    {
+      "id": "inspect-element",
+      "msgctxt": null,
+      "msgid": "Inspect Element",
+      "expect": "^Έλεγχος$",
+      "countEnglish": "^I&nspect$",
+      "countExpect": "^Έ&λεγχος$",
+      "countKeepAccessKeys": true,
+      "severity": "wrong",
+      "reason": "Inspect Element is Έλεγχος, as Chrome writes its page context menu's item, I&nspect, the narrowest-sense match for a context-menu item (Chrome: 1 of 1 messages); Chrome's plain Inspect is Επιθεώρηση, and neither takes στοιχείου.",
+      "example": {
+        "fault": "Επιθεώρηση στοιχείου"
+      }
+    },
+    {
+      "id": "sidebar",
+      "msgidPattern": "\\bside ?bar\\b",
+      "expect": "[Ππ]λευρικ\\p{L}* γραμμ",
+      "severity": "wrong",
+      "reason": "The sidebar is the πλευρική γραμμή, as Chrome writes it in Toggle sidebar, Εναλλαγή πλευρικής γραμμής (Chrome: 1 of 1 messages); Chrome's πλαϊνό πλαίσιο is its side panel, a different thing.",
+      "example": {
+        "msgid": "Sidebar",
+        "fault": "Πλαϊνή γραμμή"
+      }
+    },
+    {
+      "id": "pin",
+      "msgid": "Pin",
+      "expect": "^Καρφίτσωμα$",
+      "countEnglish": "\\bpinned\\b",
+      "countExpect": "καρφιτσ",
+      "severity": "wrong",
+      "reason": "Pinning a tab is Καρφίτσωμα, as Chrome writes its tab context menu's Pin, and a pinned tab is καρφιτσωμένη (Chrome: 16 of 16 messages).",
+      "example": {
+        "fault": "Στερέωση"
+      }
+    },
+    {
+      "id": "unpin",
+      "msgid": "Unpin",
+      "expect": "^Ξεκαρφίτσωμα$",
+      "countEnglish": "\\bunpin",
+      "countExpect": "ξεκαρφ[ιί]τσ",
+      "severity": "wrong",
+      "reason": "Unpinning a tab is Ξεκαρφίτσωμα, as Chrome writes its tab context menu's Unpin (Chrome: 26 of 26 messages).",
+      "example": {
+        "fault": "Αποδέσμευση"
+      }
+    },
+    {
+      "id": "zoom-in",
+      "msgctxt": null,
+      "msgid": "Zoom In",
+      "expect": "^Μεγέθυνση$",
+      "countEnglish": "^Zoom In$",
+      "severity": "wrong",
+      "reason": "Zoom In is Μεγέθυνση, as Chrome writes it (Chrome: 3 of 3 messages).",
+      "example": {
+        "fault": "Αύξηση μεγέθυνσης"
+      }
+    },
+    {
+      "id": "zoom-out",
+      "msgctxt": null,
+      "msgid": "Zoom Out",
+      "expect": "^Σμίκρυνση$",
+      "countEnglish": "^Zoom Out$",
+      "severity": "wrong",
+      "reason": "Zoom Out is Σμίκρυνση, as Chrome writes it (Chrome: 3 of 3 messages).",
+      "example": {
+        "fault": "Μείωση μεγέθυνσης"
+      }
+    },
+    {
+      "id": "actual-size",
+      "msgctxt": null,
+      "msgid": "Actual Size",
+      "expect": "^Πραγματικό μέγεθος$",
+      "countEnglish": "^Actual Size$",
+      "severity": "wrong",
+      "reason": "Actual Size is Πραγματικό μέγεθος, as Chrome writes it (Chrome: 3 of 3 messages).",
+      "example": {
+        "fault": "Κανονικό μέγεθος"
+      }
+    },
+    {
+      "id": "trimmed-content",
+      "msgidPattern": "\\btrimmed content\\b",
+      "expect": "[Ππ]εριεχ[οό]μ[εέ]ν\\p{L}* που έχει περικοπεί",
+      "severity": "wrong",
+      "reason": "Trimmed content is Gmail's περιεχόμενο που έχει περικοπεί, as Gmail Help names the ••• button, Εμφάνιση περιεχομένου που έχει περικοπεί (support.google.com/mail/answer/11468381?hl=el), never συμπτυγμένο περιεχόμενο.",
+      "example": {
+        "msgid": "Always show trimmed content",
+        "fault": "Να εμφανίζεται πάντα το συμπτυγμένο περιεχόμενο"
+      }
+    },
+    {
+      "id": "mark-as-read",
+      "msgctxt": null,
+      "msgidPattern": "^Mark as read$",
+      "expect": "^Σημείωση ως αναγνωσμένο$",
+      "severity": "wrong",
+      "reason": "Mark as read is Gmail's Σημείωση ως αναγνωσμένο, as Gmail Help's shortcuts page names the action beside its key, Shift+i (support.google.com/mail/answer/6594?hl=el), never Σήμανση.",
+      "example": {
+        "msgid": "Mark as read",
+        "fault": "Σήμανση ως αναγνωσμένο"
+      }
+    },
+    {
+      "id": "mark-as-spam",
+      "msgctxt": null,
+      "msgidPattern": "^Mark as spam$",
+      "expect": "^Αναφορά (?:ως )?ανεπιθύμητου μηνύματος$",
+      "severity": "wrong",
+      "reason": "Mark as spam is Gmail's Αναφορά ανεπιθύμητου μηνύματος, as Gmail Help's shortcuts page names the action beside its key (support.google.com/mail/answer/6594?hl=el); the spam page's button reads Αναφορά ως ανεπιθύμητου μηνύματος (answer/1366858). Never Σήμανση ως ανεπιθύμητο.",
+      "example": {
+        "msgid": "Mark as spam",
+        "clean": "Αναφορά ανεπιθύμητου μηνύματος",
+        "fault": "Σήμανση ως ανεπιθύμητο"
+      }
+    },
+    {
+      "id": "search-with-google",
+      "msgctxt": null,
+      "msgid": "&Search with Google",
+      "expect": "^Αναζήτηση με την Google$",
+      "countEnglish": "^Search with Google$",
+      "severity": "wrong",
+      "reason": "Search with Google, the context menu item Windows and Linux show, is Αναζήτηση με την Google, as Chrome writes it, with the article Greek gives the company's name (Chrome: 1 of 1 messages); Αναζήτηση με Google is Apple's wording, for the macOS label only.",
+      "example": {
+        "clean": "Ανα&ζήτηση με την Google",
+        "fault": "Ανα&ζήτηση με Google"
+      }
+    },
+    {
+      "id": "copy-image-address",
+      "msgctxt": null,
+      "msgid": "C&opy Image Address",
+      "expect": "^Αντιγραφή της διεύθυνσης εικόνας$",
+      "countEnglish": "^Copy image address$",
+      "severity": "wrong",
+      "reason": "Copy Image Address, the context menu item Windows and Linux show, is Αντιγραφή της διεύθυνσης εικόνας, as Chrome writes it, with the article (Chrome: 2 of 2 messages).",
+      "example": {
+        "clean": "Αντιγραφή της &διεύθυνσης εικόνας",
+        "fault": "Αντιγραφή &διεύθυνσης εικόνας"
+      }
+    },
+    {
+      "id": "lime",
+      "msgid": "Lime",
+      "expect": "^Λάιμ$",
+      "countEnglish": "^Lime$",
+      "severity": "wrong",
+      "reason": "The account color Lime is Λάιμ, as Chrome names it (Chrome: 1 of 1 messages), never Λαχανί.",
+      "example": {
+        "fault": "Λαχανί"
+      }
+    },
+    {
+      "id": "file-manager",
+      "msgidPattern": "\\bfile manager\\b",
+      "expect": "[Δδ]ιαχειριστ\\p{L}* αρχε[ιί]ων",
+      "severity": "wrong",
+      "reason": "The file manager shows only on Linux, so it takes GNOME's word, διαχειριστής αρχείων, as Files writes it (GNOME, nautilus `_Open in File Manager`, _Άνοιγμα στον διαχειριστή αρχείων_), never διαχείριση αρχείων, the managing rather than the program.",
+      "example": {
+        "msgid": "Show in your file manager",
+        "fault": "Εμφάνιση στη διαχείριση αρχείων"
+      }
+    }
+  ],
+  "accessKeys": {
+    "style": "inline",
+    "severity": "wrong",
+    "reason": "A label whose English has an & keeps one & inline, before a letter of the Greek word; a macOS label drops it."
+  },
+  "families": []
+}

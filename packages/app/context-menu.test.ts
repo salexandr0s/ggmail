@@ -228,7 +228,12 @@ describe("context menu on an open Gmail message", () => {
 
   test("has a Share item for the message link on macOS", () => {
     expect(openOn("isMacOS").filter(({ role }) => role === "shareMenu")).toEqual([
-      { label: "Share", role: "shareMenu", sharingItem: { urls: ["ggmail://message"] } },
+      {
+        id: "share",
+        label: "Share",
+        role: "shareMenu",
+        sharingItem: { urls: ["ggmail://message"] },
+      },
     ]);
   });
 

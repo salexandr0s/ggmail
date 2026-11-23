@@ -12,7 +12,6 @@
   grid-row: 2;
 }
 .attachment-refresh {
-  border-radius: 50%;
   color: var(--muted-foreground);
 }
 @container library (min-width: 38rem) {
@@ -83,7 +82,7 @@
   min-height: 2rem;
   padding: 0.3rem 0.625rem;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 999px;
   color: var(--muted-foreground);
   font-size: 0.8125rem;
   text-align: start;
@@ -111,8 +110,9 @@
   font-weight: 500;
 }
 .attachment-format:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: var(--focus-ring);
 }
 .attachment-toolbar {
   background: var(--toolbar);
@@ -155,7 +155,6 @@
 .attachment-layout-toggle button {
   width: 2rem;
   height: 1.625rem;
-  border-radius: 999px;
   color: var(--muted-foreground);
 }
 .attachment-layout-toggle button[aria-pressed="true"] {
@@ -207,6 +206,12 @@
 .attachment-filter-scroll .attachment-format[aria-pressed="true"] {
   color: var(--selected-foreground);
   background: var(--selected);
+}
+/* These have no border to colour, so the ring is drawn inside the row. */
+.attachment-filter-scroll .attachment-format:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+  box-shadow: none;
 }
 .attachment-warning,
 .attachment-loading,
@@ -320,8 +325,9 @@
   background: var(--accent);
 }
 .attachment-filter-chip:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: var(--focus-ring);
 }
 
 .attachment-detail-filters {
@@ -380,7 +386,6 @@
 }
 .attachment-filter-sheet footer button {
   min-height: 2.25rem;
-  border-radius: 999px;
 }
 @media (max-width: 32rem) {
   .attachment-filter-sheet[data-slot="dialog-content"] {

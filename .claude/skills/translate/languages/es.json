@@ -1103,7 +1103,10 @@
       "msgidPattern": "^Remove\\b(?! from history)",
       "expect": "[Qq]uitar",
       "severity": "wrong",
-      "reason": "Removing something from a list is quitar; Remove from history keeps Chrome's eliminar (Chrome: 68 of 103 messages).",
+      "reason": "Removing something from a list is quitar; Remove from history keeps Chrome's eliminar (Chrome: 68 of 103 messages). The assistant's hint, Remove a quote to add another., is a sentence and takes quitar's imperative, Quita una cita…, which the infinitive this pin reads leaves out.",
+      "allow": {
+        "entries": [{ "msgctxt": null, "msgid": "Remove a quote to add another." }]
+      },
       "example": {
         "msgid": "Remove account",
         "fault": "Eliminar cuenta"

@@ -90,10 +90,28 @@ const editReply = String.raw`(expectedUrl, body, canOpen) => {
     }
   }
   const suffix = hasContent ? "\n\n" : "";
+  const lines = (body + suffix).split(/\r\n?|\n/);
+  // Gmail requires Trusted Types, and this world inherits that: insertHTML
+  // throws on a plain string. The policy only ever sees text this function
+  // escaped itself, with its own line breaks.
+  let policy;
+  try {
+    policy = globalThis.ggmailReplyPolicy ??=
+      window.trustedTypes?.createPolicy("ggmail-insert-reply", { createHTML: (html) => html });
+  } catch {
+    // Gmail's policy now allowlists policy names. Type the lines instead.
+    for (const [index, line] of lines.entries()) {
+      if (index && !document.execCommand("insertLineBreak")) return "unavailable";
+      if (line && !document.execCommand("insertText", false, line)) return "unavailable";
+    }
+    return "inserted";
+  }
   const plain = document.createElement("div");
-  plain.textContent = body + suffix;
-  const html = plain.innerHTML.replace(/\r\n?|\n/g, "<br>");
-  return document.execCommand("insertHTML", false, html) ? "inserted" : "unavailable";
+  const html = lines.map((line) => {
+    plain.textContent = line;
+    return plain.innerHTML;
+  }).join("<br>");
+  return document.execCommand("insertHTML", false, policy?.createHTML(html) ?? html) ? "inserted" : "unavailable";
 }`;
 
 export async function insertReply(

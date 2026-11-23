@@ -44,6 +44,14 @@ mock.module("./mail-context", () => ({
     gmail: {},
   }),
   getAssistantMailboxes: () => available,
+  sourcesForQuotes: (quotes: NonNullable<AssistantRequest["quotes"]>) =>
+    quotes.map((q) => ({
+      ...primary,
+      subject: q.subject,
+      hash: "#all/" + q.messageId,
+      threadId: q.messageId,
+      excerpt: q.text,
+    })),
   openMailSource: (_scope: unknown, source: MailSource) => navigate(source),
   readMailSource: read,
   readMailPreview: preview,
@@ -53,7 +61,7 @@ mock.module("./mail-context", () => ({
   readCurrentMail: () => Promise.resolve({ kind: "mailView", sources }),
   searchAllMail: search,
 }));
-const { AssistantChat } = await import("./chat");
+const { AssistantChat, draftMailto } = await import("./chat");
 
 function request(prompt: string): AssistantRequest {
   return { provider: "chatgpt", prompt, model: "fixture", id: crypto.randomUUID(), scopeKey: key };
@@ -62,13 +70,23 @@ const quiet = () => {};
 
 test("a revision receives the actual subject and body even when ChatGPT also returned an acknowledgement", async () => {
   const chat = new AssistantChat();
-  const draft = { subject: "Agenda", body: "Let's meet at ten." };
+  // No conversation is open, so the draft is a new email whatever the model claims.
+  const draft = {
+    to: ["desk@hotel.example", "two@example.test"],
+    subject: "Agenda",
+    body: "Let's meet at ten.",
+    reply: false,
+  };
   const call = {
     type: "function_call" as const,
     namespace: "ggmail" as const,
     name: "prepare_draft",
     call_id: "draft",
-    arguments: JSON.stringify(draft),
+    arguments: JSON.stringify({
+      ...draft,
+      to: "desk@hotel.example, two@example.test",
+      reply: true,
+    }),
   };
   respondMock.mockResolvedValueOnce({ text: "", items: [call], calls: [call] });
   respondMock.mockResolvedValueOnce({ text: "Draft prepared.", items: [], calls: [] });
@@ -88,6 +106,18 @@ test("a revision receives the actual subject and body even when ChatGPT also ret
     return { text: "Okay", items: [], calls: [] };
   });
   expect((await chat.send(request("Make it shorter"), quiet)).status).toBe("complete");
+});
+
+test("one compose link carries the recipients, subject and body", () => {
+  const url = draftMailto({
+    to: ["a+b@example.test", "c@example.test"],
+    subject: "Rooms & rates?",
+    body: "First line\nSecond line",
+  });
+  expect(url).toBe(
+    "mailto:a%2Bb@example.test,c@example.test?subject=Rooms%20%26%20rates%3F&body=First%20line%0ASecond%20line",
+  );
+  expect(draftMailto({ subject: "", body: "Hi" })).toBe("mailto:?subject=&body=Hi");
 });
 
 test("citations keep their numbers when rows reorder and can only open in their own conversation", async () => {
@@ -310,4 +340,70 @@ test("unknown account and source references return tool errors without accessing
   expect((await chat.send(request("Read a conversation"), quiet)).status).toBe("complete");
   expect(search.mock.calls).toHaveLength(searches);
   expect(read.mock.calls).toHaveLength(reads);
+});
+
+test("two quoted messages retain their source and text for the comparison and its follow-up", async () => {
+  const chat = new AssistantChat();
+  const quotes = ["Alex", "Blair"].map((sender, index) => ({
+    id: crypto.randomUUID(),
+    sender,
+    subject: sender + " proposal",
+    text: index ? "180 euros" : "200 euros",
+    accountId: "personal",
+    owner: "one@example.test",
+    messageId: "194a92f8c000000" + index,
+  }));
+  for (const [index, prompt] of ["Compare both", "What is the difference?"].entries()) {
+    respondMock.mockResolvedValueOnce({ text: "Comparison", items: [], calls: [] });
+    const result = await chat.send(
+      { ...request(prompt), quotes: index === 0 ? quotes : undefined },
+      quiet,
+    );
+    expect(result.status).toBe("complete");
+    const input = respondMock.mock.lastCall?.[0].input ?? [];
+    const question = input.find(
+      (item) =>
+        "content" in item &&
+        typeof item.content === "string" &&
+        item.content.includes('"quotedMail"'),
+    );
+    const content = question && "content" in question ? question.content : undefined;
+    expect(content).toContain("Blair proposal");
+    expect(content).toContain("ggmail://one@example.test/message/" + quotes[0]?.messageId);
+    expect(content).toContain("200 euros");
+  }
+  expect(chat.transcript()[0]?.quotes).toEqual(quotes);
+});
+
+test("Compare quotes supplies only the attachments, with stable, openable citations", async () => {
+  const chat = new AssistantChat();
+  const quotes = ["First price", "Latest price"].map((subject, index) => ({
+    id: crypto.randomUUID(),
+    text: "Price " + index,
+    subject,
+    sender: "Pat",
+    owner: primary.ownerEmail,
+    accountId: primary.accountId,
+    messageId: "194a92f8c000000" + index,
+  }));
+  respondMock.mockResolvedValueOnce({ text: "Changed [1] [2].", calls: [], items: [] });
+  const answer = await chat.send(
+    { ...request("Compare quotes"), quotes, compareQuotes: true },
+    quiet,
+  );
+  expect(answer.status).toBe("complete");
+  const options = respondMock.mock.lastCall?.[0];
+  expect(options?.tools).toEqual([]);
+  const input = options?.input;
+  expect(input).toHaveLength(1);
+  const message = input?.[0];
+  const payload = message && "content" in message ? JSON.parse(String(message.content)) : undefined;
+  expect(payload.mail).toBeUndefined();
+  expect(payload.quotedMail.map((q: { sourceNumber: number }) => q.sourceNumber)).toEqual([1, 2]);
+  if (answer.status !== "complete") {
+    throw Error("Expected citations");
+  }
+  expect(answer.reply.citations.map((c) => c.subject)).toEqual(["First price", "Latest price"]);
+  chat.openSource(answer.reply.citations[1]?.id ?? "");
+  expect(navigate.mock.lastCall?.[0].threadId).toBe(quotes[1]?.messageId);
 });

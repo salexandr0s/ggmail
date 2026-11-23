@@ -4,6 +4,7 @@ import { watchForAppMenuKey } from "@/app-menu-shortcut";
 import { ipc } from "@/ipc";
 import { createBrowserWindow, getCommonBrowserWindowOptions, loadRenderer } from "@/lib/window";
 import { main } from "@/main";
+import { setupPageContextMenu } from "./page-context-menu";
 
 const WIDTH = 1000;
 const HEIGHT = 720;
@@ -85,6 +86,7 @@ class SettingsWindow {
     });
 
     watchForAppMenuKey(browserWindow.webContents);
+    setupPageContextMenu(browserWindow);
 
     const searchParams = main.createSeedSearchParams();
 

@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { platform } from "@electron-toolkit/utils";
 import { ms } from "@ggmail/shared/ms";
-import type { AccountConfig, AccountConfigs } from "@ggmail/shared/schemas";
+import type { AccountConfig, AccountConfigInput, AccountConfigs } from "@ggmail/shared/schemas";
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import type { BrowsingDataTypes } from "@ggmail/shared/types";
-import { net, powerMonitor, session } from "electron";
+import { app, net, powerMonitor, session } from "electron";
 import { Account } from "./account";
 import { config } from "./config";
 import { extensions } from "./extensions";
@@ -13,6 +13,7 @@ import { resolveViewFocusTarget } from "./lib/view-focus";
 import { main } from "./main";
 import { shellHistory } from "./shell-history";
 import { isWindowedTab } from "./tabs";
+import { appTray } from "./tray";
 import { WorkspaceApp } from "./workspace-app";
 
 const HIBERNATION_SWEEP_INTERVAL = ms("1m");
@@ -21,6 +22,8 @@ const NETWORK_RECOVERY_SWEEP_INTERVAL = ms("5s");
 
 class Accounts {
   instances: Map<string, Account> = new Map();
+
+  private dockUnreadBadge: boolean | undefined;
 
   init() {
     this.repairAccountConfigs();
@@ -379,6 +382,13 @@ class Accounts {
   }
 
   selectAccount(selectedAccountId: string) {
+    // The renderer can still list an account for a moment after it has been
+    // removed or turned off. Selecting it would mark an account nothing runs
+    // as selected, and `getSelectedAccount()` throws on that from then on.
+    if (!this.instances.has(selectedAccountId)) {
+      return;
+    }
+
     config.set(
       "accounts",
       config.get("accounts").map((accountConfig) => {
@@ -515,6 +525,10 @@ class Accounts {
     instance.destroy();
 
     this.instances.delete(accountId);
+
+    // The account's own subscription went with it, so nothing else would take
+    // its unread mail back out of the total.
+    this.syncUnreadIndicators();
   }
 
   async deleteBrowsingData(accountId: AccountConfig["id"], { cookies, cache }: BrowsingDataTypes) {
@@ -578,36 +592,22 @@ class Accounts {
     }
   }
 
-  async removeAccount(selectedAccountId: string) {
-    const instance = this.instances.get(selectedAccountId);
+  /**
+   * The account leaves the running app and the config in one synchronous step,
+   * and its data is cleared after that. Clearing takes a while and can fail,
+   * and a config that still names a torn-down account as selected makes
+   * `getSelectedAccount()` throw for everything that runs in the meantime.
+   */
+  async removeAccount(accountId: AccountConfig["id"]) {
+    // An account that launched disabled was never constructed, so there is no
+    // session object to remove it through. The data is still on disk under the
+    // account's partition, which is how `resetApp` reaches the same sessions.
+    const accountSession =
+      this.instances.get(accountId)?.session ?? session.fromPartition(`persist:${accountId}`);
 
-    if (instance) {
-      this.teardownAccount(selectedAccountId);
+    this.teardownAccount(accountId);
 
-      await instance.session.clearData();
-
-      await extensions.clearSessionData(instance.session);
-    } else {
-      // An account that launched disabled was never constructed, so there is
-      // nothing to tear down and no session object to remove it through. The
-      // data is still on disk under the account's partition, which is how
-      // `resetApp` reaches the same sessions.
-      const accountSession = session.fromPartition(`persist:${selectedAccountId}`);
-
-      await accountSession.clearData();
-
-      await extensions.clearSessionData(accountSession);
-    }
-
-    const { clearAttachmentCategories } = await import("./attachments/categories");
-    clearAttachmentCategories(selectedAccountId);
-    const { clearAttachmentIndexes } = await import("./attachments/disk-index");
-    clearAttachmentIndexes(selectedAccountId);
-    const { removeReminders } = await import("./follow-ups/store");
-    removeReminders((row) => row.accountId === selectedAccountId);
-    const updatedAccounts = config
-      .get("accounts")
-      .filter((account) => account.id !== selectedAccountId);
+    const updatedAccounts = config.get("accounts").filter((account) => account.id !== accountId);
 
     if (updatedAccounts.every((account) => account.selected === false)) {
       const nextSelectedAccount = updatedAccounts.find((account) => account.disabled !== true);
@@ -634,22 +634,53 @@ class Accounts {
 
     this.updateAllViewBounds();
 
+    // As turning an account off does: tearing the selected one down drops the
+    // front view without saying which of the rest takes its place. Without
+    // focus, because this is asked for from the settings window.
+    if (updatedAccounts.some((account) => account.selected && this.instances.has(account.id))) {
+      this.refreshSelectedAccountView({ focus: false });
+    }
+
     this.sendTabsChangedToRenderer();
+
+    const { forgetTaskAccount } = await import("./google-task-connections");
+    forgetTaskAccount(accountId);
+    const { clearAttachmentCategories } = await import("./attachments/categories");
+    clearAttachmentCategories(accountId);
+    const { clearAttachmentIndexes } = await import("./attachments/disk-index");
+    clearAttachmentIndexes(accountId);
+    const { removeReminders } = await import("./follow-ups/store");
+    removeReminders((row) => row.accountId === accountId);
+
+    await accountSession.clearData();
+
+    await extensions.clearSessionData(accountSession);
   }
 
-  updateAccount(accountDetails: AccountConfig) {
-    // `disabled` is carried over from what is stored rather than from what came
-    // in. The flag and the account instance behind it have to move together, so
-    // `setAccountEnabled` is its only writer.
+  updateAccount(accountId: AccountConfig["id"], details: AccountConfigInput) {
+    // Only what the Edit dialog can change is written. The dialog holds the
+    // account as it was when it opened, and the rest of it, such as which
+    // account is selected and its saved tabs and bookmarks, can have changed
+    // since. `disabled` is left out as well: the flag and the account instance
+    // behind it have to move together, so `setAccountEnabled` is its only writer.
     config.set(
       "accounts",
-      config
-        .get("accounts")
-        .map((account) =>
-          account.id === accountDetails.id
-            ? { ...account, ...accountDetails, disabled: account.disabled }
-            : account,
-        ),
+      config.get("accounts").map((account) =>
+        account.id === accountId
+          ? {
+              ...account,
+              label: details.label,
+              color: details.color,
+              logo: details.logo,
+              notifications: details.notifications,
+              gmail: {
+                ...account.gmail,
+                unreadBadge: details.gmail.unreadBadge,
+                unifiedInbox: details.gmail.unifiedInbox,
+              },
+            }
+          : account,
+      ),
     );
   }
 
@@ -751,6 +782,34 @@ class Accounts {
 
       return typeof unreadCount === "number" ? totalUnreadCount + unreadCount : totalUnreadCount;
     }, 0);
+  }
+
+  /**
+   * The dock badge, the taskbar overlay and the tray all show one total across
+   * accounts, so it is recounted whenever any account's count changes and
+   * whenever an account stops running.
+   */
+  syncUnreadIndicators() {
+    const totalUnreadCount = this.getTotalUnreadCount();
+
+    // `dock.unreadBadge` takes effect on restart, so it is read once.
+    this.dockUnreadBadge ??= config.get("dock.unreadBadge");
+
+    if (this.dockUnreadBadge) {
+      if (platform.isMacOS && app.dock) {
+        app.dock.setBadge(totalUnreadCount ? totalUnreadCount.toString() : "");
+      } else if (platform.isLinux) {
+        app.badgeCount = totalUnreadCount;
+      } else if (platform.isWindows) {
+        if (totalUnreadCount) {
+          ipc.renderer.send(main.window.webContents, "taskbar.setOverlayIcon", totalUnreadCount);
+        } else {
+          main.window.setOverlayIcon(null, "");
+        }
+      }
+    }
+
+    appTray.updateUnreadStatus(totalUnreadCount);
   }
 
   getFirstAccountWithUnread() {

@@ -56,7 +56,10 @@ export function WorkspaceSidebar() {
     tab && selectedAccount
       ? (event) => {
           event.preventDefault();
-          ipc.main.send("tabs.showTabContextMenu", selectedAccount.config.id, tab.id);
+          ipc.main.send("tabs.showTabContextMenu", selectedAccount.config.id, tab.id, {
+            x: event.clientX,
+            y: event.clientY,
+          });
         }
       : undefined;
 
@@ -119,6 +122,7 @@ export function WorkspaceSidebar() {
     return (
       <SidebarButton
         key={app}
+        data-shortcut={app}
         title={
           app === "calendar" || app === "tasks" || app === "meet"
             ? labels[app]
@@ -140,7 +144,17 @@ export function WorkspaceSidebar() {
       onContextMenu={(event) => {
         if (!event.defaultPrevented && selectedAccount) {
           event.preventDefault();
-          ipc.main.send("tabs.showVerticalTabsContextMenu", selectedAccount.config.id);
+          const shortcut = (event.target as Element).closest<HTMLElement>("[data-shortcut]")
+            ?.dataset.shortcut as SidebarShortcut | "settings" | undefined;
+          ipc.main.send(
+            "tabs.showVerticalTabsContextMenu",
+            selectedAccount.config.id,
+            {
+              x: event.clientX,
+              y: event.clientY,
+            },
+            shortcut,
+          );
         }
       }}
     >
@@ -148,7 +162,11 @@ export function WorkspaceSidebar() {
       <div className="workspace-sidebar-footer">
         {dockedBookmarks && renderShortcut("bookmarks")}
         {shortcuts.length > 0 && <div className="workspace-sidebar-divider" aria-hidden="true" />}
-        <SidebarButton title={t`Settings`} onClick={() => ipc.main.send("sidebar.openSettings")}>
+        <SidebarButton
+          data-shortcut="settings"
+          title={t`Settings`}
+          onClick={() => ipc.main.send("sidebar.openSettings")}
+        >
           <WorkspaceSettingsIcon />
         </SidebarButton>
       </div>

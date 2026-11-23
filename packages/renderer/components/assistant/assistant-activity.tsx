@@ -4,6 +4,7 @@ import {
   BookOpenTextIcon,
   EllipsisIcon,
   FilePenLineIcon,
+  GlobeIcon,
   InboxIcon,
   ListChecksIcon,
   MailSearchIcon,
@@ -37,6 +38,12 @@ export function AssistantActivity({
       const { page } = activity;
       Icon = MailSearchIcon;
       label = page > 1 ? t`Searching ${account} · page ${page}` : t`Searching ${account}`;
+      break;
+    }
+    case "web": {
+      const { query } = activity;
+      Icon = GlobeIcon;
+      label = query ? t`Searching the web for “${query}”` : t`Searching the web`;
       break;
     }
     case "reviewing":
