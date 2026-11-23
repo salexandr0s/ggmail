@@ -144,10 +144,11 @@ test.describe("with the second account disabled", () => {
     await expect(accountItems.nth(1)).toContainText("Work");
 
     // The point of the feature: the account is kept, not removed, so the list
-    // is where it stays reachable.
-    await expect(accountItems.nth(1).getByText("Disabled", { exact: true })).toBeVisible();
+    // is where it stays reachable. A row's options share one line, joined by a
+    // middle dot, so Disabled is read as part of that line.
+    await expect(accountItems.nth(1).getByText("Disabled")).toBeVisible();
 
-    await expect(accountItems.nth(0).getByText("Disabled", { exact: true })).toHaveCount(0);
+    await expect(accountItems.nth(0).getByText("Disabled")).toHaveCount(0);
 
     // Personal has Unified inbox as its only switch on. The badge row is drawn
     // only when one of its badges is, so a row whose condition missed that
