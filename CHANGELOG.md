@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Right-click a message or selected text for mail actions, **Add to Tasks**, **Add to Calendar** and **Quote to assistant**. Selected text can be saved to Google Tasks from a draft window, and quoted passages attach to your next assistant prompt.
+- Removing an account switches to the next one before its saved data is cleared. The dock badge and tray count update when an account is removed or turned off.
+- All Mail sorts by received time. If a conversation cannot be opened or a row action is refused, All Mail stays in place and says so.
+- Menus, dialogs and search fields share one focus ring. Menus in dark mode show a visible highlight on the hovered row.
+- The find bar counter turns red when nothing matches. Removing a follow-up dims only that row.
+
 ## 3.65.10 — 2026-11-22
 
 - Docs, Drive and Sheets join the default sidebar. Add, remove and reorder shortcuts in **Settings → Sidebar**. Settings stays pinned at the bottom.
