@@ -61,7 +61,7 @@ mock.module("./mail-context", () => ({
   readCurrentMail: () => Promise.resolve({ kind: "mailView", sources }),
   searchAllMail: search,
 }));
-const { AssistantChat } = await import("./chat");
+const { AssistantChat, draftMailto } = await import("./chat");
 
 function request(prompt: string): AssistantRequest {
   return { provider: "chatgpt", prompt, model: "fixture", id: crypto.randomUUID(), scopeKey: key };
@@ -70,13 +70,23 @@ const quiet = () => {};
 
 test("a revision receives the actual subject and body even when ChatGPT also returned an acknowledgement", async () => {
   const chat = new AssistantChat();
-  const draft = { subject: "Agenda", body: "Let's meet at ten." };
+  // No conversation is open, so the draft is a new email whatever the model claims.
+  const draft = {
+    to: ["desk@hotel.example", "two@example.test"],
+    subject: "Agenda",
+    body: "Let's meet at ten.",
+    reply: false,
+  };
   const call = {
     type: "function_call" as const,
     namespace: "ggmail" as const,
     name: "prepare_draft",
     call_id: "draft",
-    arguments: JSON.stringify(draft),
+    arguments: JSON.stringify({
+      ...draft,
+      to: "desk@hotel.example, two@example.test",
+      reply: true,
+    }),
   };
   respondMock.mockResolvedValueOnce({ text: "", items: [call], calls: [call] });
   respondMock.mockResolvedValueOnce({ text: "Draft prepared.", items: [], calls: [] });
@@ -96,6 +106,18 @@ test("a revision receives the actual subject and body even when ChatGPT also ret
     return { text: "Okay", items: [], calls: [] };
   });
   expect((await chat.send(request("Make it shorter"), quiet)).status).toBe("complete");
+});
+
+test("one compose link carries the recipients, subject and body", () => {
+  const url = draftMailto({
+    to: ["a+b@example.test", "c@example.test"],
+    subject: "Rooms & rates?",
+    body: "First line\nSecond line",
+  });
+  expect(url).toBe(
+    "mailto:a%2Bb@example.test,c@example.test?subject=Rooms%20%26%20rates%3F&body=First%20line%0ASecond%20line",
+  );
+  expect(draftMailto({ subject: "", body: "Hi" })).toBe("mailto:?subject=&body=Hi");
 });
 
 test("citations keep their numbers when rows reorder and can only open in their own conversation", async () => {

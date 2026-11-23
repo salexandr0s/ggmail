@@ -61,12 +61,25 @@ class AnswerPreview {
   }
 }
 
+function searchQuery(input: string) {
+  try {
+    return z.object({ query: z.string() }).parse(JSON.parse(input)).query;
+  } catch {
+    // The input was cut short or is not a search. The activity stays generic.
+    return undefined;
+  }
+}
+
 export class ClaudeCliStream {
   private pendingLine = "";
   private answer?: { index: number; preview: AnswerPreview };
+  private search?: { index: number; input: string };
   private result?: unknown;
 
-  constructor(private readonly onText: (text: string) => void) {}
+  constructor(
+    private readonly onText: (text: string) => void,
+    private readonly onSearch?: (query?: string) => void,
+  ) {}
 
   write(chunk: string) {
     const lines = chunk.split("\n");
@@ -108,15 +121,29 @@ export class ClaudeCliStream {
     const event = eventSchema.parse(frame.event);
     if (event.type === "message_start" || event.type === "message_stop") {
       this.answer = undefined;
+      this.search = undefined;
     } else if (event.type === "content_block_start" && event.index !== undefined) {
+      const tool = event.content_block?.type === "tool_use" ? event.content_block.name : undefined;
       // oxlint-disable-next-line lingui/no-unlocalized-strings -- Built-in Claude Code tool name.
-      if (
-        event.content_block?.type === "tool_use" &&
-        event.content_block.name === "StructuredOutput"
-      ) {
+      if (tool === "StructuredOutput") {
         this.answer = { index: event.index, preview: new AnswerPreview() };
       } else if (this.answer?.index === event.index) {
         this.answer = undefined;
+      }
+      // oxlint-disable-next-line lingui/no-unlocalized-strings -- Built-in Claude Code tool name.
+      if (tool === "WebSearch") {
+        this.search = { index: event.index, input: "" };
+        this.onSearch?.();
+      }
+    } else if (this.search && this.search.index === event.index) {
+      if (event.type === "content_block_delta" && event.delta?.type === "input_json_delta") {
+        this.search.input = (this.search.input + (event.delta.partial_json ?? "")).slice(0, 4096);
+      } else if (event.type === "content_block_stop") {
+        const query = searchQuery(this.search.input);
+        this.search = undefined;
+        if (query) {
+          this.onSearch?.(query);
+        }
       }
     } else if (this.answer && this.answer.index === event.index) {
       if (event.type === "content_block_stop") {

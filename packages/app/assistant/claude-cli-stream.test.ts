@@ -34,6 +34,19 @@ test("streams answer text before the terminal Claude result across JSON and Unic
   expect(stream.finish()).toEqual(result);
 });
 
+test("reports a web search when it starts and again with its query", () => {
+  const searches: Array<string | undefined> = [];
+  const stream = new ClaudeCliStream(
+    () => {},
+    (query) => searches.push(query),
+  );
+  stream.write(frame(start("WebSearch", 0)));
+  stream.write(frame(delta('{"query":"hotel ')));
+  stream.write(frame(delta('reception email"}')));
+  stream.write(frame({ type: "content_block_stop", index: 0 }));
+  expect(searches).toEqual([undefined, "hotel reception email"]);
+});
+
 test("ignores CLI chatter, nested tools, arguments and stale block indices", () => {
   const updates: string[] = [];
   const stream = new ClaudeCliStream((text) => updates.push(text));

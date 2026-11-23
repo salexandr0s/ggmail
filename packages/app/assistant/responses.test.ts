@@ -35,6 +35,62 @@ test("uses streamed output items when ChatGPT completes with an empty output arr
   expect(reply.text).toBe("Frist: märz");
 });
 
+test("a web search is offered, reported with its query and returned to the provider", async () => {
+  const record = {
+    type: "web_search_call" as const,
+    id: "ws",
+    action: { type: "search", query: "hotel email" },
+  };
+  const message = {
+    type: "message" as const,
+    role: "assistant" as const,
+    content: [{ type: "output_text" as const, text: "desk@hotel.example" }],
+  };
+  const completed = {
+    type: "response.completed",
+    response: { status: "completed", output: [record, message] },
+  };
+  const fetchMock = spyOn(globalThis, "fetch")
+    .mockResolvedValueOnce(
+      new Response(
+        stream(
+          { type: "response.web_search_call.searching" },
+          { type: "response.output_item.done", item: record },
+          completed,
+        ),
+      ),
+    )
+    .mockResolvedValueOnce(new Response(stream(completed)));
+  try {
+    const searches: Array<string | undefined> = [];
+    const options = {
+      token: "fixture",
+      provider: "openai" as const,
+      model: "fixture",
+      instructions: "",
+      input: [],
+      tools: [],
+      signal: new AbortController().signal,
+      onText() {},
+    };
+    const reply = await respond({
+      ...options,
+      web: { instructions: "", onSearch: (query) => searches.push(query) },
+    });
+    expect(searches).toEqual([undefined, "hotel email"]);
+    expect(reply.items).toEqual([record, message]);
+    // A round retried without web search leaves the search record behind.
+    await respond({ ...options, input: reply.items });
+    const [offered, retried] = fetchMock.mock.calls.map(([, init]) =>
+      JSON.parse(String(init?.body)),
+    );
+    expect(offered.tools).toEqual([{ type: "web_search" }]);
+    expect(retried).toMatchObject({ tools: [], input: [message] });
+  } finally {
+    fetchMock.mockRestore();
+  }
+});
+
 test("a tool call cannot run before ChatGPT completes the response", async () => {
   const body = stream({
     type: "response.output_item.done",

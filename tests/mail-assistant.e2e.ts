@@ -224,7 +224,11 @@ const answer = [
 
 // Use a synthetic provider session in this test's temporary profile. Exercise
 // the real assistant.send, tool call, conversation guard and reply IPC.
-async function useDraftProvider(body: string | null, text = answer) {
+async function useDraftProvider(
+  body: string | null,
+  text = answer,
+  fields: { to?: string; reply?: boolean } = {},
+) {
   const { writeFile } = await import("node:fs/promises");
   const { join } = await import("node:path");
   await writeFile(join(ggmail.userDataDir, "assistant-credentials"), "fixture");
@@ -287,7 +291,7 @@ async function useDraftProvider(body: string | null, text = answer) {
       }) as typeof globalThis.fetch;
     },
     {
-      draft: body === null ? null : { subject: "Planning review", body },
+      draft: body === null ? null : { subject: "Planning review", body, ...fields },
       answer: text,
       senderPhoto,
     },
@@ -786,7 +790,15 @@ test("streams answer text and shows a validated draft before the provider finish
   await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
   const panel = page.getByRole("complementary", { name: "Mail assistant" });
   await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
-  await expect(panel.getByRole("log").getByRole("status")).toHaveText("Waiting for Fixture model");
+  const status = panel.getByRole("log").getByRole("status");
+  await expect(status).toHaveText("Waiting for Fixture model");
+  await send({ type: "response.web_search_call.searching" });
+  await expect(status).toHaveText("Searching the web");
+  await send({
+    type: "response.output_item.done",
+    item: { type: "web_search_call", action: { type: "search", query: "studio opening hours" } },
+  });
+  await expect(status).toHaveText("Searching the web for “studio opening hours”");
   await send({ type: "response.output_text.delta", delta: "Friday" });
   const partial = panel.locator(".assistant-answer");
   await expect(partial).toHaveText("Friday");
@@ -871,9 +883,10 @@ for (const existing of [false, true]) {
     await expect(insert).toBeVisible();
     const prompt = "Draft a reply to the open email.";
     await expect(panel.getByText(prompt, { exact: true })).toHaveCount(0);
-    await expect(panel.locator("dl")).toHaveCount(2);
-    await expect(panel.locator("dt").first()).toHaveText("Action");
-    await expect(panel.locator("dd strong")).toHaveText("review time");
+    const facts = panel.locator(".assistant-answer");
+    await expect(facts.locator("dl")).toHaveCount(2);
+    await expect(facts.locator("dt").first()).toHaveText("Action");
+    await expect(facts.locator("dd strong")).toHaveText("review time");
     await expect(panel.getByRole("button", { name: "1. Planning review" })).toBeVisible();
     await expect(panel.locator("details")).not.toHaveAttribute("open", "");
     await panel.locator("summary").click();
@@ -1013,19 +1026,102 @@ for (const mode of ["rich text", "plaintext-only", "rich text without a policy"]
   });
 }
 
-test("a draft outside a thread opens in its own composer", async () => {
-  await useDraftProvider("See you on Friday.");
+// The stand-in sends a signed-out composer on to sign-in, so record the mail
+// link each new page is first asked to open.
+function watchComposeLinks() {
+  return ggmail.app.evaluateHandle(({ app }) => {
+    const links: string[] = [];
+    app.on("web-contents-created", (_event, contents) => {
+      contents.on("did-start-navigation", ({ url }) => {
+        const link = URL.canParse(url) && new URL(url).searchParams.get("url");
+        if (link) {
+          links.push(link);
+        }
+      });
+    });
+    return links;
+  });
+}
+
+test("a draft outside a thread opens in a composer with its recipients, subject and body", async () => {
+  const body = "Hello,\n\nIs breakfast included & when does it start?";
+  await useDraftProvider(body, answer, {
+    to: "desk@hotel.example; sam@studio.example",
+    reply: true,
+  });
   const panel = ggmail.renderer.getByRole("complementary", { name: "Mail assistant" });
   await ggmail.renderer.getByRole("button", { name: "Mail assistant", exact: true }).click();
   await panel.getByRole("button", { name: "Draft an email", exact: true }).click();
   const open = panel.getByRole("button", { name: "Open in Gmail" });
   await expect(open).toBeVisible();
+  // No conversation is open, so nothing can be inserted whatever the model claims.
   await expect(panel.getByRole("button", { name: "Insert into reply" })).toHaveCount(0);
-  const countWindows = () =>
-    ggmail.app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length);
-  const count = await countWindows();
+  const card = panel.getByRole("region", { name: "Draft email", exact: true });
+  await expect(card.locator("dt")).toHaveText(["To", "Subject", "Message"]);
+  await expect(card.locator("dd")).toHaveText([
+    "desk@hotel.example, sam@studio.example",
+    "Planning review",
+    body,
+  ]);
+  const links = await watchComposeLinks();
   await open.click();
-  await expect.poll(countWindows).toBe(count + 1);
+  await expect
+    .poll(() => links.jsonValue())
+    .toEqual([
+      "mailto:desk@hotel.example,sam@studio.example?subject=Planning%20review&body=" +
+        encodeURIComponent(body),
+    ]);
+});
+
+test("a new email drafted inside a conversation stays out of its reply, with each part copyable", async () => {
+  const mail = await openThread();
+  const body = "Hello,\n\nCould you confirm my late arrival?";
+  await useDraftProvider(body, answer, { to: "desk@hotel.example", reply: false });
+  // This account's provider refuses a request that offers web search.
+  const offers = await ggmail.app.evaluateHandle(() => {
+    const offers: boolean[] = [];
+    const fetch = globalThis.fetch;
+    globalThis.fetch = (async (url, options) => {
+      if (String(url) === "https://api.openai.com/v1/responses") {
+        const { tools } = JSON.parse(String(options?.body));
+        const web = tools.some((tool: { type: string }) => tool.type === "web_search");
+        offers.push(web);
+        if (web) {
+          return Response.json({ error: { code: "unsupported_tool" } }, { status: 400 });
+        }
+      }
+      return fetch(url, options);
+    }) as typeof globalThis.fetch;
+    return offers;
+  });
+  const page = ggmail.renderer;
+  await page.getByRole("button", { name: "Mail assistant", exact: true }).click();
+  const panel = page.getByRole("complementary", { name: "Mail assistant" });
+  await panel.getByRole("button", { name: "Draft a reply", exact: true }).click();
+  const card = panel.getByRole("region", { name: "Draft email", exact: true });
+  await expect(card.getByRole("button", { name: "Open in Gmail" })).toBeVisible();
+  // The turn still answers from mail, and the refused tool is not offered again.
+  expect(await offers.jsonValue()).toEqual([true, false, false]);
+  await expect(panel.getByRole("button", { name: "Insert into reply" })).toHaveCount(0);
+  await expect(mail.locator("#reply")).toBeHidden();
+
+  // The clipboard is the whole machine's, so read it straight after each write.
+  const copied = () => ggmail.app.evaluate(({ clipboard }) => clipboard.readText());
+  for (const [name, value] of [
+    ["Copy recipients", "desk@hotel.example"],
+    ["Copy subject", "Planning review"],
+    ["Copy draft body", body],
+  ]) {
+    await card.getByRole("button", { name, exact: true }).click();
+    await expect.poll(copied).toBe(value);
+  }
+  const links = await watchComposeLinks();
+  await card.getByRole("button", { name: "Open in Gmail" }).click();
+  await expect
+    .poll(() => links.jsonValue())
+    .toEqual([
+      "mailto:desk@hotel.example?subject=Planning%20review&body=" + encodeURIComponent(body),
+    ]);
 });
 
 test("the inbox assistant searches later result pages and reads a deadline from the full thread", async () => {

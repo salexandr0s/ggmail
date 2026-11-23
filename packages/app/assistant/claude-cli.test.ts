@@ -83,4 +83,10 @@ test("a generic CLI alias shows its resolved version and passes the chosen effor
   ]);
   await claudeCliReply(options, fingerprint);
   expect(invocations.at(-1)).not.toContain("--effort");
+  // A mail turn gets no built-in tool, or web search alone.
+  const tools = () =>
+    invocations.at(-1)?.filter((_, index, args) => /tools$/i.test(args[index - 1] ?? ""));
+  expect(tools()).toEqual([""]);
+  await claudeCliReply({ ...options, web: { instructions: "", onSearch() {} } }, fingerprint);
+  expect(tools()).toEqual(["WebSearch", "WebSearch"]);
 });

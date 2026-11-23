@@ -54,6 +54,7 @@ export type AssistantActivity =
   | { kind: "thread" | "mailbox" | "waiting" | "reviewing" | "finishing" }
   | { kind: "searching"; account: string; page: number }
   | { kind: "reading"; subject: string }
+  | { kind: "web"; query?: string }
   | { kind: "draftReady"; draft: AssistantDraft };
 
 export type ConnectionState = {
@@ -134,16 +135,27 @@ export function getSenderDomain(address: string) {
   return host && z.hostname().safeParse(host).success ? host : undefined;
 }
 
+export const DRAFT_RECIPIENT_LIMIT = 20;
 export const assistantDraftSchema = z.object({
+  /** Who a new email goes to. Empty on a reply, where Gmail addresses the conversation. */
+  to: z.array(z.email().max(254)).max(DRAFT_RECIPIENT_LIMIT).optional(),
   subject: z
     .string()
     .trim()
     .max(250)
     .regex(/^[^\r\n]*$/),
   body: z.string().trim().min(1).max(5000),
+  /** Whether the draft answers the conversation it was written in. */
+  reply: z.boolean().optional(),
 });
 
+// `to` and `reply` are absent on a draft saved before they were recorded.
 export type AssistantDraft = z.infer<typeof assistantDraftSchema>;
+
+/** A draft from before `reply` was recorded counts as a reply inside a conversation. */
+export function isReplyDraft(draft: AssistantDraft) {
+  return draft.reply ?? true;
+}
 
 export type SourceMessage = {
   index: number;

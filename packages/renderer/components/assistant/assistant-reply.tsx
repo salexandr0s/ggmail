@@ -1,6 +1,11 @@
-import type { AssistantDraft, AssistantReply as Reply } from "@ggmail/shared/assistant";
+import {
+  isReplyDraft,
+  type AssistantDraft,
+  type AssistantReply as Reply,
+} from "@ggmail/shared/assistant";
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import { Button } from "@ggmail/ui/components/button";
+import { cn } from "@ggmail/ui/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ArrowUpRightIcon,
@@ -18,32 +23,89 @@ import { Answer } from "./answer";
 import { AssistantMailCard, CitationNumber } from "./mail-card";
 import { SenderAvatar } from "./sender-avatar";
 
+/** One line of a draft: its label, its own copy button, then the text. */
+function DraftField({
+  label,
+  copyLabel,
+  value,
+  onCopyError,
+  className,
+}: {
+  label: string;
+  copyLabel: string;
+  value: string;
+  onCopyError?: () => void;
+  className: string;
+}) {
+  return (
+    <div className="py-2.5 first:pt-0 last:pb-0">
+      <dt className="flex min-h-6 items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground">
+        {label}
+        <CopyButton
+          value={value}
+          onCopyError={onCopyError}
+          variant="ghost"
+          size="icon-xs"
+          className="-me-1.5"
+          title={copyLabel}
+          aria-label={copyLabel}
+        />
+      </dt>
+      <dd dir="auto" className={cn("text-sm wrap-anywhere", className)}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
 export function DraftCard({
   draft,
-  copyButton,
+  onCopyError,
   children,
 }: {
   draft: AssistantDraft;
-  copyButton?: ReactNode;
+  onCopyError?: () => void;
   children?: ReactNode;
 }) {
   const { t } = useLingui();
+  const recipients = draft.to?.join(", ");
+  // Only a recorded reply is named as one. An older draft may be either.
+  const title = draft.reply
+    ? t({ message: "Draft reply", comment: "Label for a suggested reply to the open email" })
+    : t({ message: "Draft email", comment: "Label for a suggested email draft" });
   return (
-    <AssistantMailCard
-      label={t`Draft email`}
-      icon={FilePenLineIcon}
-      title={<Trans comment="Label for a suggested email draft">Draft email</Trans>}
-      tools={copyButton}
-      actions={children}
-    >
-      {draft.subject && (
-        <p dir="auto" className="text-base leading-snug font-semibold tracking-tight wrap-anywhere">
-          {draft.subject}
-        </p>
-      )}
-      <p dir="auto" className="text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">
-        {draft.body}
-      </p>
+    <AssistantMailCard label={title} icon={FilePenLineIcon} title={title} actions={children}>
+      <dl className="divide-y divide-border/60">
+        {recipients && (
+          <DraftField
+            label={t({ message: "To", comment: "Label of the recipients of a suggested email" })}
+            copyLabel={t`Copy recipients`}
+            value={recipients}
+            onCopyError={onCopyError}
+            className="leading-snug"
+          />
+        )}
+        {draft.subject && (
+          <DraftField
+            label={t({ message: "Subject", comment: "Label of the subject of a suggested email" })}
+            copyLabel={t`Copy subject`}
+            value={draft.subject}
+            onCopyError={onCopyError}
+            className="leading-snug font-semibold"
+          />
+        )}
+        <DraftField
+          label={t({
+            message: "Message",
+            context: "draft",
+            comment: "Label of the body text of a suggested email",
+          })}
+          copyLabel={t`Copy draft body`}
+          value={draft.body}
+          onCopyError={onCopyError}
+          className="leading-relaxed whitespace-pre-wrap"
+        />
+      </dl>
     </AssistantMailCard>
   );
 }
@@ -71,6 +133,8 @@ export const AssistantReply = memo(function AssistantReply({
   const [error, setError] = useState("");
   const [insertion, setInsertion] = useState<"ready" | "pending" | "inserted">("ready");
   const draft = reply.draft;
+  // A draft for someone outside the conversation must not land in its reply.
+  const canInsert = inThread && draft !== undefined && isReplyDraft(draft);
   const { config } = useConfig();
   const showSenderIcons = Boolean(config?.["gmail.showSenderIcons"]);
   const senders = reply.citations.flatMap((source) => source.senders ?? []);
@@ -100,7 +164,7 @@ export const AssistantReply = memo(function AssistantReply({
       onInserted();
     } catch {
       setInsertion("ready");
-      setError(t`Open a reply in this thread and try again.`);
+      setError(t`Couldn't insert the draft. Copy it instead.`);
     }
   }
 
@@ -113,20 +177,8 @@ export const AssistantReply = memo(function AssistantReply({
         showSenderIcons={showSenderIcons}
       />
       {draft && (
-        <DraftCard
-          draft={draft}
-          copyButton={
-            <CopyButton
-              value={draft.body}
-              onCopyError={copyError}
-              variant="ghost"
-              size="icon-xs"
-              title={t`Copy draft body`}
-              aria-label={t`Copy draft body`}
-            />
-          }
-        >
-          {inThread && (
+        <DraftCard draft={draft} onCopyError={copyError}>
+          {canInsert && (
             <Button size="sm" disabled={insertion !== "ready"} onClick={() => void insert()}>
               {insertion === "inserted" ? (
                 <CheckIcon />
@@ -140,7 +192,7 @@ export const AssistantReply = memo(function AssistantReply({
           )}
           {currentView && (
             <Button
-              variant={inThread ? "ghost" : "outline"}
+              variant={canInsert ? "ghost" : "default"}
               size="sm"
               onClick={() => {
                 setError("");

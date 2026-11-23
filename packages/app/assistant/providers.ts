@@ -19,6 +19,7 @@ import {
   AssistantError,
   isUnauthorized,
   listApiModels,
+  RejectedRequestError,
   respond,
   type ResponseOptions,
 } from "./responses";
@@ -40,6 +41,8 @@ export class AssistantProviders {
   });
   private readonly chatgpt = new ChatGPTConnection();
   private models: AssistantModel[] = [];
+  // Models whose provider turned down a request that offered web search.
+  private readonly withoutWeb = new Set<string>();
   private generation = 0;
   private pending?: AssistantConnection;
 
@@ -173,6 +176,29 @@ export class AssistantProviders {
     if (!this.allowsModel(provider, options.model, options.effort)) {
       throw new AssistantError(t`Choose an available model in the mail assistant.`);
     }
+    const model = provider + "/" + options.model;
+    // DeepSeek has no search tool of its own.
+    if (!options.web || provider === "deepseek" || this.withoutWeb.has(model)) {
+      return this.send(provider, { ...options, web: undefined });
+    }
+    try {
+      return await this.send(provider, {
+        ...options,
+        instructions: options.instructions + options.web.instructions,
+      });
+    } catch (error) {
+      if (!(error instanceof RejectedRequestError)) {
+        throw error;
+      }
+      // An account or model without web search refuses the whole request.
+      // Answer from mail alone, and stop offering the tool once that works.
+      const result = await this.send(provider, { ...options, web: undefined });
+      this.withoutWeb.add(model);
+      return result;
+    }
+  }
+
+  private async send(provider: AssistantProvider, options: ResponseOptions) {
     if (provider === "claude-cli") {
       const model = this.models.find((entry) => entry.id === options.model);
       return claudeCliReply(

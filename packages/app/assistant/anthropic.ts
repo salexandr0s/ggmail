@@ -36,7 +36,8 @@ export function anthropicMessages(input: ResponseInput[]) {
       append("user", { type: "tool_result", tool_use_id: item.call_id, content: item.output });
     } else if (item.type === "reasoning") {
       append("assistant", item.block);
-    } else {
+    } else if (item.type === "message") {
+      // An OpenAI search record has no place in a Claude conversation.
       for (const part of item.content) {
         append("assistant", {
           type: "text",
@@ -48,7 +49,11 @@ export function anthropicMessages(input: ResponseInput[]) {
   return messages;
 }
 
-export async function anthropicReply(options: ResponseOptions, key: string) {
+// The basic search tool runs on every model in the catalog. The newer variant
+// also runs code on the provider's side and is limited to recent models.
+const webSearchTool = { type: "web_search_20250305", name: "web_search", max_uses: 5 };
+
+async function request(options: ResponseOptions, key: string, onText: (text: string) => void) {
   const response = await providerRequest(
     new URL("https://api.anthropic.com/v1/messages"),
     {
@@ -63,23 +68,52 @@ export async function anthropicReply(options: ResponseOptions, key: string) {
         stream: true,
         system: options.instructions,
         messages: anthropicMessages(options.input),
-        tools: options.tools.map(({ name, description, parameters }) => ({
-          name,
-          description,
-          input_schema: parameters,
-        })),
+        tools: [
+          ...options.tools.map(({ name, description, parameters }) => ({
+            name,
+            description,
+            input_schema: parameters,
+          })),
+          ...(options.web ? [webSearchTool] : []),
+        ],
       }),
     },
     ms("2 minutes"),
   );
   await checkResponse(response, "anthropic");
   if (response.headers.get("content-type")?.split(";")[0]?.trim() === "application/json") {
-    return completedMessage(await readJson(response, 2_097_152));
+    return completedMessage(await readJson(response, 2_097_152), Boolean(options.web));
   }
   if (!response.body) {
     throw new AssistantError(t`The AI provider returned an empty response.`);
   }
-  return readAnthropicStream(response.body, options.onText);
+  return readAnthropicStream(response.body, onText, options.web?.onSearch);
+}
+
+export async function anthropicReply(options: ResponseOptions, key: string) {
+  let { input } = options;
+  const items: ResponseInput[] = [];
+  let text = "";
+  // A long run of searches pauses the turn. Sending the paused reply back resumes it.
+  for (let pauses = 0; ; pauses++) {
+    const earlier = text;
+    const result = await request({ ...options, input }, key, (preview) =>
+      options.onText(joinText(earlier, preview)),
+    );
+    items.push(...result.items);
+    text = joinText(text, result.text);
+    if (!result.paused) {
+      return { calls: result.calls, items, text };
+    }
+    if (pauses >= 3) {
+      throw incomplete();
+    }
+    input = [...input, ...result.items];
+  }
+}
+
+function joinText(earlier: string, later: string) {
+  return earlier && later ? earlier + "\n\n" + later : earlier || later;
 }
 
 const blockSchema = z.discriminatedUnion("type", [
@@ -93,15 +127,33 @@ const blockSchema = z.discriminatedUnion("type", [
   // The signature arrives separately in streaming mode.
   z.object({ type: z.literal("thinking"), thinking: z.string(), signature: z.string().optional() }),
   z.object({ type: z.literal("redacted_thinking"), data: z.string() }),
+  // A web search the provider ran, and its results. Both return to it unchanged.
+  z
+    .object({
+      type: z.literal("server_tool_use"),
+      id: z.string().min(1).max(256),
+      name: z.string().min(1).max(64),
+      input: z.record(z.string(), z.unknown()),
+    })
+    .passthrough(),
+  z.object({ type: z.literal("web_search_tool_result") }).passthrough(),
 ]);
-const stopReason = z.enum(["end_turn", "tool_use", "stop_sequence", "refusal"]);
-const messageSchema = z.object({ stop_reason: stopReason, content: z.array(blockSchema).max(64) });
+const stopReason = z.enum(["end_turn", "tool_use", "stop_sequence", "refusal", "pause_turn"]);
+// A cited answer splits into a text block per quoted passage, so it has many more
+// blocks than a plain one.
+const BLOCK_LIMIT = 256;
+const messageSchema = z.object({
+  stop_reason: stopReason,
+  content: z.array(blockSchema).max(BLOCK_LIMIT),
+});
 
 function incomplete() {
   return new AssistantError(t`The reply was incomplete. Try again with a shorter request.`);
 }
 
-function completedMessage(message: unknown) {
+// With web search on, the provider splits an answer into a text block per cited
+// passage. `cited` joins such a run back into the sentences it came from.
+function completedMessage(message: unknown, cited: boolean) {
   const result = messageSchema.safeParse(message);
   if (!result.success) {
     throw incomplete();
@@ -109,7 +161,10 @@ function completedMessage(message: unknown) {
   const calls: FunctionCall[] = [];
   const sections: string[] = [];
   const items: ResponseInput[] = [];
+  let previous: string | undefined;
   for (const block of result.data.content) {
+    const adjacent = previous === "text";
+    previous = block.type;
     if (block.type === "tool_use") {
       const args = JSON.stringify(block.input);
       if (args.length > 24_000) {
@@ -125,14 +180,19 @@ function completedMessage(message: unknown) {
       calls.push(call);
       items.push(call);
     } else if (block.type === "text") {
-      if (block.text) {
+      if (cited && adjacent && sections.length) {
+        sections[sections.length - 1] += block.text;
+      } else {
         sections.push(block.text);
+      }
+      if (block.text) {
         items.push({ role: "assistant", content: block.text });
       }
     } else {
       if (block.type === "thinking" && !block.signature) {
         throw incomplete();
       }
+      // Thinking and server tool blocks return to the API as they arrived.
       items.push({ type: "reasoning", block });
     }
   }
@@ -140,7 +200,12 @@ function completedMessage(message: unknown) {
   if (hasCalls !== (result.data.stop_reason === "tool_use")) {
     throw incomplete();
   }
-  return { calls, items, text: sections.join("\n\n") };
+  return {
+    calls,
+    items,
+    text: sections.filter(Boolean).join("\n\n"),
+    paused: result.data.stop_reason === "pause_turn",
+  };
 }
 
 const streamEvent = z.object({
@@ -162,6 +227,7 @@ const streamEvent = z.object({
 export async function readAnthropicStream(
   body: ReadableStream<Uint8Array>,
   onText: (text: string) => void,
+  onSearch?: (query?: string) => void,
 ) {
   const content: z.infer<typeof blockSchema>[] = [];
   let block: z.infer<typeof blockSchema> | undefined;
@@ -192,15 +258,24 @@ export async function readAnthropicStream(
           stop ||
           block ||
           index !== content.length ||
-          index >= 64 ||
+          index >= BLOCK_LIMIT ||
           !content_block
         ) {
           throw incomplete();
         }
         block = content_block;
         toolJson = "";
-        if (block.type === "text" && block.text) {
-          showText(block.text);
+        if (block.type === "text") {
+          // With web search on, text that follows text continues the same sentence.
+          const continues = onSearch && content.at(-1)?.type === "text";
+          if (completedText && !completedText.endsWith("\n\n") && !continues) {
+            completedText += "\n\n";
+          }
+          if (block.text) {
+            showText(block.text);
+          }
+        } else if (block.type === "server_tool_use") {
+          onSearch?.();
         }
         break;
       case "content_block_delta":
@@ -218,7 +293,10 @@ export async function readAnthropicStream(
             }
             break;
           case "input_json_delta":
-            if (block.type !== "tool_use" || delta.partial_json === undefined) {
+            if (
+              (block.type !== "tool_use" && block.type !== "server_tool_use") ||
+              delta.partial_json === undefined
+            ) {
               throw incomplete();
             }
             toolJson += delta.partial_json;
@@ -244,11 +322,14 @@ export async function readAnthropicStream(
         if (!block || index !== content.length) {
           throw incomplete();
         }
-        if (block.type === "tool_use" && toolJson) {
+        if ((block.type === "tool_use" || block.type === "server_tool_use") && toolJson) {
           block.input = JSON.parse(toolJson);
         }
-        if (block.type === "text" && block.text) {
-          completedText += block.text + "\n\n";
+        if (block.type === "server_tool_use" && typeof block.input.query === "string") {
+          onSearch?.(block.input.query);
+        }
+        if (block.type === "text") {
+          completedText += block.text;
         }
         content.push(block);
         block = undefined;
@@ -265,7 +346,7 @@ export async function readAnthropicStream(
         if (!started || block || !stop) {
           throw incomplete();
         }
-        return completedMessage({ stop_reason: stop, content });
+        return completedMessage({ stop_reason: stop, content }, Boolean(onSearch));
       case "error":
         throw new AssistantError(t`The AI provider couldn't complete the request. Try again.`);
     }
