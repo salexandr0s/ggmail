@@ -78,7 +78,7 @@ const ggmail = useApp(
       seedAccount({ id: "Off", label: "Off", disabled: true, selected: false }),
     ],
   },
-  { env, args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
+  { env },
 );
 
 async function openMailbox(account: string, signedOut = false) {

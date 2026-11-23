@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { useApp } from "./lib/app";
 import { configSwitch, openSettingsPage } from "./lib/settings";
 
-const ggmail = useApp({}, { args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] });
+const ggmail = useApp();
 
 /**
  * Flips Show Do Not Disturb button from the settings page and comes back to the

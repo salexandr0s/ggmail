@@ -97,7 +97,7 @@ const ggmail = useApp(
     ],
     "gmail.savedSearches": [{ id: "paid", label: "Paid receipts", query: paid }],
   },
-  { env, args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
+  { env },
 );
 
 async function openSearch() {

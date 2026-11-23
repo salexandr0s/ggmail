@@ -3,14 +3,11 @@ import { ASSISTANT_PROMPT_LIMIT, type AssistantRequest } from "@ggmail/shared/as
 import { expect, test } from "@playwright/test";
 import { useApp } from "./lib/app";
 
-const ggmail = useApp(
-  {
-    "workspaceApps.mode": "tabs",
-    "workspaceApps.openInApp": true,
-    "window.restrictMinimumSize": false,
-  },
-  { args: process.platform === "darwin" ? ["--use-mock-keychain"] : [] },
-);
+const ggmail = useApp({
+  "workspaceApps.mode": "tabs",
+  "workspaceApps.openInApp": true,
+  "window.restrictMinimumSize": false,
+});
 const threadId = "194a92f8c0000001";
 const subject = "Project review & next steps";
 const selection = "Send the revised proposal by Friday";
