@@ -232,7 +232,9 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
         }
       }
       // Offered only when the system menu holds something this one does not.
-      const other = hasNativeExtras ? [{ id: "system", label: t`System menu…`, run: systemMenu }] : [];
+      const other = hasNativeExtras
+        ? [{ id: "system", label: t`System menu…`, run: systemMenu }]
+        : [];
       showContextActions(parent, source, point, [primary, [...edits, ...links], other]);
     }
     void open(parent).catch((error) => {
