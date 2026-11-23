@@ -1217,8 +1217,16 @@ msgid "Copy Message Link"
 msgstr "Copy Message Link"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "Copy recipients"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "Copy reply"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "Copy subject"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1261,6 +1269,11 @@ msgstr "Couldn't export the logs."
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "Couldn't finish the reply. Try again."
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "Couldn't insert the draft. Copy it instead."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1605,6 +1618,11 @@ msgstr "Draft an email"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
 msgstr "Draft email"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "Draft reply"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -2598,6 +2616,12 @@ msgstr "Menu bar icon"
 msgid "Message"
 msgstr "Message"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "Message"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Message the mail assistant"
@@ -2911,8 +2935,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Open a new window to compose an email, instead of composing inside Gmail."
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "Open a reply in this thread and try again."
 
@@ -3629,6 +3651,14 @@ msgstr "Searching {account}"
 msgid "Searching {account} · page {page}"
 msgstr "Searching {account} · page {page}"
 
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "Searching the web"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "Searching the web for “{query}”"
+
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
 msgstr "Searching…"
@@ -4230,6 +4260,11 @@ msgstr "Stop the application window from being resized below a usable minimum."
 msgid "Stop the current reply before asking another question."
 msgstr "Stop the current reply before asking another question."
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "Subject"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
 msgstr "Summarize the open email and highlight anything I should know."
@@ -4450,6 +4485,11 @@ msgstr "Titlebar"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "to"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "To"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."
