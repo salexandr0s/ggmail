@@ -61,9 +61,24 @@ const SIGNED_IN_CHECK_TIMEOUT = 15_000;
  * Exported so that a second instance spawned to deliver a deep link is started
  * exactly as the app under test was — the user data directory above all, since
  * it is what the single instance lock is scoped to.
+ *
+ * `systemKeychain` is for a launch on a copy of the signed-in profile. The deep
+ * link specs skip macOS, the one platform the option changes anything on, so
+ * the second instance they spawn has no need to pass it.
  */
-export function launchArguments(userDataDir: string) {
+export function launchArguments(userDataDir: string, { systemKeychain = false } = {}) {
   const args = [`--user-data-dir=${userDataDir}`];
+
+  // An installed ggmail keeps its cookie key in the login keychain as "ggmail
+  // Safe Storage", on an access list that names the Developer ID build. The
+  // unsigned build under test is not on that list, so macOS asks before handing
+  // the key over and the launch waits on a prompt nobody answers. The mock
+  // keychain keeps a fresh profile away from it. A copy of the signed-in
+  // profile stays on the system keychain, because the mock one cannot read
+  // cookies a built app encrypted with the real key.
+  if (process.platform === "darwin" && !systemKeychain) {
+    args.push("--use-mock-keychain");
+  }
 
   // chrome-sandbox ships without its setuid bit outside an installed package,
   // so an unpacked Linux build cannot use the sandbox. The packaged apps on the
@@ -324,7 +339,10 @@ async function launchOnUserDataDir(
   // branch. Running the app the way it ships is the point.
   const app = await _electron.launch({
     executablePath: EXECUTABLE_PATH,
-    args: [...launchArguments(userDataDir), ...(options.args ?? [])],
+    args: [
+      ...launchArguments(userDataDir, { systemKeychain: Boolean(options.signedInProfileDir) }),
+      ...(options.args ?? []),
+    ],
     cwd: process.cwd(),
     // Other sessions share this machine's desktop, and a test has no use for
     // its foreground.
