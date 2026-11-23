@@ -35,12 +35,8 @@
   color: var(--primary);
 }
 .task-emblem.is-saved {
-  background: #ceead6;
-  color: #137333;
-}
-.dark .task-emblem.is-saved {
-  background: #183b2a;
-  color: #81c995;
+  background: var(--success-surface);
+  color: var(--success);
 }
 .task-identity {
   min-width: 0;
@@ -65,9 +61,14 @@
 .task-setup button {
   color: var(--primary);
 }
-.task-account button:hover,
-.task-setup button:hover {
+.task-account button:enabled:hover,
+.task-setup button:enabled:hover {
   text-decoration: underline;
+}
+.task-account button:disabled,
+.task-setup button:disabled,
+.task-clear:disabled {
+  opacity: 0.5;
 }
 .task-body {
   display: flex;
@@ -87,7 +88,6 @@
 .task-field input {
   height: 40px;
   border-radius: 8px;
-  box-shadow: none;
 }
 .task-field .task-title-input {
   font-size: 16px;
@@ -105,8 +105,9 @@
   height: 32px;
   color: var(--muted-foreground);
 }
-.task-clear:hover {
-  background: var(--muted);
+.task-clear:enabled:hover {
+  background: var(--accent);
+  color: var(--foreground);
 }
 .task-source {
   gap: 12px;
@@ -183,7 +184,7 @@
   color: var(--muted-foreground);
 }
 .task-dialog :is(a, button):focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 @media (max-width: 420px), (max-height: 395px) {

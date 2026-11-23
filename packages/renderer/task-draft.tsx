@@ -203,7 +203,7 @@ function TaskDraft() {
         )}
         {operation === "connect" && (
           <p role="status" className="task-setup">
-            {t`Finish signing in in your browser, then return here.`}
+            {t`Sign in with Google in your browser, then return here.`}
           </p>
         )}
         {error && (

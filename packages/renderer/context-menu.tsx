@@ -1,5 +1,6 @@
 import { ipc } from "@ggmail/shared/renderer/ipc";
 import type { ContextMenuItem } from "@ggmail/shared/types";
+import { cn } from "@ggmail/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
   Bookmark,
@@ -34,7 +35,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { Fragment, useLayoutEffect, useRef } from "react";
+import { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { renderApp } from "./lib/react";
 import "./context-menu.css";
 
@@ -84,6 +85,8 @@ function ContextMenu() {
     dateMenu && options.every((item) => item.calendar?.zone === firstZone) ? firstZone : undefined;
   const menu = useRef<HTMLDivElement>(null);
   const typed = useRef({ prefix: "", time: 0 });
+  // Whether the keyboard moved the highlight last. Only then does the row draw a ring.
+  const [keyboard, setKeyboard] = useState(false);
   useLayoutEffect(() => {
     menu.current?.focus();
     const outside = (event: PointerEvent) => {
@@ -98,11 +101,16 @@ function ContextMenu() {
   return (
     <div
       ref={menu}
-      className={dateMenu ? "context-surface calendar-choices" : "context-surface"}
+      className={cn(
+        "context-surface bg-popover text-popover-foreground",
+        dateMenu && "calendar-choices",
+      )}
+      data-keyboard={keyboard || undefined}
       role="menu"
       tabIndex={-1}
       aria-label={dateMenu ? t`Choose a date` : t`Actions`}
       onKeyDown={(event) => {
+        setKeyboard(true);
         if (event.key === "Escape" || event.key === "Tab") {
           event.preventDefault();
           choose(null);
@@ -190,6 +198,12 @@ function ContextMenu() {
                 tabIndex={-1}
                 title={item.label}
                 aria-label={item.label}
+                onPointerMove={(event) => {
+                  setKeyboard(false);
+                  event.currentTarget.focus();
+                }}
+                // Like a native menu, nothing stays highlighted once the pointer has left the row.
+                onPointerLeave={() => menu.current?.focus()}
                 onClick={() => choose(value)}
               >
                 {item.calendar ? (
@@ -208,9 +222,7 @@ function ContextMenu() {
                   </>
                 ) : (
                   <>
-                    <span className="context-icon">
-                      {Icon && <Icon size={19} strokeWidth={1.8} />}
-                    </span>
+                    <span className="context-icon">{Icon && <Icon size={18} />}</span>
                     <span className="context-label">{item.label}</span>
                   </>
                 )}

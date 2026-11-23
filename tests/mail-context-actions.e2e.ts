@@ -155,7 +155,7 @@ test("edits and saves a selected task, preserves its origin and chooses between 
     nativeTheme.themeSource = "dark";
   });
   const first = await rightClickSelection();
-  await expect(first.getByRole("menu")).toHaveCSS("background-color", "rgb(41, 42, 45)");
+  await expect(first.getByRole("menu")).toHaveCSS("background-color", "rgb(48, 48, 48)");
   await expect(first.getByRole("menuitem", { name: "Add to Tasks" })).toBeVisible();
   await first.screenshot({
     path: test.info().outputPath("message-menu.png"),

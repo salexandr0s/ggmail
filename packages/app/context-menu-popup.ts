@@ -36,10 +36,24 @@ export async function runContextAction(action: Pick<ContextAction, "id" | "run">
   }
 }
 
-/** A row that also names its time zone runs to a third line. */
-const DATE_ROW_HEIGHT = 68;
+/*
+ * The popup window is sized here, before its page has rendered, so these
+ * mirror the box sizes in `context-menu.css`. A window taller than its content
+ * leaves a dead strip under the menu that still swallows clicks.
+ */
+const MENU_FRAME_HEIGHT = 10;
 
-const DATE_ROW_HEIGHT_WITH_ZONE = 88;
+const MENU_ROW_HEIGHT = 36;
+
+const MENU_SEPARATOR_HEIGHT = 9;
+
+/** The frame of the date chooser, with its heading. */
+const DATE_FRAME_HEIGHT = 81;
+
+const DATE_ROW_HEIGHT = 64;
+
+/** A row that also names its time zone runs to a third line. */
+const DATE_ROW_HEIGHT_WITH_ZONE = 76;
 
 export function showContextActions(
   parent: BrowserWindow,
@@ -67,12 +81,16 @@ export function showContextActions(
   const datesHeight = actions.reduce(
     (height, action) =>
       height + (action.calendar?.zone && !sharedZone ? DATE_ROW_HEIGHT_WITH_ZONE : DATE_ROW_HEIGHT),
-    76,
+    DATE_FRAME_HEIGHT,
   );
   popup.toggle(parent, {
     page: "context-menu",
     width,
-    height: dates ? datesHeight : 14 + 36 * actions.length + 9 * (sections.length - 1),
+    height: dates
+      ? datesHeight
+      : MENU_FRAME_HEIGHT +
+        MENU_ROW_HEIGHT * actions.length +
+        MENU_SEPARATOR_HEIGHT * (sections.length - 1),
     anchor: { ...point, align: "start" },
     fitVertically: true,
     searchParams: new URLSearchParams({ items: JSON.stringify(items) }),

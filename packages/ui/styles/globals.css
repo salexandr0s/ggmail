@@ -101,6 +101,8 @@
   --muted-foreground: #444746;
   --accent: #e8eaed;
   --accent-foreground: var(--foreground);
+  /* The hover and highlight fill on the popover surface. See `.bg-popover` below. */
+  --popover-accent: var(--accent);
   --destructive: #b3261e;
   --border: #dadce0;
   --input: #80868b;
@@ -148,6 +150,7 @@
   --muted: #282828;
   --muted-foreground: #b7b7b7;
   --accent: #383838;
+  --popover-accent: #464646;
   --destructive: #ffb4ab;
   --border: #373737;
   --input: #777777;
@@ -191,6 +194,15 @@
   input,
   textarea {
     @apply cursor-text;
+  }
+
+  /*
+   * In dark mode the popover surface is lighter than the page, and the page's
+   * highlight fill all but disappears on it. Menus, selects, dialogs and sheets
+   * take a fill lifted by the same step.
+   */
+  .bg-popover {
+    --accent: var(--popover-accent);
   }
 }
 

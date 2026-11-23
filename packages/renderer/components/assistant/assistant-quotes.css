@@ -183,8 +183,8 @@
   text-decoration: underline;
 }
 :is(.quote-tray, .quote-list) :is(button, a):focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 .quote-feedback {
   display: block;
