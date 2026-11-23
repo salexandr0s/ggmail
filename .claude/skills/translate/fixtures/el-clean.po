@@ -1,0 +1,209 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: el\n"
+
+# Apple's Τερματισμός is the macOS label's word, Microsoft's and GNOME's Έξοδος the others'.
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Quit {appName}"
+msgstr "Τερματισμός {appName}"
+
+#: packages/app/menu.ts
+msgctxt "Windows"
+msgid "Quit {appName}"
+msgstr "Έξοδος από το {appName}"
+
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "Quit {appName}"
+msgstr "Έξοδος του {appName}"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgctxt "macOS"
+msgid "Show Save As dialog before downloading"
+msgstr "Εμφάνιση διαλόγου «Αποθήκευση ως» πριν από τη λήψη"
+
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Check for Updates…"
+msgstr "Έλεγχος για ενημερώσεις…"
+
+#: packages/renderer/recent-download-history.tsx
+msgid "Recent download history"
+msgstr "Ιστορικό πρόσφατων λήψεων"
+
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "File"
+msgstr "Αρχείο"
+
+#: packages/app/menu.ts
+msgctxt "macOS"
+msgid "Settings…"
+msgstr "Ρυθμίσεις…"
+
+#: packages/app/menu.ts
+msgctxt "Linux"
+msgid "About {appName}"
+msgstr "Περί {appName}"
+
+#: packages/app/downloads.ts
+msgctxt "macOS"
+msgid "Show in Finder"
+msgstr "Εμφάνιση στο Finder"
+
+# Microsoft's Άκυρο and GNOME's Εντάξει are their platforms' words for a native dialog's buttons.
+#: packages/app/lib/native-cancel-label.ts
+msgctxt "Windows"
+msgid "Cancel"
+msgstr "Άκυρο"
+
+#: packages/app/dialogs.ts
+msgctxt "Linux"
+msgid "OK"
+msgstr "Εντάξει"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgctxt "Windows"
+msgid "Enable system tray icon"
+msgstr "Ενεργοποίηση εικονιδίου περιοχής συστήματος"
+
+# A Windows or Linux label keeps one & before a Greek letter; the macOS label drops it.
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Cu&t"
+msgstr "Απο&κοπή"
+
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Cu&t"
+msgstr "Αποκοπή"
+
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Sa&ve Image As…"
+msgstr "Αποθήκευση εικόνας &ως…"
+
+#: packages/app/context-menu.ts
+msgctxt "Windows"
+msgid "Paste and &Match Style"
+msgstr "Επικόλληση και αντιστοίχιση &μορφής"
+
+#: packages/app/context-menu.ts
+msgctxt "Linux"
+msgid "Paste and &Match Style"
+msgstr "Επικόλληση και αντιστοίχιση &στιλ"
+
+# Chrome's wording, with its article, is the house word; Apple's is the macOS label's.
+#: packages/app/context-menu.ts
+msgid "&Search with Google"
+msgstr "Ανα&ζήτηση με την Google"
+
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "&Search with Google"
+msgstr "Αναζήτηση με Google"
+
+#: packages/app/context-menu.ts
+msgid "Copy Link Addr&ess"
+msgstr "Αντιγραφή διεύ&θυνσης συνδέσμου"
+
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Copy Link Addr&ess"
+msgstr "Αντιγραφή συνδέσμου"
+
+#: packages/app/context-menu.ts
+msgctxt "macOS"
+msgid "Look Up “{selection}”"
+msgstr "Διερεύνηση «{selection}»"
+
+#: packages/renderer/routes/settings/appearance.tsx
+msgid "Show bookmarks button"
+msgstr "Εμφάνιση κουμπιού σελιδοδεικτών"
+
+# A Gmail label is an ετικέτα; ggmail's own Label field is a name.
+#: packages/renderer/routes/settings/gmail/label-colors.tsx
+msgctxt "Gmail label"
+msgid "Enter a label"
+msgstr "Εισαγάγετε μια ετικέτα"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgctxt "saved search"
+msgid "Enter a label"
+msgstr "Εισαγάγετε ένα όνομα"
+
+# Greek quotation marks, and the Greek question mark, U+003B.
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Remove {label}?"
+msgstr "Κατάργηση του λογαριασμού «{label}»;"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Are you sure you want to delete this message?"
+msgstr "Θέλετε σίγουρα να διαγράψετε αυτό το μήνυμα;"
+
+# The formal plural: σας, never σου.
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "ggmail keeps this account signed in but doesn't load it."
+msgstr "Το ggmail διατηρεί τον λογαριασμό σας συνδεδεμένο, αλλά δεν τον φορτώνει."
+
+#: packages/renderer/components/app-titlebar.tsx
+msgid "{count, plural, one {# tab} other {# tabs}}"
+msgstr "{count, plural, one {# καρτέλα} other {# καρτέλες}}"
+
+#: packages/renderer/routes/settings/extensions.tsx
+msgid "{failedCount, plural, one {Couldn't update # extension} other {Couldn't update # extensions}}"
+msgstr "{failedCount, plural, one {Αποτυχία ενημέρωσης # επέκτασης} other {Αποτυχία ενημέρωσης # επεκτάσεων}}"
+
+#: packages/renderer/routes/settings/notifications.tsx
+msgid "30 minutes"
+msgstr "30 λεπτά"
+
+#: packages/app/ipc.ts
+msgid "Move to New Window"
+msgstr "Μετακίνηση σε νέο παράθυρο"
+
+#: packages/renderer/routes/settings/general.tsx
+msgid "Notify when updates are available"
+msgstr "Ειδοποίηση όταν υπάρχουν διαθέσιμες ενημερώσεις"
+
+#: packages/renderer/routes/settings/saved-searches.tsx
+msgid "Edit saved search"
+msgstr "Επεξεργασία αποθηκευμένης αναζήτησης"
+
+#: packages/app/dialogs.ts
+msgid "Restart ggmail to apply the changes."
+msgstr "Επανεκκινήστε το ggmail για να εφαρμοστούν οι αλλαγές."
+
+#: packages/app/menu.ts
+msgid "Find…"
+msgstr "Εύρεση…"
+
+#: packages/app/menu.ts
+msgid "Downloads"
+msgstr "Λήψεις"
+
+#: packages/renderer/routes/settings/downloads.tsx
+msgid "Open folder when done"
+msgstr "Άνοιγμα φακέλου μετά την ολοκλήρωση"
+
+#: packages/renderer/components/download-history.tsx
+msgid "Show in folder"
+msgstr "Εμφάνιση στον φάκελο"
+
+# A placeholder named email is not the Latin word in the copy.
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Connected as {email}"
+msgstr "Σύνδεση ως {email}"
+
+#: packages/app/context-menu.ts
+msgid "Copy Email Address"
+msgstr "Αντιγραφή διεύθυνσης ηλεκτρονικού ταχυδρομείου"
+
+#: packages/renderer/routes/settings/accounts.tsx
+msgid "Couldn't add the account."
+msgstr "Δεν ήταν δυνατή η προσθήκη του λογαριασμού."

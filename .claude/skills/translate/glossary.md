@@ -15,6 +15,7 @@ Every word here follows the source order in `.claude/skills/translate/source-ord
 The window and ggmail's own copy, also the Settings section of the language's style sheet. The app-menu item has a platform `msgctxt`: on macOS it is AppKit's word with AppKit's ellipsis, named below, and on Windows and Linux the platform's word with the English's ellipsis, from the style sheet.
 
 - de: Einstellungen (Chrome 430/436); the macOS menu item _Einstellungen …_ with a no-break space before the ellipsis (Apple)
+- el: Ρυθμίσεις (Chrome 432/432); the macOS menu item _Ρυθμίσεις…_ (Apple)
 - fr: Paramètres (Chrome 416/432, Chromium 156.0.8078.49's .xtb files); the macOS menu item _Réglages…_ (Apple)
 - it: Impostazioni (Chrome 431/436); the macOS menu item _Impostazioni…_ (Apple)
 - es: Configuración (Chrome 300/432, ajustes in the rest); the macOS menu item _Ajustes…_ (Apple)
@@ -30,6 +31,7 @@ The window and ggmail's own copy, also the Settings section of the language's st
 A Google account in ggmail: _Add account_, _Remove account_, _Manage Accounts_.
 
 - de: Konto, plural Konten (Chrome 392/404; _Konto hinzufügen …_). Never _Account_.
+- el: λογαριασμός (Chrome 393/393; _Προσθήκη λογαριασμού_)
 - fr: compte (Chrome 393/404; _Ajouter un compte…_)
 - it: account, invariable (Chrome 402/404; _Aggiungi account…_), never _accounts_
 - es: cuenta (Chrome 393/404; _Añadir cuenta…_)
@@ -45,6 +47,7 @@ A Google account in ggmail: _Add account_, _Remove account_, _Manage Accounts_.
 An entry in an account's vertical tabs strip.
 
 - de: Tab, der; plural Tabs (Chrome 814/819; _Tab schließen_)
+- el: καρτέλα (Chrome 757/819; _Κλείσιμο καρτέλας_)
 - fr: onglet (Chrome 747/819; _Fermer l’onglet_)
 - it: scheda, plural schede (Chrome 748/819; _Chiudi scheda_), never _pannello_
 - es: pestaña (Chrome 749/819; _Cerrar pestaña_)
@@ -60,6 +63,7 @@ An entry in an account's vertical tabs strip.
 A tab kept in the strip's upper section. _Pin_ and _Unpin_ are the context-menu actions; _Unpinned tabs_ is a hibernation option. The counts are of the messages with _pinned_; the labels are Chrome's tab context menu's _Pin tab_ and _Unpin_.
 
 - de: angepinnter Tab; _Anpinnen_, _Loslösen_ (Chrome 16/16; _Tab anpinnen_, _Loslösen_)
+- el: καρφιτσωμένη καρτέλα; _Καρφίτσωμα_, _Ξεκαρφίτσωμα_ (Chrome 16/16; _Καρφίτσωμα καρτέλας_, _Ξεκαρφίτσωμα_)
 - fr: onglet épinglé; _Épingler_, _Retirer_ (Chrome 4/4 for a pinned tab and 22/23 for _Unpin_, Chromium 156.0.8078.49's .xtb files; _Épingler l’onglet_, _Retirer_)
 - it: scheda fissata; _Fissa_, _Stacca_ (Chrome 13/16; _Fissa scheda_, _Stacca_)
 - es: pestaña fija; _Fijar_, _Desfijar_ (Chrome 16/16; _Fijar pestaña_, _Desfijar_), never _anclar_
@@ -75,6 +79,7 @@ A tab kept in the strip's upper section. _Pin_ and _Unpin_ are the context-menu 
 The page listing new mail across every account. ggmail's own feature. The phrase is unresolved by the app count: of the seven apps only Thunderbird (gruppierte Ordner) and Android (kombinierte Ansicht) have a merged inbox. So each language takes the source order's next fallback, Google's wording: the Gmail app's name for its own every-account inbox, English _All inboxes_, from Gmail Help answer/6078445 (https://support.google.com/mail/answer/6078445?hl=<tag>), unless that name is another Gmail concept's, such as its All Mail folder in "Archive Gmail messages" (https://support.google.com/mail/answer/6576?hl=<tag>). It is a view's name, so it keeps Google's capitalization inside a sentence too.
 
 - de: Alle Posteingänge, quoted „…“ inside a sentence, as „Nicht stören“ is (Google: the Gmail app's _Alle Posteingänge_, its every-account inbox, in Gmail Help answer/6078445 `hl=de`, taken by the source order's fallback since the app count leaves it unresolved; never _kombinierter Posteingang_)
+- el: Όλα τα εισερχόμενα, quoted «…» inside a sentence, as «Μην ενοχλείτε» is (Google: the Gmail app's _Όλα τα εισερχόμενα_, its every-account inbox, in Gmail Help answer/6078445 `hl=el`, taken by the source order's fallback since the app count leaves it unresolved; never _ενοποιημένα εισερχόμενα_)
 - fr: Toutes les boîtes (Google: the Gmail app's _Toutes les boîtes_, its every-account inbox, in Gmail Help answer/6078445 `hl=fr`, taken by the source order's fallback since the app count leaves it unresolved; never _boîte de réception unifiée_)
 - it: Tutte le caselle (Google: the Gmail app's _Tutte le caselle_, its every-account inbox, in Gmail Help answer/6078445 `hl=it`, taken by the source order's fallback since the app count leaves it unresolved; never _posta in arrivo unificata_)
 - es: Todas las bandejas (Google: the Gmail app's _Todas las bandejas_, its every-account inbox, in Gmail Help answer/6078445 `hl=es`, taken by the source order's fallback since the app count leaves it unresolved; never _bandeja de entrada unificada_)
@@ -90,6 +95,7 @@ The page listing new mail across every account. ggmail's own feature. The phrase
 A timed or indefinite hold on notifications. A part of the operating system, so Apple's names, from macOS's Focus strings, as each style sheet cites them; they keep Apple's capitalization as a feature name.
 
 - de: Nicht stören (Apple)
+- el: Μην ενοχλείτε (Apple)
 - fr: Ne pas déranger (Apple)
 - it: Non disturbare (Apple)
 - es: No molestar (Apple)
@@ -103,6 +109,7 @@ A timed or indefinite hold on notifications. A part of the operating system, so 
 ## Notification
 
 - de: Benachrichtigung, plural Benachrichtigungen (Chrome 131/132). Never _Mitteilung_.
+- el: ειδοποίηση, plural ειδοποιήσεις (Chrome 132/132). Never _γνωστοποίηση_, Apple's word, which belongs only in a `macOS` label.
 - fr: notification (Chrome 131/132)
 - it: notifica, plural notifiche (Chrome 132/132)
 - es: notificación (Chrome 132/132)
@@ -118,6 +125,7 @@ A timed or indefinite hold on notifications. A part of the operating system, so 
 The time windows outside which no notification is shown. The interface reads _Notification times_; one window is a _time window_. Built on the word for notification above; the window is the apps' word for a time window, counted in their messages with _time window_, _slot_, _range_ or _frame_.
 
 - de: Benachrichtigungszeiten; a window is a _Zeitfenster_ (agent-chosen: Zeitfenster: 2 of 7 (VS Code, Microsoft))
+- el: ώρες ειδοποιήσεων; a window is a _χρονικό διάστημα_ (agent-chosen: χρονικό εύρος: 2 of 7 (LibreOffice, Apple), thin, so Google's wording decides, χρονικό διάστημα twice and χρονικό εύρος once in Google Calendar Help's appointment-schedule page (support.google.com/calendar/answer/10729749))
 - fr: horaires des notifications; a window is a _créneau horaire_ (agent-chosen: the apps tie, Thunderbird and Microsoft between créneau and intervalle, Firefox intervalle, Apple période; Google's wording breaks it, créneau 4 times and période 2 in Google Calendar Help, "Create an appointment schedule" (support.google.com/calendar/answer/10729749))
 - it: orari delle notifiche; a window is un _intervallo_ (agent-chosen: intervallo: 5 of 7 (Thunderbird, Firefox, LibreOffice, Microsoft, Apple))
 - es: horario de notificaciones; a window is un _intervalo_ (agent-chosen: intervalo: 3 of 7 (Thunderbird, Firefox, Apple))
@@ -135,6 +143,7 @@ The compounds for _Notification times_ are built on Chrome's notification word a
 Unloading an idle tab to give back its memory, keeping it in the list: _Hibernate idle tabs_, _Hibernate after_, _Hibernate When Idle_. It is what Chrome's Memory Saver does to a tab, which Chrome calls an _inactive tab_, so a hibernated tab takes Chrome's word for that state, counted in its 8 messages with _inactive tab_; to hibernate is to make a tab inactive, worded as the sentence needs. Never the operating system's word for sleep, which would read as the computer going to sleep.
 
 - de: inaktiv; _Inaktiver Tab_, _inaktiv machen_ (Chrome 8/8), never _Ruhezustand_
+- el: ανενεργή; _Ανενεργή καρτέλα_, _γίνεται ανενεργή_ (Chrome 8/8), never _αδρανοποίηση_, the operating system's sleep
 - fr: inactif; _Onglet inactif_, _rendre inactif_ (Chrome 8/8), never _mise en veille_
 - it: non attiva, inattiva; _Scheda non attiva_, _rendere inattiva_ (Chrome 8/8)
 - es: inactiva; _Pestaña inactiva_, _inactivar_ (Chrome 8/8)
@@ -150,6 +159,7 @@ Unloading an idle tab to give back its memory, keeping it in the list: _Hibernat
 A Google Workspace site opened as a tab or window. _Workspace_ stays English. The app word is Chrome's.
 
 - de: Workspace-App, plural Workspace-Apps (Chrome's _App_ 470/472)
+- el: εφαρμογή Workspace, plural εφαρμογές Workspace (Chrome's _εφαρμογή_ 458/459)
 - fr: appli Workspace, plural applis Workspace (Chrome's _appli_ 456/472), never _app_
 - it: app di Workspace (Chrome's _app_ 459/472)
 - es: aplicación de Workspace (Chrome's _aplicación_ 433/472), never _app_ outside a `macOS` label
@@ -165,6 +175,7 @@ A Google Workspace site opened as a tab or window. _Workspace_ stays English. Th
 The one tab per app that every link to that app opens in. The badge setting reads _Show app links badge_. Built on Chrome's words for tab, link and app; none of the seven apps has such a tab, so the phrase is not counted and stays agent-chosen.
 
 - de: Tab für App-Links (agent-chosen, not countable: Chrome's _Tab_ and _Link_)
+- el: καρτέλα συνδέσμων εφαρμογής (agent-chosen, not countable: Chrome's _καρτέλα_, _σύνδεσμος_ and _εφαρμογή_)
 - fr: onglet des liens d’appli (agent-chosen, not countable: Chrome's _onglet_, _lien_ and _appli_)
 - it: scheda dei link dell’app (agent-chosen, not countable: Chrome's _scheda_, _link_ and _app_)
 - es: pestaña de enlaces de la aplicación (agent-chosen, not countable: Chrome's _pestaña_, _enlace_ and _aplicación_)
@@ -178,7 +189,7 @@ The one tab per app that every link to that app opens in. The badge setting read
 The badge that marks it, in _Show app links badge_. It marks a tab rather than counting, so the word for a badge under [Unread badge](#unread-badge) holds only where it names a badge of either kind, and every language has a line of its own.
 
 - de: Kennzeichen (_Kennzeichen für App-Links anzeigen_), the unread badge's word
-- el: σήμα (_Εμφάνιση σήματος συνδέσμων εφαρμογής_)
+- el: σήμα (_Εμφάνιση σήματος συνδέσμων εφαρμογής_), the unread badge's word, which names a badge of either kind (Chrome 0/0; agent-chosen, unresolved by the app count: σήμα: 2 of 7 (Thunderbird, Microsoft), thin, LibreOffice _έμβλημα_, Apple _ταμπέλα_, so the existing σήμα stays)
 - fr: pastille (_Afficher la pastille de l’onglet des liens d’appli_), the unread badge's word, never _indicateur_
 - it: badge (_Mostra il badge della scheda dei link dell’app_), the unread badge's word
 - es: insignia (_Mostrar insignia de enlaces de la aplicación_), the unread badge's word
@@ -194,6 +205,7 @@ The badge that marks it, in _Show app links badge_. It marks a tab rather than c
 A named Gmail query an account keeps. Built on Chrome's words for save and search, in the messages with _save_ (N 593) and _search_ (N 356).
 
 - de: gespeicherte Suche (Chrome's _speichern_ 582/593, _Suche_ 348/356)
+- el: αποθηκευμένη αναζήτηση (Chrome's _αποθηκεύω_ 284/289 in the messages with _saved_, _αναζήτηση_ 353/356)
 - fr: recherche enregistrée (Chrome's _enregistrer_ 577/593, _recherche_ 353/356)
 - it: ricerca salvata (Chrome's _salvare_ 569/593, _ricerca_ 355/356)
 - es: búsqueda guardada (Chrome's _guardar_ 570/593, _búsqueda_ 350/356)
@@ -209,6 +221,7 @@ A named Gmail query an account keeps. Built on Chrome's words for save and searc
 A saved URL for an account, opened from the bookmarks popup.
 
 - de: Lesezeichen (Chrome 163/163)
+- el: σελιδοδείκτης (Chrome 163/163)
 - fr: favori, plural favoris (Chrome 163/163; _Ajouter aux favoris_), never _signet_
 - it: preferito, plural preferiti (Chrome 158/163; _Preferiti_, _Aggiungi ai Preferiti_), never _segnalibro_
 - es: marcador (Chrome 163/163)
@@ -224,6 +237,7 @@ A saved URL for an account, opened from the bookmarks popup.
 The titlebar or sidebar dropdown that opens a workspace app. Chrome's word is ChromeOS's launcher, which opens apps as ggmail's does.
 
 - de: Launcher (Chrome 17/19)
+- el: λειτουργία εκκίνησης (Chrome 13/19, _εφαρμογή εκκίνησης_ in the other 6)
 - fr: lanceur (Chrome 19/19, Chromium 156.0.8078.49's .xtb files)
 - it: Avvio app (Chrome 19/19), capitalized as Chrome writes the name
 - es: menú de aplicaciones (Chrome 19/19)
@@ -239,6 +253,7 @@ The titlebar or sidebar dropdown that opens a workspace app. Chrome's word is Ch
 The strip down the left edge of the window. Chrome writes the term in 2 messages; the seven apps' count backs every word where 3 apps have the concept (fr, it, pt-BR, nl, pl, 3 of 7: Firefox, LibreOffice, Microsoft), and Firefox and Microsoft agree in the rest.
 
 - de: vertikale Tabs (Chrome 2/2)
+- el: κατακόρυφες καρτέλες (Chrome 2/2)
 - fr: onglets verticaux (Chrome 1/2)
 - it: schede verticali (Chrome 1/2)
 - es: pestañas verticales (Chrome 1/2)
@@ -254,6 +269,7 @@ The strip down the left edge of the window. Chrome writes the term in 2 messages
 The strip across the top of the window.
 
 - de: Titelleiste (Chrome 5/5)
+- el: γραμμή τίτλου (Chrome 5/5)
 - fr: barre de titre (Chrome 5/5)
 - it: barra del titolo (Chrome 5/5)
 - es: barra de título (Chrome 5/5)
@@ -269,6 +285,7 @@ The strip across the top of the window.
 The column down the side of the window that holds the vertical tabs. Chrome names one in its _Toggle sidebar_ (1/1); its _side panel_ is a different thing, a panel beside the page. The seven apps' count, each distinct message once, agrees in eight languages (fr, it, es, es-419, pt-BR, nl, sv, ja, 3 to 5 of 7) and differs in two: German apps write Sidebar (3 of 7: Thunderbird, Firefox, Microsoft; Seitenleiste 2: LibreOffice, Apple) and Polish ties panel boczny (Firefox, LibreOffice) and pasek boczny (Microsoft, Apple). Chrome's word stands by step 4a.
 
 - de: Seitenleiste (Chrome 1/1)
+- el: πλευρική γραμμή (Chrome 1/1); the apps write _πλαϊνή γραμμή_ (3 of 7: Thunderbird, Firefox, Microsoft), and Chrome's word stands by step 4a
 - fr: barre latérale (Chrome 1/1)
 - it: barra laterale (Chrome 1/1)
 - es: barra lateral (Chrome 1/1)
@@ -284,6 +301,7 @@ The column down the side of the window that holds the vertical tabs. Chrome name
 The icon in the macOS menu bar, or in the Windows and Linux system tray. Both are parts of the operating system: the menu bar takes Apple's name, the first word below, and the system tray strings carry a `Windows` or `Linux` `msgctxt` and take Microsoft's word, the second, and on Linux the style sheet's word, the third where it differs.
 
 - de: Menüleiste (Apple); Infobereich (Microsoft); Linux _Statusbereich_ (inferred from Microsoft)
+- el: γραμμή μενού (Apple); περιοχή συστήματος (Microsoft, whose _notification area_ is _περιοχή ειδοποιήσεων_)
 - fr: barre des menus (Apple); zone de notification (Microsoft)
 - it: barra dei menu (Apple); area di notifica (Microsoft)
 - es: barra de menús (Apple); bandeja del sistema (Microsoft)
@@ -297,6 +315,7 @@ The icon in the macOS menu bar, or in the Windows and Linux system tray. Both ar
 ## Window
 
 - de: Fenster (Chrome 203/241)
+- el: παράθυρο (Chrome 201/242)
 - fr: fenêtre (Chrome 201/241)
 - it: finestra (Chrome 202/241)
 - es: ventana (Chrome 202/241)
@@ -312,6 +331,7 @@ The icon in the macOS menu bar, or in the Windows and Linux system tray. Both ar
 A one-time passcode ggmail copies to the clipboard.
 
 - de: Bestätigungscode (Chrome 7/7)
+- el: κωδικός επαλήθευσης (Chrome 7/7)
 - fr: code de validation (Chrome 7/7), never _code de vérification_
 - it: codice di verifica (Chrome 7/7)
 - es: código de verificación (Chrome 4/7)
@@ -327,6 +347,7 @@ A one-time passcode ggmail copies to the clipboard.
 The verification-codes switch. It names Gmail's own folder, so _Trash_ takes Gmail's word. Never a word for _delete_. Source: Gmail Help, "Delete or recover deleted Gmail messages" (support.google.com/mail/answer/7401, `hl=<tag>`).
 
 - de: Papierkorb (Gmail)
+- el: Κάδος (Gmail)
 - fr: Corbeille (Gmail)
 - it: Cestino (Gmail)
 - es: Papelera (Gmail)
@@ -342,6 +363,7 @@ The verification-codes switch. It names Gmail's own folder, so _Trash_ takes Gma
 A Chrome extension from ggmail's list.
 
 - de: Erweiterung (Chrome 300/308)
+- el: επέκταση (Chrome 303/304)
 - fr: extension (Chrome 304/304, Chromium 156.0.8078.49's .xtb files)
 - it: estensione (Chrome 303/304)
 - es: extensión (Chrome 303/304)
@@ -357,6 +379,7 @@ A Chrome extension from ggmail's list.
 The two maturity badges, and _Beta_ is also the update channel beside _Stable_. Never a third word. Experimental is counted in Chrome's 9 messages with it; Beta and Stable are its channel names.
 
 - de: Experimentell (Chrome 9/9); Beta; Stabil (Chrome)
+- el: Πειραματικό (Chrome 9/9); Beta, in Latin letters; Σταθερό (Chrome)
 - fr: Expérimental (Chrome 9/9); Bêta; Stable (Chrome)
 - it: Sperimentale (Chrome 8/9); Beta; Stabile (Chrome)
 - es: Experimental (Chrome 9/9); Beta; Estable (Chrome)
@@ -372,6 +395,7 @@ The two maturity badges, and _Beta_ is also the update channel beside _Stable_. 
 The pinned tab's context-menu item deciding whether it comes back as a view at start. Built on Chrome's word for startup, in its 10 messages with _on startup_ or _at launch_.
 
 - de: Beim Start laden (Chrome's _Start_ 10/10)
+- el: Φόρτωση κατά την εκκίνηση (Chrome's _εκκίνηση_ 10/10)
 - fr: Charger au démarrage (Chrome's _démarrage_ 10/10)
 - it: Carica all’avvio (Chrome's _avvio_ 9/10)
 - es: Cargar al iniciar (Chrome's _iniciar_ 8/10)
@@ -387,6 +411,7 @@ The pinned tab's context-menu item deciding whether it comes back as a view at s
 The device is Chrome's word. The license key is unresolved by the app count: only Microsoft has one, as a product key. The trial is the apps' word, counted in their messages with _trial_.
 
 - de: Lizenzschlüssel; Testzeitraum; Gerät (Chrome 981/1011; license key agent-chosen, unresolved by the app count; trial agent-chosen: Testversion: 2 of 7 (Firefox, Microsoft), thin, so Google's wording decides, Testzeitraum 23 times and Testversion once in Google Workspace's free-trial page (support.google.com/a/answer/6388094))
+- el: the license key is decided in the language's run; δοκιμή; συσκευή (Chrome 984/988; license key agent-chosen, unresolved by the app count: only Microsoft has one, _αριθμός-κλειδί προϊόντος_, a product key, and the catalog has no string that names it; trial agent-chosen: δοκιμή: 3 of 7 (Firefox, LibreOffice, Apple))
 - fr: clé de licence; essai; appareil (Chrome 959/1011; license key agent-chosen, unresolved by the app count; trial agent-chosen: essai: 3 of 7 (Firefox, VS Code, Apple))
 - it: chiave di licenza; prova; dispositivo (Chrome 983/1011; license key agent-chosen, unresolved by the app count; trial agent-chosen: the apps tie, Firefox and Apple prova, VS Code and Microsoft versione di valutazione; Google's wording breaks it, prova 29 times and valutazione none in Google Workspace Help, "About your Google Workspace free trial" (support.google.com/a/answer/6388094), as in _prova senza costi_)
 - es: clave de licencia; prueba; dispositivo (Chrome 985/1011; license key agent-chosen, unresolved by the app count; trial agent-chosen: prueba: 3 of 7 (Firefox, VS Code, Microsoft))
@@ -402,6 +427,7 @@ The device is Chrome's word. The license key is unresolved by the app count: onl
 Counted in Chrome's messages with _download history_; where a language pins the page and the recent popup apart, the page's count leaves out _recent download history_.
 
 - de: Downloadverlauf for the page, in _Download history_, _Full download history_ and _Close download history_ (Chrome 8/8); the recent download history popup is _Letzte Downloads_ (_Letzte Downloads anzeigen_), never _Aktueller Downloadverlauf_ (the user's call, from Chrome's _Letzte Downloads_)
+- el: ιστορικό λήψεων (Chrome 10/10), also in _Ιστορικό πρόσφατων λήψεων_
 - fr: historique des téléchargements, in _Historique complet des téléchargements_ and _Fermer l’historique des téléchargements_ (Chrome 8/8); the recent download history popup is _Historique des téléchargements récents_ (Chrome)
 - it: cronologia dei download; the page's title _Cronologia download_ (Chrome 8/8); the recent download history popup is _Cronologia dei download recenti_ (Chrome)
 - es: historial de descargas (Chrome 10/10), also in _Historial de descargas recientes_
@@ -417,6 +443,7 @@ Counted in Chrome's messages with _download history_; where a language pins the 
 The dark theme is Chrome's _Dark theme_ label (1/1), which the seven apps' count backs in pt-BR and ja (3 and 5 of 7) and not in de (dunkler Modus 3 of 7), fr (mode sombre 3), es-419 (modo oscuro 3) and sv (mörkt läge 3), with it, es, nl and pl tied; Chrome's word stands by step 4a; Chrome's word stands by step 4a; the blocker is the apps' word, counted in their messages with _blocker_ or _content blocking_; the spellchecker is counted in its 23 messages with _spell check_.
 
 - de: dunkles Design (Chrome 1/1); Blocker (agent-chosen: Blocker: 2 of 7 (Firefox, Microsoft)); Rechtschreibprüfung (Chrome 22/23)
+- el: σκούρο θέμα (Chrome 1/1); αποκλεισμός, in full _αποκλεισμός περιεχομένου_ (agent-chosen: αποκλεισμός: 2 of 7 (Firefox, Microsoft), thin, and Google's wording agrees, _αποκλεισμός αναδυόμενων παραθύρων_ in Chrome Help's pop-up page (support.google.com/chrome/answer/95472)); ορθογραφικός έλεγχος (Chrome 22/23)
 - fr: thème sombre (Chrome 1/1); blocage (agent-chosen: bloqueur: 2 of 7 (Firefox, Microsoft), thin, so Google's wording decides, blocage in Chrome Help's pop-up page and bloqueur nowhere); correcteur orthographique (Chrome 21/23)
 - it: tema scuro (Chrome 1/1); blocco contenuti (agent-chosen: blocco contenuti: 3 of 7 (Thunderbird, Firefox, Microsoft)); controllo ortografico (Chrome 22/23)
 - es: tema oscuro (Chrome 1/1); bloqueador (agent-chosen: bloqueo: 2 of 7 (Thunderbird, Firefox), thin; Google's wording decides, bloqueador in Chrome Help, "Block or allow pop-ups in Chrome" (support.google.com/chrome/answer/95472)); corrector ortográfico (Chrome 14/23)
@@ -432,6 +459,7 @@ The dark theme is Chrome's _Dark theme_ label (1/1), which the seven apps' count
 A key named in a sentence, such as the Workspace apps Mode setting's _hold Cmd_ or _Ctrl_ and _Shift_. The keys are the operating system's, so they take its names. The source writes the short form printed on keys, so keep a short form where the language has one: Cmd and Option on macOS, Ctrl, Shift and Alt on Windows and Linux. Cmd and Ctrl are separate messages already, and Shift carries a platform `msgctxt`: `macOS` takes Apple's name, `Windows` Microsoft's and `Linux` GNOME's, from the style sheet's Platform words where it has them. Sources: **Apple** is "Mac keyboard shortcuts" (support.apple.com/<locale>/102650), which names each key with its short form in brackets; **Microsoft** is "Keyboard shortcuts in Windows" (support.microsoft.com/<locale>/windows/keyboard-shortcuts-in-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec). Each line gives Apple's Command, Shift, Option and Control, then Microsoft's Ctrl, Shift and Alt, each checked against both pages in its language.
 
 - de: Apple Befehlstaste (Cmd), Umschalttaste, Wahltaste (Alt), Control-Taste (Ctrl); Microsoft Strg, Umschalt, Alt (Microsoft writes them in capitals, STRG and UMSCHALT)
+- el: Apple Command (Cmd), Shift, Option (Alt), Control (Ctrl); Microsoft Ctrl, Shift, Alt
 - fr: Apple Commande (Cmd), Maj, Option (Alt), Contrôle (Ctrl); Microsoft Ctrl, Maj, Alt
 - it: Apple Comando (Cmd), Maiuscole, Opzione (Alt), Control (Ctrl); Microsoft Ctrl, Maiusc, Alt (Microsoft writes them in capitals, CTRL and MAIUSC)
 - es: Apple Comando (Cmd), Mayúsculas, Opción (Alt), Control (Ctrl); Microsoft Ctrl, Mayús, Alt
@@ -447,6 +475,7 @@ A key named in a sentence, such as the Workspace apps Mode setting's _hold Cmd_ 
 A brief message ggmail shows over its window or over Gmail, such as the one after a setting changes, and the region the toasts appear in, which the interface reads as _Notifications_ with `msgctxt` `toasts`. Chrome has no word for one. In the seven apps' count only VS Code and Microsoft have the concept, and VS Code writes it with the notification word, which is out, so the count leaves Microsoft alone, or in Japanese two apps; Google has no word for it; so the direct match decides, Microsoft's _toast notification_ and VS Code's toast strings without the notification word, and without a banner or strip form, which names something else. Never the word for a system [notification](#notification).
 
 - de: Popup, plural Popups (_Popup schließen_), never _Benachrichtigung_ (agent-chosen: Microsoft's toast notification is Popup, Popupbenachrichtigung, Banner and Benachrichtigungsbanner; the forms with Benachrichtigung are out, and Popup remains)
+- el: decided in the language's run: the catalog writes the notification's own word, _Κλείσιμο ειδοποίησης_, which a toast never takes (agent-chosen, unresolved by the app count: Microsoft's toast notification is ειδοποίηση, αναδυόμενη ειδοποίηση, πλαίσιο ειδοποιήσεων and μπάνερ; the forms with ειδοποίηση are out, and μπάνερ is a banner form, no direct match for a toast, so nothing remains)
 - fr: toast, plural toasts (_Fermer le toast_), never _notification_ (agent-chosen: Microsoft's toast notification is toast, notification toast, bannière and bannière de notification; the forms with notification are out, and toast remains)
 - it: avviso, plural avvisi (_Chiudi avviso_), never _notifica_ (agent-chosen: Microsoft's toast notification is avviso popup, notifica di tipo avviso popup, banner and banner di notifica; the forms with notifica are out, and avviso popup remains)
 - es: mensaje emergente, plural mensajes emergentes (_Cerrar mensaje emergente_), never _notificación_ (agent-chosen: Microsoft's toast notification is notificación del sistema, mensaje emergente, tira and banner de notificación; the forms with notificación are out, and mensaje emergente remains)
@@ -462,6 +491,7 @@ A brief message ggmail shows over its window or over Gmail, such as the one afte
 The count on an account, a tab or the dock icon for its unread emails: _Show unread badge_, _Unread badge_. Chrome has no word for one, so it takes the apps' word, counted in ggmail's own sense: their messages for an app-icon, unread or notification badge. Where that count is thin or tied, Google has no word for an unread count, so the most direct match decides: Apple's _unread badge_ or Thunderbird's _App icon badge_.
 
 - de: Kennzeichen; in full _Kennzeichen für ungelesene E-Mails_ (_Kennzeichen für ungelesene E-Mails anzeigen_) (agent-chosen: the apps tie, Thunderbird Zähler, Microsoft Badge, Apple Kennzeichen; Google has no word for a count; the most direct match is Apple's _unread badge_, Kennzeichen für ungelesene Mails)
+- el: σήμα; in full _σήμα μη αναγνωσμένων_ (_Εμφάνιση σήματος μη αναγνωσμένων_) (agent-chosen, unresolved by the app count: the apps tie, Thunderbird σήμα, Microsoft ένδειξη, Apple ταμπέλα; Google has no word for a count; the direct matches split, Thunderbird's _App icon badge_, Σήμα εικονιδίου εφαρμογής, and Apple's _unread badge_, ταμπέλα «μη αναγνωσμένα», so the existing σήμα stays)
 - fr: pastille; in full _pastille des e-mails non lus_ (_Afficher la pastille des e-mails non lus_) (agent-chosen: pastille: 2 of 7 (Thunderbird, Apple), thin; Google has no word for a count; the direct matches decide, Thunderbird's _App icon badge_, Pastille de l’icône de l’application, and Apple's _unread badge_, pastille Non lu)
 - it: badge; in full _badge delle email non lette_ (_Mostra il badge delle email non lette_) (agent-chosen: badge: 2 of 7 (Microsoft, Apple), thin; Google has no word for a count; Apple's _Badge application icon_, Badge sull’icona dell’app, is a direct match)
 - es: insignia; in full _insignia de no leídos_ (_Mostrar insignia de no leídos_) (agent-chosen: the apps tie, Thunderbird insignia, Apple globo, Microsoft between distintivo and insignia; Google has no word for a count; Thunderbird's direct _App icon badge_, Insignia del icono de la aplicación, decides)
@@ -475,6 +505,7 @@ The count on an account, a tab or the dock icon for its unread emails: _Show unr
 The badge on an account's row in Settings, `msgctxt` `account row badge`, sits on a row that cannot wrap, so it takes the shortest form, the apps' word for unread, counted in their messages with _unread_:
 
 - de: Ungelesen (agent-chosen: ungelesen: 5 of 7 (Thunderbird, VS Code, Android, Microsoft, Apple))
+- el: Μη αναγνωσμένα (agent-chosen: μη αναγνωσμένα: 4 of 7 (Thunderbird, Android, Microsoft, Apple))
 - fr: Non lus (agent-chosen: non lu: 5 of 7 (Thunderbird, VS Code, Android, Microsoft, Apple))
 - it: Non lette (agent-chosen: non letto: 5 of 7 (Thunderbird, VS Code, Android, Microsoft, Apple))
 - es: No leídos (agent-chosen: no leído: 5 of 7 (Thunderbird, VS Code, Android, Microsoft, Apple))
@@ -490,6 +521,7 @@ The badge on an account's row in Settings, `msgctxt` `account row badge`, sits o
 The tabs within an account, which Workspace apps' New windows mode leaves out: _Narrow the tab strip_. Counted in Chrome's 7 messages with _tab strip_.
 
 - de: Tableiste (_Tableiste verschmälern_) (Chrome 6/7)
+- el: γραμμή καρτελών (Chrome 7/7)
 - fr: barre d’onglets (_Réduire la barre d’onglets_) (Chrome 7/7)
 - it: tabstrip, feminine (_Restringi la tabstrip_) (Chrome 7/7)
 - es: barra de pestañas (_Estrechar la barra de pestañas_) (Chrome 7/7)
@@ -505,6 +537,7 @@ The tabs within an account, which Workspace apps' New windows mode leaves out: _
 The name ggmail shows for an account or a saved search, in its _Label_ field and _Enter a label_ with `msgctxt` `saved search`. Never Gmail's label, which is under [Starred, Snooze, Label](#starred-snooze-label) and carries `msgctxt` `Gmail label`. It is a display name, so it takes the apps' word for a _Name_ field, counted in their messages that are _Name_ alone.
 
 - de: Name (_Namen eingeben_) (agent-chosen: Name: 7 of 7 (Thunderbird, Firefox, VS Code, Android, LibreOffice, Microsoft, Apple))
+- el: όνομα (_Εισαγάγετε ένα όνομα_) (agent-chosen: όνομα: 6 of 7 (Thunderbird, Firefox, Android, LibreOffice, Microsoft, Apple))
 - fr: nom (_Saisir un nom_) (agent-chosen: nom: 7 of 7 (Thunderbird, Firefox, VS Code, Android, LibreOffice, Microsoft, Apple))
 - it: nome (_Inserisci un nome_) (agent-chosen: nome: 7 of 7 (Thunderbird, Firefox, VS Code, Android, LibreOffice, Microsoft, Apple))
 - es: nombre (_Introduce un nombre_) (agent-chosen: nombre: 7 of 7 (Thunderbird, Firefox, VS Code, Android, LibreOffice, Microsoft, Apple))
@@ -520,6 +553,7 @@ The name ggmail shows for an account or a saved search, in its _Label_ field and
 The name this computer goes by among the devices using a license key. Chrome's word for a device name, counted in its 11 messages with _device name_.
 
 - de: Gerätename (_Gerätenamen eingeben_) (Chrome 11/11)
+- el: όνομα συσκευής (Chrome 11/11)
 - fr: nom de l’appareil (_Saisir le nom de l’appareil_) (Chrome 6/11)
 - it: nome del dispositivo (_Inserisci il nome del dispositivo_) (Chrome 4/11, the rest _nome dispositivo_)
 - es: nombre del dispositivo (_Introduce un nombre del dispositivo_) (Chrome 6/11)
@@ -535,6 +569,7 @@ The name this computer goes by among the devices using a license key. Chrome's w
 Which releases ggmail updates to, Stable or [Beta](#experimental-beta): _Release channel_, _Switch to the beta channel?_ Chrome's word for a channel, in its 11 messages with _channel_; the compounds are agent-chosen where Chrome has none.
 
 - de: Update-Kanal; _Beta-Kanal_ (_Zum Beta-Kanal wechseln?_) (Chrome's _Kanal_ 10/11; compounds agent-chosen: Update-Kanal: 2 of 7 (Thunderbird, Firefox))
+- el: κανάλι ενημέρωσης; _κανάλι beta_ (Chrome's _κανάλι_ 11/11; its own _Update channel_ is _Κανάλι ενημέρωσης_, Chrome 1/1)
 - fr: version de mise à jour; _version bêta_ (_Passer à la version bêta ?_, with a no-break space before ?) (Chrome 10/11)
 - it: canale di aggiornamento; _canale beta_ (_Passare al canale beta?_) (Chrome 11/11)
 - es: canal de versiones; _canal beta_ (_¿Cambiar al canal beta?_) (Chrome's _canal_ 11/11)
@@ -550,6 +585,7 @@ Which releases ggmail updates to, Stable or [Beta](#experimental-beta): _Release
 The hosts whose links open without the link prompt: _Trusted hosts_, _links from untrusted hosts_. Chrome's word for trusted, in its 22 messages with _trusted_, with its _host_.
 
 - de: vertrauenswürdige Hosts; _nicht vertrauenswürdige Hosts_ (Chrome 20/22)
+- el: αξιόπιστοι κεντρικοί υπολογιστές; _μη αξιόπιστοι κεντρικοί υπολογιστές_ (Chrome 18/22, with its _host_, _κεντρικός υπολογιστής_, Chrome 4/5), never _ιστότοποι_, which are sites
 - fr: hôtes approuvés; _hôtes non approuvés_ (Chrome 14/22)
 - it: host attendibili; _host non attendibili_ (Chrome 19/22)
 - es: hosts de confianza; _hosts que no son de confianza_ (Chrome 10/22, its most common form)
@@ -565,6 +601,7 @@ The hosts whose links open without the link prompt: _Trusted hosts_, _links from
 Chrome's word for phishing, in its 4 messages with it; the protection phrase is the language's ordinary one.
 
 - de: Phishing-Schutz (Chrome's _Phishing_ 4/4)
+- el: προστασία από ηλεκτρονικό ψάρεμα (Chrome's _ηλεκτρονικό ψάρεμα_ 4/4)
 - fr: protection contre l’hameçonnage (Chrome's _hameçonnage_ 4/4)
 - it: protezione dal phishing (Chrome's _phishing_ 4/4)
 - es: protección contra phishing (Chrome's _phishing_ 4/4)
@@ -580,6 +617,7 @@ Chrome's word for phishing, in its 4 messages with it; the protection phrase is 
 The verb beside [Notification](#notification): _Notify when updates are available_, _Notify for_. Chrome's _notify_ means telling Google something, so it is no source; the apps' word is counted in their messages with _notify_.
 
 - de: benachrichtigen (_Bei verfügbaren Updates benachrichtigen_) (agent-chosen: benachrichtigen: 6 of 7 (Thunderbird, Firefox, VS Code, Android, Microsoft, Apple))
+- el: ειδοποιώ, in a label its noun, _ειδοποίηση_ (_Ειδοποιήσεις για_) (agent-chosen: ειδοποιώ: 5 of 7 (Thunderbird, Firefox, Android, LibreOffice, Microsoft))
 - fr: notifier (_Notifier quand des mises à jour sont disponibles_) (agent-chosen: notifier: 3 of 7 (VS Code, Android, Microsoft); Thunderbird writes informer, LibreOffice avertir, Apple prévenir, Firefox ties avertir and informer)
 - it: notificare (_Notifica quando sono disponibili aggiornamenti_), never _avvisare_, which would read as the toast's avviso (agent-chosen: notificare: 5 of 7 (Thunderbird, VS Code, Android, LibreOffice, Microsoft))
 - es: notificar (_Notificar cuando haya actualizaciones_) (agent-chosen: notificar: 7 of 7 (Thunderbird, Firefox, VS Code, Android, LibreOffice, Microsoft, Apple))
@@ -595,6 +633,7 @@ The verb beside [Notification](#notification): _Notify when updates are availabl
 Moving a tab, an email, an attachment or a file: _Move to New Window_, _Move attachments to top_, _File moved or deleted_. Counted in Chrome's 132 messages with _move_.
 
 - de: verschieben (_In neues Fenster verschieben_, _Datei verschoben oder gelöscht_) (Chrome 97/132); _bewegen_ is only for dragging or the pointer
+- el: μετακίνηση, the verb _μετακινώ_ (_Μετακίνηση σε νέο παράθυρο_, _Το αρχείο μετακινήθηκε ή διαγράφηκε_) (Chrome 111/133)
 - fr: déplacer (_Déplacer vers une nouvelle fenêtre_, _Fichier déplacé ou supprimé_) (Chrome 106/132)
 - it: spostare (_Sposta in una nuova finestra_, _File spostato o eliminato_) (Chrome 119/132)
 - es: mover (_Mover a una ventana nueva_, _Archivo movido o eliminado_) (Chrome 116/132)
@@ -610,6 +649,7 @@ Moving a tab, an email, an attachment or a file: _Move to New Window_, _Move att
 The notification sounds Breeze, Chime, Duet, Knock and Linen, picked in Settings. Chrome has none of them, and the app count leaves them unresolved by the app count: no name is in more than two of the seven apps (Apple's Brise and Leinen, LibreOffice's Windspiel and Breeze, Microsoft's Duet as a product name). They are names, each translated by what one hears, Linen too, as the user settled for German.
 
 - de: Brise, Klangspiel, Duett, Klopfen, Leinen (agent-chosen, unresolved by the app count; Leinen the user's call)
+- el: Αύρα, Κουδούνισμα, Ντουέτο, Χτύπος, Λινό (agent-chosen, unresolved by the app count)
 - fr: Brise, Carillon, Duo, Toc-toc, Lin (agent-chosen, unresolved by the app count)
 - it: Brezza, Rintocco, Duetto, Bussata, Lino (agent-chosen, unresolved by the app count)
 - es: Brisa, Campanilla, Dúo, Golpe, Lino (agent-chosen, unresolved by the app count)
@@ -625,6 +665,7 @@ The notification sounds Breeze, Chime, Duet, Knock and Linen, picked in Settings
 A button drawn on screen, such as the bookmarks button, the width button or Gmail's Upgrade button, never a key on the keyboard, which is under [Keyboard keys](#keyboard-keys). Counted in Chrome's 141 messages with _button_.
 
 - de: Button, der, plural Buttons; a compound takes a hyphen, though Chrome writes both _Scroll-Buttons_ and _Scrollbuttons_: _der Lesezeichen-Button_, _der Installations-Button_ (Chrome 102/141; _Schaltfläche_ 3, all in compounds, where Chrome writes Button 12 times). Never _Schaltfläche_, alone or in a compound. Never a standalone _Taste_, which Chrome keeps for a key or a mouse button (_Maustaste_); a key name such as _Umschalttaste_ keeps it.
+- el: κουμπί (_κουμπί σελιδοδεικτών_) (Chrome 141/141); a key on the keyboard is a _πλήκτρο_
 - fr: bouton (_bouton des favoris_) (Chrome 141/141); a key on the keyboard is a _touche_
 - it: pulsante (_pulsante dei preferiti_) (Chrome 124/141); a key on the keyboard, or a hardware button, is a _tasto_
 - es: botón (_botón de marcadores_) (Chrome 141/141)
@@ -640,6 +681,7 @@ A button drawn on screen, such as the bookmarks button, the width button or Gmai
 The string a browser sends to name itself, in the Advanced settings. A language without a line takes Chrome's word.
 
 - de: User-Agent (Chrome 1/1)
+- el: παράγοντας χρήστη (Chrome 1/1)
 - it: user-agent, hyphenated (_lo user-agent_) (Chrome 1/1), never _user agent_
 - ja: ユーザーエージェント (Chrome 1/1, ユーザー エージェント without its space, as the style sheet spaces katakana)
 - es: user-agent, hyphenated (_un user-agent_) (Chrome 1/1, Chromium 156.0.8078.49's .xtb files), never _agente de usuario_
@@ -652,6 +694,7 @@ The string a browser sends to name itself, in the Advanced settings. A language 
 
 Google's password manager, named in the passkey help: _Passkeys from Chrome, Google Password Manager, or your phone don't work here_. Google's name, so Google's word, read from its own Help; Chrome's count is counted in Chromium 156.0.8078.49's `.xtb` files, in the messages with _Google Password Manager_. A language without a line takes Google's name.
 
+- el: Διαχείριση κωδικών πρόσβασης Google, capitalized as a name, with its article outside it (_της Διαχείρισης κωδικών πρόσβασης Google_) (Google, Help "Έναρξη χρήσης της Διαχείρισης κωδικών πρόσβασης Google" (support.google.com/accounts/answer/6208650?hl=el); Chrome 36/63, with _Διαχειριστής κωδικών πρόσβασης Google_ in 10, _Google_ left out in 13 and _της Google_ in 4)
 - fr: Gestionnaire de mots de passe de Google, capitalized as a name, with its article outside it (_du Gestionnaire de mots de passe de Google_) (Google, Help "Premiers pas avec le Gestionnaire de mots de passe de Google" (support.google.com/accounts/answer/6208650?hl=fr); Chrome 58/63, Chromium 156.0.8078.49's .xtb files), never _Gestionnaire de mots de passe Google_
 - it: Gestore delle password di Google, capitalized as a name, with its article outside it (_del Gestore delle password di Google_) (Google, Chrome 63/63, Chromium 156.0.8078.49's .xtb files), never _Gestore password Google_
 - es: Gestor de contraseñas de Google, capitalized as a name (Google, Chrome 63/63, Chromium 156.0.8078.49's .xtb files)
@@ -672,6 +715,7 @@ Google's task list, which the task window saves to: _Connect Google Tasks_, _Ope
 
 Linux's file manager, named on the download notification: _Show in your file manager_. It shows only on Linux, so it takes GNOME's word. A language without a line takes GNOME's word for it.
 
+- el: διαχειριστής αρχείων (GNOME, nautilus `_Open in File Manager`, _Άνοιγμα στον διαχειριστή αρχείων_), never _διαχείριση αρχείων_, the managing rather than the program
 - it: gestore file (GNOME, nautilus `_Open in File Manager`, _Apri nel gestore file_), never _file manager_
 - es: gestor de archivos (_Mostrar en tu gestor de archivos_) (GNOME, nautilus metainfo `default file manager`, _gestor de archivos predeterminado_)
 - es-419: gestor de archivos (GNOME, nautilus metainfo `default file manager`, _gestor de archivos predeterminado_; GNOME has one Spanish)
@@ -705,6 +749,7 @@ Erasing ggmail's data and starting over: _Reset App_, the dialog's _Reset_ butto
 
 The colors an account can be marked with, where Chrome names the same color. Counted in Chromium 156.0.8078.49's `.xtb` files, in its color names, the messages that are exactly the color's English name. A language without a line takes Chrome's word.
 
+- el: Lime _Λάιμ_ (Chrome 1/1), never _Λαχανί_; the colors Chrome has no name for (Chrome 0/0 each; it writes teal only in compounds, _γαλαζοπράσινο_ in Light teal and Dark teal): Teal _Πετρόλ_ (agent-chosen: πετρόλ: 2 of 7 (Microsoft, Apple), thin; the messages that are _Teal_ alone are Apple's _Πετρόλ_ and LibreOffice's _Γαλαζοπράσινο_, and Thunderbird keeps _Teal_), and, each vote too thin: Emerald _Σμαραγδί_ (Apple's _Emerald_; agent-chosen: σμαραγδί: 1 of 7 (Apple), fewer than 3 apps), Indigo _Λουλακί_ (LibreOffice's and Apple's _Indigo_; agent-chosen: λουλακί: 2 of 7 (LibreOffice, Apple), fewer than 3 apps), Amber _Κεχριμπαρί_ (agent-chosen, unresolved by the app count: LibreOffice's _Amber_ is _Κεχριμπάρι_ and Android writes _κεχριμπαρένιο_, so the existing word stays), Sky _Γαλάζιο_ (agent-chosen, unresolved by the app count: LibreOffice's _Sky blue_ is _Ουρανί_, Apple's _Sky Blue_ _Μπλε του ουρανού_, and the bare _Sky_ of both is the sky itself, _Ουρανός_, so the existing word stays); Google's own wording for the five was not checked
 - fr: Purple _Violet_ (Chrome 2/2), Violet _Mauve_ (Chrome 1/1), never _Pourpre_
 - nl: Teal _Blauwgroen_, never _Groenblauw_: Chrome has no message that is exactly _Teal_, but writes teal as _blauwgroen_ in _Light teal_, _Dark teal_ and its default teal avatar (Chrome 3/4 in Chromium 156.0.8078.49's .xtb files, the fourth _Light teal and white_, _Lichtdonkergroen/wit_), which comes before the apps' vote (groenblauw: 2 of 7 (Microsoft, Apple)); the colors Chrome has no name for (Chrome 0/0 each), each vote too thin, so each takes the app message whose English is the color's name alone: Amber _Amber_ (LibreOffice's _Amber_; agent-chosen: amber: 1 of 7 (LibreOffice), fewer than 3 apps), Emerald _Smaragd_ (Apple's _Emerald_; agent-chosen: smaragd: 1 of 7 (Apple), fewer than 3 apps), never _Smaragdgroen_, Indigo _Indigo_ (LibreOffice's and Apple's _Indigo_; agent-chosen: indigo: 2 of 7 (LibreOffice, Apple), fewer than 3 apps), Sky _Hemelsblauw_ (LibreOffice's and Apple's _Sky Blue_, since their bare _Sky_, _Hemel_ and _Lucht_, is the sky; agent-chosen: hemelsblauw: 2 of 7 (LibreOffice, Apple), fewer than 3 apps); Google's own wording for the four was not checked
 - it: Violet _Lilla_ (Chrome 1/1), Lime _Giallo-verde_ (Chrome 1/1), never _Violetto_; the colors Chrome has no name for (Chrome 0/0 each), each vote too thin, so each takes the app message whose English is the color's name alone: Amber _Ambra_ (LibreOffice's _Amber_; agent-chosen: ambra: 2 of 7 (Android, LibreOffice), fewer than 3 apps), Emerald _Smeraldo_ (Apple's _Emerald_; agent-chosen: smeraldo: 1 of 7 (Apple), fewer than 3 apps), Indigo _Indaco_ (LibreOffice's and Apple's _Indigo_; agent-chosen: indaco: 2 of 7 (LibreOffice, Apple), fewer than 3 apps), Sky _Celeste_ (LibreOffice's and Apple's _Sky Blue_, since their bare _Sky_, _Cielo_, is the sky; agent-chosen: celeste: 2 of 7 (LibreOffice, Apple), fewer than 3 apps), never _Azzurro_, Teal _Verde acqua_ (Thunderbird's _Teal_ and Microsoft's _teal_, beside LibreOffice's _Foglia di tè_ and Apple's three words; agent-chosen: verde acqua: 2 of 7 (Thunderbird, Microsoft), with Apple tied); Google's own wording for the five was not checked
@@ -717,6 +762,7 @@ The colors an account can be marked with, where Chrome names the same color. Cou
 
 The page context menu's item that opens the developer tools on the element clicked, as Chrome's _Inspect_ item. Counted in Chromium 156.0.8078.49's `.xtb` files, in the messages that are exactly _Inspect_. A language without a line takes Chrome's word.
 
+- el: Έλεγχος. Chrome's two messages that are exactly _Inspect_ split, _Επιθεώρηση_ and _Έλεγχος_, and its _Inspect elements_ messages stay English, so the page context menu's own item, `I&nspect`, _Έ&λεγχος_, decides, the narrowest-sense match (Chrome 1/1), never _Επιθεώρηση στοιχείου_
 - fr: Inspecter (Chrome 2/2), never _Inspecter l’élément_
 - it: Ispeziona (Chrome 2/2, Chromium 156.0.8078.49's .xtb files), never _Ispeziona elemento_
 - pt-BR: Inspecionar (Chrome 2/2, Chromium 156.0.8078.49's .xtb files), never _Inspecionar Elemento_
@@ -732,6 +778,7 @@ The menu that holds ggmail's help and its links. It is the operating system's ow
 The option that lets ggmail decide, in the Width, Placement, Launcher display and Text color settings, each its own message by `msgctxt` so a gendered language agrees with that setting's noun. Counted in the messages that are exactly _Auto_. A language without a line takes Chrome's word.
 
 - de: Auto (Chrome 2/2, Chromium 156.0.8078.49's .xtb files), never _Automatisch_, which is Chrome's _Automatic_
+- el: Αυτόματα in all four (Chrome 2/2), an adverb, so it agrees with none of the settings' nouns; never an adjective such as _Αυτόματο_ or _Αυτόματη_
 - fr: Auto (Chrome 2/2, Chromium 156.0.8078.49's .xtb files), never _Automatique_
 - it: Automatica for the Width (_la larghezza_), Placement (_la posizione_) and Launcher display (_la visualizzazione_), Automatico for the Text color (_il colore_), Chrome's _Automatico_ agreeing with each (Chrome 2/2, Chromium 156.0.8078.49's .xtb files), never _Auto_
 - pt-BR: Automática for the Width (_a largura_), Launcher display (_a exibição_) and Text color (_a cor_), Automático for the Placement (_o posicionamento_, Chrome's _placement_ 1/1), Chrome's _Automática_ agreeing with each (Chrome 2/2, Chromium 156.0.8078.49's .xtb files), never _Auto_
@@ -743,6 +790,7 @@ The option that lets ggmail decide, in the Width, Placement, Launcher display an
 
 The value a field shows when nothing is picked, in the account's Color field and the Excluded apps field, each its own message by `msgctxt` so a gendered language agrees with that field's noun. Counted in the messages that are exactly _None_. A language without a line takes Chrome's word.
 
+- el: Κανένα for the account color (_το χρώμα_), Καμία for the excluded apps (_η εφαρμογή_), as Chrome writes None by what it stands for (Chrome 3/3: _Καμία_ twice, _Κανένα_ once)
 - pt-BR: Nenhuma for the account color (_a cor_), Nenhum for the excluded apps (_os apps_), Chrome's _Nenhum_ and _Nenhuma_ agreeing with each (Chrome 3/3, Chromium 156.0.8078.49's .xtb files)
 - nl: Geen in both (Chrome 3/3, Chromium 156.0.8078.49's .xtb files), which takes no agreement
 - pl: Brak in both (Chrome 3/3, Chromium 156.0.8078.49's .xtb files), a noun, so it agrees with neither _kolor_ nor _aplikacje_; never _Żaden_ or _Żadne_
@@ -752,6 +800,7 @@ The value a field shows when nothing is picked, in the account's Color field and
 
 The system tray icon's Color setting's options, `msgctxt` `tray icon color`, apart from the Theme setting's Light and Dark so a gendered language agrees with each setting's noun. Counted in the messages that are exactly _Light_ or _Dark_. A language without a line takes Chrome's word, as its Theme does.
 
+- el: Ανοιχτόχρωμο (Chrome 2/4 for the messages that are exactly _Light_; _Φωτεινό_ once and _Ελαφρύ_, a font weight, once), Σκούρο (Chrome 16/24 for _dark_, the word of its _Σκούρο θέμα_; the messages that are exactly _Dark_ write _Σκούρο_ once and _Σκοτεινή_ or _Σκοτεινό_ three times, a mode's word), agreeing with _χρώμα_
 - pl: Jasny, Ciemny, agreeing with _kolor_, as the Theme's Jasny and Ciemny agree with _motyw_ (Chrome 3/4 each, Chromium 156.0.8078.49's .xtb files; the one _Light_ left is _Mała_, a font weight, the one _Dark_ left _Ciemna_), never _Jasna_ or _Ciemna_, agreeing with _ikona_
 - sv: Ljust, Mörkt for the Theme (_ett tema_), Ljus, Mörk for the tray icon (_en färg_), Chrome's _Ljust_ (Chrome 3/4, the fourth _Lätt_, a weight) and _Mörk_ or _Mörkt_ (Chrome 4/4) agreeing with each, Chromium 156.0.8078.49's .xtb files
 
@@ -759,6 +808,7 @@ The system tray icon's Color setting's options, `msgctxt` `tray icon color`, apa
 
 The download history's button and the download notification's option, `msgctxt` `download action`, that show a finished download in its folder. Counted in the messages that are exactly _Show in folder_, in either case. A language without a line takes Chrome's word.
 
+- el: Εμφάνιση στον φάκελο for both (Chrome 4/4, which writes _στο φάκελο_; the style sheet keeps the article's final ν), never _Άνοιγμα φακέλου_, which opens the folder rather than showing the file
 - pl: Pokaż w folderze for both, since a Polish label is sentence style (Chrome 4/4, Chromium 156.0.8078.49's .xtb files), never _Otwórz folder_, which opens the folder rather than showing the file
 - sv: Visa i mapp for both (Chrome 4/4, Chromium 156.0.8078.49's .xtb files), never _Visa i mappen_
 
@@ -766,6 +816,7 @@ The download history's button and the download notification's option, `msgctxt` 
 
 The View menu's zoom items, which are not platform words: no platform's View menu in the style sheets' tables names them. Counted in the messages that are exactly _Zoom In_, _Zoom Out_ or _Actual Size_, in either case; where Chrome writes its title-case menu item and its sentence-case label differently, the menu item's word wins, since ggmail's are menu items. A language without a line takes Chrome's word.
 
+- el: Μεγέθυνση, Σμίκρυνση, Πραγματικό μέγεθος (Chrome 3/3 each)
 - it: Ingrandisci, Riduci, Dimensioni effettive (Chrome 2/3 each, Chromium 156.0.8078.49's .xtb files: the View menu items `Zoom &In`, `Zoom &Out` and `A&ctual Size`; the sentence-case _Zoom in_ and _Zoom out_ are _Aumenta lo zoom_ and _Diminuisci lo zoom_, and a plain _Actual Size_ outside the menu is _Dimensioni reali_)
 - es: Ampliar, Reducir zoom, Tamaño real (Chrome 2/3 for _Zoom In_, 1/3 for _Zoom Out_, 3/3 for _Actual Size_, Chromium 156.0.8078.49's .xtb files: the View menu items `Zoom &In`, `Zoom &Out` and `A&ctual Size`, _&Ampliar_, _&Reducir zoom_ and _Tamaño &real_; the title-case _Zoom Out_ is _Alejar_ and the sentence-case _Zoom in_ and _Zoom out_ are _Acercar_ and _Reducir_)
 - es-419: Acercar, Alejar, Tamaño real (Chrome 3/3 each, Chromium 156.0.8078.49's .xtb files)
@@ -776,6 +827,7 @@ The View menu's zoom items, which are not platform words: no platform's View men
 
 The files ggmail writes to diagnose a problem: _Logs_, _Export logs_, _View Logs_. Counted in Chromium 156.0.8078.49's `.xtb` files, in the messages with _log_ or _logs_ as a word. A language without a line takes Chrome's word.
 
+- el: αρχεία καταγραφής (_Εξαγωγή αρχείων καταγραφής_) (Chrome 46/54)
 - es: registros (_Exportar registros_) (Chrome 47/54, Chromium 156.0.8078.49's .xtb files)
 - es-419: registros (_Exportar registros_) (Chrome 47/54, Chromium 156.0.8078.49's .xtb files)
 - pt-BR: registros (_Exportar Registros_) (Chrome 44/54, Chromium 156.0.8078.49's .xtb files)
@@ -785,6 +837,7 @@ The files ggmail writes to diagnose a problem: _Logs_, _Export logs_, _View Logs
 
 ggmail's support, which a license error asks the user to contact: _contact support_. Built on Chrome's _support team_, its one message, _equipo de asistencia de TI_; ggmail's support is no IT department, so the _de TI_ is dropped. A language without a line takes Chrome's word.
 
+- el: υποστήριξη (_αποστολή στην υποστήριξη_), the head word of Chrome's _ομάδα υποστήριξης ΙΤ_ (Chrome 1/1 for _support team_), its _ομάδα_ and _ΙΤ_ dropped
 - es: equipo de asistencia (_ponte en contacto con el equipo de asistencia_) (Chrome 1/1 for _support team_, Chromium 156.0.8078.49's .xtb files)
 - es-419: equipo de asistencia (_comunícate con el equipo de asistencia_) (Chrome 1/1 for _support team_, Chromium 156.0.8078.49's .xtb files)
 - pt-BR: suporte (_entre em contato com o suporte_) (Chrome 1/1 for _support team_, _equipe de suporte de TI_, Chromium 156.0.8078.49's .xtb files)
@@ -794,6 +847,7 @@ ggmail's support, which a license error asks the user to contact: _contact suppo
 
 The Width setting's options for the vertical tabs sidebar. A language whose word for width is also its word for wide gives Wide another word, since a select whose label equals one of its options reads as a defect. A language without a line takes Chrome's word.
 
+- el: Στενό, Πλατύ, agreeing with Width's _πλάτος_ (Chrome 3/5 for _width_, _εύρος_ in the other two). Chrome's one _Wide_, _Μεγάλο πλάτος_, is Reading mode's letter spacing, so it is out under the narrowest sense and the apps' word decides (agent-chosen: πλατύ: 2 of 7 (Firefox, LibreOffice), thin; of the apps' three messages that are _Wide_ alone, Firefox's and LibreOffice's are _Πλατύ_ and Apple's is _Ευρεία_). Chrome has no _Narrow_ (Chrome 0/0), so it takes LibreOffice's _Στενό_, the antonym it pairs with _Πλατύ_; a sentence names them _στενό_ and _πλατύ_
 - es: Estrecho, Amplio, never _Ancho_, by a recorded call: Chrome's one _Wide_, _Ancho_, is Width's own word here, and a select can't show its label as one of its values (agent-chosen, unresolved by the app count: amplio: 2 of 7 (Thunderbird, LibreOffice), with Width's _Ancho_ out of the vote; LibreOffice pairs _Estrechos_ and _Amplios_)
 - es-419: Estrecho, Amplio, never _Ancho_, by the same recorded call (agent-chosen, unresolved by the app count: amplio: 2 of 7 (Thunderbird, LibreOffice), with Width's _Ancho_ out of the vote)
 - pt-BR: Estreita, Larga, agreeing with Width's _a largura_ (Chrome 4/5), never _Espaçadas_ or _Ampla_, by a recorded call: Chrome's one _Wide_, _Espaçadas_, names spacing, not a sidebar's size, so it is out under the narrowest sense, and the apps' word decides (agent-chosen: largo: 2 of 7 (Thunderbird, Firefox), thin, taken by the same call; LibreOffice _amplo_, Apple _grande-angular_); a sentence names them _estreita e larga_
@@ -806,6 +860,7 @@ The Width setting's options for the vertical tabs sidebar. A language whose word
 What Delete browsing data… deletes from one account: its cookies, the data sites store and its cache, as Chrome's Delete browsing data does. Counted on _browsing data_ as a whole word; Chrome's exact _Browsing data_ takes the same word in every language (Chrome 2/2).
 
 - de: Browserdaten (Chrome 26/27; _Browserdaten löschen_)
+- el: δεδομένα περιήγησης (Chrome 26/27; _Διαγραφή δεδομένων περιήγησης_)
 - fr: données de navigation (Chrome 26/27; _Supprimer les données de navigation_)
 - it: dati di navigazione (Chrome 25/27; _Elimina dati di navigazione_)
 - es: datos de navegación (Chrome 27/27; _Eliminar datos de navegación_)
@@ -821,6 +876,7 @@ What Delete browsing data… deletes from one account: its cookies, the data sit
 The name of the button on an account's row in Settings that opens the menu of what can be done to the account. Chrome has no _account actions_ (Chrome 0/0), so each word is the glossary's account with Chrome's word for _actions_, counted on _actions_ as a whole word.
 
 - de: Kontoaktionen (Chrome 41/44 for _Aktion_)
+- el: ενέργειες λογαριασμού (Chrome 44/44 for _ενέργει_)
 - fr: actions du compte (Chrome 44/44 for _action_)
 - it: azioni dell’account (Chrome 44/44 for _azion_)
 - es: acciones de la cuenta (Chrome 44/44 for _accion_)
@@ -838,6 +894,7 @@ What Gmail itself shows for the things a ggmail string can name, by step 2 of th
 ### Undo, in the message-sent toast
 
 - de: Rückgängig machen (Gmail's own toast, the user's reading; the undo send page writes _Rückgängig_)
+- el: Αναίρεση (Gmail, undo send)
 - fr: Annuler (Gmail, undo send)
 - it: Annulla (Gmail, undo send)
 - es: Deshacer (Gmail, undo send)
@@ -851,6 +908,7 @@ What Gmail itself shows for the things a ggmail string can name, by step 2 of th
 ### Message sent, the toast
 
 - de: Nachricht gesendet (Gmail, undo send, which has _Ihre Nachricht wurde gesendet_ in Gmail's _Sie_)
+- el: Το μήνυμα έχει σταλεί (Gmail, undo send, which describes the toast inside a sentence, _η ένδειξη ότι το μήνυμα έχει σταλεί_; agent-chosen, unresolved: Gmail shows the toast only to a signed-in account, so its own wording was not read)
 - fr: Message envoyé (Gmail, undo send)
 - it: Messaggio inviato (Gmail, undo send)
 - es: Mensaje enviado (Gmail, undo send)
@@ -864,6 +922,7 @@ What Gmail itself shows for the things a ggmail string can name, by step 2 of th
 ### Inbox
 
 - de: Posteingang (Gmail, trash)
+- el: Εισερχόμενα (Gmail, trash)
 - fr: boîte de réception (Gmail, trash, shortcuts)
 - it: Posta in arrivo (Gmail, trash, shortcuts)
 - es: Recibidos as the folder, _bandeja de entrada_ in prose (Gmail, shortcuts, trash)
@@ -879,6 +938,7 @@ What Gmail itself shows for the things a ggmail string can name, by step 2 of th
 The folder, and _Not spam_ for the button that takes a message out of it.
 
 - de: Spam; Kein Spam (Gmail, spam)
+- el: Ανεπιθύμητα; Μη ανεπιθύμητο μήνυμα (Gmail, spam)
 - fr: Spam; Non-spam (Gmail, spam)
 - it: Spam; Non spam (Gmail, spam)
 - es: Spam; No es spam (Gmail, spam)
@@ -894,6 +954,7 @@ The folder, and _Not spam_ for the button that takes a message out of it.
 From shortcuts, with Sent and Drafts confirmed by undo send. The File menu's Compose is not this one: it carries a platform `msgctxt` and takes the platform's word for a new email, from the style sheet.
 
 - de: Archivieren; Schreiben; Entwürfe; Gesendet (Gmail)
+- el: Αρχειοθέτηση; Σύνταξη; Πρόχειρα; Απεσταλμένα (Gmail)
 - fr: Archiver; Nouveau message; Brouillons; Messages envoyés (Gmail)
 - it: Archivia; Scrivi; Bozze; Posta inviata (Gmail)
 - es: Archivar; Redactar; Borradores; Enviados (Gmail)
@@ -909,6 +970,7 @@ From shortcuts, with Sent and Drafts confirmed by undo send. The File menu's Com
 The actions on a message in the unified inbox, beside Archive above. From shortcuts, which names each beside its key: Shift+i, ! and #.
 
 - de: Als gelesen markieren; Als Spam markieren; Löschen (Gmail)
+- el: Σημείωση ως αναγνωσμένο; Αναφορά ανεπιθύμητου μηνύματος; Διαγραφή (Gmail)
 - fr: Marquer comme lu; Signaler comme spam; Supprimer (Gmail)
 - it: Segna come già letto; Segnala come spam; Elimina (Gmail)
 - es: Marcar como leído; Marcar como spam; Eliminar (Gmail)
@@ -924,6 +986,7 @@ The actions on a message in the unified inbox, beside Archive above. From shortc
 From shortcuts: the folder of starred conversations, the action and the folder of snoozed ones, and a label.
 
 - de: Markiert; Zurückstellen, zurückgestellt; Label (Gmail)
+- el: με αστέρι (_συζητήσεις με αστέρι_); Αναβολή, σε αναβολή; ετικέτα (Gmail)
 - fr: suivi (_conversations dont le suivi est activé_); Mettre en attente, En attente; libellé (Gmail)
 - it: Speciali; Posticipa, posticipate; etichetta (Gmail)
 - es: Destacados; Posponer, pospuestas; etiqueta (Gmail)
@@ -939,6 +1002,7 @@ From shortcuts: the folder of starred conversations, the action and the folder o
 The inbox category, as in _Primary only_. From categories.
 
 - de: Allgemein (Gmail)
+- el: Κύρια (Gmail)
 - fr: Principale (Gmail)
 - it: Principale (Gmail)
 - es: Principal (Gmail)
@@ -954,6 +1018,7 @@ The inbox category, as in _Primary only_. From categories.
 What Gmail marks as important, as in _Important only_ and _the emails Gmail marks as important_. From importance, which uses the word in _marked as important_; the label takes the language's label form.
 
 - de: wichtig (Gmail)
+- el: σημαντικό (Gmail)
 - fr: important (Gmail)
 - it: importante (Gmail)
 - es: importante (Gmail)
@@ -969,6 +1034,7 @@ What Gmail marks as important, as in _Important only_ and _the emails Gmail mark
 A reply or forward opened in a window of its own. Gmail Help calls it a new window, so a pop-out is the window of _Reply in a new window_. From shortcuts.
 
 - de: neues Fenster; _In einem neuen Fenster antworten_ (Gmail)
+- el: νέο παράθυρο; _Απάντηση σε νέο παράθυρο_ (Gmail)
 - fr: nouvelle fenêtre; _Répondre dans une nouvelle fenêtre_ (Gmail)
 - it: nuova finestra; _Rispondi in una nuova finestra_ (Gmail)
 - es: ventana nueva; _Responder en una ventana nueva_ (Gmail)
@@ -982,6 +1048,7 @@ A reply or forward opened in a window of its own. Gmail Help calls it a new wind
 ### View entire message, Upgrade
 
 - de: Vollständige Nachricht ansehen; Upgraden (Gmail)
+- el: View entire message is decided in the language's run; Αναβάθμιση (agent-chosen, unresolved: Gmail shows the link and the button only to a signed-in account, and no Gmail Help page in Greek names either; Upgrade takes Chrome's _αναβάθμιση_, Chrome 15/15)
 - fr: Afficher l’intégralité du message; Mettre à niveau (Gmail)
 - it: Visualizza intero messaggio; Fai l’upgrade (Gmail)
 - es: Ver todo el mensaje; Cambiar a plan superior (Gmail)
@@ -997,6 +1064,7 @@ A reply or forward opened in a window of its own. Gmail Help calls it a new wind
 Gmail's vacation responder, as in _Open Gmail settings to turn off out of office_, and the inbox type with several sections. Gmail's own features, so Gmail's words by step 2, as Gmail Help names the settings: **vacation responder** is "Send automatic replies when you're out" (support.google.com/mail/answer/25922), **multiple inboxes** "Manage your emails with multiple inboxes" (answer/9694882), both with `hl=<tag>`.
 
 - de: Abwesenheitsnotiz; mehrere Posteingänge (Gmail, vacation responder: _Abwesenheitsnotiz aktiviert_; multiple inboxes)
+- el: αυτόματη απάντηση; πολλαπλά εισερχόμενα (Gmail, vacation responder: _Αυτόματη απάντηση_; multiple inboxes)
 - fr: réponse automatique; plusieurs boîtes de réception (Gmail, vacation responder: _Réponse automatique activée_; multiple inboxes)
 - it: risponditore automatico; Posta in arrivo multipla (Gmail, vacation responder: _Attiva risponditore automatico_; multiple inboxes)
 - es: respuesta automática; varias bandejas de entrada (Gmail, vacation responder: _Respuesta automática activada_; multiple inboxes)
@@ -1011,6 +1079,7 @@ Gmail's vacation responder, as in _Open Gmail settings to turn off out of office
 
 The quoted and repeated text Gmail folds behind its ••• button, as in _Always show trimmed content_. Gmail's own feature, so Gmail's word by step 2, as Gmail Help names the button, _Show trimmed content_ (support.google.com/mail/answer/9259856 and answer/11468381, with `hl=<tag>`).
 
+- el: περιεχόμενο που έχει περικοπεί (Gmail, _Εμφάνιση περιεχομένου που έχει περικοπεί_), never _συμπτυγμένο περιεχόμενο_
 - es: contenido reducido (Gmail, _Mostrar contenido reducido_), never _recortado_
 - es-419: contenido acortado (Gmail, _Mostrar contenido acortado_), never _recortado_
 - pt-BR: conteúdo cortado (Gmail, _Mostrar conteúdo cortado_), never _conteúdo reduzido_
