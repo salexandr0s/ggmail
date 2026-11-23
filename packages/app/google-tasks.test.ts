@@ -28,7 +28,7 @@ test("Google Tasks sign-in binds the loopback response, PKCE verifier and select
     fetch,
   );
   const connect = () =>
-    connectTasks(client, "writer@example.test", AbortSignal.timeout(5000), open, google);
+    connectTasks(client, "writer@example.test", AbortSignal.timeout(5000), open, "Done", google);
   expect((await connect()).token).toBe("test-token");
   owner = "other@example.test";
   await expect(connect()).rejects.toThrow("account mismatch");

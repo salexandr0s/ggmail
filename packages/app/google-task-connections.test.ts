@@ -49,3 +49,10 @@ test("revoked consent prompts reconnection, and a late refresh cannot undo disco
   expect(await pending).toBeUndefined();
   expect(session.connected).toBe(false);
 });
+test("a saved grant that cannot be read asks for a new connection", async () => {
+  writeFileSync(file, "{");
+  const restored = new TaskConnection(file);
+  expect(restored.connected).toBe(true);
+  expect(await restored.token()).toBeUndefined();
+  expect(restored.connected).toBe(false);
+});

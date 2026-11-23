@@ -1,6 +1,6 @@
 import { SCHEDULE_FOLLOW_UP_PATH } from "@ggmail/shared/follow-ups";
 import { t } from "@lingui/core/macro";
-import { BrowserWindow, Menu, type WebContentsView } from "electron";
+import { app, BrowserWindow, Menu, type WebContentsView } from "electron";
 import { accounts } from "./accounts";
 import { config } from "./config";
 import { setupWindowContextMenu } from "./context-menu";
@@ -11,6 +11,15 @@ import { log } from "./lib/log";
 import { quoteToAssistant, threadActions } from "./mail-context-actions";
 import { main } from "./main";
 import { openExternalUrl } from "./url";
+
+/**
+ * Native items the ggmail menu cannot stand in for. Look Up and Share only work
+ * from the menu macOS draws, and Inspect Element stays a step away from the
+ * mail actions. They remain reachable under "System menu…".
+ */
+const NATIVE_ONLY = new Set(["lookUpSelection", "share", "inspectElement"]);
+
+const EDIT_ITEMS = new Set(["cut", "copy", "paste", "pasteAndMatchStyle", "selectAll"]);
 
 const threadControls = String.raw`(expectedUrl, routeId, point, taskLabel, hasSelection, addTask) => {
   if (location.href !== expectedUrl) return null;
@@ -39,7 +48,8 @@ const threadControls = String.raw`(expectedUrl, routeId, point, taskLabel, hasSe
       [...el.querySelectorAll("img, .asa, [style]")].some(icon => /(?:add_task|add_to_tasks|tasks_add)/i.test(icon.getAttribute("src") || getComputedStyle(icon).backgroundImage)));
   });
   if (addTask) { if (task) task.click(); return !!task; }
-  return {subject: heading.textContent.trim().slice(0, 512), excerpt, sender, messageId, withinMessage, task: !!task};
+  const threadId = /^[0-9a-f]{15,16}$/i.test(legacy || "") ? legacy : undefined;
+  return {subject: heading.textContent.trim().slice(0, 512), excerpt, sender, messageId, threadId, withinMessage, task: !!task};
 }`;
 
 export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
@@ -61,7 +71,12 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
     if (
       !parent ||
       (!shell && !mailbox && !resolveRoutableUrl(url)) ||
-      params.formControlType === "input-password"
+      params.formControlType === "input-password" ||
+      // Spelling suggestions, Writing Tools and the rest of what the system
+      // offers for text being written are one click away in its own menu, and
+      // two behind "System menu…".
+      params.isEditable ||
+      params.misspelledWord
     ) {
       systemMenu();
       return;
@@ -74,9 +89,7 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
     }
     const selection = params.selectionText.trim();
     const id =
-      mailbox && gmail.messageId && params.frame === source.mainFrame && !params.isEditable
-        ? gmail.messageId
-        : null;
+      mailbox && gmail.messageId && params.frame === source.mainFrame ? gmail.messageId : null;
     const controlArgs = JSON.stringify([
       url,
       id,
@@ -97,6 +110,7 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
             sender: string;
             withinMessage: boolean;
             messageId?: string;
+            threadId?: string;
             excerpt: string;
             task: boolean;
           } | null)
@@ -119,6 +133,7 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
                 snippet: "",
                 sender: controls.sender,
                 messageId: controls.messageId,
+                threadId: controls.threadId,
               },
               selection,
               controls.excerpt,
@@ -162,7 +177,7 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
             run: () => main.navigate(SCHEDULE_FOLLOW_UP_PATH),
           });
         }
-      } else if (selection && !params.isEditable && (mailbox || parent === main.windowIfCreated)) {
+      } else if (selection && (mailbox || parent === main.windowIfCreated)) {
         primary.push({
           id: "quote",
           label: t`Quote to assistant`,
@@ -179,27 +194,19 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
         });
       }
       const native = Menu.buildFromTemplate(template);
+      let hasNativeExtras = false;
       for (const item of native.items) {
-        let id = item.id;
-        if (item.label === t`Copy URL`) {
-          id = "pageUrl";
-        }
-        if (item.label === t`Open in Default Browser`) {
-          id = "browser";
-        }
-        if (
-          !id ||
-          ["lookUpSelection", "dictionarySuggestions", "learnSpelling", "noGuessesFound"].includes(
-            id,
-          )
-        ) {
+        const id = item.id;
+        // The thread's own link, added below, covers the open message.
+        if (!id || (id === "copyMessageLink" && thread)) {
           continue;
         }
-        const group = ["cut", "copy", "paste", "pasteAndMatchStyle", "selectAll"].includes(id)
-          ? edits
-          : links;
-        group.push({
-          id,
+        if (NATIVE_ONLY.has(id)) {
+          hasNativeExtras ||= id !== "inspectElement" || !shell || !app.isPackaged;
+          continue;
+        }
+        (EDIT_ITEMS.has(id) ? edits : links).push({
+          id: id === "copyMessageLink" ? "messageLink" : id,
           label: item.label.replace(/&(.)/g, "$1"),
           enabled: item.enabled,
           run: () => item.click(),
@@ -208,7 +215,6 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
       if (thread) {
         links.unshift(thread.messageLink);
       }
-      const other = [{ id: "system", label: t`System menu…`, run: systemMenu }];
       if (shell && !primary.length && !edits.length && !links.length) {
         if (parent === main.windowIfCreated && config.get("unifiedInbox.enabled")) {
           primary.push({
@@ -216,13 +222,18 @@ export function setupPageContextMenu(view: BrowserWindow | WebContentsView) {
             label: t`All Mail`,
             run: () => main.navigate("/unified-inbox"),
           });
-        } else {
+        } else if (hasNativeExtras) {
           systemMenu();
+          return;
+        } else {
+          // Empty app chrome in a release build, where Inspect Element would
+          // be the whole menu.
           return;
         }
       }
-      const commands = params.isEditable ? [edits, links] : [[...edits, ...links]];
-      showContextActions(parent, source, point, [primary, ...commands, other]);
+      // Offered only when the system menu holds something this one does not.
+      const other = hasNativeExtras ? [{ id: "system", label: t`System menu…`, run: systemMenu }] : [];
+      showContextActions(parent, source, point, [primary, [...edits, ...links], other]);
     }
     void open(parent).catch((error) => {
       log.error("Could not open context menu", error);

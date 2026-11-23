@@ -8,14 +8,16 @@ import { createGgmailMessageUrl, gmailMessageWebUrl } from "@ggmail/shared/messa
 import { GMAIL_TAB_ID } from "@ggmail/shared/tabs";
 import { t } from "@lingui/core/macro";
 import { app, type IpcMainEvent } from "electron";
+import { serializeError } from "serialize-error";
 import { z } from "zod";
 import { accounts } from "./accounts";
-import { type ContextAction, showContextActions } from "./context-menu-popup";
+import { type ContextAction, runContextAction, showContextActions } from "./context-menu-popup";
 import { legacyThreadId } from "./gmail/print-thread";
 import { getSearchMailbox } from "./gmail/search";
 import { appI18n } from "./i18n";
 import { ipc } from "./ipc";
 import { copyText } from "./lib/clipboard";
+import { log } from "./lib/log";
 import type { CalendarOption } from "./mail-selection";
 import { main } from "./main";
 import { openTaskDraft } from "./task-draft";
@@ -35,6 +37,8 @@ const threadSchema = z.object({
     .string()
     .regex(/^[a-zA-Z0-9]{15,128}$/)
     .optional(),
+  /** The conversation's own id, where the page gives one apart from the route's. */
+  threadId: z.string().regex(legacyThreadId).optional(),
 });
 export type MenuThread = z.infer<typeof threadSchema>;
 export type MenuAccount = ReturnType<typeof accounts.getSelectedAccount>;
@@ -169,6 +173,9 @@ export function threadActions(
           accountId: account.config.id,
           owner: owner ?? "",
           messageId,
+          // The id in a route is not always one Gmail's conversation reader
+          // takes, so only an id in that form is kept.
+          threadId: [thread.threadId, thread.id].find((id) => id && legacyThreadId.test(id)),
           mailbox: getSearchMailbox(gmail, delegation),
         });
       },
@@ -181,11 +188,18 @@ export function threadActions(
           openCalendar();
           return;
         }
-        const { selectionDates } = await import("./mail-selection");
+        let options: CalendarOption[] = [];
+        try {
+          const { selectionDates } = await import("./mail-selection");
+          options = selectionDates(selection, new Date(), undefined, selectionLocale());
+        } catch (error) {
+          // Finding a date in the text is a convenience. Without it the event
+          // still opens, with the selection in its details.
+          log.error("Could not read dates from the selection", { error: serializeError(error) });
+        }
         if (!current()) {
           return;
         }
-        const options = selectionDates(selection, new Date(), undefined, selectionLocale());
         if (options.length > 1 && chooseDate) {
           chooseDate(options, openCalendar);
         } else {
@@ -245,7 +259,7 @@ export function registerMailContextActions(listener: typeof ipc.main) {
     ) {
       return;
     }
-    threadActions(account, thread.data, "")[action].run();
+    void runContextAction(threadActions(account, thread.data, "")[action]);
   });
   listener.on(
     "contextMenu.inboxRow",

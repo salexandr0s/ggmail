@@ -78,6 +78,11 @@ export const assistantQuoteSchema = z.object({
   owner: z.string().max(320),
   mailbox: z.string().max(2048).optional(),
   messageId: z.string().regex(/^[a-zA-Z0-9]{15,128}$/),
+  /** The conversation the message is in. Absent on a quote saved before it was recorded. */
+  threadId: z
+    .string()
+    .regex(/^[a-zA-Z0-9]{15,128}$/)
+    .optional(),
 });
 export type AssistantQuote = z.infer<typeof assistantQuoteSchema>;
 export const quoteSourceSchema = assistantQuoteSchema.pick({

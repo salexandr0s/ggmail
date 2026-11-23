@@ -167,13 +167,16 @@ export function sourcesForQuotes(quotes: AssistantQuote[]): Array<MailSource | u
     ) {
       return;
     }
+    // Reading a source asks Gmail for the whole conversation, which goes by the
+    // conversation's id. A later message in it has an id of its own.
+    const threadId = quote.threadId ?? quote.messageId;
     return {
       accountId: account.accountId,
       mailbox: account.mailbox,
       ownerEmail: account.ownerEmail,
       subject: quote.subject.slice(0, 300),
-      hash: "#all/" + quote.messageId,
-      threadId: quote.messageId,
+      hash: "#all/" + threadId,
+      threadId,
       senders: quote.sender
         ? [{ name: quote.sender.slice(0, 320), domain: getSenderDomain(quote.sender) }]
         : undefined,

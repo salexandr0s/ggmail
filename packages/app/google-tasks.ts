@@ -19,6 +19,11 @@ export async function connectTasks(
   owner: string,
   signal: AbortSignal,
   open: (url: string) => Promise<void>,
+  /**
+   * What the browser tab shows once Google hands back. It cannot promise the
+   * connection: the token exchange and the account check come after it.
+   */
+  finished = "ggmail",
   fetcher: typeof globalThis.fetch = fetch,
 ) {
   const verifier = randomBytes(48).toString("base64url");
@@ -40,8 +45,11 @@ export async function connectTasks(
         }
         const result = url.searchParams.get("code");
         response
-          .writeHead(200, { "Cache-Control": "no-store", "Content-Type": "text/plain" })
-          .end("GGMail");
+          .writeHead(200, {
+            "Cache-Control": "no-store",
+            "Content-Type": "text/plain; charset=utf-8",
+          })
+          .end(finished);
         cleanup();
         if (result) {
           resolve({ code: result, redirect });

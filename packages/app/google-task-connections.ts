@@ -104,8 +104,21 @@ export class TaskConnection {
     }
     return this.renewal;
   }
+  private readGrant() {
+    try {
+      return grantSchema.parse(JSON.parse(readSecret(this.file)));
+    } catch {
+      // A saved grant that can no longer be read cannot be renewed either.
+      // Kept, it would show the account as connected while every save failed.
+      return undefined;
+    }
+  }
   private async refresh(generation: number) {
-    const grant = this.grant ?? grantSchema.parse(JSON.parse(readSecret(this.file)));
+    const grant = this.grant ?? this.readGrant();
+    if (!grant) {
+      this.forget();
+      return;
+    }
     const auth = await refreshTasks(grant.client, grant.refreshToken);
     if (generation !== this.generation) {
       return;

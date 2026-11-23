@@ -352,6 +352,7 @@ function messageItems({ view, parameters }: MenuContext): MenuItems {
 
   return [
     {
+      id: "copyMessageLink",
       label: t({ message: "Copy Message Link", context: "context menu" }),
       click: () => {
         copyText(ggmailMessageUrl);
@@ -362,6 +363,7 @@ function messageItems({ view, parameters }: MenuContext): MenuItems {
     ...(platform.isMacOS
       ? [
           {
+            id: "share",
             label: t({ message: "Share", context: "macOS" }),
             role: "shareMenu" as const,
             sharingItem: {
@@ -383,12 +385,14 @@ function pageItems({ view }: MenuContext): MenuItems {
 
   return [
     {
+      id: "pageUrl",
       label: t`Copy URL`,
       click: () => {
         copyText(view.webContents.getURL());
       },
     },
     {
+      id: "browser",
       label: t`Open in Default Browser`,
       click: () => {
         openExternalUrl(view.webContents.getURL(), {
@@ -402,6 +406,7 @@ function pageItems({ view }: MenuContext): MenuItems {
 function inspectItems({ view, parameters }: MenuContext): MenuItems {
   return [
     {
+      id: "inspectElement",
       label: t({
         message: "Inspect Element",
         comment: "Context menu item that opens the developer tools on the element clicked",

@@ -32,7 +32,9 @@ function TaskDraft() {
     }
   }, [error]);
   useEffect(() => {
-    void load().then(setDraft);
+    // The draft lives in the main process until this window reads it. If it
+    // cannot be read there is nothing to show, and an empty window would stay.
+    void load().then(setDraft, () => window.close());
   }, []);
   if (!draft) {
     return null;
@@ -94,7 +96,9 @@ function TaskDraft() {
       onKeyDown={(event) => {
         if (
           event.key === "Escape" &&
-          !busy &&
+          // Like Cancel, it stays available while Google sign-in is open in
+          // the browser. Only a save in flight has to finish.
+          operation !== "save" &&
           !event.nativeEvent.isComposing &&
           !event.defaultPrevented &&
           !dateInput.current?.matches(":open")
@@ -195,6 +199,11 @@ function TaskDraft() {
               disabled={busy}
               onClick={() => void act("setup")}
             >{t`Setup instructions`}</button>
+          </p>
+        )}
+        {operation === "connect" && (
+          <p role="status" className="task-setup">
+            {t`Finish signing in in your browser, then return here.`}
           </p>
         )}
         {error && (

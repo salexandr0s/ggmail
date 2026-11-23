@@ -4,13 +4,13 @@ exports[`layout on macOS in an open Gmail message on a page 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -22,7 +22,7 @@ exports[`layout on macOS in an open Gmail message on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -69,13 +69,13 @@ exports[`layout on macOS in an open Gmail message on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -87,7 +87,7 @@ exports[`layout on macOS in an open Gmail message on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -134,13 +134,13 @@ exports[`layout on macOS in an open Gmail message on selected text that cannot b
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -152,7 +152,7 @@ exports[`layout on macOS in an open Gmail message on selected text that cannot b
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -199,13 +199,13 @@ exports[`layout on macOS in an open Gmail message on selected text with surround
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -217,7 +217,7 @@ exports[`layout on macOS in an open Gmail message on selected text with surround
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -264,13 +264,13 @@ exports[`layout on macOS in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -282,7 +282,7 @@ exports[`layout on macOS in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -329,13 +329,13 @@ exports[`layout on macOS in an open Gmail message on selected text of 25 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -347,7 +347,7 @@ exports[`layout on macOS in an open Gmail message on selected text of 25 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -394,13 +394,13 @@ exports[`layout on macOS in an open Gmail message on selected text of 26 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -412,7 +412,7 @@ exports[`layout on macOS in an open Gmail message on selected text of 26 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -459,13 +459,13 @@ exports[`layout on macOS in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -477,7 +477,7 @@ exports[`layout on macOS in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -524,13 +524,13 @@ exports[`layout on macOS in an open Gmail message on selected text on a link 1`]
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -542,7 +542,7 @@ exports[`layout on macOS in an open Gmail message on selected text on a link 1`]
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -607,13 +607,13 @@ exports[`layout on macOS in an open Gmail message on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -625,7 +625,7 @@ exports[`layout on macOS in an open Gmail message on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -666,13 +666,13 @@ exports[`layout on macOS in an open Gmail message on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -684,7 +684,7 @@ exports[`layout on macOS in an open Gmail message on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -749,13 +749,13 @@ exports[`layout on macOS in an open Gmail message on a text field with nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -767,7 +767,7 @@ exports[`layout on macOS in an open Gmail message on a text field with nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -856,13 +856,13 @@ exports[`layout on macOS in an open Gmail message on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -874,7 +874,7 @@ exports[`layout on macOS in an open Gmail message on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -975,13 +975,13 @@ exports[`layout on macOS in an open Gmail message on a misspelled word with seve
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -993,7 +993,7 @@ exports[`layout on macOS in an open Gmail message on a misspelled word with seve
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1082,13 +1082,13 @@ exports[`layout on macOS in an open Gmail message on a misspelled word without s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1100,7 +1100,7 @@ exports[`layout on macOS in an open Gmail message on a misspelled word without s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1147,13 +1147,13 @@ exports[`layout on macOS in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1165,7 +1165,7 @@ exports[`layout on macOS in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1224,13 +1224,13 @@ exports[`layout on macOS in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1242,7 +1242,7 @@ exports[`layout on macOS in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1283,13 +1283,13 @@ exports[`layout on macOS in an open Gmail message on a misspelled word nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1301,7 +1301,7 @@ exports[`layout on macOS in an open Gmail message on a misspelled word nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1324,13 +1324,13 @@ exports[`layout on macOS in an open Gmail message on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1342,7 +1342,7 @@ exports[`layout on macOS in an open Gmail message on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1365,13 +1365,13 @@ exports[`layout on macOS in an open Gmail message on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1383,7 +1383,7 @@ exports[`layout on macOS in an open Gmail message on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1436,13 +1436,13 @@ exports[`layout on macOS in an open Gmail message on a link in a text field 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1454,7 +1454,7 @@ exports[`layout on macOS in an open Gmail message on a link in a text field 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1489,13 +1489,13 @@ exports[`layout on macOS in an open Gmail message on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1507,7 +1507,7 @@ exports[`layout on macOS in an open Gmail message on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1542,13 +1542,13 @@ exports[`layout on macOS in an open Gmail message on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1560,7 +1560,7 @@ exports[`layout on macOS in an open Gmail message on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1595,13 +1595,13 @@ exports[`layout on macOS in an open Gmail message on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1613,7 +1613,7 @@ exports[`layout on macOS in an open Gmail message on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1654,13 +1654,13 @@ exports[`layout on macOS in an open Gmail message on an image linked to an email
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1672,7 +1672,7 @@ exports[`layout on macOS in an open Gmail message on an image linked to an email
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1683,13 +1683,13 @@ exports[`layout on macOS in an open Gmail message on a video 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1701,7 +1701,7 @@ exports[`layout on macOS in an open Gmail message on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1712,13 +1712,13 @@ exports[`layout on macOS in an open Gmail message on a linked video 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1730,7 +1730,7 @@ exports[`layout on macOS in an open Gmail message on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1837,13 +1837,13 @@ exports[`layout on macOS in an open Gmail message on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "share",
     "label": "Share",
     "type": undefined,
   },
@@ -1855,7 +1855,7 @@ exports[`layout on macOS in an open Gmail message on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1866,7 +1866,7 @@ exports[`layout on macOS in Gmail on a page 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1913,7 +1913,7 @@ exports[`layout on macOS in Gmail on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -1960,7 +1960,7 @@ exports[`layout on macOS in Gmail on selected text that cannot be copied 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2007,7 +2007,7 @@ exports[`layout on macOS in Gmail on selected text with surrounding space 1`] = 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2054,7 +2054,7 @@ exports[`layout on macOS in Gmail on selected text with an ampersand 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2101,7 +2101,7 @@ exports[`layout on macOS in Gmail on selected text of 25 characters 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2148,7 +2148,7 @@ exports[`layout on macOS in Gmail on selected text of 26 characters 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2195,7 +2195,7 @@ exports[`layout on macOS in Gmail on selected text with an ampersand past the cu
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2242,7 +2242,7 @@ exports[`layout on macOS in Gmail on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2307,7 +2307,7 @@ exports[`layout on macOS in Gmail on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2348,7 +2348,7 @@ exports[`layout on macOS in Gmail on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2413,7 +2413,7 @@ exports[`layout on macOS in Gmail on a text field with nothing it can do 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2502,7 +2502,7 @@ exports[`layout on macOS in Gmail on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2603,7 +2603,7 @@ exports[`layout on macOS in Gmail on a misspelled word with several suggestions 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2692,7 +2692,7 @@ exports[`layout on macOS in Gmail on a misspelled word without suggestions 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2739,7 +2739,7 @@ exports[`layout on macOS in Gmail on a misspelled word outside a text field 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2798,7 +2798,7 @@ exports[`layout on macOS in Gmail on a misspelled word outside a text field with
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2839,7 +2839,7 @@ exports[`layout on macOS in Gmail on a misspelled word nothing is selected on 1`
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2862,7 +2862,7 @@ exports[`layout on macOS in Gmail on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2885,7 +2885,7 @@ exports[`layout on macOS in Gmail on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2938,7 +2938,7 @@ exports[`layout on macOS in Gmail on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -2973,7 +2973,7 @@ exports[`layout on macOS in Gmail on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3008,7 +3008,7 @@ exports[`layout on macOS in Gmail on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3043,7 +3043,7 @@ exports[`layout on macOS in Gmail on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3084,7 +3084,7 @@ exports[`layout on macOS in Gmail on an image linked to an email address 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3095,7 +3095,7 @@ exports[`layout on macOS in Gmail on a video 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3106,7 +3106,7 @@ exports[`layout on macOS in Gmail on a linked video 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3213,7 +3213,7 @@ exports[`layout on macOS in Gmail on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3224,13 +3224,13 @@ exports[`layout on macOS in a Workspace view on a page 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3242,7 +3242,7 @@ exports[`layout on macOS in a Workspace view on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3289,13 +3289,13 @@ exports[`layout on macOS in a Workspace view on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3307,7 +3307,7 @@ exports[`layout on macOS in a Workspace view on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3354,13 +3354,13 @@ exports[`layout on macOS in a Workspace view on selected text that cannot be cop
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3372,7 +3372,7 @@ exports[`layout on macOS in a Workspace view on selected text that cannot be cop
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3419,13 +3419,13 @@ exports[`layout on macOS in a Workspace view on selected text with surrounding s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3437,7 +3437,7 @@ exports[`layout on macOS in a Workspace view on selected text with surrounding s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3484,13 +3484,13 @@ exports[`layout on macOS in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3502,7 +3502,7 @@ exports[`layout on macOS in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3549,13 +3549,13 @@ exports[`layout on macOS in a Workspace view on selected text of 25 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3567,7 +3567,7 @@ exports[`layout on macOS in a Workspace view on selected text of 25 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3614,13 +3614,13 @@ exports[`layout on macOS in a Workspace view on selected text of 26 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3632,7 +3632,7 @@ exports[`layout on macOS in a Workspace view on selected text of 26 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3679,13 +3679,13 @@ exports[`layout on macOS in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3697,7 +3697,7 @@ exports[`layout on macOS in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3744,13 +3744,13 @@ exports[`layout on macOS in a Workspace view on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3762,7 +3762,7 @@ exports[`layout on macOS in a Workspace view on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3827,13 +3827,13 @@ exports[`layout on macOS in a Workspace view on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3845,7 +3845,7 @@ exports[`layout on macOS in a Workspace view on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3886,13 +3886,13 @@ exports[`layout on macOS in a Workspace view on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3904,7 +3904,7 @@ exports[`layout on macOS in a Workspace view on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -3969,13 +3969,13 @@ exports[`layout on macOS in a Workspace view on a text field with nothing it can
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -3987,7 +3987,7 @@ exports[`layout on macOS in a Workspace view on a text field with nothing it can
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4076,13 +4076,13 @@ exports[`layout on macOS in a Workspace view on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4094,7 +4094,7 @@ exports[`layout on macOS in a Workspace view on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4195,13 +4195,13 @@ exports[`layout on macOS in a Workspace view on a misspelled word with several s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4213,7 +4213,7 @@ exports[`layout on macOS in a Workspace view on a misspelled word with several s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4302,13 +4302,13 @@ exports[`layout on macOS in a Workspace view on a misspelled word without sugges
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4320,7 +4320,7 @@ exports[`layout on macOS in a Workspace view on a misspelled word without sugges
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4367,13 +4367,13 @@ exports[`layout on macOS in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4385,7 +4385,7 @@ exports[`layout on macOS in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4444,13 +4444,13 @@ exports[`layout on macOS in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4462,7 +4462,7 @@ exports[`layout on macOS in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4503,13 +4503,13 @@ exports[`layout on macOS in a Workspace view on a misspelled word nothing is sel
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4521,7 +4521,7 @@ exports[`layout on macOS in a Workspace view on a misspelled word nothing is sel
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4544,13 +4544,13 @@ exports[`layout on macOS in a Workspace view on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4562,7 +4562,7 @@ exports[`layout on macOS in a Workspace view on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4585,13 +4585,13 @@ exports[`layout on macOS in a Workspace view on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4603,7 +4603,7 @@ exports[`layout on macOS in a Workspace view on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4656,13 +4656,13 @@ exports[`layout on macOS in a Workspace view on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4674,7 +4674,7 @@ exports[`layout on macOS in a Workspace view on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4709,13 +4709,13 @@ exports[`layout on macOS in a Workspace view on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4727,7 +4727,7 @@ exports[`layout on macOS in a Workspace view on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4762,13 +4762,13 @@ exports[`layout on macOS in a Workspace view on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4780,7 +4780,7 @@ exports[`layout on macOS in a Workspace view on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4815,13 +4815,13 @@ exports[`layout on macOS in a Workspace view on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4833,7 +4833,7 @@ exports[`layout on macOS in a Workspace view on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4874,13 +4874,13 @@ exports[`layout on macOS in a Workspace view on an image linked to an email addr
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4892,7 +4892,7 @@ exports[`layout on macOS in a Workspace view on an image linked to an email addr
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4903,13 +4903,13 @@ exports[`layout on macOS in a Workspace view on a video 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4921,7 +4921,7 @@ exports[`layout on macOS in a Workspace view on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -4932,13 +4932,13 @@ exports[`layout on macOS in a Workspace view on a linked video 1`] = `
 [
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -4950,7 +4950,7 @@ exports[`layout on macOS in a Workspace view on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5057,13 +5057,13 @@ exports[`layout on macOS in a Workspace view on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -5075,7 +5075,7 @@ exports[`layout on macOS in a Workspace view on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5098,7 +5098,7 @@ exports[`layout on Windows in an open Gmail message on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5110,7 +5110,7 @@ exports[`layout on Windows in an open Gmail message on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5151,7 +5151,7 @@ exports[`layout on Windows in an open Gmail message on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5163,7 +5163,7 @@ exports[`layout on Windows in an open Gmail message on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5204,7 +5204,7 @@ exports[`layout on Windows in an open Gmail message on selected text that cannot
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5216,7 +5216,7 @@ exports[`layout on Windows in an open Gmail message on selected text that cannot
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5257,7 +5257,7 @@ exports[`layout on Windows in an open Gmail message on selected text with surrou
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5269,7 +5269,7 @@ exports[`layout on Windows in an open Gmail message on selected text with surrou
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5310,7 +5310,7 @@ exports[`layout on Windows in an open Gmail message on selected text with an amp
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5322,7 +5322,7 @@ exports[`layout on Windows in an open Gmail message on selected text with an amp
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5363,7 +5363,7 @@ exports[`layout on Windows in an open Gmail message on selected text of 25 chara
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5375,7 +5375,7 @@ exports[`layout on Windows in an open Gmail message on selected text of 25 chara
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5416,7 +5416,7 @@ exports[`layout on Windows in an open Gmail message on selected text of 26 chara
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5428,7 +5428,7 @@ exports[`layout on Windows in an open Gmail message on selected text of 26 chara
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5469,7 +5469,7 @@ exports[`layout on Windows in an open Gmail message on selected text with an amp
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5481,7 +5481,7 @@ exports[`layout on Windows in an open Gmail message on selected text with an amp
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5534,7 +5534,7 @@ exports[`layout on Windows in an open Gmail message on selected text on a link 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5546,7 +5546,7 @@ exports[`layout on Windows in an open Gmail message on selected text on a link 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5605,7 +5605,7 @@ exports[`layout on Windows in an open Gmail message on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5617,7 +5617,7 @@ exports[`layout on Windows in an open Gmail message on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5664,7 +5664,7 @@ exports[`layout on Windows in an open Gmail message on an empty text field 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5676,7 +5676,7 @@ exports[`layout on Windows in an open Gmail message on an empty text field 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5735,7 +5735,7 @@ exports[`layout on Windows in an open Gmail message on a text field with nothing
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5747,7 +5747,7 @@ exports[`layout on Windows in an open Gmail message on a text field with nothing
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5830,7 +5830,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5842,7 +5842,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -5937,7 +5937,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word with se
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -5949,7 +5949,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word with se
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6032,7 +6032,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word without
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6044,7 +6044,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word without
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6085,7 +6085,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word outside
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6097,7 +6097,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word outside
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6150,7 +6150,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word outside
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6162,7 +6162,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word outside
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6209,7 +6209,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word nothing
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6221,7 +6221,7 @@ exports[`layout on Windows in an open Gmail message on a misspelled word nothing
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6256,7 +6256,7 @@ exports[`layout on Windows in an open Gmail message on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6268,7 +6268,7 @@ exports[`layout on Windows in an open Gmail message on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6303,7 +6303,7 @@ exports[`layout on Windows in an open Gmail message on a link without text 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6315,7 +6315,7 @@ exports[`layout on Windows in an open Gmail message on a link without text 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6374,7 +6374,7 @@ exports[`layout on Windows in an open Gmail message on a link in a text field 1`
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6386,7 +6386,7 @@ exports[`layout on Windows in an open Gmail message on a link in a text field 1`
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6433,7 +6433,7 @@ exports[`layout on Windows in an open Gmail message on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6445,7 +6445,7 @@ exports[`layout on Windows in an open Gmail message on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6492,7 +6492,7 @@ exports[`layout on Windows in an open Gmail message on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6504,7 +6504,7 @@ exports[`layout on Windows in an open Gmail message on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6551,7 +6551,7 @@ exports[`layout on Windows in an open Gmail message on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6563,7 +6563,7 @@ exports[`layout on Windows in an open Gmail message on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6616,7 +6616,7 @@ exports[`layout on Windows in an open Gmail message on an image linked to an ema
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6628,7 +6628,7 @@ exports[`layout on Windows in an open Gmail message on an image linked to an ema
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6651,7 +6651,7 @@ exports[`layout on Windows in an open Gmail message on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6663,7 +6663,7 @@ exports[`layout on Windows in an open Gmail message on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6686,7 +6686,7 @@ exports[`layout on Windows in an open Gmail message on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6698,7 +6698,7 @@ exports[`layout on Windows in an open Gmail message on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6811,7 +6811,7 @@ exports[`layout on Windows in an open Gmail message on everything at once 1`] = 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -6823,7 +6823,7 @@ exports[`layout on Windows in an open Gmail message on everything at once 1`] = 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6846,7 +6846,7 @@ exports[`layout on Windows in Gmail on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6887,7 +6887,7 @@ exports[`layout on Windows in Gmail on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6928,7 +6928,7 @@ exports[`layout on Windows in Gmail on selected text that cannot be copied 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -6969,7 +6969,7 @@ exports[`layout on Windows in Gmail on selected text with surrounding space 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7010,7 +7010,7 @@ exports[`layout on Windows in Gmail on selected text with an ampersand 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7051,7 +7051,7 @@ exports[`layout on Windows in Gmail on selected text of 25 characters 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7092,7 +7092,7 @@ exports[`layout on Windows in Gmail on selected text of 26 characters 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7133,7 +7133,7 @@ exports[`layout on Windows in Gmail on selected text with an ampersand past the 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7186,7 +7186,7 @@ exports[`layout on Windows in Gmail on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7245,7 +7245,7 @@ exports[`layout on Windows in Gmail on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7292,7 +7292,7 @@ exports[`layout on Windows in Gmail on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7351,7 +7351,7 @@ exports[`layout on Windows in Gmail on a text field with nothing it can do 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7434,7 +7434,7 @@ exports[`layout on Windows in Gmail on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7529,7 +7529,7 @@ exports[`layout on Windows in Gmail on a misspelled word with several suggestion
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7612,7 +7612,7 @@ exports[`layout on Windows in Gmail on a misspelled word without suggestions 1`]
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7653,7 +7653,7 @@ exports[`layout on Windows in Gmail on a misspelled word outside a text field 1`
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7706,7 +7706,7 @@ exports[`layout on Windows in Gmail on a misspelled word outside a text field wi
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7753,7 +7753,7 @@ exports[`layout on Windows in Gmail on a misspelled word nothing is selected on 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7788,7 +7788,7 @@ exports[`layout on Windows in Gmail on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7823,7 +7823,7 @@ exports[`layout on Windows in Gmail on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7882,7 +7882,7 @@ exports[`layout on Windows in Gmail on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7929,7 +7929,7 @@ exports[`layout on Windows in Gmail on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -7976,7 +7976,7 @@ exports[`layout on Windows in Gmail on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8023,7 +8023,7 @@ exports[`layout on Windows in Gmail on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8076,7 +8076,7 @@ exports[`layout on Windows in Gmail on an image linked to an email address 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8099,7 +8099,7 @@ exports[`layout on Windows in Gmail on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8122,7 +8122,7 @@ exports[`layout on Windows in Gmail on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8235,7 +8235,7 @@ exports[`layout on Windows in Gmail on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8258,13 +8258,13 @@ exports[`layout on Windows in a Workspace view on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8276,7 +8276,7 @@ exports[`layout on Windows in a Workspace view on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8317,13 +8317,13 @@ exports[`layout on Windows in a Workspace view on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8335,7 +8335,7 @@ exports[`layout on Windows in a Workspace view on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8376,13 +8376,13 @@ exports[`layout on Windows in a Workspace view on selected text that cannot be c
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8394,7 +8394,7 @@ exports[`layout on Windows in a Workspace view on selected text that cannot be c
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8435,13 +8435,13 @@ exports[`layout on Windows in a Workspace view on selected text with surrounding
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8453,7 +8453,7 @@ exports[`layout on Windows in a Workspace view on selected text with surrounding
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8494,13 +8494,13 @@ exports[`layout on Windows in a Workspace view on selected text with an ampersan
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8512,7 +8512,7 @@ exports[`layout on Windows in a Workspace view on selected text with an ampersan
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8553,13 +8553,13 @@ exports[`layout on Windows in a Workspace view on selected text of 25 characters
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8571,7 +8571,7 @@ exports[`layout on Windows in a Workspace view on selected text of 25 characters
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8612,13 +8612,13 @@ exports[`layout on Windows in a Workspace view on selected text of 26 characters
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8630,7 +8630,7 @@ exports[`layout on Windows in a Workspace view on selected text of 26 characters
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8671,13 +8671,13 @@ exports[`layout on Windows in a Workspace view on selected text with an ampersan
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8689,7 +8689,7 @@ exports[`layout on Windows in a Workspace view on selected text with an ampersan
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8742,13 +8742,13 @@ exports[`layout on Windows in a Workspace view on selected text on a link 1`] = 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8760,7 +8760,7 @@ exports[`layout on Windows in a Workspace view on selected text on a link 1`] = 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8819,13 +8819,13 @@ exports[`layout on Windows in a Workspace view on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8837,7 +8837,7 @@ exports[`layout on Windows in a Workspace view on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8884,13 +8884,13 @@ exports[`layout on Windows in a Workspace view on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8902,7 +8902,7 @@ exports[`layout on Windows in a Workspace view on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -8961,13 +8961,13 @@ exports[`layout on Windows in a Workspace view on a text field with nothing it c
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -8979,7 +8979,7 @@ exports[`layout on Windows in a Workspace view on a text field with nothing it c
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9062,13 +9062,13 @@ exports[`layout on Windows in a Workspace view on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9080,7 +9080,7 @@ exports[`layout on Windows in a Workspace view on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9175,13 +9175,13 @@ exports[`layout on Windows in a Workspace view on a misspelled word with several
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9193,7 +9193,7 @@ exports[`layout on Windows in a Workspace view on a misspelled word with several
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9276,13 +9276,13 @@ exports[`layout on Windows in a Workspace view on a misspelled word without sugg
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9294,7 +9294,7 @@ exports[`layout on Windows in a Workspace view on a misspelled word without sugg
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9335,13 +9335,13 @@ exports[`layout on Windows in a Workspace view on a misspelled word outside a te
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9353,7 +9353,7 @@ exports[`layout on Windows in a Workspace view on a misspelled word outside a te
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9406,13 +9406,13 @@ exports[`layout on Windows in a Workspace view on a misspelled word outside a te
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9424,7 +9424,7 @@ exports[`layout on Windows in a Workspace view on a misspelled word outside a te
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9471,13 +9471,13 @@ exports[`layout on Windows in a Workspace view on a misspelled word nothing is s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9489,7 +9489,7 @@ exports[`layout on Windows in a Workspace view on a misspelled word nothing is s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9524,13 +9524,13 @@ exports[`layout on Windows in a Workspace view on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9542,7 +9542,7 @@ exports[`layout on Windows in a Workspace view on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9577,13 +9577,13 @@ exports[`layout on Windows in a Workspace view on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9595,7 +9595,7 @@ exports[`layout on Windows in a Workspace view on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9654,13 +9654,13 @@ exports[`layout on Windows in a Workspace view on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9672,7 +9672,7 @@ exports[`layout on Windows in a Workspace view on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9719,13 +9719,13 @@ exports[`layout on Windows in a Workspace view on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9737,7 +9737,7 @@ exports[`layout on Windows in a Workspace view on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9784,13 +9784,13 @@ exports[`layout on Windows in a Workspace view on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9802,7 +9802,7 @@ exports[`layout on Windows in a Workspace view on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9849,13 +9849,13 @@ exports[`layout on Windows in a Workspace view on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9867,7 +9867,7 @@ exports[`layout on Windows in a Workspace view on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9920,13 +9920,13 @@ exports[`layout on Windows in a Workspace view on an image linked to an email ad
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9938,7 +9938,7 @@ exports[`layout on Windows in a Workspace view on an image linked to an email ad
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -9961,13 +9961,13 @@ exports[`layout on Windows in a Workspace view on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -9979,7 +9979,7 @@ exports[`layout on Windows in a Workspace view on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10002,13 +10002,13 @@ exports[`layout on Windows in a Workspace view on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -10020,7 +10020,7 @@ exports[`layout on Windows in a Workspace view on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10133,13 +10133,13 @@ exports[`layout on Windows in a Workspace view on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -10151,7 +10151,7 @@ exports[`layout on Windows in a Workspace view on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10174,7 +10174,7 @@ exports[`layout on Linux in an open Gmail message on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10186,7 +10186,7 @@ exports[`layout on Linux in an open Gmail message on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10227,7 +10227,7 @@ exports[`layout on Linux in an open Gmail message on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10239,7 +10239,7 @@ exports[`layout on Linux in an open Gmail message on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10280,7 +10280,7 @@ exports[`layout on Linux in an open Gmail message on selected text that cannot b
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10292,7 +10292,7 @@ exports[`layout on Linux in an open Gmail message on selected text that cannot b
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10333,7 +10333,7 @@ exports[`layout on Linux in an open Gmail message on selected text with surround
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10345,7 +10345,7 @@ exports[`layout on Linux in an open Gmail message on selected text with surround
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10386,7 +10386,7 @@ exports[`layout on Linux in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10398,7 +10398,7 @@ exports[`layout on Linux in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10439,7 +10439,7 @@ exports[`layout on Linux in an open Gmail message on selected text of 25 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10451,7 +10451,7 @@ exports[`layout on Linux in an open Gmail message on selected text of 25 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10492,7 +10492,7 @@ exports[`layout on Linux in an open Gmail message on selected text of 26 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10504,7 +10504,7 @@ exports[`layout on Linux in an open Gmail message on selected text of 26 charact
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10545,7 +10545,7 @@ exports[`layout on Linux in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10557,7 +10557,7 @@ exports[`layout on Linux in an open Gmail message on selected text with an amper
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10610,7 +10610,7 @@ exports[`layout on Linux in an open Gmail message on selected text on a link 1`]
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10622,7 +10622,7 @@ exports[`layout on Linux in an open Gmail message on selected text on a link 1`]
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10681,7 +10681,7 @@ exports[`layout on Linux in an open Gmail message on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10693,7 +10693,7 @@ exports[`layout on Linux in an open Gmail message on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10740,7 +10740,7 @@ exports[`layout on Linux in an open Gmail message on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10752,7 +10752,7 @@ exports[`layout on Linux in an open Gmail message on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10811,7 +10811,7 @@ exports[`layout on Linux in an open Gmail message on a text field with nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10823,7 +10823,7 @@ exports[`layout on Linux in an open Gmail message on a text field with nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -10906,7 +10906,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -10918,7 +10918,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11013,7 +11013,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word with seve
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11025,7 +11025,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word with seve
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11108,7 +11108,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word without s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11120,7 +11120,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word without s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11161,7 +11161,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11173,7 +11173,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11226,7 +11226,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11238,7 +11238,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word outside a
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11285,7 +11285,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11297,7 +11297,7 @@ exports[`layout on Linux in an open Gmail message on a misspelled word nothing i
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11332,7 +11332,7 @@ exports[`layout on Linux in an open Gmail message on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11344,7 +11344,7 @@ exports[`layout on Linux in an open Gmail message on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11379,7 +11379,7 @@ exports[`layout on Linux in an open Gmail message on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11391,7 +11391,7 @@ exports[`layout on Linux in an open Gmail message on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11450,7 +11450,7 @@ exports[`layout on Linux in an open Gmail message on a link in a text field 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11462,7 +11462,7 @@ exports[`layout on Linux in an open Gmail message on a link in a text field 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11509,7 +11509,7 @@ exports[`layout on Linux in an open Gmail message on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11521,7 +11521,7 @@ exports[`layout on Linux in an open Gmail message on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11568,7 +11568,7 @@ exports[`layout on Linux in an open Gmail message on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11580,7 +11580,7 @@ exports[`layout on Linux in an open Gmail message on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11627,7 +11627,7 @@ exports[`layout on Linux in an open Gmail message on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11639,7 +11639,7 @@ exports[`layout on Linux in an open Gmail message on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11692,7 +11692,7 @@ exports[`layout on Linux in an open Gmail message on an image linked to an email
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11704,7 +11704,7 @@ exports[`layout on Linux in an open Gmail message on an image linked to an email
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11727,7 +11727,7 @@ exports[`layout on Linux in an open Gmail message on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11739,7 +11739,7 @@ exports[`layout on Linux in an open Gmail message on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11762,7 +11762,7 @@ exports[`layout on Linux in an open Gmail message on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11774,7 +11774,7 @@ exports[`layout on Linux in an open Gmail message on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11887,7 +11887,7 @@ exports[`layout on Linux in an open Gmail message on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "copyMessageLink",
     "label": "Copy Message Link",
     "type": undefined,
   },
@@ -11899,7 +11899,7 @@ exports[`layout on Linux in an open Gmail message on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11922,7 +11922,7 @@ exports[`layout on Linux in Gmail on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -11963,7 +11963,7 @@ exports[`layout on Linux in Gmail on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12004,7 +12004,7 @@ exports[`layout on Linux in Gmail on selected text that cannot be copied 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12045,7 +12045,7 @@ exports[`layout on Linux in Gmail on selected text with surrounding space 1`] = 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12086,7 +12086,7 @@ exports[`layout on Linux in Gmail on selected text with an ampersand 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12127,7 +12127,7 @@ exports[`layout on Linux in Gmail on selected text of 25 characters 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12168,7 +12168,7 @@ exports[`layout on Linux in Gmail on selected text of 26 characters 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12209,7 +12209,7 @@ exports[`layout on Linux in Gmail on selected text with an ampersand past the cu
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12262,7 +12262,7 @@ exports[`layout on Linux in Gmail on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12321,7 +12321,7 @@ exports[`layout on Linux in Gmail on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12368,7 +12368,7 @@ exports[`layout on Linux in Gmail on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12427,7 +12427,7 @@ exports[`layout on Linux in Gmail on a text field with nothing it can do 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12510,7 +12510,7 @@ exports[`layout on Linux in Gmail on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12605,7 +12605,7 @@ exports[`layout on Linux in Gmail on a misspelled word with several suggestions 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12688,7 +12688,7 @@ exports[`layout on Linux in Gmail on a misspelled word without suggestions 1`] =
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12729,7 +12729,7 @@ exports[`layout on Linux in Gmail on a misspelled word outside a text field 1`] 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12782,7 +12782,7 @@ exports[`layout on Linux in Gmail on a misspelled word outside a text field with
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12829,7 +12829,7 @@ exports[`layout on Linux in Gmail on a misspelled word nothing is selected on 1`
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12864,7 +12864,7 @@ exports[`layout on Linux in Gmail on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12899,7 +12899,7 @@ exports[`layout on Linux in Gmail on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -12958,7 +12958,7 @@ exports[`layout on Linux in Gmail on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13005,7 +13005,7 @@ exports[`layout on Linux in Gmail on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13052,7 +13052,7 @@ exports[`layout on Linux in Gmail on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13099,7 +13099,7 @@ exports[`layout on Linux in Gmail on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13152,7 +13152,7 @@ exports[`layout on Linux in Gmail on an image linked to an email address 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13175,7 +13175,7 @@ exports[`layout on Linux in Gmail on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13198,7 +13198,7 @@ exports[`layout on Linux in Gmail on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13311,7 +13311,7 @@ exports[`layout on Linux in Gmail on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13334,13 +13334,13 @@ exports[`layout on Linux in a Workspace view on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13352,7 +13352,7 @@ exports[`layout on Linux in a Workspace view on a page 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13393,13 +13393,13 @@ exports[`layout on Linux in a Workspace view on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13411,7 +13411,7 @@ exports[`layout on Linux in a Workspace view on selected text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13452,13 +13452,13 @@ exports[`layout on Linux in a Workspace view on selected text that cannot be cop
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13470,7 +13470,7 @@ exports[`layout on Linux in a Workspace view on selected text that cannot be cop
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13511,13 +13511,13 @@ exports[`layout on Linux in a Workspace view on selected text with surrounding s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13529,7 +13529,7 @@ exports[`layout on Linux in a Workspace view on selected text with surrounding s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13570,13 +13570,13 @@ exports[`layout on Linux in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13588,7 +13588,7 @@ exports[`layout on Linux in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13629,13 +13629,13 @@ exports[`layout on Linux in a Workspace view on selected text of 25 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13647,7 +13647,7 @@ exports[`layout on Linux in a Workspace view on selected text of 25 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13688,13 +13688,13 @@ exports[`layout on Linux in a Workspace view on selected text of 26 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13706,7 +13706,7 @@ exports[`layout on Linux in a Workspace view on selected text of 26 characters 1
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13747,13 +13747,13 @@ exports[`layout on Linux in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13765,7 +13765,7 @@ exports[`layout on Linux in a Workspace view on selected text with an ampersand 
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13818,13 +13818,13 @@ exports[`layout on Linux in a Workspace view on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13836,7 +13836,7 @@ exports[`layout on Linux in a Workspace view on selected text on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13895,13 +13895,13 @@ exports[`layout on Linux in a Workspace view on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13913,7 +13913,7 @@ exports[`layout on Linux in a Workspace view on a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -13960,13 +13960,13 @@ exports[`layout on Linux in a Workspace view on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -13978,7 +13978,7 @@ exports[`layout on Linux in a Workspace view on an empty text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14037,13 +14037,13 @@ exports[`layout on Linux in a Workspace view on a text field with nothing it can
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14055,7 +14055,7 @@ exports[`layout on Linux in a Workspace view on a text field with nothing it can
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14138,13 +14138,13 @@ exports[`layout on Linux in a Workspace view on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14156,7 +14156,7 @@ exports[`layout on Linux in a Workspace view on a misspelled word 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14251,13 +14251,13 @@ exports[`layout on Linux in a Workspace view on a misspelled word with several s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14269,7 +14269,7 @@ exports[`layout on Linux in a Workspace view on a misspelled word with several s
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14352,13 +14352,13 @@ exports[`layout on Linux in a Workspace view on a misspelled word without sugges
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14370,7 +14370,7 @@ exports[`layout on Linux in a Workspace view on a misspelled word without sugges
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14411,13 +14411,13 @@ exports[`layout on Linux in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14429,7 +14429,7 @@ exports[`layout on Linux in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14482,13 +14482,13 @@ exports[`layout on Linux in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14500,7 +14500,7 @@ exports[`layout on Linux in a Workspace view on a misspelled word outside a text
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14547,13 +14547,13 @@ exports[`layout on Linux in a Workspace view on a misspelled word nothing is sel
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14565,7 +14565,7 @@ exports[`layout on Linux in a Workspace view on a misspelled word nothing is sel
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14600,13 +14600,13 @@ exports[`layout on Linux in a Workspace view on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14618,7 +14618,7 @@ exports[`layout on Linux in a Workspace view on a link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14653,13 +14653,13 @@ exports[`layout on Linux in a Workspace view on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14671,7 +14671,7 @@ exports[`layout on Linux in a Workspace view on a link without text 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14730,13 +14730,13 @@ exports[`layout on Linux in a Workspace view on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14748,7 +14748,7 @@ exports[`layout on Linux in a Workspace view on a link in a text field 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14795,13 +14795,13 @@ exports[`layout on Linux in a Workspace view on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14813,7 +14813,7 @@ exports[`layout on Linux in a Workspace view on an email link 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14860,13 +14860,13 @@ exports[`layout on Linux in a Workspace view on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14878,7 +14878,7 @@ exports[`layout on Linux in a Workspace view on an image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14925,13 +14925,13 @@ exports[`layout on Linux in a Workspace view on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -14943,7 +14943,7 @@ exports[`layout on Linux in a Workspace view on a linked image 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -14996,13 +14996,13 @@ exports[`layout on Linux in a Workspace view on an image linked to an email addr
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -15014,7 +15014,7 @@ exports[`layout on Linux in a Workspace view on an image linked to an email addr
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -15037,13 +15037,13 @@ exports[`layout on Linux in a Workspace view on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -15055,7 +15055,7 @@ exports[`layout on Linux in a Workspace view on a video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -15078,13 +15078,13 @@ exports[`layout on Linux in a Workspace view on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -15096,7 +15096,7 @@ exports[`layout on Linux in a Workspace view on a linked video 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },
@@ -15209,13 +15209,13 @@ exports[`layout on Linux in a Workspace view on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "pageUrl",
     "label": "Copy URL",
     "type": undefined,
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "browser",
     "label": "Open in Default Browser",
     "type": undefined,
   },
@@ -15227,7 +15227,7 @@ exports[`layout on Linux in a Workspace view on everything at once 1`] = `
   },
   {
     "enabled": undefined,
-    "id": undefined,
+    "id": "inspectElement",
     "label": "Inspect Element",
     "type": undefined,
   },

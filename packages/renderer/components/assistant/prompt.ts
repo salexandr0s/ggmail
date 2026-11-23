@@ -1,7 +1,7 @@
 import {
   ASSISTANT_PROMPT_LIMIT,
   QUOTE_LIMIT,
-  quoteListSchema,
+  assistantQuoteSchema,
   type AssistantQuote,
 } from "@ggmail/shared/assistant";
 
@@ -31,9 +31,15 @@ const quotesKey = "assistant.unsentQuotes";
 
 export function readQuotes(): AssistantQuote[] {
   try {
-    return (
-      quoteListSchema.safeParse(JSON.parse(localStorage.getItem(quotesKey) ?? "[]")).data ?? []
-    );
+    const stored: unknown = JSON.parse(localStorage.getItem(quotesKey) ?? "[]");
+    if (!Array.isArray(stored)) {
+      return [];
+    }
+    // Checked one at a time, so a quote that no longer fits is dropped alone
+    // rather than taking the others with it.
+    return stored
+      .flatMap((quote) => assistantQuoteSchema.safeParse(quote).data ?? [])
+      .slice(0, QUOTE_LIMIT);
   } catch {
     return [];
   }

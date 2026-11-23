@@ -6,6 +6,7 @@ import { canStoreSecrets, readSecret, writeSecret } from "./assistant/connection
 import { taskConnection } from "./google-task-connections";
 import { connectTasks, desktopClient, insertGoogleTask, taskEdits } from "./google-tasks";
 import type { ipc } from "./ipc";
+import { log } from "./lib/log";
 import { createBrowserWindow, getCommonBrowserWindowOptions, loadRenderer } from "./lib/window";
 import { main } from "./main";
 
@@ -31,6 +32,17 @@ const drafts = new Map<
 >();
 export function taskDraftContents() {
   return drafts.keys();
+}
+
+/**
+ * What went wrong, for the log. A file that is not JSON fails with a piece of
+ * its contents in the message, and the file here holds a client secret.
+ */
+function failureReason(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "unknown";
+  }
+  return error instanceof SyntaxError ? error.name : `${error.name}: ${error.message}`;
 }
 
 function clientFile() {
@@ -120,6 +132,21 @@ export function registerTaskDraft(listener: typeof ipc.main) {
       return { error: t`Reopen the email and try again.` };
     }
     const connection = taskConnection(draft.accountId, owner);
+    // Once the request to add the task has left, a failure no longer says
+    // whether Google has the task, and saving again could add it twice.
+    let sent = false;
+    const renewedToken = async (): Promise<{ token?: string; error?: string }> => {
+      try {
+        return { token: await connection.token() };
+      } catch (error) {
+        log.error("Could not renew Google Tasks access", { reason: failureReason(error) });
+        return { error: t`Couldn’t reach Google Tasks. Check your connection and try again.` };
+      }
+    };
+    const expired = () => ({
+      connected: false,
+      error: t`Google Tasks access expired. Connect again to save.`,
+    });
     state.busy = true;
     try {
       if (action === "original") {
@@ -163,6 +190,7 @@ export function registerTaskDraft(listener: typeof ipc.main) {
           owner,
           AbortSignal.any([state.controller.signal, AbortSignal.timeout(300_000)]),
           (url) => shell.openExternal(url),
+          t`You can close this tab and return to ggmail.`,
         );
         if (
           generation !== connection.generation ||
@@ -184,44 +212,60 @@ export function registerTaskDraft(listener: typeof ipc.main) {
       const notes = fields.due
         ? [t`Due date`, fields.due].join(" · ") + "\n\n" + draft.notes
         : draft.notes;
-      let token = await connection.token();
-      if (!token) {
-        return { connected: false };
+      let access = await renewedToken();
+      if (access.error) {
+        return { error: access.error };
+      }
+      if (!access.token) {
+        return expired();
       }
       if (!state.current() || state.controller.signal.aborted) {
         return { error: t`Reopen the email and try again.` };
       }
-      let result = await insertGoogleTask(token, fields, notes);
+      sent = true;
+      let result = await insertGoogleTask(access.token, fields, notes);
       // A 401 definitively rejected the insert. An unknown network outcome must never be replayed.
       if (result.status === 401) {
-        connection.rejectToken(token);
-        token = await connection.token();
-        if (!token) {
-          return { connected: false };
+        sent = false;
+        connection.rejectToken(access.token);
+        access = await renewedToken();
+        if (access.error) {
+          return { error: access.error };
+        }
+        if (!access.token) {
+          return expired();
         }
         if (!state.current() || state.controller.signal.aborted) {
           return { error: t`Reopen the email and try again.` };
         }
-        result = await insertGoogleTask(token, fields, notes);
+        sent = true;
+        result = await insertGoogleTask(access.token, fields, notes);
         if (result.status === 401) {
-          connection.forget(token);
-          return { connected: false };
+          connection.forget(access.token);
+          return expired();
         }
       }
       const { status, url } = result;
       if (status < 200 || status >= 300) {
-        throw new Error("Task save failed");
+        // Google answered and refused, so nothing was added.
+        log.error("Google Tasks refused the task", { status });
+        return { error: t`Google Tasks didn’t save this task. Try again.` };
       }
       const taskUrl = url ?? new URL("https://tasks.google.com/tasks/");
       taskUrl.searchParams.set("authuser", owner);
       state.saved = taskUrl.href;
       return { saved: true };
-    } catch {
+    } catch (error) {
+      log.error("Task draft action failed", { action, sent, reason: failureReason(error) });
+      if (action === "connect") {
+        return {
+          error: t`Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here.`,
+        };
+      }
       return {
-        error:
-          action === "connect"
-            ? t`Couldn’t connect Google Tasks. Check the desktop client and sign in with the email shown here.`
-            : t`Check Google Tasks before retrying the save.`,
+        error: sent
+          ? t`Check Google Tasks before retrying the save.`
+          : t`Reopen the email and try again.`,
       };
     } finally {
       state.busy = false;
