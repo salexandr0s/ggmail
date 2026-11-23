@@ -186,3 +186,7 @@ msgstr "Buscar…"
 #: packages/app/do-not-disturb.ts
 msgid "5 Minutes"
 msgstr "5 minutos"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Remove a quote to add another."
+msgstr "Quita una cita para añadir otra."

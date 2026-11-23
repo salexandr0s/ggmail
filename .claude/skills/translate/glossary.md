@@ -659,6 +659,15 @@ Google's password manager, named in the passkey help: _Passkeys from Chrome, Goo
 - pt-BR: Gerenciador de senhas do Google, capitalized as a name, with its article outside it (_do Gerenciador de senhas do Google_) (Google, Chrome 61/63, Chromium 156.0.8078.49's .xtb files)
 - nl: Google Wachtwoordmanager, capitalized as a name (Google, Chrome 63/63, Chromium 156.0.8078.49's .xtb files)
 
+## Google Tasks
+
+Google's task list, which the task window saves to: _Connect Google Tasks_, _Open in Google Tasks_, _Add to Tasks_. Google's name, so Google's word, read from its own Help page "Learn about Google Tasks" (support.google.com/tasks/answer/7675772 with `hl=<tag>`). A language without a line keeps _Google Tasks_ and the short form _Tasks_, as Google's Help does in German, French, Italian, both Spanishes, Dutch and Swedish.
+
+- el: decided in the language's run: the catalog writes _Εργασίες Google_, and Google's Help keeps _Google Tasks_ (_Μάθετε σχετικά με το Google Tasks_)
+- pt-BR: Google Tarefas (Google, Help "Saiba mais sobre o Google Tarefas")
+- pl: Lista zadań Google, declined as a Polish name (_Otwórz na Liście zadań Google_), and the short form _Lista zadań_ (Google, Help "Więcej informacji o Liście zadań Google"), also on the sidebar's label, by the user's decision of 2026-11-23; never _Zadania Google_ or the English name
+- ja: Google ToDoリスト, and the short form ToDoリスト (Google, Help "Google ToDo リストの概要"), without the space Google's Help writes inside the name, since this catalog takes no space around Latin text, by the user's decision of 2026-11-23
+
 ## File manager
 
 Linux's file manager, named on the download notification: _Show in your file manager_. It shows only on Linux, so it takes GNOME's word. A language without a line takes GNOME's word for it.

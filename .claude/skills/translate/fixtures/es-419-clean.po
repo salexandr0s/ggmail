@@ -147,3 +147,7 @@ msgstr "Elige ggmail en la carpeta Aplicaciones."
 msgctxt "macOS"
 msgid "Copy Link Addr&ess"
 msgstr "Copiar enlace"
+
+#: packages/renderer/components/assistant/assistant-conversation.tsx
+msgid "Remove a quote to add another."
+msgstr "Quita una cita para agregar otra."
