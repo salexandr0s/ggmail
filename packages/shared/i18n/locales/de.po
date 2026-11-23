@@ -1217,8 +1217,16 @@ msgid "Copy Message Link"
 msgstr "Link zur Nachricht kopieren"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "Empfänger kopieren"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "Antwort kopieren"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "Betreff kopieren"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1261,6 +1269,11 @@ msgstr "Die Protokolle konnten nicht exportiert werden."
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "Die Antwort konnte nicht fertiggestellt werden. Versuche es erneut."
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "Der Entwurf konnte nicht eingefügt werden. Kopiere ihn stattdessen."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1429,6 +1442,10 @@ msgstr "Dunkel"
 msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Dunkel"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "DeepSeek-Modelle können nicht im Internet suchen."
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
@@ -1605,6 +1622,11 @@ msgstr "E-Mail entwerfen"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
 msgstr "E-Mail-Entwurf"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "Antwortentwurf"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -2598,6 +2620,12 @@ msgstr "Menüleistensymbol"
 msgid "Message"
 msgstr "Nachricht"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "Nachricht"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Nachricht an den E-Mail-Assistenten"
@@ -2911,8 +2939,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Zum Schreiben einer E-Mail ein neues Fenster öffnen, statt in Gmail zu schreiben."
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "Öffne eine Antwort in dieser Unterhaltung und versuche es erneut."
 
@@ -3616,6 +3642,10 @@ msgstr "Dateien, Absender oder Betreff suchen"
 msgid "Search results"
 msgstr "Suchergebnisse"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "Im Internet suchen"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3628,6 +3658,14 @@ msgstr "Suche in „{account}“"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Searching {account} · page {page}"
 msgstr "Suche in „{account}“ · Seite {page}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "Suche im Internet"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "Suche im Internet nach „{query}“"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -4230,6 +4268,11 @@ msgstr "Verhindern, dass das App-Fenster kleiner als ein nutzbares Minimum wird.
 msgid "Stop the current reply before asking another question."
 msgstr "Stoppe die aktuelle Antwort, bevor du eine weitere Frage stellst."
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "Betreff"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
 msgstr "Fasse die geöffnete E-Mail zusammen und hebe hervor, was ich wissen sollte."
@@ -4336,6 +4379,10 @@ msgstr "Die Antwort des KI-Anbieters ist zu groß."
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "Der KI-Anbieter hat eine leere Antwort geliefert."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "Der Assistent kann öffentliche Informationen nachschlagen, etwa die Kontaktadresse eines Unternehmens. Die Suche läuft über den ausgewählten Anbieter."
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
@@ -4450,6 +4497,11 @@ msgstr "Titelleiste"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "bis"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "An"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."

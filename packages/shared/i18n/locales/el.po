@@ -1217,8 +1217,16 @@ msgid "Copy Message Link"
 msgstr "Αντιγραφή συνδέσμου μηνύματος"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "Αντιγραφή παραληπτών"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "Αντιγραφή απάντησης"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "Αντιγραφή θέματος"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1261,6 +1269,11 @@ msgstr "Η εξαγωγή των αρχείων καταγραφής απέτυ�
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "Η απάντηση δεν ολοκληρώθηκε. Δοκιμάστε ξανά."
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "Η εισαγωγή του προχείρου μηνύματος απέτυχε. Εναλλακτικά, αντιγράψτε το."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1429,6 +1442,10 @@ msgstr "Σκούρο"
 msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Σκούρο"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "Τα μοντέλα DeepSeek δεν μπορούν να κάνουν αναζήτηση στον ιστό."
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
@@ -1605,6 +1622,11 @@ msgstr "Σύνταξη μηνύματος"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
 msgstr "Πρόχειρο μήνυμα"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "Πρόχειρη απάντηση"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -2598,6 +2620,12 @@ msgstr "Εικονίδιο γραμμής μενού"
 msgid "Message"
 msgstr "Μήνυμα"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "Μήνυμα"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Μήνυμα στον βοηθό αλληλογραφίας"
@@ -2911,8 +2939,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Άνοιγμα νέου παραθύρου για σύνταξη μηνύματος εκτός της κύριας προβολής του Gmail."
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "Ανοίξτε μια απάντηση σε αυτή τη συνομιλία και δοκιμάστε ξανά."
 
@@ -3616,6 +3642,10 @@ msgstr "Αναζήτηση αρχείων, αποστολέων ή θεμάτω�
 msgid "Search results"
 msgstr "Αποτελέσματα αναζήτησης"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "Αναζήτηση στον ιστό"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3628,6 +3658,14 @@ msgstr "Αναζήτηση στον λογαριασμό {account}"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Searching {account} · page {page}"
 msgstr "Αναζήτηση στον λογαριασμό {account} · σελίδα {page}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "Αναζήτηση στον ιστό"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "Αναζήτηση στον ιστό για «{query}»"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -4230,6 +4268,11 @@ msgstr "Διατήρηση ελάχιστου μεγέθους παραθύρο�
 msgid "Stop the current reply before asking another question."
 msgstr "Διακόψτε την τρέχουσα απάντηση πριν υποβάλετε νέα ερώτηση."
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "Θέμα"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
 msgstr "Σύνοψισε το ανοιχτό μήνυμα και επισήμανε όσα πρέπει να γνωρίζω."
@@ -4336,6 +4379,10 @@ msgstr "Η απάντηση του παρόχου τεχνητής νοημοσ�
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "Ο πάροχος τεχνητής νοημοσύνης επέστρεψε κενή απάντηση."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "Ο βοηθός μπορεί να αναζητά δημόσιες πληροφορίες, όπως τη διεύθυνση επικοινωνίας μιας επιχείρησης. Οι αναζητήσεις γίνονται μέσω του επιλεγμένου παρόχου."
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
@@ -4450,6 +4497,11 @@ msgstr "Γραμμή τίτλου"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "έως"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "Προς"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."

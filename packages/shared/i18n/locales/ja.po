@@ -1217,8 +1217,16 @@ msgid "Copy Message Link"
 msgstr "メッセージのリンクをコピー"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "受信者をコピー"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "回答をコピー"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "件名をコピー"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1261,6 +1269,11 @@ msgstr "ログをエクスポートできませんでした。"
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "回答を完了できませんでした。もう一度お試しください。"
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "下書きを挿入できませんでした。代わりにコピーしてください。"
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1429,6 +1442,10 @@ msgstr "ダーク"
 msgctxt "tray icon color"
 msgid "Dark"
 msgstr "ダーク"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "DeepSeekのモデルはウェブを検索できません。"
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
@@ -1605,6 +1622,11 @@ msgstr "メールの下書きを作成"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
 msgstr "メールの下書き"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "返信の下書き"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -2598,6 +2620,12 @@ msgstr "メニューバーアイコン"
 msgid "Message"
 msgstr "メッセージ"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "本文"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "メールアシスタントにメッセージを入力"
@@ -2911,8 +2939,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Gmail内ではなく、新しいウィンドウを開いてメールを作成します。"
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "このスレッドで返信を開き、もう一度お試しください。"
 
@@ -3616,6 +3642,10 @@ msgstr "ファイル、差出人、件名で検索"
 msgid "Search results"
 msgstr "検索結果"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "ウェブ検索"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3628,6 +3658,14 @@ msgstr "{account}を検索中"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Searching {account} · page {page}"
 msgstr "{account}を検索中（{page}ページ目）"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "ウェブを検索中"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "ウェブで“{query}”を検索中"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -4230,6 +4268,11 @@ msgstr "アプリケーションのウィンドウが、使用可能な最小サ
 msgid "Stop the current reply before asking another question."
 msgstr "別の質問をするには、現在の回答を停止してください。"
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "件名"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
 msgstr "開いているメールを要約し、知っておくべき点を挙げてください。"
@@ -4336,6 +4379,10 @@ msgstr "AI プロバイダーからの応答が大きすぎます。"
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "AI プロバイダーから空の応答が返されました。"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "アシスタントは企業の連絡先など、公開されている情報を調べることができます。検索には選択したプロバイダを使用します。"
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
@@ -4450,6 +4497,11 @@ msgstr "タイトルバー"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "〜"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "宛先"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."

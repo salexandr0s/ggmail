@@ -1217,8 +1217,16 @@ msgid "Copy Message Link"
 msgstr "Kopiera meddelandelänk"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "Kopiera mottagare"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "Kopiera svar"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "Kopiera ämne"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1261,6 +1269,11 @@ msgstr "Det gick inte att exportera loggarna."
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "Det gick inte att slutföra svaret. Försök igen."
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "Det gick inte att infoga utkastet. Kopiera det i stället."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1429,6 +1442,10 @@ msgstr "Mörkt"
 msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Mörk"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "DeepSeek-modeller kan inte söka på webben."
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
@@ -1605,6 +1622,11 @@ msgstr "Skriv ett mejlutkast"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
 msgstr "Mejlutkast"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "Svarsutkast"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -2598,6 +2620,12 @@ msgstr "Ikon i menyraden"
 msgid "Message"
 msgstr "Meddelande"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "Meddelande"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Skriv till mejlassistenten"
@@ -2911,8 +2939,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Öppna ett nytt fönster för att skriva ett e-postmeddelande i stället för att skriva i Gmail."
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "Öppna ett svar i den här tråden och försök igen."
 
@@ -3616,6 +3642,10 @@ msgstr "Sök efter filer, avsändare eller ämnen"
 msgid "Search results"
 msgstr "Sökresultat"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "Sök på webben"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3628,6 +3658,14 @@ msgstr "Söker i {account}"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Searching {account} · page {page}"
 msgstr "Söker i {account} · sida {page}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "Söker på webben"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "Söker på webben efter ”{query}”"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -4230,6 +4268,11 @@ msgstr "Förhindra att appfönstret görs mindre än en användbar minsta storle
 msgid "Stop the current reply before asking another question."
 msgstr "Stoppa det pågående svaret innan du ställer en ny fråga."
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "Ämne"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
 msgstr "Sammanfatta det öppna mejlet och lyft fram det jag behöver veta."
@@ -4336,6 +4379,10 @@ msgstr "AI-leverantören gav ett för stort svar."
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "AI-leverantören gav ett tomt svar."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "Låt assistenten slå upp offentliga uppgifter, till exempel ett företags kontaktadress. Sökningarna görs via den valda leverantören."
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
@@ -4450,6 +4497,11 @@ msgstr "Namnlist"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "till"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "Till"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."

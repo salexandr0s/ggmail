@@ -1217,8 +1217,16 @@ msgid "Copy Message Link"
 msgstr "Berichtlink kopiëren"
 
 #: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy recipients"
+msgstr "Kopieer ontvangers"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Copy reply"
 msgstr "Antwoord kopiëren"
+
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Copy subject"
+msgstr "Kopieer onderwerp"
 
 #. Copies the address of the page open in a Google Workspace app; an item in the app's page context menu and its tab's context menu
 #: packages/app/context-menu.ts
@@ -1261,6 +1269,11 @@ msgstr "De logboeken kunnen niet worden geëxporteerd."
 #: packages/app/assistant/chat.ts
 msgid "Couldn't finish the reply. Try again."
 msgstr "Het antwoord kon niet worden voltooid. Probeer het opnieuw."
+
+#: packages/app/assistant/ipc.ts
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Couldn't insert the draft. Copy it instead."
+msgstr "Het concept kan niet worden ingevoegd. Kopieer het in plaats daarvan."
 
 #: packages/renderer/routes/settings/extensions.tsx
 msgid "Couldn't install {extensionName}"
@@ -1429,6 +1442,10 @@ msgstr "Donker"
 msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Donker"
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "DeepSeek-modellen kunnen niet op het web zoeken."
 
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
@@ -1605,6 +1622,11 @@ msgstr "E-mail opstellen"
 #: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Draft email"
 msgstr "Conceptbericht"
+
+#. Label for a suggested reply to the open email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Draft reply"
+msgstr "Conceptantwoord"
 
 #: packages/renderer/components/app-picker.tsx
 #: packages/renderer/routes/settings/accounts.tsx
@@ -2598,6 +2620,12 @@ msgstr "Pictogram in menubalk"
 msgid "Message"
 msgstr "Bericht"
 
+#. Label of the body text of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgctxt "draft"
+msgid "Message"
+msgstr "Bericht"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Message the mail assistant"
 msgstr "Bericht aan de e-mailassistent"
@@ -2911,8 +2939,6 @@ msgid "Open a new window to compose an email, instead of composing inside Gmail.
 msgstr "Open een nieuw venster om een e-mail op te stellen, in plaats van in Gmail zelf."
 
 #: packages/app/assistant/insert-reply.ts
-#: packages/app/assistant/ipc.ts
-#: packages/renderer/components/assistant/assistant-reply.tsx
 msgid "Open a reply in this thread and try again."
 msgstr "Open een antwoord in dit gesprek en probeer het opnieuw."
 
@@ -3616,6 +3642,10 @@ msgstr "Zoek naar bestanden, afzenders of onderwerpen"
 msgid "Search results"
 msgstr "Zoekresultaten"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "Zoek op het web"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -3628,6 +3658,14 @@ msgstr "Zoeken in {account}"
 #: packages/renderer/components/assistant/assistant-activity.tsx
 msgid "Searching {account} · page {page}"
 msgstr "Zoeken in {account} · pagina {page}"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web"
+msgstr "Zoeken op het web"
+
+#: packages/renderer/components/assistant/assistant-activity.tsx
+msgid "Searching the web for “{query}”"
+msgstr "Zoeken op het web naar ‘{query}’"
 
 #: packages/renderer/components/unified-search.tsx
 msgid "Searching…"
@@ -4230,6 +4268,11 @@ msgstr "Voorkom dat het app-venster kleiner wordt gemaakt dan een bruikbaar mini
 msgid "Stop the current reply before asking another question."
 msgstr "Stop het huidige antwoord voordat je een nieuwe vraag stelt."
 
+#. Label of the subject of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "Subject"
+msgstr "Onderwerp"
+
 #: packages/renderer/components/assistant/assistant-conversation.tsx
 msgid "Summarize the open email and highlight anything I should know."
 msgstr "Vat de geopende e-mail samen en geef aan wat ik moet weten."
@@ -4336,6 +4379,10 @@ msgstr "Het antwoord van de AI-aanbieder is te groot."
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "De AI-aanbieder gaf een leeg antwoord."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "De assistent kan openbare gegevens opzoeken, zoals het contactadres van een bedrijf. Zoekopdrachten lopen via de geselecteerde aanbieder."
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
@@ -4450,6 +4497,11 @@ msgstr "Titelbalk"
 #: packages/renderer/routes/settings/notifications.tsx
 msgid "to"
 msgstr "tot"
+
+#. Label of the recipients of a suggested email
+#: packages/renderer/components/assistant/assistant-reply.tsx
+msgid "To"
+msgstr "Aan"
 
 #: packages/renderer/components/follow-ups.tsx
 msgid "To schedule a follow-up, open a sent conversation in Gmail and return here."
