@@ -66,7 +66,9 @@ When you’ve sent the last message and need an answer, open that conversation a
 
 Connect a provider in **Settings → AI**. You can use a ChatGPT subscription, a signed-in Claude Code CLI session, or an API key for Claude, OpenAI or DeepSeek. When you ask a question, your chosen provider receives the chat and relevant mail.
 
-Open an email and select **Mail assistant** in the title bar. Ask what the sender needs, open a citation to check the original wording, or ask for a draft. **Insert into reply** puts the draft into the Gmail thread for you to edit and send.
+Open an email and select **Mail assistant** in the title bar. Ask what the sender needs, open a citation to check the original wording, or ask for a draft. **Insert into reply** puts the draft into the Gmail thread for you to edit and send. For a new email, **Open in Gmail** fills in the recipients, subject and message.
+
+With OpenAI, ChatGPT and Claude models, the assistant can search the web for public details, such as a business’s contact address. Turn this off with **Search the web** in **Settings → AI**.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/mail-assistant-dark.png">

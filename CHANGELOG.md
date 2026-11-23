@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.65.11 — 2026-11-23
 
 - Right-click a message or selected text for mail actions, **Add to Tasks**, **Add to Calendar** and **Quote to assistant**. Selected text can be saved to Google Tasks from a draft window, and quoted passages attach to your next assistant prompt.
 - Removing an account switches to the next one before its saved data is cleared. The dock badge and tray count update when an account is removed or turned off.
