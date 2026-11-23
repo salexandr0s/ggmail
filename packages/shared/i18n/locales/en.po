@@ -1443,6 +1443,10 @@ msgctxt "tray icon color"
 msgid "Dark"
 msgstr "Dark"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "DeepSeek models can't search the web."
+msgstr "DeepSeek models can't search the web."
+
 #: packages/renderer/components/assistant/effort-picker.tsx
 msgid "Default"
 msgstr "Default"
@@ -3638,6 +3642,10 @@ msgstr "Search files, senders, or subjects"
 msgid "Search results"
 msgstr "Search results"
 
+#: packages/renderer/routes/settings/ai.tsx
+msgid "Search the web"
+msgstr "Search the web"
+
 #. Placeholder of the emoji picker's search field
 #: packages/renderer/components/emoji-picker-button.tsx
 msgid "Search…"
@@ -4371,6 +4379,10 @@ msgstr "The AI provider returned a response that is too large."
 #: packages/app/assistant/responses.ts
 msgid "The AI provider returned an empty response."
 msgstr "The AI provider returned an empty response."
+
+#: packages/renderer/routes/settings/ai.tsx
+msgid "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
+msgstr "The assistant can look up public details, such as a business's contact address. Searches run through the selected provider."
 
 #: packages/app/assistant/chat.ts
 msgid "The assistant couldn't finish the mail request. Try a narrower question."
