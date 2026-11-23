@@ -29,6 +29,9 @@
   --color-toolbar: var(--toolbar);
   --color-warning: var(--warning);
   --color-warning-surface: var(--warning-surface);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-overlay: var(--overlay);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -55,6 +58,9 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --font-sans: "Roboto Variable", Roboto, Arial, sans-serif;
+  --shadow-popover: var(--elevation-popover);
+  --shadow-dialog: var(--elevation-dialog);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root,
@@ -70,6 +76,17 @@
   --selected-foreground: #001d35;
   --warning: #805400;
   --warning-surface: #fff3d9;
+  --success: #146c2e;
+  --success-surface: #e6f4ea;
+  /* The dimmed page behind a dialog or sheet. */
+  --overlay: rgb(0 0 0 / 0.32);
+  --elevation-popover: 0 1px 2px rgb(60 64 67 / 0.3), 0 2px 6px 2px rgb(60 64 67 / 0.15);
+  --elevation-dialog: 0 1px 3px rgb(60 64 67 / 0.3), 0 4px 8px 3px rgb(60 64 67 / 0.15);
+  /* The halo around a focused control, for stylesheets that cannot use the `focus-ring` utility. */
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--ring) 35%, transparent);
+  --duration-fast: 120ms;
+  --duration-base: 160ms;
+  --duration-slow: 220ms;
   --background: #ffffff;
   --foreground: #1f1f1f;
   --card: #ffffff;
@@ -116,6 +133,11 @@
   --selected-foreground: #ffffff;
   --warning: #f3c46c;
   --warning-surface: #3c3223;
+  --success: #81c995;
+  --success-surface: #1b3524;
+  --overlay: rgb(0 0 0 / 0.56);
+  --elevation-popover: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 6px 2px rgb(0 0 0 / 0.3);
+  --elevation-dialog: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 8px 3px rgb(0 0 0 / 0.3);
   --background: #131313;
   --foreground: #ffffff;
   --card: #131313;
@@ -170,6 +192,31 @@
   textarea {
     @apply cursor-text;
   }
+}
+
+/* Someone who has asked the system for less motion gets state changes without the travel. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * One focus indicator for every control: the border takes the ring colour and
+ * a soft halo sits outside it. `focus-ring-inset` is for rows that fill their
+ * container edge to edge, where a halo would be clipped.
+ */
+@utility focus-ring {
+  @apply outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/35;
+}
+
+@utility focus-ring-inset {
+  @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset;
 }
 
 @utility draggable {
